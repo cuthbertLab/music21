@@ -109,7 +109,7 @@ These are unfortunately not usually indicated in the scores themselves
 Music21 currently supports one flavor type, ``JRP`` for Stanford's
 Josquin Research Project, which interprets dots on tuplets differently
 from other parts of the Humdrum community (in a way that is more typically
-seen in early music).  Switch ``music21.humdrum.flavors['JRP'] = True` to
+seen in early music).  Switch ``music21.humdrum.flavors['JRP'] = True`` to
 get that behavior before parsing.
 '''
 
@@ -1307,35 +1307,6 @@ class HumdrumSpine(prebase.ProtoM21Object):
 
         return streamOut
 
-    @staticmethod
-    def extractDuration(eventC: str) -> tuple[str, str]:
-        '''
-        Extract duration characters from a token, returning what is left.
-
-        >>> humdrum.spineParser.KernSpine.extractDuration('2cc.')
-        ('2.', 'cc')
-
-        available on all Humdrum spines, since they might need duration
-        information from other spines.
-
-        >>> humdrum.spineParser.HumdrumSpine.extractDuration('3%2D')
-        ('3%2', 'D')
-        >>> humdrum.spineParser.HarmSpine.extractDuration('B#')
-        ('', 'B#')
-
-        For ``**kern``, this routine should be run separately for each component of a chord.
-
-        New in v11.
-        '''
-        d = []
-        remain = []
-        for c in eventC:
-            if c in '0123456789.%':
-                d.append(c)
-            else:
-                remain.append(c)
-        return (''.join(d), ''.join(remain))
-
     def parse(self) -> None:
         '''
         Dummy method that pushes all these objects to HumdrumSpine.stream
@@ -1487,7 +1458,7 @@ class KernSpine(HumdrumSpine):
         firstDuration: duration.Duration|None = None
         firstDurationChars = ''
         for noteToProcess in notesToProcess:
-            durationChars, bareContents = self.extractDuration(noteToProcess)
+            durationChars, bareContents = extractDuration(noteToProcess)
             if firstDuration is not None and durationChars in ('', firstDurationChars):
                 thisNote = hdStringToNote(bareContents, overrideDuration=firstDuration)
             else:
@@ -2297,6 +2268,32 @@ class EventCollection(prebase.ProtoM21Object):
             retEvents.append(self.getSpineOccurring(i))
         return retEvents
 
+
+def extractDuration(eventC: str) -> tuple[str, str]:
+    '''
+    Extract duration characters from a token, returning what is left.
+
+    >>> humdrum.spineParser.extractDuration('2cc.')
+    ('2.', 'cc')
+    >>> humdrum.spineParser.extractDuration('3%2D')
+    ('3%2', 'D')
+    >>> humdrum.spineParser.extractDuration('B#')
+    ('', 'B#')
+
+    For ``**kern``, this routine should be run separately for each component of a chord.
+
+    New in v11.
+    '''
+    d = []
+    remain = []
+    for c in eventC:
+        if c in '0123456789.%':
+            d.append(c)
+        else:
+            remain.append(c)
+    return (''.join(d), ''.join(remain))
+
+
 def hdStringToDuration(contents: str) -> duration.Duration:
     '''
     Convert ``contents`` to a :class:`~music21.duration.Duration` object.
@@ -2577,11 +2574,14 @@ def hdStringToNote(
 
     >>> import warnings
     >>> with warnings.catch_warnings(record=True) as w:
+    ...      warnings.simplefilter('always')  # _DOCS_HIDE
     ...      n = humdrum.spineParser.hdStringToNote('B-')
     ...      n.fullName
     'B-flat in octave 3 Quarter Note'
     >>> w[0].message
-    UserWarning('Could not find a duration in B-, using quarter note.')
+    UserWarning("Could not find a duration in 'B-', using quarter note.")
+
+    * Changed in v11: give a warning if no duration can be found and a quarter default was used.
     '''
     # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern
 
@@ -2590,7 +2590,7 @@ def hdStringToNote(
         d = overrideDuration or hdStringToDuration(contents)
     except HumdrumException:
         d = duration.Duration(1.0)
-        warnings.warn(f'Could not find a duration in {contents}, using quarter note.',
+        warnings.warn(f'Could not find a duration in {contents!r}, using quarter note.',
                       stacklevel=2)
 
     # 3.2.1 Pitches and 3.3 Rests
