@@ -1271,7 +1271,7 @@ class Tuplet(prebase.ProtoM21Object):
 
         '''
         self._checkFrozen()
-        if common.isNum(durType) and not isinstance(durType, str):
+        if not isinstance(durType, str):
             durType = convertQuarterLengthToType(durType)
 
         self.durationActual = durationTupleFromTypeDots(durType, dots)
@@ -1633,7 +1633,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                  /,
                  *,
                  type: str|None = None,  # pylint: disable=redefined-builtin
-                 dots: int|None = 0,
+                 dots: int = 0,
                  quarterLength: OffsetQLIn|None = None,
                  durationTuple: DurationTuple|None = None,
                  components: Iterable[DurationTuple]|None = None,
@@ -1697,6 +1697,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
 
     # SPECIAL METHODS #
+    
     def __eq__(self, other):
         '''
         Two durations are the same if their type, dots, tuplets, and

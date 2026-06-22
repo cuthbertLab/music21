@@ -2590,7 +2590,8 @@ def hdStringToNote(
         d = overrideDuration or hdStringToDuration(contents)
     except HumdrumException:
         d = duration.Duration(1.0)
-        warnings.warn(f'Could not find a duration in {contents}, using quarter note.')
+        warnings.warn(f'Could not find a duration in {contents}, using quarter note.',
+                      stacklevel=2)
 
     # 3.2.1 Pitches and 3.3 Rests
 
