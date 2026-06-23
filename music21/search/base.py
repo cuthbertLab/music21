@@ -19,6 +19,7 @@ from collections.abc import Callable
 import copy
 import difflib
 import math
+import typing as t
 import unittest
 
 from more_itertools import windowed
@@ -81,7 +82,7 @@ class Wildcard(m21Base.Music21Object):
     >>> st1.append(note.Note('D', type='half'))
     >>> st1.append(wc1)
     '''
-    def __init__(self, **keywords):
+    def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
         self.duration = WildcardDuration()
 
@@ -98,7 +99,7 @@ class SearchMatch(namedtuple('SearchMatch', ['elStart', 'els', 'index', 'iterato
         'iterator': '''The iterator which produced these elements.''',
     }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         es = self.elStart
         el = len(self.els)
         ix = self.index
@@ -275,23 +276,93 @@ class StreamSearcher:
 
         return foundEls
 
-    def wildcardAlgorithm(self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object):
+    def wildcardAlgorithm(
+        self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object
+    ) -> bool|None:
         '''
-        An algorithm that supports Wildcards -- added by default to the search function.
+        An algorithm that supports Wildcards -- added by default to the search.
+
+        Every algorithm compares one element taken from the stream being
+        searched, `streamEl`, against the element it is currently lined up with
+        in the `searchList`, `searchEl`.  Both are *single* elements such as
+        Notes, Rests, or Chords -- never Streams.  (The `stream` in `streamEl`
+        is short for "an element drawn *from* the stream being searched"; it is
+        not itself a :class:`~music21.stream.Stream`.)
+
+        An algorithm returns one of three values:
+
+        * True -- it is certain the pair matches; the remaining algorithms are
+          not consulted for this pair.
+        * False -- it is certain the pair does not match; the candidate window
+          fails here.
+        * None -- it has no opinion, so the next algorithm in `self.algorithms`
+          is consulted.
+
+        `wildcardAlgorithm` returns True whenever `searchEl` is a
+        :class:`Wildcard` (which matches any element of the stream) and None
+        otherwise:
+
+        >>> ss = search.StreamSearcher(stream.Stream(), [])
+        >>> ss.wildcardAlgorithm(note.Note('C'), search.Wildcard())
+        True
+        >>> print(ss.wildcardAlgorithm(note.Note('C'), note.Note('D')))
+        None
         '''
         if isinstance(searchEl, Wildcard):
             return True
         else:
             return None
 
-    def rhythmAlgorithm(self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object):
+    def rhythmAlgorithm(
+        self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object
+    ) -> bool|None:
+        '''
+        Compares the rhythm (`duration.quarterLength`) of the stream element
+        `streamEl` against the search element `searchEl`.  See
+        :meth:`wildcardAlgorithm` for what the two arguments are and what the
+        True/False/None return value means.
+
+        Returns True if `searchEl` has a :class:`WildcardDuration` (any rhythm
+        matches), False if the two `quarterLength`s differ, or None when they
+        are equal -- no opinion, so an algorithm such as `noteNameAlgorithm`
+        can still rule on the pitch:
+
+        >>> ss = search.StreamSearcher(stream.Stream(), [])
+        >>> half = note.Note(quarterLength=2.0)
+        >>> alsoHalf = note.Note(quarterLength=2.0)
+        >>> print(ss.rhythmAlgorithm(half, alsoHalf))
+        None
+        >>> quarter = note.Note(quarterLength=1.0)
+        >>> ss.rhythmAlgorithm(half, quarter)
+        False
+        >>> wildRhythm = note.Note()
+        >>> wildRhythm.duration = search.WildcardDuration()
+        >>> ss.rhythmAlgorithm(half, wildRhythm)
+        True
+        '''
         if isinstance(searchEl.duration, WildcardDuration):
             return True
         if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
             return False
         return None
 
-    def noteNameAlgorithm(self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object):
+    def noteNameAlgorithm(
+        self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object
+    ) -> bool|None:
+        '''
+        Compares the `.name` of the stream element `streamEl` against the
+        search element `searchEl`.  See :meth:`wildcardAlgorithm` for what the
+        two arguments are and what the True/False/None return value means.
+
+        Returns False if either element lacks a `.name` or the names differ,
+        and None (no opinion) when the names match:
+
+        >>> ss = search.StreamSearcher(stream.Stream(), [])
+        >>> print(ss.noteNameAlgorithm(note.Note('C'), note.Note('C')))
+        None
+        >>> ss.noteNameAlgorithm(note.Note('C'), note.Note('D'))
+        False
+        '''
         if not hasattr(searchEl, 'name'):
             return False
         if not hasattr(streamEl, 'name'):
@@ -301,7 +372,11 @@ class StreamSearcher:
         return None
 
 
-def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
+def streamSearchBase(
+    thisStreamOrIterator: Stream|iterator.StreamIterator,
+    searchList: t.Sequence[m21Base.Music21Object],
+    algorithm: Callable[[m21Base.Music21Object, m21Base.Music21Object], bool|None]|None = None,
+) -> list[int]:
     '''
     A basic search function that is used by other search mechanisms,
     which takes in a stream or StreamIterator and a searchList or stream
@@ -322,7 +397,7 @@ def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
     if searchLength == 0:
         raise SearchException('the search Stream or list cannot be empty')
 
-    foundEls = []
+    foundEls: list[int] = []
     if searchLength > streamLength:
         return foundEls
 
@@ -330,6 +405,9 @@ def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
         for j in range(searchLength):
             streamEl = streamEls[j]
             searchEl = searchList[j]
+            if streamEl is None:  # pragma: no cover
+                result = False
+                break
             result = algorithm(streamEl, searchEl)
             if not result:
                 break
@@ -338,7 +416,10 @@ def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
     return foundEls
 
 
-def rhythmicSearch(thisStreamOrIterator, searchList):
+def rhythmicSearch(
+    thisStreamOrIterator: Stream|iterator.StreamIterator,
+    searchList: t.Sequence[m21Base.Music21Object],
+) -> list[int]:
     '''
     Takes two streams -- the first is the stream to be searched and the second
     is a stream of elements whose rhythms must match the first.  Returns a list
@@ -427,7 +508,9 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     >>> float(len(term1results)) / len(term2results)
     8.0
     '''
-    def rhythmAlgorithm(streamEl, searchEl):
+    def rhythmAlgorithm(
+        streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object
+    ) -> bool:
         if 'WildcardDuration' in searchEl.duration.classes:
             return True
         if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
@@ -437,7 +520,10 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     return streamSearchBase(thisStreamOrIterator, searchList, algorithm=rhythmAlgorithm)
 
 
-def noteNameSearch(thisStreamOrIterator, searchList):
+def noteNameSearch(
+    thisStreamOrIterator: Stream|iterator.StreamIterator,
+    searchList: t.Sequence[m21Base.Music21Object],
+) -> list[int]:
     # noinspection PyShadowingNames
     '''
     >>> thisStream = converter.parse('tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e')
@@ -450,7 +536,9 @@ def noteNameSearch(thisStreamOrIterator, searchList):
     >>> search.noteNameSearch(thisStreamIter, searchList2)
     [0, 3, 7, 11]
     '''
-    def noteNameAlgorithm(streamEl, searchEl):
+    def noteNameAlgorithm(
+        streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object
+    ) -> bool:
         if 'Wildcard' in searchEl.classes:
             return True
         if not hasattr(searchEl, 'name'):
@@ -465,7 +553,10 @@ def noteNameSearch(thisStreamOrIterator, searchList):
     return streamSearchBase(thisStreamOrIterator, searchList, algorithm=noteNameAlgorithm)
 
 
-def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
+def noteNameRhythmicSearch(
+    thisStreamOrIterator: Stream|iterator.StreamIterator,
+    searchList: t.Sequence[m21Base.Music21Object],
+) -> list[int]:
     # noinspection PyShadowingNames
     '''
     >>> thisStream = converter.parse('tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e')
@@ -481,7 +572,9 @@ def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
     >>> search.noteNameRhythmicSearch(thisStreamIter, searchList)
     [0, 3, 7]
     '''
-    def noteNameRhythmAlgorithm(streamEl, searchEl):
+    def noteNameRhythmAlgorithm(
+        streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object
+    ) -> bool:
         if 'Wildcard' in searchEl.classes:
             return True
         if not hasattr(searchEl, 'name'):
@@ -502,7 +595,9 @@ def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
     return streamSearchBase(thisStreamOrIterator, searchList, algorithm=noteNameRhythmAlgorithm)
 
 
-def approximateNoteSearch(thisStream, otherStreams):
+def approximateNoteSearch(
+    thisStream: Stream, otherStreams: t.Sequence[Stream]
+) -> list[Stream]:
     # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
@@ -531,14 +626,16 @@ def approximateNoteSearch(thisStream, otherStreams):
         sn = s.flatten().notesAndRests
         thatStreamStr = translateStreamToString(sn)
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
-        s.matchProbability = ratio
+        s.matchProbability = ratio  # type: ignore[attr-defined]
         sorterList.append((ratio, s))
     sortedList = sorted(sorterList, key=lambda x: 1 - x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
 
-def approximateNoteSearchNoRhythm(thisStream, otherStreams):
+def approximateNoteSearchNoRhythm(
+    thisStream: Stream, otherStreams: t.Sequence[Stream]
+) -> list[Stream]:
     # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
@@ -560,21 +657,23 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
     o2 0.1666666...
     '''
     isJunk = None
-    n = thisStream.flatten().notesAndRests.stream()
+    n: Stream = thisStream.flatten().notesAndRests.stream()
     thisStreamStr = translateStreamToStringNoRhythm(n)
     sorterList = []
     for s in otherStreams:
-        sn = s.flatten().notesAndRests.stream()
+        sn: Stream = s.flatten().notesAndRests.stream()
         thatStreamStr = translateStreamToStringNoRhythm(sn)
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
-        s.matchProbability = ratio
+        s.matchProbability = ratio  # type: ignore[attr-defined]
         sorterList.append((ratio, s))
     sortedList = sorted(sorterList, key=lambda x: 1 - x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
 
-def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
+def approximateNoteSearchOnlyRhythm(
+    thisStream: Stream, otherStreams: t.Sequence[Stream]
+) -> list[Stream]:
     # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
@@ -596,21 +695,23 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     o2 0.0
     '''
     isJunk = None
-    n = thisStream.flatten().notesAndRests.stream()
+    n: Stream = thisStream.flatten().notesAndRests.stream()
     thisStreamStr = translateStreamToStringOnlyRhythm(n)
     sorterList = []
     for s in otherStreams:
-        sn = s.flatten().notesAndRests.stream()
+        sn: Stream = s.flatten().notesAndRests.stream()
         thatStreamStr = translateStreamToStringOnlyRhythm(sn)
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
-        s.matchProbability = ratio
+        s.matchProbability = ratio  # type: ignore[attr-defined]
         sorterList.append((ratio, s))
     sortedList = sorted(sorterList, key=lambda x: 1 - x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
 
-def approximateNoteSearchWeighted(thisStream, otherStreams):
+def approximateNoteSearchWeighted(
+    thisStream: Stream, otherStreams: t.Sequence[Stream]
+) -> list[Stream]:
     # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
@@ -635,7 +736,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     o2 0.25
     '''
     isJunk = None
-    n = thisStream.flatten().notesAndRests.stream()
+    n: Stream = thisStream.flatten().notesAndRests.stream()
     thisStreamStrPitches = translateStreamToStringNoRhythm(n)
     thisStreamStrDuration = translateStreamToStringOnlyRhythm(n)
     # print('notes',thisStreamStrPitches)
@@ -654,15 +755,32 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
                                                 thisStreamStrDuration,
                                                 thatStreamStrDuration).ratio()
         ratio = (3 * ratioPitches + ratioDuration) / 4.0
-        s.matchProbability = ratio
+        s.matchProbability = ratio  # type: ignore[attr-defined]
         sorterList.append((ratio, s))
     sortedList = sorted(sorterList, key=lambda x: 1 - x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
 
+@t.overload
+def translateStreamToString(
+    inputStreamOrIterator: Stream|iterator.StreamIterator,
+    returnMeasures: t.Literal[False] = False,
+) -> str:
+    ...
+
+@t.overload
+def translateStreamToString(
+    inputStreamOrIterator: Stream|iterator.StreamIterator,
+    returnMeasures: t.Literal[True],
+) -> tuple[str, list[int|None]]:
+    ...
+
 # noinspection SpellCheckingInspection
-def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
+def translateStreamToString(
+    inputStreamOrIterator: Stream|iterator.StreamIterator,
+    returnMeasures: bool = False,
+) -> str|tuple[str, list[int|None]]:
     '''
     takes a stream (or streamIterator) of notesAndRests only and returns
     a string for searching on.
@@ -685,7 +803,8 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
     [60, 80, 127, 80, 60, 80, 127, 80]
     '''
     b = ''
-    measures = []
+    measures: list[int|None] = []
+    n: note.GeneralNote
     for n in inputStreamOrIterator:
         b += translateNoteWithDurationToBytes(n)
         if returnMeasures:
@@ -696,7 +815,24 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
         return (b, measures)
 
 
-def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False):
+@t.overload
+def translateDiatonicStreamToString(
+    inputStreamOrIterator: Stream|iterator.StreamIterator,
+    returnMeasures: t.Literal[False] = False,
+) -> str:
+    ...
+
+@t.overload
+def translateDiatonicStreamToString(
+    inputStreamOrIterator: Stream|iterator.StreamIterator,
+    returnMeasures: t.Literal[True],
+) -> tuple[str, list[int|None]]:
+    ...
+
+def translateDiatonicStreamToString(
+    inputStreamOrIterator: Stream|iterator.StreamIterator,
+    returnMeasures: bool = False,
+) -> str|tuple[str, list[int|None]]:
     # noinspection SpellCheckingInspection, PyShadowingNames
     r'''
     Translates a Stream or StreamIterator of Notes and Rests only into a string,
@@ -730,13 +866,14 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
     >>> measures
     [1, 1, 1, 1, 1, 2, 2]
     '''
-    b = []
-    measures = []
+    b: list[str] = []
+    measures: list[int|None] = []
     previousRest = False
     previousTie = False
-    previousQL = None
+    previousQL: duration.OffsetQL|None = None
+    n: note.NotRest|note.Rest
     for n in inputStreamOrIterator:
-        mNum = None
+        mNum: int|None = None
         if returnMeasures:
             mNum = n.measureNumber
 
@@ -764,7 +901,8 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
         else:
             ascShift = 7
         previousQL = ql
-        newName = chr(ord(n.pitches[0].step) + ascShift)
+        notRestN = t.cast(note.NotRest, n)
+        newName = chr(ord(notRestN.pitches[0].step) + ascShift)
         measures.append(mNum)
         b.append(newName)
 
@@ -775,7 +913,24 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
         return (joined, measures)
 
 
-def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
+@t.overload
+def translateIntervalsAndSpeed(
+    inputStream: Stream,
+    returnMeasures: t.Literal[False] = False,
+) -> str:
+    ...
+
+@t.overload
+def translateIntervalsAndSpeed(
+    inputStream: Stream,
+    returnMeasures: t.Literal[True],
+) -> tuple[str, list[int|None]]:
+    ...
+
+def translateIntervalsAndSpeed(
+    inputStream: Stream,
+    returnMeasures: bool = False,
+) -> str|tuple[str, list[int|None]]:
     # noinspection PyShadowingNames
     r'''
     Translates a Stream (not StreamIterator) of Notes and Rests only into a string,
@@ -809,19 +964,21 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
     >>> measures
     [1, 1, 1, 1, 1, 2, 2, 2]
     '''
-    b = []
-    measures = []
+    b: list[str] = []
+    measures: list[int|None] = []
 
     previousRest = False  # was the previous a Rest
     previousTie = False  # was the previous a Tie?
-    previousQL = None
+    previousQL: duration.OffsetQL|None = None
     previousMidi = 60
-    for n in inputStream.getElementsByClass(note.Note):
-        previousMidi = n.pitches[0].midi
+    for firstNote in inputStream.getElementsByClass(note.Note):
+        previousMidi = firstNote.pitches[0].midi
         break
 
-    for n in inputStream:
-        mNum = None
+    el: m21Base.Music21Object
+    for el in inputStream:
+        n = t.cast('note.NotRest|note.Rest', el)
+        mNum: int|None = None
         if returnMeasures:
             mNum = n.measureNumber
         if n.isRest:
@@ -848,12 +1005,13 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
         else:
             ascShift = 14
         previousQL = ql
-        pitchDifference = previousMidi - n.pitches[0].midi
+        notRestN = t.cast(note.NotRest, n)
+        pitchDifference = previousMidi - notRestN.pitches[0].midi
         if pitchDifference > 13:
             pitchDifference = 13
         elif pitchDifference < -13:
             pitchDifference = -13
-        previousMidi = n.pitches[0].midi
+        previousMidi = notRestN.pitches[0].midi
         newName = chr(32 + pitchDifference + ascShift)
         measures.append(mNum)
         b.append(newName)
@@ -865,7 +1023,24 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
         return (joined, measures)
 
 
-def translateStreamToStringNoRhythm(inputStream, returnMeasures=False):
+@t.overload
+def translateStreamToStringNoRhythm(
+    inputStream: Stream|iterator.StreamIterator,
+    returnMeasures: t.Literal[False] = False,
+) -> str:
+    ...
+
+@t.overload
+def translateStreamToStringNoRhythm(
+    inputStream: Stream|iterator.StreamIterator,
+    returnMeasures: t.Literal[True],
+) -> tuple[str, list[int|None]]:
+    ...
+
+def translateStreamToStringNoRhythm(
+    inputStream: Stream|iterator.StreamIterator,
+    returnMeasures: bool = False,
+) -> str|tuple[str, list[int|None]]:
     '''
     takes a stream or streamIterator of notesAndRests only and returns
     a string for searching on, using translateNoteToByte.
@@ -881,7 +1056,8 @@ def translateStreamToStringNoRhythm(inputStream, returnMeasures=False):
     ('<>@)QF', [1, 1, 1, 1, 2, 2])
     '''
     b = ''
-    measures = []
+    measures: list[int|None] = []
+    n: note.GeneralNote
     for n in inputStream:
         b += translateNoteToByte(n)
         if returnMeasures:
@@ -892,7 +1068,24 @@ def translateStreamToStringNoRhythm(inputStream, returnMeasures=False):
         return b
 
 
-def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
+@t.overload
+def translateStreamToStringOnlyRhythm(
+    inputStream: Stream|iterator.StreamIterator,
+    returnMeasures: t.Literal[False] = False,
+) -> str:
+    ...
+
+@t.overload
+def translateStreamToStringOnlyRhythm(
+    inputStream: Stream|iterator.StreamIterator,
+    returnMeasures: t.Literal[True],
+) -> tuple[str, list[int|None]]:
+    ...
+
+def translateStreamToStringOnlyRhythm(
+    inputStream: Stream|iterator.StreamIterator,
+    returnMeasures: bool = False,
+) -> str|tuple[str, list[int|None]]:
     '''
     takes a stream or streamIterator of notesAndRests only and returns
     a string for searching on.
@@ -906,7 +1099,8 @@ def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
     6
     '''
     b = ''
-    measures = []
+    measures: list[int|None] = []
+    n: note.GeneralNote
     for n in inputStream:
         b += translateDurationToBytes(n)
         if returnMeasures:
@@ -982,7 +1176,7 @@ def translateNoteWithDurationToBytes(n: note.GeneralNote, includeTieByte: bool =
         return firstByte + secondByte
 
 
-def translateNoteTieToByte(n: note.GeneralNote):
+def translateNoteTieToByte(n: note.GeneralNote) -> str:
     # noinspection PyShadowingNames
     '''
     takes a note.Note object and returns a one-byte representation
@@ -1017,7 +1211,7 @@ def translateNoteTieToByte(n: note.GeneralNote):
         return ''
 
 
-def translateDurationToBytes(n: note.GeneralNote):
+def translateDurationToBytes(n: note.GeneralNote) -> str:
     # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a two-byte representation
@@ -1044,7 +1238,9 @@ def translateDurationToBytes(n: note.GeneralNote):
 
 # -------------------
 
-def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
+def mostCommonMeasureRhythms(
+    streamIn: Stream, transposeDiatonic: bool = False
+) -> list[dict[str, t.Any]]:
     '''
     returns a sorted list of dictionaries
     of the most common rhythms in a stream where
@@ -1093,7 +1289,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
 
     * Changed in v7: bars are ordered first by number, then by part.
     '''
-    returnDicts = []
+    returnDicts: list[dict[str, t.Any]] = []
 
     for thisMeasure in streamIn[Measure]:
         rhythmString = translateStreamToStringOnlyRhythm(thisMeasure.notesAndRests)
@@ -1105,18 +1301,20 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
                 entry['measures'].append(thisMeasure)
                 break
         if not rhythmFound:
-            newDict = {
+            newDict: dict[str, t.Any] = {
                 'number': 1,
                 'rhythmString': rhythmString,
             }
             measureNotes = thisMeasure.notes
             for measureNote in measureNotes:
                 if isinstance(measureNote, note.Note):
-                    distanceToTranspose = 72 - measureNotes[0].pitch.ps
+                    firstNote = t.cast(note.Note, measureNotes[0])
+                    distanceToTranspose = 72 - firstNote.pitch.ps
                     thisMeasureCopy = copy.deepcopy(thisMeasure)
-                    for n in thisMeasureCopy.notes:
+                    for transposableNote in thisMeasureCopy.notes:
                         # TODO: Transpose Diatonic
-                        n.transpose(distanceToTranspose, inPlace=True)
+                        nn = t.cast(note.Note, transposableNote)
+                        nn.transpose(distanceToTranspose, inPlace=True)
                     newDict['rhythm'] = thisMeasureCopy
                     break
             else:
@@ -1134,7 +1332,7 @@ class SearchException(exceptions21.Music21Exception):
 
 class Test(unittest.TestCase):
 
-    def testCopyAndDeepcopy(self):
+    def testCopyAndDeepcopy(self) -> None:
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
 
