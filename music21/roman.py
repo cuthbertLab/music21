@@ -571,8 +571,8 @@ def identifyAsTonicOrDominant(
     pitchNameList = []
     for x in inChord.pitches:
         pitchNameList.append(x.name)
-    oneRoot = inKey.pitchFromDegree(1)
-    fiveRoot = inKey.pitchFromDegree(5)
+    oneRoot = t.cast(pitch.Pitch, inKey.pitchFromDegree(1))
+    fiveRoot = t.cast(pitch.Pitch, inKey.pitchFromDegree(5))
     oneChordIdentified = False
     fiveChordIdentified = False
     if oneRoot.name in pitchNameList:
@@ -3211,7 +3211,8 @@ class RomanNumeral(harmony.Harmony):
             self.scaleCardinality = useScale.getDegreeMaxUnique()
 
         bassScaleDegree = self.bassScaleDegreeFromNotation(self.figuresNotationObj)
-        bassPitch = useScale.pitchFromDegree(bassScaleDegree, direction=scale.Direction.ASCENDING)
+        bassPitch = t.cast(pitch.Pitch, useScale.pitchFromDegree(
+            bassScaleDegree, direction=scale.Direction.ASCENDING))
         pitches: list[pitch.Pitch] = [bassPitch]
         lastPitch = bassPitch
         numberNotes = len(self.figuresNotationObj.numbers)
@@ -3221,8 +3222,8 @@ class RomanNumeral(harmony.Harmony):
             thisScaleDegree = (bassScaleDegree
                                 + t.cast(int, self.figuresNotationObj.numbers[i])
                                 - 1)
-            newPitch = useScale.pitchFromDegree(thisScaleDegree,
-                                                direction=scale.Direction.ASCENDING)
+            newPitch = t.cast(pitch.Pitch, useScale.pitchFromDegree(
+                thisScaleDegree, direction=scale.Direction.ASCENDING))
             pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(newPitch.name)
             newNewPitch = pitch.Pitch(pitchName)
             if newPitch.octave is not None:
@@ -3281,21 +3282,21 @@ class RomanNumeral(harmony.Harmony):
                 else:
                     alteration = addAccidental.count('#')
                 thisScaleDegree = (self.scaleDegree + stepNumber - 1)
-                addedPitch = useScale.pitchFromDegree(thisScaleDegree,
-                                                      direction=scale.Direction.ASCENDING)
+                addedPitch = t.cast(pitch.Pitch, useScale.pitchFromDegree(
+                    thisScaleDegree, direction=scale.Direction.ASCENDING))
                 if addedPitch.accidental is not None:
                     addedPitch.accidental.alter += alteration
                 else:
                     addedPitch.accidental = pitch.Accidental(alteration)
 
                 while addedPitch.ps < bassPitch.ps:
-                    addedPitch.octave += 1
+                    addedPitch.octave = addedPitch.implicitOctave + 1
 
                 if (addedPitch.ps == bassPitch.ps
                         and addedPitch.diatonicNoteNum < bassPitch.diatonicNoteNum):
                     # RN('IV[add#7]', 'C') would otherwise result
                     # in E#4 as bass, not E#5 as highest note.
-                    addedPitch.octave += 1
+                    addedPitch.octave = addedPitch.implicitOctave + 1
 
                 if addedPitch not in self.pitches:
                     self.add(addedPitch)

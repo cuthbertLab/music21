@@ -2437,7 +2437,7 @@ class RepeatFinder:
         mList = self.getMeasureSimilarityList()
         mGroups = self._getSimilarMeasureTuples(mList, self.hasPickup())
 
-        processed = {}
+        processed: set[int] = set()
 
         # Want to give priority first to the longest repeated sections,
         # and then to the repeated sections that happen earlier.
@@ -2506,7 +2506,7 @@ class RepeatFinder:
             # only add the measure numbers to the list of processed measures if
             # those measures were actually part of a repeat or repeat ending
             for mNum in measureNumbers:
-                processed[mNum] = True
+                processed.add(mNum)
 
         for startingBar, firstEndingBar, repeatSignBar in repeatEndingBars:
             # print(startingBar, firstEndingBar, repeatSignBar)
