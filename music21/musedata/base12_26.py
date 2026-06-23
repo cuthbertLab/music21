@@ -16,18 +16,18 @@ from __future__ import annotations
 # ------------------------------------------------------------------------------
 # Key => Base12 pitch number
 # Value => Music21 Pitch name
-base12Equivalent: dict[int, str|None] = {
+base12Equivalent: dict[int, str] = {
     0: 'C',
-    1: None,
+    1: '',
     2: 'D',
-    3: None,
+    3: '',
     4: 'E',
     5: 'F',
-    6: None,
+    6: '',
     7: 'G',
-    8: None,
+    8: '',
     9: 'A',
-    10: None,
+    10: '',
     11: 'B',
 }
 
@@ -69,30 +69,30 @@ Base12IntervalTable: dict[int, str] = {
 
 # Key => Base26 pitch number
 # Value => Music21 Pitch name
-base26Equivalent: dict[int, str|None] = {
+base26Equivalent: dict[int, str] = {
     0: 'C-',
     1: 'C',
     2: 'C#',
-    3: None,
+    3: '',
     4: 'D-',
     5: 'D',
     6: 'D#',
-    7: None,
+    7: '',
     8: 'E-',
     9: 'E',
     10: 'E#',
     11: 'F-',
     12: 'F',
     13: 'F#',
-    14: None,
+    14: '',
     15: 'G-',
     16: 'G',
     17: 'G#',
-    18: None,
+    18: '',
     19: 'A-',
     20: 'A',
     21: 'A#',
-    22: None,
+    22: '',
     23: 'B-',
     24: 'B',
     25: 'B#',
@@ -149,16 +149,16 @@ Base26IntervalTable: dict[int, str] = {
     # 13
     # 14
     15: 'P5',
-    # 15
     # 16
+    # 17
     18: 'm6',
     19: 'M6',
-    # 17
-    # 18
+    # 20
+    # 21
     22: 'm7',
     23: 'M7',
-    # 19
-    # 20
+    # 24
+    # 25
 }
 
 # ------------------------------------------------------------------------------

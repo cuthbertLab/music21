@@ -153,7 +153,7 @@ base40IntervalTable: dict[int, str] = {
     36: 'A7',
 
     39: 'd8',
-    40: 'P8',  # wraps around
+    # 40: 'P8',  # wraps around
 }
 
 
