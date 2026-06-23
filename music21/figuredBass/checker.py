@@ -302,9 +302,7 @@ def checkSinglePossibilities(
 
 def checkConsecutivePossibilities(
     music21Stream: stream.Score,
-    functionToApply: Callable[
-        [Possibility, Possibility], list[PartPair]
-    ],
+    functionToApply: Callable[[Possibility, Possibility], list[PartPair]],
     color: str | None = '#FF0000',
     debug: bool = False
 ) -> None:
@@ -431,9 +429,7 @@ def voiceCrossing(possibA: Possibility) -> list[PartPair]:
 # computed by one module is valid for the other.  See possibility.py for the definitions.
 
 
-def parallelFifths(
-    possibA: Possibility, possibB: Possibility
-) -> list[PartPair]:
+def parallelFifths(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
     two voices which form parallel fifths.
@@ -504,9 +500,7 @@ def parallelFifths(
     return partViolations
 
 
-def hiddenFifths(
-    possibA: Possibility, possibB: Possibility
-) -> list[PartPair]:
+def hiddenFifths(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list with a (highestPart, lowestPart) pair which represents
     a hidden fifth between shared outer parts of possibA and possibB. The
@@ -579,9 +573,7 @@ def hiddenFifths(
     return partViolations
 
 
-def parallelOctaves(
-    possibA: Possibility, possibB: Possibility
-) -> list[PartPair]:
+def parallelOctaves(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
     two voices which form parallel octaves.
@@ -653,9 +645,7 @@ def parallelOctaves(
     return partViolations
 
 
-def hiddenOctaves(
-    possibA: Possibility, possibB: Possibility
-) -> list[PartPair]:
+def hiddenOctaves(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list with a (highestPart, lowestPart) pair which represents
     a hidden octave between shared outer parts of possibA and possibB. The
