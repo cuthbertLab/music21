@@ -31,6 +31,19 @@ if t.TYPE_CHECKING:
 
 environLocal = environment.Environment()
 
+# A pitch class as supplied to a search: an int (reduced mod 12) or a string
+# name such as 'B', '11', or '-24'.
+type PitchClassElement = int | str
+# A search segment or multiset as supplied to a matcher's .find(): a sequence
+# of pitch-class elements.
+type SearchSegment = t.Sequence[PitchClassElement]
+# A search segment after normalization.  Each SegmentMatcher subclass normalizes
+# differently: the base class to a list of pitch classes,
+# TransposedSegmentMatcher to an interval string, and TransformedSegmentMatcher
+# to a ToneRow -- so the normalized form is one of these.  (The multiset matchers
+# additionally store Counters in searchedAlready; see that attribute's type.)
+type NormalizedSegment = list[int] | str | ToneRow
+
 # ------- parsing functions for atonal music -------
 
 
@@ -106,8 +119,8 @@ class ContiguousSegmentOfNotes(base.Music21Object):
             containerStream if containerStream is not None else stream.Stream()
         )
         self.partNumber: int | None = partNumber
-        self.activeSegment: list[int] | ToneRow = []
-        self.matchedSegment: list[int] | ToneRow | None = None
+        self.activeSegment: NormalizedSegment = []
+        self.matchedSegment: list[int | str] | ToneRow | None = None
 
     def _reprInternal(self) -> str:
         chordList = []
@@ -154,7 +167,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         return (activeRow, matchedRow)
 
     @property
-    def zeroCenteredTransformationsFromMatched(self) -> bool | list[t.Any]:
+    def zeroCenteredTransformationsFromMatched(self) -> bool | list[tuple[str, int]]:
         '''
         The list of zero-centered transformations taking a segment being searched
         for to a found segment, for example, in
@@ -166,7 +179,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         return matchedRow.findZeroCenteredTransformations(activeRow)
 
     @property
-    def originalCenteredTransformationsFromMatched(self) -> bool | list[t.Any]:
+    def originalCenteredTransformationsFromMatched(self) -> bool | list[tuple[str, int]]:
         '''
         The list of original-centered transformations taking a segment being
         searched for to a found segment, for example, in
@@ -1054,7 +1067,7 @@ class SegmentMatcher:
         self.stream = inputStream
         self._reps = reps
         self._includeChords = includeChords
-        self.searchedAlready: list[t.Any] = []
+        self.searchedAlready: list[NormalizedSegment | Counter[int]] = []
         self.matchedSegments: list[ContiguousSegmentOfNotes] = []
         self.currentSearchSegmentLength: int = 0
         self._contiguousSegmentsByLength: dict[int, list[ContiguousSegmentOfNotes]] = {}
@@ -1107,18 +1120,22 @@ class SegmentMatcher:
 
         return theseSegments
 
-    def find(self, searchList: t.Sequence[t.Any]) -> list[ContiguousSegmentOfNotes]:
+    def find(self,
+             searchList: t.Sequence[SearchSegment | PitchClassElement]
+             ) -> list[ContiguousSegmentOfNotes]:
         if not searchList:
             return []
-        elif not (common.isIterable(searchList[0])):
-            # a single list instead of a list of lists:
-            searchList = [searchList]
+        elif common.isIterable(searchList[0]):
+            searchSegments = t.cast('t.Sequence[SearchSegment]', searchList)
+        else:
+            # a single segment instead of a list of segments:
+            searchSegments = [t.cast('SearchSegment', searchList)]
 
         self.matchedSegments = []
         self.searchedAlready = []
         self._contiguousSegmentsByLength = {}
 
-        for unNormalizedCurrentSearchSegment in searchList:
+        for unNormalizedCurrentSearchSegment in searchSegments:
             # normalize and check.
             if self.checkSearchedAlready(unNormalizedCurrentSearchSegment):
                 continue
@@ -1142,8 +1159,9 @@ class SegmentMatcher:
 
     def findOneIgnoreAll(self,
                          thisSegment: ContiguousSegmentOfNotes,
-                         searchSegment: t.Any,
-                         unNormalizedCurrentSearchSegment: t.Any = None) -> None:
+                         searchSegment: NormalizedSegment,
+                         unNormalizedCurrentSearchSegment: SearchSegment | NormalizedSegment | None
+                         = None) -> None:
         '''
         Checks whether thisSegment is a match for the searchSegment if 'ignoreAll' is the search
         term.
@@ -1174,8 +1192,9 @@ class SegmentMatcher:
 
     def findOneOtherReps(self,
                          thisSegment: ContiguousSegmentOfNotes,
-                         searchSegment: t.Any,
-                         unNormalizedCurrentSearchSegment: t.Any) -> None:
+                         searchSegment: NormalizedSegment,
+                         unNormalizedCurrentSearchSegment: SearchSegment | NormalizedSegment
+                         ) -> None:
         '''
         Checks whether thisSegment is a match for the searchSegment if 'ignoreAll' is NOT the search
         term.
@@ -1200,7 +1219,7 @@ class SegmentMatcher:
             self.matchedSegments.append(thisSegment)
             break
 
-    def checkSearchedAlready(self, unNormalizedSearchSegment: t.Any) -> bool:
+    def checkSearchedAlready(self, unNormalizedSearchSegment: SearchSegment) -> bool:
         '''
         Check to see if we have searched this segment already.
 
@@ -1225,7 +1244,7 @@ class SegmentMatcher:
         return False
 
     @staticmethod
-    def normalize(segment: t.Any) -> t.Any:
+    def normalize(segment: SearchSegment) -> NormalizedSegment:
         '''
         Normalize an input segment for searching. This class just changes
         letters to numbers, etc.
@@ -1239,7 +1258,9 @@ class SegmentMatcher:
         '''
         return pcToToneRow(segment).pitchClasses()
 
-    def equalSubset(self, searchSegment: t.Any, subsetToCheck: t.Any) -> bool:
+    def equalSubset(self,
+                    searchSegment: NormalizedSegment,
+                    subsetToCheck: NormalizedSegment) -> bool:
         '''
         Returns True if these are equal in some way.
 
@@ -1375,7 +1396,7 @@ class TransposedSegmentMatcher(SegmentMatcher):
     '''
 
     @staticmethod
-    def normalize(segment: t.Any) -> t.Any:
+    def normalize(segment: SearchSegment) -> str:
         '''
         Normalize an input segment for searching. For this class changes to intervals
 
@@ -1532,7 +1553,7 @@ class TransformedSegmentMatcher(SegmentMatcher):
     [2, -7, 4]
     '''
 
-    def checkSearchedAlready(self, unNormalizedSearchSegment: t.Any) -> bool:
+    def checkSearchedAlready(self, unNormalizedSearchSegment: SearchSegment) -> bool:
         '''
         Here a segment is returned as searchedAlready if it is a transformation
         of a previous search segment.
@@ -1549,13 +1570,13 @@ class TransformedSegmentMatcher(SegmentMatcher):
         '''
         segmentRow = self.normalize(unNormalizedSearchSegment)
         for usedRow in self.searchedAlready:
-            if self.getTransformations(segmentRow, usedRow):
+            if self.getTransformations(segmentRow, t.cast('ToneRow', usedRow)):
                 return True
         self.searchedAlready.append(segmentRow)
         return False
 
     @staticmethod
-    def normalize(segment: t.Any) -> t.Any:
+    def normalize(segment: SearchSegment) -> ToneRow:
         '''
         Normalize an input segment for searching. For this class changes to intervals
 
@@ -1569,7 +1590,7 @@ class TransformedSegmentMatcher(SegmentMatcher):
         return pcToToneRow(segment)
 
     @staticmethod
-    def getTransformations(row1: ToneRow, row2: ToneRow) -> bool | list[t.Any]:
+    def getTransformations(row1: ToneRow, row2: ToneRow) -> bool | list[tuple[str, int]]:
         '''
         Returns a list of transformations that transform row1 into row2
 
@@ -1584,7 +1605,9 @@ class TransformedSegmentMatcher(SegmentMatcher):
         '''
         return row2.findZeroCenteredTransformations(row1)
 
-    def equalSubset(self, searchSegment: t.Any, subsetToCheck: t.Any) -> bool:
+    def equalSubset(self,
+                    searchSegment: NormalizedSegment,
+                    subsetToCheck: NormalizedSegment) -> bool:
         '''
         Returns True if these are equal in some way.
 
@@ -1596,7 +1619,8 @@ class TransformedSegmentMatcher(SegmentMatcher):
         >>> TSM.equalSubset(TSM.normalize([0, 1, 2]), TSM.normalize([0, 1, 3]))
         False
         '''
-        return bool(self.getTransformations(searchSegment, subsetToCheck))
+        return bool(self.getTransformations(
+            t.cast('ToneRow', searchSegment), t.cast('ToneRow', subsetToCheck)))
 
 
 class MultisetSegmentMatcher(SegmentMatcher):
@@ -1754,7 +1778,9 @@ class MultisetSegmentMatcher(SegmentMatcher):
     '''
     includeMultisetDuplicates = True
 
-    def equalSubset(self, searchSegment: t.Any, subsetToCheck: t.Any) -> bool:
+    def equalSubset(self,
+                    searchSegment: NormalizedSegment,
+                    subsetToCheck: NormalizedSegment) -> bool:
         '''
         Returns True if there are the same number of each pitchClass in searchSegment
         as in subsetToCheck
@@ -1848,26 +1874,31 @@ class TransposedMultisetMatcher(SegmentMatcher):
     '''
     includeMultisetDuplicates = True
 
-    def checkSearchedAlready(self, multiset: t.Any) -> bool:
+    def checkSearchedAlready(self, multiset: SearchSegment) -> bool:
         '''
         searched already uses counters.
         '''
-        searchSegmentCounter: Counter = Counter()
+        # multiset matchers operate on integer pitch classes
+        intMultiset = t.cast('t.Sequence[int]', multiset)
+        searchSegmentCounter: Counter[int] = Counter()
         for i in range(12):
-            searchSegmentCounter = Counter([(p + i) % 12 for p in multiset])
+            searchSegmentCounter = Counter([(p + i) % 12 for p in intMultiset])
             if searchSegmentCounter in self.searchedAlready:
                 return True
         self.searchedAlready.append(searchSegmentCounter)
         return False
 
-    def equalSubset(self, searchSegment: t.Any, subsetToCheck: t.Any) -> bool:
+    def equalSubset(self,
+                    searchSegment: NormalizedSegment,
+                    subsetToCheck: NormalizedSegment) -> bool:
         '''
         Returns True if there are the same number of each pitchClass in searchSegment
         as in subsetToCheck
         '''
         subsetCounter = Counter(subsetToCheck)
+        intSearchSegment = t.cast('t.Sequence[int]', searchSegment)
         for i in range(12):
-            searchSegmentCounter = Counter([(p + i) % 12 for p in searchSegment])
+            searchSegmentCounter = Counter([(p + i) % 12 for p in intSearchSegment])
             if bool(searchSegmentCounter == subsetCounter):
                 return True
         return False
@@ -1954,18 +1985,22 @@ class TransposedInvertedMultisetMatcher(TransposedMultisetMatcher):
     '''
     includeMultisetDuplicates = True
 
-    def checkSearchedAlready(self, multiset: t.Any) -> bool:
+    def checkSearchedAlready(self, multiset: SearchSegment) -> bool:
         '''
         since the parent class adds to the list, we check inversions
         first and then return the parent class result
         '''
+        # multiset matchers operate on integer pitch classes
+        intMultiset = t.cast('t.Sequence[int]', multiset)
         for i in range(12):
-            searchSegmentCounter = Counter([(-1 * (p + i)) % 12 for p in multiset])
+            searchSegmentCounter = Counter([(-1 * (p + i)) % 12 for p in intMultiset])
             if searchSegmentCounter in self.searchedAlready:
                 return True
         return super().checkSearchedAlready(multiset)
 
-    def equalSubset(self, searchSegment: t.Any, subsetToCheck: t.Any) -> bool:
+    def equalSubset(self,
+                    searchSegment: NormalizedSegment,
+                    subsetToCheck: NormalizedSegment) -> bool:
         '''
         Returns True if there are the same number of each pitchClass in searchSegment
         as in subsetToCheck
@@ -1974,8 +2009,9 @@ class TransposedInvertedMultisetMatcher(TransposedMultisetMatcher):
             return True
 
         subsetCounter = Counter(subsetToCheck)
+        intSearchSegment = t.cast('t.Sequence[int]', searchSegment)
         for i in range(12):
-            searchSegmentCounter = Counter([(-1 * (p + i)) % 12 for p in searchSegment])
+            searchSegmentCounter = Counter([(-1 * (p + i)) % 12 for p in intSearchSegment])
             if bool(searchSegmentCounter == subsetCounter):
                 return True
         return False
@@ -1992,6 +2028,10 @@ def _labelGeneral(segmentsToLabel: list[ContiguousSegmentOfNotes],
     Private because this should only be called
     in conjunction with one of the find(type of set of pitch classes) functions.
     '''
+    # parts/bigContainer are left untyped because of a latent inconsistency:
+    # TODO: the Score branch assigns a StreamIterator (no .insert()), so the
+    #    .insert() call below would fail whenever the input contains a Score.
+    #    bigContainer should probably be the Score itself, e.g. scores.first().
     parts: t.Any = {}
     bigContainer: t.Any
     if not inputStream.getElementsByClass(stream.Score):
@@ -2028,15 +2068,17 @@ def _labelGeneral(segmentsToLabel: list[ContiguousSegmentOfNotes],
             firstNote = foundSegment.segment[0]
 
             # for labelTransformedSegments
-            transformations: list[t.Any]
+            transformations: list[tuple[str, int]]
             if labelTransformations is False:
                 transformations = []
             elif labelTransformations == 'original':
                 transformations = t.cast(
-                    'list[t.Any]', foundSegment.originalCenteredTransformationsFromMatched)
+                    'list[tuple[str, int]]',
+                    foundSegment.originalCenteredTransformationsFromMatched)
             elif labelTransformations == 'zero':
                 transformations = t.cast(
-                    'list[t.Any]', foundSegment.zeroCenteredTransformationsFromMatched)
+                    'list[tuple[str, int]]',
+                    foundSegment.zeroCenteredTransformationsFromMatched)
             else:
                 transformations = []
 
