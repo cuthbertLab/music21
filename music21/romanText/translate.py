@@ -1728,7 +1728,7 @@ m1 C: I'''
             m4-5 = m1-2
         ''')
         s = converter.parse(empty_measures_with_copy, format='romanText')
-        assert s.duration.quarterLength == 10
+        self.assertEqual(s.duration.quarterLength, 10)
 
     def testRepeats(self):
         from music21 import converter

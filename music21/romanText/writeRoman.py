@@ -620,7 +620,7 @@ class Test(unittest.TestCase):
         ''')
         s = converter.parse(rntxt, format='romanText')
         writer = RnWriter(s)
-        assert '\n'.join(writer.combinedList).strip().endswith(rntxt.strip())
+        self.assertTrue('\n'.join(writer.combinedList).strip().endswith(rntxt.strip()))
 
     def testRnString(self) -> None:
         test = rnString(1, 1, 'G: I')

@@ -1508,6 +1508,7 @@ class Test(unittest.TestCase):
     def testReA(self) -> None:
         # gets the index of the end of the measure indication
         g = reMeasureTag.match('m1 g: V b2 i')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.end(), 2)
         self.assertEqual(g.group(0), 'm1')
@@ -1515,48 +1516,60 @@ class Test(unittest.TestCase):
         self.assertEqual(reMeasureTag.match('Time Signature: 2/2'), None)
 
         g = reMeasureTag.match('m3-4=m1-2')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.end(), 4)
         self.assertEqual(g.start(), 0)
         self.assertEqual(g.group(0), 'm3-4')
 
         g = reMeasureTag.match('m123-432=m1120-24234')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'm123-432')
 
         g = reMeasureTag.match('m231a IV6 b4 C: V')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'm231a')
 
         g = reMeasureTag.match('m123b-432b=m1120a-24234a')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'm123b-432b')
 
         g = reMeasureTag.match('m231var1 IV6 b4 C: V')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'm231')
 
         # this only works if it starts the string
         g = reVariant.match('var1 IV6 b4 C: V')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'var1')
 
         g = reAnalyticKeyAtom.match('Bb:')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'Bb:')
         g = reAnalyticKeyAtom.match('F#:')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'F#:')
         g = reAnalyticKeyAtom.match('f#:')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'f#:')
         g = reAnalyticKeyAtom.match('b:')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'b:')
         g = reAnalyticKeyAtom.match('bb:')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'bb:')
         g = reAnalyticKeyAtom.match('g:')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'g:')
 
@@ -1565,6 +1578,7 @@ class Test(unittest.TestCase):
         self.assertEqual(reKeyAtom.match('b2.5'), None)
 
         g = reBeatAtom.match('b2.5')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'b2.5')
 
@@ -1572,6 +1586,7 @@ class Test(unittest.TestCase):
         self.assertEqual(g, None)
 
         g = reBeatAtom.match('b1.66.5')
+        self.assertIsNotNone(g)
         assert g is not None
         self.assertEqual(g.group(0), 'b1.66.5')
 
