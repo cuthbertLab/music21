@@ -57,7 +57,8 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         'segment': 'The list of notes and chords in the contiguous segment.',
         'containerStream': '''
             The stream containing the contiguous segment -
-            all contiguous segments must have a container stream.''',
+            all contiguous segments must have a container stream, so if none is
+            supplied an empty Stream is created.''',
         'partNumber': '''
             The part number in which the segment appears, or None
             (if the container stream has no parts). Note that this attribute is zero-indexed,
@@ -88,7 +89,9 @@ class ContiguousSegmentOfNotes(base.Music21Object):
                  **keywords):
         super().__init__(**keywords)
         self.segment: list[note.NotRest] = segment if segment is not None else []
-        self.containerStream: stream.Stream | None = containerStream
+        self.containerStream: stream.Stream = (
+            containerStream if containerStream is not None else stream.Stream()
+        )
         self.partNumber: int | None = partNumber
         self.activeSegment: list[int] | ToneRow = []
         self.matchedSegment: list[int] | ToneRow | None = None
