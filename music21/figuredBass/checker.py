@@ -20,20 +20,27 @@ from music21 import voiceLeading
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL
 from music21.figuredBass import possibility
+from music21.figuredBass.possibility import Possibility
 from music21.exceptions21 import Music21Exception
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable
 
-# A vertical sonority observed from a score for voice-leading checking: one
-# element per part, each a Pitch or the rest placeholder 'RT' returned by
-# generalNoteToPitch.  Distinct from possibility.Possibility, which is pitch-only
-# and represents a candidate realization rather than an observed sonority.
-type PossibilityWithRests = tuple[pitch.Pitch | t.Literal['RT'], ...]
+# Voice-leading here works on Possibility tuples (one Pitch per part).
 # (offset, endTime) delimiting a voice-leading moment.
 type OffsetEndTime = tuple[OffsetQL, OffsetQL]
 # (partNumberA, partNumberB) one-indexed voice pair forming a violation.
 type PartPair = tuple[int, int]
+
+
+def _isRest(p: pitch.Pitch) -> bool:
+    '''
+    True if p is the rest placeholder returned by :func:`generalNoteToPitch`
+    (a :class:`~music21.pitch.Pitch` whose ps is
+    :obj:`~music21.figuredBass.possibility.POSSIBILITY_REST_PS`) rather than a
+    sounding pitch. Voice-leading checks skip these.
+    '''
+    return p.ps == possibility.POSSIBILITY_REST_PS
 
 
 # ------------------------------------------------------------------------------
@@ -229,7 +236,7 @@ def correlateHarmonies(
 
 def checkSinglePossibilities(
     music21Stream: stream.Score,
-    functionToApply: Callable[[PossibilityWithRests], list[PartPair]],
+    functionToApply: Callable[[Possibility], list[PartPair]],
     color: str | None = '#FF0000',
     debug: bool = False
 ) -> None:
@@ -295,7 +302,7 @@ def checkSinglePossibilities(
 
 def checkConsecutivePossibilities(
     music21Stream: stream.Score,
-    functionToApply: Callable[[PossibilityWithRests, PossibilityWithRests], list[PartPair]],
+    functionToApply: Callable[[Possibility, Possibility], list[PartPair]],
     color: str | None = '#FF0000',
     debug: bool = False
 ) -> None:
@@ -379,7 +386,7 @@ def checkConsecutivePossibilities(
 # represent two voices which form a voice crossing.
 
 
-def voiceCrossing(possibA: PossibilityWithRests) -> list[PartPair]:
+def voiceCrossing(possibA: Possibility) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
     two voices which form a voice crossing. The parts from the lowest part to
@@ -403,11 +410,11 @@ def voiceCrossing(possibA: PossibilityWithRests) -> list[PartPair]:
     partViolations: list[PartPair] = []
     for part1Index in range(len(possibA)):
         higherPitch = possibA[part1Index]
-        if not isinstance(higherPitch, pitch.Pitch):
+        if _isRest(higherPitch):
             continue
         for part2Index in range(part1Index + 1, len(possibA)):
             lowerPitch = possibA[part2Index]
-            if not isinstance(lowerPitch, pitch.Pitch):
+            if _isRest(lowerPitch):
                 continue
             if higherPitch < lowerPitch:
                 partViolations.append((part1Index + 1, part2Index + 1))
@@ -422,7 +429,7 @@ def voiceCrossing(possibA: PossibilityWithRests) -> list[PartPair]:
 # computed by one module is valid for the other.  See possibility.py for the definitions.
 
 
-def parallelFifths(possibA: PossibilityWithRests, possibB: PossibilityWithRests) -> list[PartPair]:
+def parallelFifths(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
     two voices which form parallel fifths.
@@ -465,19 +472,15 @@ def parallelFifths(possibA: PossibilityWithRests, possibB: PossibilityWithRests)
     []
     '''
     partViolations: list[PartPair] = []
-    pairsList = list(zip(possibA, possibB, strict=True))
+    pairsList = possibility.partPairs(possibA, possibB)
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
-        if not isinstance(higherPitchA, pitch.Pitch):
-            continue
-        if not isinstance(higherPitchB, pitch.Pitch):
+        if _isRest(higherPitchA) or _isRest(higherPitchB):
             continue
         for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
-            if not isinstance(lowerPitchA, pitch.Pitch):
-                continue
-            if not isinstance(lowerPitchB, pitch.Pitch):
+            if _isRest(lowerPitchA) or _isRest(lowerPitchB):
                 continue
             if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 7:
                 continue
@@ -497,7 +500,7 @@ def parallelFifths(possibA: PossibilityWithRests, possibB: PossibilityWithRests)
     return partViolations
 
 
-def hiddenFifths(possibA: PossibilityWithRests, possibB: PossibilityWithRests) -> list[PartPair]:
+def hiddenFifths(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list with a (highestPart, lowestPart) pair which represents
     a hidden fifth between shared outer parts of possibA and possibB. The
@@ -548,16 +551,11 @@ def hiddenFifths(possibA: PossibilityWithRests, possibB: PossibilityWithRests) -
     * Changed in v11: renamed from hiddenFifth (singular) to match parallelFifths.
     '''
     partViolations: list[PartPair] = []
-    pairsList = list(zip(possibA, possibB, strict=True))
+    pairsList = possibility.partPairs(possibA, possibB)
     (highestPitchA, highestPitchB) = pairsList[0]
     (lowestPitchA, lowestPitchB) = pairsList[-1]
-    if not isinstance(highestPitchA, pitch.Pitch):
-        return partViolations
-    if not isinstance(highestPitchB, pitch.Pitch):
-        return partViolations
-    if not isinstance(lowestPitchA, pitch.Pitch):
-        return partViolations
-    if not isinstance(lowestPitchB, pitch.Pitch):
+    if any(_isRest(p) for p in (
+            highestPitchA, highestPitchB, lowestPitchA, lowestPitchB)):
         return partViolations
 
     if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 7:
@@ -575,7 +573,7 @@ def hiddenFifths(possibA: PossibilityWithRests, possibB: PossibilityWithRests) -
     return partViolations
 
 
-def parallelOctaves(possibA: PossibilityWithRests, possibB: PossibilityWithRests) -> list[PartPair]:
+def parallelOctaves(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
     two voices which form parallel octaves.
@@ -619,19 +617,15 @@ def parallelOctaves(possibA: PossibilityWithRests, possibB: PossibilityWithRests
     []
     '''
     partViolations: list[PartPair] = []
-    pairsList = list(zip(possibA, possibB, strict=True))
+    pairsList = possibility.partPairs(possibA, possibB)
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
-        if not isinstance(higherPitchA, pitch.Pitch):
-            continue
-        if not isinstance(higherPitchB, pitch.Pitch):
+        if _isRest(higherPitchA) or _isRest(higherPitchB):
             continue
         for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
-            if not isinstance(lowerPitchA, pitch.Pitch):
-                continue
-            if not isinstance(lowerPitchB, pitch.Pitch):
+            if _isRest(lowerPitchA) or _isRest(lowerPitchB):
                 continue
             if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 0:
                 continue
@@ -651,7 +645,7 @@ def parallelOctaves(possibA: PossibilityWithRests, possibB: PossibilityWithRests
     return partViolations
 
 
-def hiddenOctaves(possibA: PossibilityWithRests, possibB: PossibilityWithRests) -> list[PartPair]:
+def hiddenOctaves(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list with a (highestPart, lowestPart) pair which represents
     a hidden octave between shared outer parts of possibA and possibB. The
@@ -692,16 +686,11 @@ def hiddenOctaves(possibA: PossibilityWithRests, possibB: PossibilityWithRests) 
     * Changed in v11: renamed from hiddenOctave (singular) to match parallelOctaves.
     '''
     partViolations: list[PartPair] = []
-    pairsList = list(zip(possibA, possibB, strict=True))
+    pairsList = possibility.partPairs(possibA, possibB)
     (highestPitchA, highestPitchB) = pairsList[0]
     (lowestPitchA, lowestPitchB) = pairsList[-1]
-    if not isinstance(highestPitchA, pitch.Pitch):
-        return partViolations
-    if not isinstance(highestPitchB, pitch.Pitch):
-        return partViolations
-    if not isinstance(lowestPitchA, pitch.Pitch):
-        return partViolations
-    if not isinstance(lowestPitchB, pitch.Pitch):
+    if any(_isRest(p) for p in (
+            highestPitchA, highestPitchB, lowestPitchA, lowestPitchB)):
         return partViolations
 
     if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 0:
@@ -722,23 +711,30 @@ def hiddenOctaves(possibA: PossibilityWithRests, possibB: PossibilityWithRests) 
 # Helper Methods
 
 
-def generalNoteToPitch(music21GeneralNote: note.GeneralNote) -> pitch.Pitch | t.Literal['RT']:
+def generalNoteToPitch(music21GeneralNote: note.GeneralNote) -> pitch.Pitch:
     '''
     Takes a :class:`~music21.note.GeneralNote`. If it is a :class:`~music21.note.Note`,
-    returns its pitch. Otherwise, returns the string "RT", a rest placeholder.
+    returns its pitch.
 
     >>> n1 = note.Note('G5')
     >>> c1 = chord.Chord(['C3', 'E3', 'G3'])
 
     >>> figuredBass.checker.generalNoteToPitch(n1)
     <music21.pitch.Pitch G5>
-    >>> figuredBass.checker.generalNoteToPitch(c1)
-    'RT'
+
+    A chord (or rest) becomes the rest placeholder:
+
+    >>> restPlaceholder = figuredBass.checker.generalNoteToPitch(c1)
+    >>> restPlaceholder.ps == figuredBass.possibility.POSSIBILITY_REST_PS
+    True
+    >>> restPlaceholder.ps
+    0.0
     '''
     if isinstance(music21GeneralNote, note.Note):
         return music21GeneralNote.pitch
-    else:
-        return 'RT'
+    restPlaceholder = pitch.Pitch()
+    restPlaceholder.ps = possibility.POSSIBILITY_REST_PS
+    return restPlaceholder
 
 
 _DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments,
