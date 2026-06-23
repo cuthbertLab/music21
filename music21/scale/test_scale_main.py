@@ -529,10 +529,10 @@ class Test(unittest.TestCase):
     def testRagMarwaC(self):
         sc = scale.RagMarwa('c4')
 
-        self.assertEqual(sc.abstract.network.realizeTermini('c1', Terminus.LOW),
+        self.assertEqual(sc.abstract._net.realizeTermini('c1', Terminus.LOW),
                          (pitch.Pitch('C1'), pitch.Pitch('C2')))
 
-        self.assertEqual(sc.abstract.network.realizeMinMax('c1', Terminus.LOW),
+        self.assertEqual(sc.abstract._net.realizeMinMax('c1', Terminus.LOW),
                          (pitch.Pitch('C1'), pitch.Pitch('D-2')))
 
         # descending from d-2, we can either go to c2 or b1
@@ -692,7 +692,7 @@ class Test(unittest.TestCase):
     def testScalaScaleB(self):
         # test importing from scala archive
         sc = scale.ScalaScale('e2', 'fj 12tet')
-        self.assertEqual(sc._abstract.network.pitchSimplification, 'mostCommon')
+        self.assertEqual(sc._abstract._net.pitchSimplification, 'mostCommon')
         # this is showing that there are slight microtonal adjustments,
         # but they are less than one cent large
         pList = sc.pitches
