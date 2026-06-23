@@ -22,7 +22,7 @@ from music21 import note
 # from music21 import common
 
 if t.TYPE_CHECKING:
-    from music21.common.types import StreamType
+    from music21 import stream
 
 LINEBREAK_TOKEN = ' // '
 
@@ -55,12 +55,12 @@ class IndexedLyric(namedtuple(
         'absoluteEnd': '''the end position in all the lyrics'''
     }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f'IndexedLyric(el={self.el!r}, start={self.start!r}, end={self.end!r}, '
                 f'measure={self.measure!r}, lyric={self.lyric!r}, text={self.text!r}, '
                 f'identifier={self.identifier!r})')
 
-    def modify(self, **keywords):
+    def modify(self, **keywords) -> IndexedLyric:
         '''
         see docs for SortTuple for what this does
         '''
@@ -100,7 +100,7 @@ class SearchMatch(namedtuple('SearchMatch',
             ''',
     }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f'SearchMatch(mStart={self.mStart!r}, mEnd={self.mEnd!r}, '
                 f'matchText={self.matchText!r}, els={self.els!r}, indices=[...], '
                 f'identifier={self.identifier!r})')
@@ -135,8 +135,8 @@ class LyricSearcher:
         found if a work contains multiple voices.
     '''
 
-    def __init__(self, s: StreamType|None = None, *, wordSeparator: str = ' '):
-        self.stream: StreamType|None = s
+    def __init__(self, s: stream.Stream|None = None, *, wordSeparator: str = ' '):
+        self.stream: stream.Stream|None = s
         self.includeIntermediateElements = False  # currently does nothing
         self.includeTrailingMelisma = False  # currently does nothing
 
@@ -164,7 +164,7 @@ class LyricSearcher:
             self.index()
         return self._indexTuples
 
-    def index(self, s=None) -> list[IndexedLyric]:
+    def index(self, s: stream.Stream|None = None) -> list[IndexedLyric]:
         # noinspection PyShadowingNames
         '''
         A method that indexes the Stream's lyrics and returns the list
@@ -200,6 +200,9 @@ class LyricSearcher:
             s = self.stream
         else:
             self.stream = s
+
+        if s is None:
+            raise LyricSearcherException('Cannot index without a Stream to search.')
 
         indexByIdentifier: OrderedDict[str|int, list[IndexedLyric]] = OrderedDict()
         iTextByIdentifier: OrderedDict[str|int, str] = OrderedDict()
@@ -244,12 +247,12 @@ class LyricSearcher:
                     lastSyllabic = ly.components[-1].syllabic
                 lastSyllabicByIdentifier[lyIdentifier] = lastSyllabic
 
-        indexPreliminary = []
+        indexPreliminary: list[IndexedLyric] = []
         for oneIdentifierIndex in indexByIdentifier.values():
             indexPreliminary.extend(oneIdentifierIndex)
 
         absolutePosShift = 0
-        lastIdentifier = None
+        lastIdentifier: str|int|None = None
         lastEnd = 0
         index = []
         oneIndex: IndexedLyric
@@ -269,7 +272,9 @@ class LyricSearcher:
         self._indexText = iText
         return index
 
-    def search(self, textOrRe, s=None) -> list[SearchMatch]:
+    def search(self,
+               textOrRe: str|re.Pattern,
+               s: stream.Stream|None = None) -> list[SearchMatch]:
         # noinspection SpellCheckingInspection
         r'''
         Return a list of SearchMatch objects matching a string or regular expression.
@@ -317,19 +322,14 @@ class LyricSearcher:
             self.index(s)
 
         if isinstance(textOrRe, str):
-            plainText = True
+            return self._reSearch(re.compile(re.escape(textOrRe)))
         elif hasattr(textOrRe, 'finditer'):
-            plainText = False
+            return self._reSearch(textOrRe)
         else:
             raise LyricSearcherException(
                 f'{textOrRe} is not a string or RE with the finditer() function')
 
-        if plainText is True:
-            return self._reSearch(re.compile(re.escape(textOrRe)))
-        else:
-            return self._reSearch(textOrRe)
-
-    def _findObjInIndexByPos(self, pos) -> IndexedLyric:
+    def _findObjInIndexByPos(self, pos: int) -> IndexedLyric:
         '''
         Finds an object in ._indexTuples by search position.
 
@@ -344,11 +344,11 @@ class LyricSearcher:
 
         raise LyricSearcherException(f'Could not find position {pos} in text')
 
-    def _findObjsInIndexByPos(self, posStart, posEnd=999999) -> list[IndexedLyric]:
+    def _findObjsInIndexByPos(self, posStart: int, posEnd: int = 999999) -> list[IndexedLyric]:
         '''
         Finds a list of objects in ._indexTuples by search position (inclusive)
         '''
-        indices = []
+        indices: list[IndexedLyric] = []
         for i in self._indexTuples:
             if i.absoluteEnd > posStart and i.absoluteStart <= posEnd:
                 indices.append(i)
@@ -405,7 +405,7 @@ class LyricSearcher:
 class Test(unittest.TestCase):
     pass
 
-    def testMultipleLyricsInNote(self):
+    def testMultipleLyricsInNote(self) -> None:
         '''
         This score uses a non-breaking space as an elision
         '''
@@ -444,20 +444,21 @@ class Test(unittest.TestCase):
         s = converter.parse(partXML, format='MusicXML')
         ly = s.flatten().notes[0].lyrics[0]
 
-        def runSearch():
+        def runSearch() -> None:
             ls = search.lyrics.LyricSearcher(s)
             # there is a non-breaking space between the two la's.
             self.assertEqual(ls.indexText, 'la la')
 
         runSearch()
-        ly.components[0].syllabic = 'begin'
-        ly.components[1].syllabic = 'end'
+        components = t.cast('list[note.Lyric]', ly.components)
+        components[0].syllabic = 'begin'
+        components[1].syllabic = 'end'
         runSearch()
-        ly.components[0].syllabic = 'single'
-        ly.components[1].syllabic = 'single'
+        components[0].syllabic = 'single'
+        components[1].syllabic = 'single'
         runSearch()
 
-    def testMultipleVerses(self):
+    def testMultipleVerses(self) -> None:
         from music21 import converter
         from music21 import search
 
@@ -569,7 +570,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match[0].mEnd, 2)
         self.assertEqual(match[0].identifier, 1)
 
-    def testCustomSeparator(self):
+    def testCustomSeparator(self) -> None:
         from music21 import converter
         from music21 import search
         import more_itertools
