@@ -20,14 +20,13 @@ from music21 import voiceLeading
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL
 from music21.figuredBass import possibility
+from music21.figuredBass.possibility import Possibility
 from music21.exceptions21 import Music21Exception
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable
 
-# Voice-leading here works on possibility.Possibility tuples (one Pitch per part).
-# A part that is silent (a rest, or any non-Note) is represented by a Pitch whose ps
-# is possibility.POSSIBILITY_REST_PS; the checks skip those placeholder pitches.
+# Voice-leading here works on Possibility tuples (one Pitch per part).
 # (offset, endTime) delimiting a voice-leading moment.
 type OffsetEndTime = tuple[OffsetQL, OffsetQL]
 # (partNumberA, partNumberB) one-indexed voice pair forming a violation.
@@ -237,7 +236,7 @@ def correlateHarmonies(
 
 def checkSinglePossibilities(
     music21Stream: stream.Score,
-    functionToApply: Callable[[possibility.Possibility], list[PartPair]],
+    functionToApply: Callable[[Possibility], list[PartPair]],
     color: str | None = '#FF0000',
     debug: bool = False
 ) -> None:
@@ -304,7 +303,7 @@ def checkSinglePossibilities(
 def checkConsecutivePossibilities(
     music21Stream: stream.Score,
     functionToApply: Callable[
-        [possibility.Possibility, possibility.Possibility], list[PartPair]
+        [Possibility, Possibility], list[PartPair]
     ],
     color: str | None = '#FF0000',
     debug: bool = False
@@ -389,7 +388,7 @@ def checkConsecutivePossibilities(
 # represent two voices which form a voice crossing.
 
 
-def voiceCrossing(possibA: possibility.Possibility) -> list[PartPair]:
+def voiceCrossing(possibA: Possibility) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
     two voices which form a voice crossing. The parts from the lowest part to
@@ -433,7 +432,7 @@ def voiceCrossing(possibA: possibility.Possibility) -> list[PartPair]:
 
 
 def parallelFifths(
-    possibA: possibility.Possibility, possibB: possibility.Possibility
+    possibA: Possibility, possibB: Possibility
 ) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
@@ -477,7 +476,7 @@ def parallelFifths(
     []
     '''
     partViolations: list[PartPair] = []
-    pairsList = list(zip(possibA, possibB, strict=True))
+    pairsList = possibility.partPairs(possibA, possibB)
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
@@ -506,7 +505,7 @@ def parallelFifths(
 
 
 def hiddenFifths(
-    possibA: possibility.Possibility, possibB: possibility.Possibility
+    possibA: Possibility, possibB: Possibility
 ) -> list[PartPair]:
     '''
     Returns a list with a (highestPart, lowestPart) pair which represents
@@ -558,7 +557,7 @@ def hiddenFifths(
     * Changed in v11: renamed from hiddenFifth (singular) to match parallelFifths.
     '''
     partViolations: list[PartPair] = []
-    pairsList = list(zip(possibA, possibB, strict=True))
+    pairsList = possibility.partPairs(possibA, possibB)
     (highestPitchA, highestPitchB) = pairsList[0]
     (lowestPitchA, lowestPitchB) = pairsList[-1]
     if any(_isRest(p) for p in (
@@ -581,7 +580,7 @@ def hiddenFifths(
 
 
 def parallelOctaves(
-    possibA: possibility.Possibility, possibB: possibility.Possibility
+    possibA: Possibility, possibB: Possibility
 ) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
@@ -626,7 +625,7 @@ def parallelOctaves(
     []
     '''
     partViolations: list[PartPair] = []
-    pairsList = list(zip(possibA, possibB, strict=True))
+    pairsList = possibility.partPairs(possibA, possibB)
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
@@ -655,7 +654,7 @@ def parallelOctaves(
 
 
 def hiddenOctaves(
-    possibA: possibility.Possibility, possibB: possibility.Possibility
+    possibA: Possibility, possibB: Possibility
 ) -> list[PartPair]:
     '''
     Returns a list with a (highestPart, lowestPart) pair which represents
@@ -697,7 +696,7 @@ def hiddenOctaves(
     * Changed in v11: renamed from hiddenOctave (singular) to match parallelOctaves.
     '''
     partViolations: list[PartPair] = []
-    pairsList = list(zip(possibA, possibB, strict=True))
+    pairsList = possibility.partPairs(possibA, possibB)
     (highestPitchA, highestPitchB) = pairsList[0]
     (lowestPitchA, lowestPitchB) = pairsList[-1]
     if any(_isRest(p) for p in (
@@ -725,10 +724,7 @@ def hiddenOctaves(
 def generalNoteToPitch(music21GeneralNote: note.GeneralNote) -> pitch.Pitch:
     '''
     Takes a :class:`~music21.note.GeneralNote`. If it is a :class:`~music21.note.Note`,
-    returns its pitch. Otherwise (a rest, a chord, or anything that is not a single
-    Note) returns a placeholder :class:`~music21.pitch.Pitch` whose ps is
-    :obj:`~music21.figuredBass.possibility.POSSIBILITY_REST_PS`; the voice-leading
-    checks skip such placeholders.
+    returns its pitch.
 
     >>> n1 = note.Note('G5')
     >>> c1 = chord.Chord(['C3', 'E3', 'G3'])
