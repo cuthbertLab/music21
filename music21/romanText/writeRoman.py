@@ -119,7 +119,7 @@ class RnWriter(prebase.ProtoM21Object):
 
     def __init__(self,
                  obj: base.Music21Object,
-                 ):
+                 ) -> None:
 
         self.composer = 'Composer unknown'
         self.title = 'Title unknown'
@@ -179,7 +179,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.prepSequentialListOfLines()
 
     def _makeContainer(self,
-                       obj: stream.Stream|list):
+                       obj: stream.Stream|list[base.Music21Object]) -> stream.Part:
         '''
         Makes a placeholder container for the unusual cases where this class is called on
         generic- or non-stream object as opposed to
@@ -194,7 +194,7 @@ class RnWriter(prebase.ProtoM21Object):
         return container
 
     def prepTitle(self,
-                  md: metadata.Metadata):
+                  md: metadata.Metadata) -> None:
         '''
         Attempt to prepare a single work title from the score metadata looking at each of
         the title, movementNumber and movementName attributes.
@@ -214,7 +214,7 @@ class RnWriter(prebase.ProtoM21Object):
         'Fake title - No.123456789: Fake movementName'
         '''
 
-        workingTitle = []
+        workingTitle: list[str] = []
 
         if md.bestTitle:
             workingTitle.append(md.bestTitle)
@@ -229,7 +229,7 @@ class RnWriter(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 
-    def prepSequentialListOfLines(self):
+    def prepSequentialListOfLines(self) -> None:
         '''
         Prepares a sequential list of text lines, with time signatures and Roman numerals
         adding this to the (already prepared) metadata preamble ready for printing.
@@ -318,6 +318,7 @@ class RnWriter(prebase.ProtoM21Object):
                 #   numeral to avoid printing an unnecessary indication like
                 #   'b3' prior to the repeat
                 last_rn = thisMeasure[roman.RomanNumeral].last()
+                beat: float|fractions.Fraction
                 if last_rn is None:
                     beat = 1.0
                 else:
@@ -332,7 +333,7 @@ class RnWriter(prebase.ProtoM21Object):
                 self.combinedList.append(measureString)
 
     def getChordString(self,
-                       rn: roman.RomanNumeral):
+                       rn: roman.RomanNumeral) -> str:
         '''
         Produce a string from a Roman numeral with the chord and
         the key if that key constitutes a change from the foregoing context.
@@ -365,7 +366,7 @@ class RnWriter(prebase.ProtoM21Object):
 def rnString(measureNumber: int|str,
              beat: str|int|float|fractions.Fraction,
              chordString: str,
-             inString: str|None = ''):
+             inString: str|None = '') -> str:
     '''
     Creates or extends a string of RomanText such that the output corresponds to a single
     measure line.
@@ -413,7 +414,7 @@ def rnString(measureNumber: int|str,
 
 
 def intBeat(beat: str|int|float|fractions.Fraction,
-            roundValue: int = 2):
+            roundValue: int = 2) -> int|float:
     '''
     Converts beats to integers if possible, and otherwise to rounded decimals.
     Accepts input as string, int, float, or fractions.Fraction.
@@ -478,7 +479,7 @@ class Test(unittest.TestCase):
     for handling the special case of opus objects.
     '''
 
-    def testOpus(self):
+    def testOpus(self) -> None:
         '''
         As the rntxt input parser handles Opus objects
         (i.e. more than one score within the same rntxt files),
@@ -526,7 +527,7 @@ class Test(unittest.TestCase):
                   ]:
             self.assertIn(x, testOpusRnWriter.combinedList)
 
-    def testTwoCorpusPiecesAndTwoCorruptions(self):
+    def testTwoCorpusPiecesAndTwoCorruptions(self) -> None:
         '''
         Tests for two analysis cases (the smallest rntxt files in the music21 corpus)
         along with two test by modifying those scores.
@@ -575,7 +576,7 @@ class Test(unittest.TestCase):
         adjustedMonte = RnWriter(scoreMonte)
         self.assertEqual(adjustedMonte.title, 'Fake title - No.123456789: Fake movementName')
 
-    def testTypeParses(self):
+    def testTypeParses(self) -> None:
         '''
         Tests successful init on a range of supported objects (score, part, even RomanNumeral).
         '''
@@ -606,7 +607,7 @@ class Test(unittest.TestCase):
         rn = roman.RomanNumeral('viio6', 'G')
         RnWriter(rn)  # and even (perhaps dubiously) directly on other music21 objects
 
-    def testRepeats(self):
+    def testRepeats(self) -> None:
         from music21 import converter
         rntxt = textwrap.dedent('''
             Time Signature: 2/4
@@ -621,7 +622,7 @@ class Test(unittest.TestCase):
         writer = RnWriter(s)
         assert '\n'.join(writer.combinedList).strip().endswith(rntxt.strip())
 
-    def testRnString(self):
+    def testRnString(self) -> None:
         test = rnString(1, 1, 'G: I')
         self.assertEqual(test, 'm1 G: I')  # no beat number given for b1
 
@@ -631,7 +632,7 @@ class Test(unittest.TestCase):
         with self.assertRaises(ValueError):  # error when the measure numbers don't match
             rnString(15, 1, 'viio6', 'm14 G: I')
 
-    def testIntBeat(self):
+    def testIntBeat(self) -> None:
         testInt = intBeat(1, roundValue=2)
         self.assertEqual(testInt, 1)
 
