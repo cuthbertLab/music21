@@ -18,6 +18,7 @@ generally useful beyond to MSAC.
 from __future__ import annotations
 
 import os
+import shlex
 import subprocess
 
 def getDirBuildHtml():
@@ -29,28 +30,6 @@ def getDirBuildHtml():
     dirBuild = os.path.join(parentDir, 'documentation', 'build')
     dirBuildHtml = os.path.join(dirBuild, 'html')
     return dirBuildHtml
-
-
-# noinspection SpellCheckingInspection
-# def main():
-#     # this needs to be on level higher then the level of the source
-#     remoteHost = 'music21.org'
-#     remoteDir = '/home/bitnami/htdocs/music21docs/'
-#     keyFile = '/Users/cuthbert/Web/trecentoweb_key-us-west-2.pem'
-#     user = 'bitnami'
-#
-#     src = getDirBuildHtml()
-#
-#     # -r flag makes this recursive
-#     # noinspection SpellCheckingInspection
-#     cmdStr = (
-#         f'tar czpf --disable-copyfile --no-xattrs - -C {src} . | '
-#         f'ssh -i "{keyFile}" {user}@{remoteHost} '
-#         f'"tar xzpf - -C {remoteDir}"'
-#     )
-#     print(cmdStr)
-#
-#     os.system(cmdStr)
 
 
 def main():
@@ -78,7 +57,7 @@ def main():
     print('Unzipping on remote server.')
     subprocess.run([
         'ssh', '-i', key, remote,
-        f'unzip -oq {remoteZip} -d {remoteDir} && rm -f {remoteZip}'
+        f'unzip -oq {shlex.quote(remoteZip)} -d {shlex.quote(remoteDir)} && rm -f {shlex.quote(remoteZip)}'
     ], check=True)
 
     # Remove local
