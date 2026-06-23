@@ -52,6 +52,19 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     >>> cdContiguousSegment = search.serial.ContiguousSegmentOfNotes([n1, n2], s, 0)
     >>> cdContiguousSegment
     <music21.search.serial.ContiguousSegmentOfNotes ['C4', 'D4']>
+
+    The `containerStream` records which stream the segment was drawn from, so a
+    segment can always be traced back to its source:
+
+    >>> cdContiguousSegment.containerStream is s
+    True
+
+    Every contiguous segment must have a container stream, so if none is given
+    an empty one is supplied rather than leaving it unset:
+
+    >>> orphan = search.serial.ContiguousSegmentOfNotes([n1, n2])
+    >>> isinstance(orphan.containerStream, stream.Stream)
+    True
     '''
     _DOC_ATTR: dict[str, str] = {
         'segment': 'The list of notes and chords in the contiguous segment.',
@@ -918,6 +931,15 @@ class SegmentMatcher:
 
     >>> GABandABC[0].startMeasureNumber, GABandABC[1].startMeasureNumber
     (5, 6)
+
+    Every found segment keeps a reference to the stream that was searched in its
+    :attr:`~music21.search.serial.ContiguousSegmentOfNotes.containerStream`
+    attribute, so a match can be traced back to the score it came from:
+
+    >>> GABandABC[0].containerStream is sc
+    True
+    >>> GABandABC[1].containerStream is sc
+    True
 
     In case it is not clear, we can use
     the :attr:`~music21.search.serial.ContiguousSegmentsOfNotes.matchedSegment` property
