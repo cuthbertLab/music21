@@ -287,8 +287,7 @@ class StreamSearcher:
         in the `searchList`, `searchEl`.  Both are *single* elements such as
         Notes, Rests, or Chords -- never Streams.  (The `stream` in `streamEl`
         is short for "an element drawn *from* the stream being searched"; it is
-        not itself a :class:`~music21.stream.Stream`, which is why both
-        arguments are typed as plain `Music21Object`.)
+        not itself a :class:`~music21.stream.Stream`.)
 
         An algorithm returns one of three values:
 
