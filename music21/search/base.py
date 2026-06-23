@@ -280,7 +280,34 @@ class StreamSearcher:
         self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object
     ) -> bool|None:
         '''
-        An algorithm that supports Wildcards -- added by default to the search function.
+        An algorithm that supports Wildcards -- added by default to the search.
+
+        Every algorithm compares one element taken from the stream being
+        searched, `streamEl`, against the element it is currently lined up with
+        in the `searchList`, `searchEl`.  Both are *single* elements such as
+        Notes, Rests, or Chords -- never Streams.  (The `stream` in `streamEl`
+        is short for "an element drawn *from* the stream being searched"; it is
+        not itself a :class:`~music21.stream.Stream`, which is why both
+        arguments are typed as plain `Music21Object`.)
+
+        An algorithm returns one of three values:
+
+        * True -- it is certain the pair matches; the remaining algorithms are
+          not consulted for this pair.
+        * False -- it is certain the pair does not match; the candidate window
+          fails here.
+        * None -- it has no opinion, so the next algorithm in `self.algorithms`
+          is consulted.
+
+        `wildcardAlgorithm` returns True whenever `searchEl` is a
+        :class:`Wildcard` (which matches any element of the stream) and None
+        otherwise:
+
+        >>> ss = search.StreamSearcher(stream.Stream(), [])
+        >>> ss.wildcardAlgorithm(note.Note('C'), search.Wildcard())
+        True
+        >>> ss.wildcardAlgorithm(note.Note('C'), note.Note('D')) is None
+        True
         '''
         if isinstance(searchEl, Wildcard):
             return True
@@ -290,6 +317,30 @@ class StreamSearcher:
     def rhythmAlgorithm(
         self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object
     ) -> bool|None:
+        '''
+        Compares the rhythm (`duration.quarterLength`) of the stream element
+        `streamEl` against the search element `searchEl`.  See
+        :meth:`wildcardAlgorithm` for what the two arguments are and what the
+        True/False/None return value means.
+
+        Returns True if `searchEl` has a :class:`WildcardDuration` (any rhythm
+        matches), False if the two `quarterLength`s differ, or None when they
+        are equal -- no opinion, so an algorithm such as `noteNameAlgorithm`
+        can still rule on the pitch:
+
+        >>> ss = search.StreamSearcher(stream.Stream(), [])
+        >>> half = note.Note(quarterLength=2.0)
+        >>> alsoHalf = note.Note(quarterLength=2.0)
+        >>> ss.rhythmAlgorithm(half, alsoHalf) is None
+        True
+        >>> quarter = note.Note(quarterLength=1.0)
+        >>> ss.rhythmAlgorithm(half, quarter)
+        False
+        >>> wildRhythm = note.Note()
+        >>> wildRhythm.duration = search.WildcardDuration()
+        >>> ss.rhythmAlgorithm(half, wildRhythm)
+        True
+        '''
         if isinstance(searchEl.duration, WildcardDuration):
             return True
         if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
@@ -299,6 +350,20 @@ class StreamSearcher:
     def noteNameAlgorithm(
         self, streamEl: m21Base.Music21Object, searchEl: m21Base.Music21Object
     ) -> bool|None:
+        '''
+        Compares the `.name` of the stream element `streamEl` against the
+        search element `searchEl`.  See :meth:`wildcardAlgorithm` for what the
+        two arguments are and what the True/False/None return value means.
+
+        Returns False if either element lacks a `.name` or the names differ,
+        and None (no opinion) when the names match:
+
+        >>> ss = search.StreamSearcher(stream.Stream(), [])
+        >>> ss.noteNameAlgorithm(note.Note('C'), note.Note('C')) is None
+        True
+        >>> ss.noteNameAlgorithm(note.Note('C'), note.Note('D'))
+        False
+        '''
         if not hasattr(searchEl, 'name'):
             return False
         if not hasattr(streamEl, 'name'):
