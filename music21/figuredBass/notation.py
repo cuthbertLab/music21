@@ -216,8 +216,8 @@ class Notation(prebase.ProtoM21Object):
         # Parse notation string
         self.notationColumn: str = notationColumn or ''
         self.figureStrings: list[str] = []
-        # numbers are usually ints, but an extender-only figure stores
-        # EXTENDER_SENTINEL (see _parseNotationColumn), and a figure with a modifier
+        # numbers are usually strings cast as int()s, but an extender-only figure stores
+        # the int EXTENDER_SENTINEL (see _parseNotationColumn), and a figure with a modifier
         # but no number stores None until longhand expansion.
         self.origNumbers: tuple[int|None, ...] = ()
         self.origModStrings: tuple[str|None, ...] = ()
