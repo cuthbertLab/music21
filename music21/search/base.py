@@ -306,8 +306,8 @@ class StreamSearcher:
         >>> ss = search.StreamSearcher(stream.Stream(), [])
         >>> ss.wildcardAlgorithm(note.Note('C'), search.Wildcard())
         True
-        >>> ss.wildcardAlgorithm(note.Note('C'), note.Note('D')) is None
-        True
+        >>> print(ss.wildcardAlgorithm(note.Note('C'), note.Note('D')))
+        None
         '''
         if isinstance(searchEl, Wildcard):
             return True
@@ -331,8 +331,8 @@ class StreamSearcher:
         >>> ss = search.StreamSearcher(stream.Stream(), [])
         >>> half = note.Note(quarterLength=2.0)
         >>> alsoHalf = note.Note(quarterLength=2.0)
-        >>> ss.rhythmAlgorithm(half, alsoHalf) is None
-        True
+        >>> print(ss.rhythmAlgorithm(half, alsoHalf))
+        None
         >>> quarter = note.Note(quarterLength=1.0)
         >>> ss.rhythmAlgorithm(half, quarter)
         False
@@ -359,8 +359,8 @@ class StreamSearcher:
         and None (no opinion) when the names match:
 
         >>> ss = search.StreamSearcher(stream.Stream(), [])
-        >>> ss.noteNameAlgorithm(note.Note('C'), note.Note('C')) is None
-        True
+        >>> print(ss.noteNameAlgorithm(note.Note('C'), note.Note('C')))
+        None
         >>> ss.noteNameAlgorithm(note.Note('C'), note.Note('D'))
         False
         '''
