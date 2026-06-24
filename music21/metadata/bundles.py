@@ -1337,7 +1337,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             storedCorpusClient = self._corpus  # no weakrefs allowed
             self._corpus = None
 
-            # Protocol 5 is Python 3.8 and above.
+            # Protocol 5 available since Python 3.8.
             uncompressed = pickle.dumps(self, protocol=5)
 
             # # uncomment this and SafePickler when we next need to

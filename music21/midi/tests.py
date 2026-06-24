@@ -1629,6 +1629,15 @@ class Test(unittest.TestCase):
         self.assertEqual(getEndEvents()[0].time, defaults.ticksAtStart)
         self.assertEqual(getEndEvents(addEndDelay=False)[0].time, 0)
 
+    def testContainsWorksWithIntEnum(self):
+        '''
+        Make sure that our previous ContainsEnums now work with Python 3.12
+        IntEnums
+        '''
+        c = ChannelVoiceMessages.NOTE_OFF
+        self.assertIn(c, ChannelVoiceMessages)
+        self.assertTrue(c in ChannelVoiceMessages)
+
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

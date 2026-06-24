@@ -1849,7 +1849,7 @@ class Unpitched(NotRest):
     >>> unp.displayStep = 'G'
     >>> unp.pitch
     Traceback (most recent call last):
-    AttributeError: 'Unpitched' object has no attribute 'pitch...
+    AttributeError: 'Unpitched' object has no attribute 'pitch'. Did you mean: 'pitches'?
 
     Unpitched elements generally have an instrument object associated with them:
 
@@ -1872,9 +1872,6 @@ class Unpitched(NotRest):
     >>> unp == unp2
     False
     '''
-    # TODO: when Python 3.12 is minimum version.  Change AttributeError to read:
-    #        AttributeError: 'Unpitched' object has no attribute 'pitch'. Did you mean: 'pitches'?
-
     equalityAttributes = ('displayStep', 'displayOctave', 'storedInstrument')
 
     def __init__(

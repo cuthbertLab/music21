@@ -42,9 +42,21 @@ class ContainsMeta(EnumType):
             return False
 
 
-class ContainsEnum(IntEnum, metaclass=ContainsMeta):
+class ContainsEnum(IntEnum):
     '''
-    An IntEnum that allows "in" checks against the values of the enum.
+    An IntEnum that allows "in" checks against the values of the enum with
+    hasValue.
+
+    >>> from music21.midi import ChannelVoiceMessages
+    >>> issubclass(ChannelVoiceMessages, common.enums.ContainsEnum)
+    True
+    >>> ChannelVoiceMessages.NOTE_ON
+    <ChannelVoiceMessages.NOTE_ON: 0x90>
+    >>> ChannelVoiceMessages.NOTE_ON in ChannelVoiceMessages
+    True
+    >>> 0x90 in ChannelVoiceMessages
+    True
+    >>> ChannelVoiceMessages._value2member_map_
     '''
     def __repr__(self):
         val = super().__repr__()
@@ -191,10 +203,10 @@ class OffsetSpecial(StrEnum):
 
     * New in v7.
     * Note -- a previous note said that the 'highestTime' == OffsetSpecial.AT_END
-      would be removed in v9 or an upcoming music21 release.  Since then, Python has
+      would be removed in v9 or an upcoming music21 release.  Since then, Python
       changed direction and in 3.11 added StrEnum to the standard library and in 3.12
       allows for containment checks of strings in StrEnum (such as
-      `'lowestOffset' in OffsetSpecial` returning True).  Therefore there is no
+      `'lowestOffset' in OffsetSpecial` returning True).  Therefore, there is no
       reason for music21 to ever remove this valuable and backwards compatible
       tool.
     '''
