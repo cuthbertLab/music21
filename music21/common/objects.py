@@ -70,6 +70,8 @@ class RelativeCounter(collections.Counter):
         sortedKeys = sorted(super().__iter__(), key=lambda x: self[x], reverse=True)
         yield from sortedKeys
 
+    # deliberately a generator (not dict's re-iterable ItemsView) so that the
+    # pairs follow the most-common-first order of the overridden __iter__.
     def items(self) -> Iterator[tuple[t.Any, t.Any]]:  # type: ignore[override]
         for k in self:
             yield k, self[k]
