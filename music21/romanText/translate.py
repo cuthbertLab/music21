@@ -176,8 +176,8 @@ class RomanTextUnprocessedMetadata(base.Music21Object):
 def _copySingleMeasure(
     rtTagged: rtObjects.RTMeasure,
     p: stream.Part,
-    kCurrent: key.Key|None,
-) -> tuple[stream.Measure|None, key.Key|None]:
+    kCurrent: key.Key,
+) -> tuple[stream.Measure, key.Key]:
     '''
     Given a RomanText token, a Part used as the current container,
     and the current Key, return a Measure copied from the past of the Part.
@@ -208,10 +208,6 @@ def _copySingleMeasure(
             m.number = rtTagged.number[0]
             # update all keys
             for rnPast in m.getElementsByClass(roman.RomanNumeral):
-                if kCurrent is None:  # pragma: no cover
-                    # should not happen
-                    raise RomanTextTranslateException(
-                        'attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange:
                     kCurrent = rnPast.key
                 elif rnPast.pivotChord is not None:
@@ -228,14 +224,17 @@ def _copySingleMeasure(
                     m.replace(rnPast, newRN)
 
             break
+    if m is None:
+        raise RomanTextTranslateException(
+            f'Could not find measure {target} to copy from')
     return m, kCurrent
 
 
 def _copyMultipleMeasures(
     rtMeasure: rtObjects.RTMeasure,
     p: stream.Part,
-    kCurrent: key.Key|None,
-) -> tuple[list[stream.Measure], key.Key|None]:
+    kCurrent: key.Key,
+) -> tuple[list[stream.Measure], key.Key]:
     '''
     Given a RomanText token for a RTMeasure, a
     Part used as the current container, and the current Key,
@@ -279,10 +278,6 @@ def _copyMultipleMeasures(
             # update all keys
             allRNs = list(m.getElementsByClass(roman.RomanNumeral))
             for rnPast in allRNs:
-                if kCurrent is None:  # pragma: no cover
-                    # should not happen
-                    raise RomanTextTranslateException(
-                        'attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange:
                     kCurrent = rnPast.key
                 elif rnPast.pivotChord is not None:
@@ -300,6 +295,9 @@ def _copyMultipleMeasures(
 
         if mPast.number == targetEnd:
             break
+    if not measures:
+        raise RomanTextTranslateException(
+            f'Could not find measures {targetStart}-{targetEnd} to copy from')
     return measures, kCurrent
 
 
@@ -361,7 +359,8 @@ class PartTranslator:
         self.tsCurrent: meter.TimeSignature = meter.TimeSignature('4/4')  # create default 4/4
         self.tsAtTimeOfLastChord: meter.TimeSignature = self.tsCurrent
         self.tsSet = False  # store if set to a measure
-        self.lastMeasureToken: rtObjects.RTMeasure|None = None
+        # measure-0 sentinel; always overwritten with the real token before use
+        self.lastMeasureToken: rtObjects.RTMeasure = rtObjects.RTMeasure('m0')
         self.lastMeasureNumber = 0
         self.previousRn: note.GeneralNote|None = None
         self.keySigCurrent: key.KeySignature|None = None
@@ -375,8 +374,9 @@ class PartTranslator:
 
         self.repeatEndings: dict[int, list[tuple[int, stream.Measure]]] = {}
 
-        # reset for each measure
-        self.currentMeasureToken: rtObjects.RTMeasure|None = None
+        # reset for each measure.  currentMeasureToken starts as a measure-0
+        # sentinel and is always overwritten with the real token before use.
+        self.currentMeasureToken: rtObjects.RTMeasure = rtObjects.RTMeasure('m0')
         self.previousChordInMeasure: note.GeneralNote|None = None
         self.pivotChordPossible = False
         self.numberOfAtomsInCurrentMeasure = 0
@@ -570,9 +570,7 @@ class PartTranslator:
         # create a new measure or copy a past measure
         if isSingleMeasureCopy:  # if not a range
             p.coreElementsChanged()
-            mCopy, kCopied = _copySingleMeasure(measureLineToken, p, self.kCurrent)
-            m = t.cast(stream.Measure, mCopy)
-            self.kCurrent = t.cast(key.Key, kCopied)
+            m, self.kCurrent = _copySingleMeasure(measureLineToken, p, self.kCurrent)
             p.coreAppend(m)
             self.lastMeasureNumber = m.number
             self.lastMeasureToken = measureLineToken
@@ -582,8 +580,7 @@ class PartTranslator:
 
         elif isMultipleMeasureCopy:
             p.coreElementsChanged()
-            measures, kCopiedMulti = _copyMultipleMeasures(measureLineToken, p, self.kCurrent)
-            self.kCurrent = t.cast(key.Key, kCopiedMulti)
+            measures, self.kCurrent = _copyMultipleMeasures(measureLineToken, p, self.kCurrent)
             p.append(measures)  # appendCore does not work with list
             self.lastMeasureNumber = measures[-1].number
             self.lastMeasureToken = measureLineToken
@@ -608,7 +605,7 @@ class PartTranslator:
             mFill.number = i
             self.fillMeasureFromPreviousRn(mFill)
             appendMeasureToRepeatEndingsDict(
-                t.cast(rtObjects.RTMeasure, self.lastMeasureToken),
+                self.lastMeasureToken,
                 mFill,
                 self.repeatEndings, i)
             p.coreAppend(mFill)
@@ -731,7 +728,7 @@ class PartTranslator:
         Uses coreInsert and coreAppend methods, so must have `m.coreElementsChanged()`
         called afterward.
         '''
-        currentMeasureToken = t.cast(rtObjects.RTMeasure, self.currentMeasureToken)
+        currentMeasureToken = self.currentMeasureToken
         if (isinstance(a, rtObjects.RTKey)
                 or (self.foundAKeySignatureSoFar is False
                     and isinstance(a, rtObjects.RTAnalyticKey))):
@@ -859,7 +856,7 @@ class PartTranslator:
         '''
         Process a single RTChord atom.
         '''
-        currentMeasureToken = t.cast(rtObjects.RTMeasure, self.currentMeasureToken)
+        currentMeasureToken = self.currentMeasureToken
         # use source to evaluation roman
         self.tsAtTimeOfLastChord = self.tsCurrent
         try:
@@ -944,7 +941,7 @@ class PartTranslator:
         Indicates a change in the analyzed key, not a change in anything
         else, such as the keySignature.
         '''
-        currentMeasureToken = t.cast(rtObjects.RTMeasure, self.currentMeasureToken)
+        currentMeasureToken = self.currentMeasureToken
         try:  # this sets the key and the keysignature
             self.kCurrent, pl = _getKeyAndPrefix(a)
             self.prefixLyric += pl
@@ -1729,6 +1726,26 @@ m1 C: I'''
         ''')
         s = converter.parse(empty_measures_with_copy, format='romanText')
         self.assertEqual(s.duration.quarterLength, 10)
+
+    def testCopySingleMeasureTargetNotFound(self) -> None:
+        from music21 import key, stream
+        from music21.romanText import rtObjects
+        # m2 copies from m9, which does not exist in the part
+        rtm = rtObjects.RTMeasure('m2=m9')
+        p = stream.Part()
+        with self.assertRaisesRegex(
+                RomanTextTranslateException, 'Could not find measure 9'):
+            _copySingleMeasure(rtm, p, key.Key('C'))
+
+    def testCopyMultipleMeasuresTargetNotFound(self) -> None:
+        from music21 import key, stream
+        from music21.romanText import rtObjects
+        # m20-21 copies from m2-3, which do not exist in the part
+        rtm = rtObjects.RTMeasure('m20-21=m2-3')
+        p = stream.Part()
+        with self.assertRaisesRegex(
+                RomanTextTranslateException, 'Could not find measures 2-3'):
+            _copyMultipleMeasures(rtm, p, key.Key('C'))
 
     def testRepeats(self):
         from music21 import converter
