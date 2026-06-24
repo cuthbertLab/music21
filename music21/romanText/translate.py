@@ -1748,15 +1748,21 @@ m1 C: I'''
             _copyMultipleMeasures(rtm, p, key.Key('C'))
 
     def testLeadingMeasureWithoutChord(self) -> None:
-        # a piece may begin with measures that have no chord atoms (empty or
-        # key-only); the last-chord duration adjustment must be skipped rather
-        # than crash because no previous RomanNumeral exists yet.
-        from music21 import converter, stream
+        # Regression: a piece may begin with measures that have no chord atoms
+        # (empty or key-only).  The last-chord duration adjustment in
+        # translateSingleMeasure must be skipped rather than crash with
+        # AttributeError because no previous RomanNumeral exists yet.
+        from music21 import converter, roman, stream
         for src in ('Time Signature: 4/4\nm1\nm2 I\n',
                     'Time Signature: 4/4\nm1 G:\nm2 I\n'):
             s = converter.parse(src, format='romanText')
             measures = list(s.recurse().getElementsByClass(stream.Measure))
             self.assertEqual(len(measures), 2)
+            # the empty first measure has no chord; the second parses as I
+            self.assertEqual(len(measures[0].getElementsByClass(roman.RomanNumeral)), 0)
+            secondMeasureRNs = list(measures[1].getElementsByClass(roman.RomanNumeral))
+            self.assertEqual(len(secondMeasureRNs), 1)
+            self.assertEqual(secondMeasureRNs[0].figure, 'I')
 
     def testRepeats(self):
         from music21 import converter
