@@ -644,9 +644,12 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
             newSpineList: list[HumdrumSpine|None] = []
 
-            # These are either False OR the spine being merged/exchanged.
-            # TODO: separate the two concepts.
-            mergerActive: bool|HumdrumSpine = False
+            # A merge or exchange spine-path op spans two cells on this line.
+            # mergerActive flags an open merge; mergerParentSpine is the first
+            # spine's parent to merge back into (None if it had none).
+            # exchangeActive is the first spine of an open exchange.
+            mergerActive = False
+            mergerParentSpine: HumdrumSpine|None = None
             exchangeActive: HumdrumSpine|None = None
             for j in range(maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
@@ -684,12 +687,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                     # merge spine -- n.b. we allow non-adjacent
                     # lines to be merged. this is incorrect
                     # per Humdrum syntax, but is easily done.
-                    if mergerActive is False:
+                    if not mergerActive:
                         # assume that previous spine continues
-                        if currentSpine.parentSpine is not None:
-                            mergerActive = currentSpine.parentSpine
-                        else:
-                            mergerActive = True
+                        mergerActive = True
+                        mergerParentSpine = currentSpine.parentSpine
                         currentSpine.endingPoint = lineNumber
                     else:
                         # if second merger code is not found then
@@ -698,9 +699,9 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         # merge back to parent if possible:
                         if currentSpine.parentSpine is not None:
                             newSpineList.append(currentSpine.parentSpine)
-                        # or merge back to other spine's parent:
-                        elif mergerActive is not True:  # other spine parent set
-                            newSpineList.append(mergerActive)
+                        # or merge back to the first spine's parent:
+                        elif mergerParentSpine is not None:
+                            newSpineList.append(mergerParentSpine)
                         # or make a new spine:
                         else:
                             s = spineCollection.addSpine(streamClass=stream.Part)
@@ -708,6 +709,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                             newSpineList.append(s)
 
                         mergerActive = False
+                        mergerParentSpine = None
 
                 elif thisEvent.contents == '*x':  # exchange spine
                     if exchangeActive is None:
