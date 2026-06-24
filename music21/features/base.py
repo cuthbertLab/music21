@@ -85,7 +85,7 @@ class Feature:
     And that's it! FeatureExtractors are much more interesting.
     '''
 
-    def __init__(self):
+    def __init__(self) -> None:
         # these values will be filled by the extractor
         self.dimensions: int = 1  # number of dimensions
         # data storage; possibly use numpy array
@@ -97,7 +97,7 @@ class Feature:
         self.isSequential = None  # True or False
         self.discrete = None  # is discrete or continuous
 
-    def _getVectors(self):
+    def _getVectors(self) -> list[int|float]:
         '''
         Prepare a vector of appropriate size and return
         '''

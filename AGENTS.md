@@ -46,6 +46,12 @@
 
 # PRs and Issues
 
+- GitHub runs PR checks against your branch **merged with the latest `master`**, not the
+  branch alone. So before opening a PR (or pushing updates to one), merge the latest commits
+  from `master` into the branch — unless told otherwise, or when updating an older version
+  branch such as `m21_9`. When a CI check fails but passes locally, "is my branch behind
+  `master`?" should be one of the first things to check: fetch and merge `master`, then the
+  newer types/code on `master` will reproduce the failure locally.
 - All PRs and Issues need to be declared AI-assisted.
 - 10 or more lines of code written by an agent needs to be declared as AI-assisted in the docstring.  
   Humans can remove and should remove this note when they do a review.

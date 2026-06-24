@@ -164,7 +164,7 @@ class RomanTextUnprocessedToken(base.ElementWrapper):
 
 
 class RomanTextUnprocessedMetadata(base.Music21Object):
-    def __init__(self, tag='', data='', **keywords):
+    def __init__(self, tag: str = '', data: str = '', **keywords) -> None:
         super().__init__(**keywords)
         self.tag = tag
         self.data = data
@@ -173,7 +173,11 @@ class RomanTextUnprocessedMetadata(base.Music21Object):
         return f'{self.tag}: {self.data}'
 
 
-def _copySingleMeasure(rtTagged, p, kCurrent):
+def _copySingleMeasure(
+    rtTagged: rtObjects.RTMeasure,
+    p: stream.Part,
+    kCurrent: key.Key,
+) -> tuple[stream.Measure, key.Key]:
     '''
     Given a RomanText token, a Part used as the current container,
     and the current Key, return a Measure copied from the past of the Part.
@@ -181,7 +185,7 @@ def _copySingleMeasure(rtTagged, p, kCurrent):
     This is used in cases of definitions such as:
     m23=m21
     '''
-    m = None
+    m: stream.Measure|None = None
     # copy from a past location; need to change key
     # environLocal.printDebug(['calling _copySingleMeasure()'])
     targetNumber, unused_targetRepeat = rtTagged.getCopyTarget()
@@ -204,10 +208,6 @@ def _copySingleMeasure(rtTagged, p, kCurrent):
             m.number = rtTagged.number[0]
             # update all keys
             for rnPast in m.getElementsByClass(roman.RomanNumeral):
-                if kCurrent is None:  # pragma: no cover
-                    # should not happen
-                    raise RomanTextTranslateException(
-                        'attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange:
                     kCurrent = rnPast.key
                 elif rnPast.pivotChord is not None:
@@ -224,12 +224,17 @@ def _copySingleMeasure(rtTagged, p, kCurrent):
                     m.replace(rnPast, newRN)
 
             break
+    if m is None:
+        raise RomanTextTranslateException(
+            f'Could not find measure {target} to copy from')
     return m, kCurrent
 
 
-def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
-                          p: stream.Part,
-                          kCurrent: key.Key|None):
+def _copyMultipleMeasures(
+    rtMeasure: rtObjects.RTMeasure,
+    p: stream.Part,
+    kCurrent: key.Key,
+) -> tuple[list[stream.Measure], key.Key]:
     '''
     Given a RomanText token for a RTMeasure, a
     Part used as the current container, and the current Key,
@@ -256,7 +261,7 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
         raise RomanTextTranslateException(
             'the source section cannot overlap with the destination section')
 
-    measures = []
+    measures: list[stream.Measure] = []
     for mPast in p.getElementsByClass(stream.Measure):
         if mPast.number in range(targetStart, targetEnd + 1):
             try:
@@ -273,10 +278,6 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
             # update all keys
             allRNs = list(m.getElementsByClass(roman.RomanNumeral))
             for rnPast in allRNs:
-                if kCurrent is None:  # pragma: no cover
-                    # should not happen
-                    raise RomanTextTranslateException(
-                        'attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange:
                     kCurrent = rnPast.key
                 elif rnPast.pivotChord is not None:
@@ -294,10 +295,15 @@ def _copyMultipleMeasures(rtMeasure: rtObjects.RTMeasure,
 
         if mPast.number == targetEnd:
             break
+    if not measures:
+        raise RomanTextTranslateException(
+            f'Could not find measures {targetStart}-{targetEnd} to copy from')
     return measures, kCurrent
 
 
-def _getKeyAndPrefix(rtKeyOrString):
+def _getKeyAndPrefix(
+    rtKeyOrString: str|rtObjects.RTKeyTypeAtom,
+) -> tuple[key.Key, str]:
     '''
     Given an RTKey specification, return the Key and a string prefix based
     on the tonic:
@@ -318,8 +324,8 @@ def _getKeyAndPrefix(rtKeyOrString):
     (<music21.key.Key of B-- major>, 'B--: ')
     '''
     if isinstance(rtKeyOrString, str):
-        rtKeyOrString = key.convertKeyStringToMusic21KeyString(rtKeyOrString)
-        k = key.Key(rtKeyOrString)
+        keyString = key.convertKeyStringToMusic21KeyString(rtKeyOrString)
+        k = key.Key(keyString)
     else:
         k = rtKeyOrString.getKey()
     tonicName = k.tonic.name
@@ -341,22 +347,27 @@ class PartTranslator:
     was written under severe time constraints).
     '''
 
-    def __init__(self, md=None):
+    def __init__(self, md: metadata.Metadata|None = None) -> None:
         if md is None:
             md = metadata.Metadata()
         self.md = md  # global metadata object
         self.p = stream.Part()
 
-        self.romanTextVersion = ROMANTEXT_VERSION
+        self.romanTextVersion: float = ROMANTEXT_VERSION
 
         # ts indication are found in header, and also found elsewhere
-        self.tsCurrent = meter.TimeSignature('4/4')  # create default 4/4
-        self.tsAtTimeOfLastChord = self.tsCurrent
+        self.tsCurrent: meter.TimeSignature = meter.TimeSignature('4/4')  # create default 4/4
+        self.tsAtTimeOfLastChord: meter.TimeSignature = self.tsCurrent
         self.tsSet = False  # store if set to a measure
-        self.lastMeasureToken = None
+        # measure-0 sentinel; always overwritten with the real token before use
+        self.lastMeasureToken: rtObjects.RTMeasure = rtObjects.RTMeasure('m0')
         self.lastMeasureNumber = 0
-        self.previousRn = None
-        self.keySigCurrent = None
+        # TODO: make previousRn start as a note.Rest (dropping the None option)
+        #    so that a piece beginning before its first chord -- e.g. one that
+        #    starts with N.C. -- gets leading rests instead of a gap at the
+        #    start of the stream.
+        self.previousRn: roman.RomanNumeral|note.Rest|None = None
+        self.keySigCurrent: key.KeySignature|None = None
         self.setKeySigFromFirstKeyToken = True  # set a keySignature
         self.foundAKeySignatureSoFar = False
         self.kCurrent, unused_prefixLyric = _getKeyAndPrefix('C')  # default if none defined
@@ -365,17 +376,18 @@ class PartTranslator:
         self.sixthMinor = roman.Minor67Default.CAUTIONARY
         self.seventhMinor = roman.Minor67Default.CAUTIONARY
 
-        self.repeatEndings = {}
+        self.repeatEndings: dict[int, list[tuple[int, stream.Measure]]] = {}
 
-        # reset for each measure
-        self.currentMeasureToken = None
-        self.previousChordInMeasure = None
+        # reset for each measure.  currentMeasureToken starts as a measure-0
+        # sentinel and is always overwritten with the real token before use.
+        self.currentMeasureToken: rtObjects.RTMeasure = rtObjects.RTMeasure('m0')
+        self.previousChordInMeasure: note.GeneralNote|None = None
         self.pivotChordPossible = False
         self.numberOfAtomsInCurrentMeasure = 0
         self.setKeyChangeToken = False
-        self.currentOffsetInMeasure = 0.0
+        self.currentOffsetInMeasure: OffsetQL = 0.0
 
-    def translateTokens(self, tokens):
+    def translateTokens(self, tokens: list[rtObjects.RTToken]) -> stream.Part:
         for token in tokens:
             try:
                 self.translateOneLineToken(token)
@@ -393,7 +405,7 @@ class PartTranslator:
         _addRepeatsFromRepeatEndings(p, self.repeatEndings)  # 1st and second endings
         return p
 
-    def translateOneLineToken(self, lineToken: rtObjects.RTTagged):
+    def translateOneLineToken(self, lineToken: rtObjects.RTToken) -> None:
         # noinspection SpellCheckingInspection
         '''
         Translates one line token and set the current settings.
@@ -409,8 +421,11 @@ class PartTranslator:
         if lineToken.isMeasure():
             measureToken = t.cast(rtObjects.RTMeasure, lineToken)
             self.translateMeasureLineToken(measureToken)
+            return
 
-        elif lineToken.isTitle():
+        # everything below is a tagged (non-measure) line token
+        lineToken = t.cast(rtObjects.RTTagged, lineToken)
+        if lineToken.isTitle():
             md.add('title', lineToken.data)
 
         elif lineToken.isWork():
@@ -460,7 +475,7 @@ class PartTranslator:
             unprocessed = RomanTextUnprocessedToken(lineToken)
             self.p.append(unprocessed)
 
-    def setMinorRootParse(self, rtTagged: rtObjects.RTTagged):
+    def setMinorRootParse(self, rtTagged: rtObjects.RTTagged) -> None:
         '''
         Set Roman Numeral parsing standards from a token.
 
@@ -523,7 +538,7 @@ class PartTranslator:
         else:
             self.seventhMinor = tEnum
 
-    def translateMeasureLineToken(self, measureLineToken: rtObjects.RTMeasure):
+    def translateMeasureLineToken(self, measureLineToken: rtObjects.RTMeasure) -> None:
         '''
         Translate a measure token consisting of a single line such as::
 
@@ -583,7 +598,7 @@ class PartTranslator:
                 self.fillMeasureFromPreviousRn(m)
             p.coreAppend(m)
 
-    def fillToMeasureToken(self, measureToken: rtObjects.RTMeasure):
+    def fillToMeasureToken(self, measureToken: rtObjects.RTMeasure) -> None:
         '''
         Create a series of measures which extend the previous RN until the measure number
         implied by `measureToken`.
@@ -593,9 +608,10 @@ class PartTranslator:
             mFill = stream.Measure()
             mFill.number = i
             self.fillMeasureFromPreviousRn(mFill)
-            appendMeasureToRepeatEndingsDict(self.lastMeasureToken,
-                                             mFill,
-                                             self.repeatEndings, i)
+            appendMeasureToRepeatEndingsDict(
+                self.lastMeasureToken,
+                mFill,
+                self.repeatEndings, i)
             p.coreAppend(mFill)
         self.lastMeasureNumber = measureToken.number[0] - 1
         self.lastMeasureToken = measureToken
@@ -615,7 +631,7 @@ class PartTranslator:
             self.previousRn = newRn
             mFill.append(newRn)
 
-    def parseKeySignatureTag(self, rtTagged: rtObjects.RTTagged):
+    def parseKeySignatureTag(self, rtTagged: rtObjects.RTTagged) -> None:
         '''
         Parse a key signature tag which has already been determined to
         be a key signature.
@@ -663,7 +679,7 @@ class PartTranslator:
         # environLocal.printDebug(['keySigCurrent:', keySigCurrent])
         self.foundAKeySignatureSoFar = True
 
-    def translateSingleMeasure(self, measureToken):
+    def translateSingleMeasure(self, measureToken: rtObjects.RTMeasure) -> stream.Measure:
         '''
         Given a measureToken, return a `stream.Measure` object with
         the appropriate atoms set.
@@ -692,10 +708,11 @@ class PartTranslator:
             isLastAtomInMeasure = (i == self.numberOfAtomsInCurrentMeasure - 1)
             self.translateSingleMeasureAtom(a, m, isLastAtomInMeasure=isLastAtomInMeasure)
 
-        # may need to adjust duration of last chord added
-        if self.tsCurrent is not None:
-            self.previousRn.quarterLength = (self.tsCurrent.barDuration.quarterLength
-                                                - self.currentOffsetInMeasure)
+        # may need to adjust duration of last chord added (if any chord was added)
+        if self.tsCurrent is not None and self.previousRn is not None:
+            self.previousRn.quarterLength = (
+                self.tsCurrent.barDuration.quarterLength - self.currentOffsetInMeasure
+            )
         m.coreElementsChanged()
         return m
 
@@ -715,6 +732,7 @@ class PartTranslator:
         Uses coreInsert and coreAppend methods, so must have `m.coreElementsChanged()`
         called afterward.
         '''
+        currentMeasureToken = self.currentMeasureToken
         if (isinstance(a, rtObjects.RTKey)
                 or (self.foundAKeySignatureSoFar is False
                     and isinstance(a, rtObjects.RTAnalyticKey))):
@@ -732,7 +750,7 @@ class PartTranslator:
                 thisSig = a.getKeySignature()
             except (exceptions21.Music21Exception, ValueError) as ve:  # pragma: no cover
                 raise RomanTextTranslateException(
-                    f'cannot get key from {a.src} in line {self.currentMeasureToken.src}'
+                    f'cannot get key from {a.src} in line {currentMeasureToken.src}'
                 ) from ve
             # insert at beginning of measure if at beginning
             #     -- for things like pickups.
@@ -753,8 +771,11 @@ class PartTranslator:
                 raise RomanTextTranslateException(
                     f'cannot properly get an offset from beat data {a.src} '
                     f'under timeSignature {self.tsCurrent} '
-                    f'in line {self.currentMeasureToken.src}'
+                    f'in line {currentMeasureToken.src}'
                 ) from ve
+            # Back-fills the measure start from a tied-forward chord -- but not
+            # at the start of a piece (previousRn is None there).  See the
+            # previousRn TODO: starting it as a Rest would fix the leading gap.
             if (self.previousChordInMeasure is None
                     and self.previousRn is not None
                     and newOffset > 0):
@@ -789,7 +810,7 @@ class PartTranslator:
                     newQL = self.currentOffsetInMeasure - oPrevious
                     if newQL <= 0:  # pragma: no cover
                         raise RomanTextTranslateException(
-                            f'too many notes in this measure: {self.currentMeasureToken.src}')
+                            f'too many notes in this measure: {currentMeasureToken.src}')
                     self.previousChordInMeasure.quarterLength = newQL
                 self.prefixLyric = ''
                 m.coreInsert(self.currentOffsetInMeasure, rn)
@@ -842,6 +863,7 @@ class PartTranslator:
         '''
         Process a single RTChord atom.
         '''
+        currentMeasureToken = self.currentMeasureToken
         # use source to evaluation roman
         self.tsAtTimeOfLastChord = self.tsCurrent
         try:
@@ -905,7 +927,7 @@ class PartTranslator:
                 newQL = currentOffset - oPrevious
                 if newQL <= 0:  # pragma: no cover
                     raise RomanTextTranslateException(
-                        f'too many notes in this measure: {self.currentMeasureToken.src}')
+                        f'too many notes in this measure: {currentMeasureToken.src}')
                 self.previousChordInMeasure.quarterLength = newQL
 
             rn.addLyric(self.prefixLyric + a.src)
@@ -915,27 +937,32 @@ class PartTranslator:
             self.previousRn = rn
             self.pivotChordPossible = True
         else:
-            self.previousChordInMeasure.lyric += '//' + self.prefixLyric + a.src
-            self.previousChordInMeasure.pivotChord = rn
+            previousChord = t.cast(roman.RomanNumeral, self.previousChordInMeasure)
+            previousChord.lyric = (previousChord.lyric or '') + '//' + self.prefixLyric + a.src
+            previousChord.pivotChord = rn
             self.prefixLyric = ''
             self.pivotChordPossible = False
 
-    def setAnalyticKey(self, a):
+    def setAnalyticKey(self, a: rtObjects.RTKeyTypeAtom) -> None:
         '''
         Indicates a change in the analyzed key, not a change in anything
         else, such as the keySignature.
         '''
+        currentMeasureToken = self.currentMeasureToken
         try:  # this sets the key and the keysignature
             self.kCurrent, pl = _getKeyAndPrefix(a)
             self.prefixLyric += pl
         except (ValueError, exceptions21.Music21Exception) as ve:  # pragma: no cover
             raise RomanTextTranslateException(
-                f'cannot get analytic key from {a.src} in line {self.currentMeasureToken.src}'
+                f'cannot get analytic key from {a.src} in line {currentMeasureToken.src}'
             ) from ve
         self.setKeyChangeToken = True
 
 
-def romanTextToStreamScore(rtHandler, inputM21=None):
+def romanTextToStreamScore(
+    rtHandler: rtObjects.RTHandler|str,
+    inputM21: stream.Score|None = None,
+) -> stream.Score:
     '''
     The main processing module for single-movement RomanText works.
 
@@ -971,8 +998,8 @@ letterToNumDict = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 
 
 def appendMeasureToRepeatEndingsDict(rtMeasureObj: rtObjects.RTMeasure,
                                      m: stream.Measure,
-                                     repeatEndings: dict,
-                                     measureNumber=None):
+                                     repeatEndings: dict[int, list[tuple[int, stream.Measure]]],
+                                     measureNumber: int|None = None) -> None:
     # noinspection PyShadowingNames
     '''
     Takes an RTMeasure object (which might represent one or more
@@ -1024,7 +1051,9 @@ def appendMeasureToRepeatEndingsDict(rtMeasureObj: rtObjects.RTMeasure,
         repeatEndings[repeatNumber].append(measureTuple)
 
 
-def _consolidateRepeatEndings(repeatEndings):
+def _consolidateRepeatEndings[M](
+    repeatEndings: dict[int, list[tuple[int, M]]],
+) -> list[tuple[list[M], int]]:
     # noinspection PyShadowingNames
     '''
     take repeatEndings, which is a dict of integers (repeat ending numbers) each
@@ -1045,18 +1074,18 @@ def _consolidateRepeatEndings(repeatEndings):
     [(['m5a', 'm6a'], 1), (['m17', 'm18', 'm19'], 1), (['m23a'], 1),
      (['m5b', 'm6b'], 2), (['m20', 'm21'], 2), (['m23b'], 2), (['m23c'], 3)]
     '''
-    returnList = []
+    returnList: list[tuple[list[M], int]] = []
 
     for endingNumber in repeatEndings:
-        startMeasureNumber = None
-        lastMeasureNumber = None
-        measureList = []
+        startMeasureNumber: int|None = None
+        lastMeasureNumber: int|None = None
+        measureList: list[M] = []
         for measureNumberUnderEnding, measureObject in repeatEndings[endingNumber]:
             if startMeasureNumber is None:
                 startMeasureNumber = measureNumberUnderEnding
                 lastMeasureNumber = measureNumberUnderEnding
                 measureList.append(measureObject)
-            elif measureNumberUnderEnding > lastMeasureNumber + 1:
+            elif lastMeasureNumber is not None and measureNumberUnderEnding > lastMeasureNumber + 1:
                 myTuple = (measureList, endingNumber)
                 returnList.append(myTuple)
                 startMeasureNumber = measureNumberUnderEnding
@@ -1072,7 +1101,10 @@ def _consolidateRepeatEndings(repeatEndings):
     return returnList
 
 
-def _addRepeatsFromRepeatEndings(s, repeatEndings):
+def _addRepeatsFromRepeatEndings(
+    s: stream.Part,
+    repeatEndings: dict[int, list[tuple[int, stream.Measure]]],
+) -> None:
     '''
     Given a Stream and the repeatEndings dict, add repeats to the stream.
     '''
@@ -1090,7 +1122,7 @@ def _addRepeatsFromRepeatEndings(s, repeatEndings):
                 measureList[-1].rightBarline = bar.Repeat(direction='end')
 
 
-def fixPickupMeasure(partObject):
+def fixPickupMeasure(partObject: stream.Part) -> None:
     # noinspection PyShadowingNames
     '''
     Fix a pickup measure if any.
@@ -1157,7 +1189,7 @@ def fixPickupMeasure(partObject):
         if el.offset > 0:
             el.offset -= leftPadding
     mLast = partObject.getElementsByClass(stream.Measure).last()
-    if mLast is m0:
+    if mLast is None or mLast is m0:
         return
 
     lastRN = mLast.getElementsByClass([roman.RomanNumeral, harmony.NoChord]).last()
@@ -1177,7 +1209,10 @@ def fixPickupMeasure(partObject):
                 i -= 1
 
 
-def romanTextToStreamOpus(rtHandler, inputM21=None):
+def romanTextToStreamOpus(
+    rtHandler: rtObjects.RTHandler|str,
+    inputM21: stream.Score|stream.Opus|None = None,
+) -> stream.Score|stream.Opus:
     '''
     The main processing routine for RomanText objects that may or may not
     be multi movement.
@@ -1196,6 +1231,7 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
         rtHandler = rtf.readstr(rtHandler)  # return handler, processes tokens
 
     if rtHandler.definesMovements():  # create an opus
+        s: stream.Score|stream.Opus
         if inputM21 is None:
             s = stream.Opus()
         else:
@@ -1209,7 +1245,8 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
             s.append(romanTextToStreamScore(h))
         return s  # an opus
     else:  # create a Score
-        return romanTextToStreamScore(rtHandler, inputM21=inputM21)
+        scoreInput = t.cast('stream.Score|None', inputM21)
+        return romanTextToStreamScore(rtHandler, inputM21=scoreInput)
 
 
 # ------------------------------------------------------------------------------
@@ -1368,7 +1405,7 @@ class Test(unittest.TestCase):
         s = romanTextToStreamScore(testFiles.testSetMinorRootParse)
         chords = list(s[roman.RomanNumeral])
 
-        def pitchEqual(index, pitchStr):
+        def pitchEqual(index: int, pitchStr: str) -> None:
             ch = chords[index]
             chPitches = ch.pitches
             self.assertEqual(' '.join(p.name for p in chPitches), pitchStr)
@@ -1685,7 +1722,7 @@ m1 C: I'''
         self.assertEqual(n2.offset, common.opFrac(11 / 6))
         self.assertEqual(n2.duration.quarterLength, common.opFrac(13 / 6))
 
-    def testCopyEmptyMeasures(self) -> None:
+    def testCopyEmptyMeasures(self):
         from music21 import converter
         empty_measures_with_copy = textwrap.dedent(''''
             Time Signature: 2/4
@@ -1695,9 +1732,42 @@ m1 C: I'''
             m4-5 = m1-2
         ''')
         s = converter.parse(empty_measures_with_copy, format='romanText')
-        assert s.duration.quarterLength == 10
+        self.assertEqual(s.duration.quarterLength, 10)
 
-    def testRepeats(self) -> None:
+    def testCopySingleMeasureTargetNotFound(self) -> None:
+        # m2 copies from m9, which does not exist in the part
+        rtm = rtObjects.RTMeasure('m2=m9')
+        p = stream.Part()
+        with self.assertRaisesRegex(
+                RomanTextTranslateException, 'Could not find measure 9'):
+            _copySingleMeasure(rtm, p, key.Key('C'))
+
+    def testCopyMultipleMeasuresTargetNotFound(self) -> None:
+        # m20-21 copies from m2-3, which do not exist in the part
+        rtm = rtObjects.RTMeasure('m20-21=m2-3')
+        p = stream.Part()
+        with self.assertRaisesRegex(
+                RomanTextTranslateException, 'Could not find measures 2-3'):
+            _copyMultipleMeasures(rtm, p, key.Key('C'))
+
+    def testLeadingMeasureWithoutChord(self) -> None:
+        # Regression: a piece may begin with measures that have no chord atoms
+        # (empty or key-only).  The last-chord duration adjustment in
+        # translateSingleMeasure must be skipped rather than crash with
+        # AttributeError because no previous RomanNumeral exists yet.
+        from music21 import converter
+        for src in ('Time Signature: 4/4\nm1\nm2 I\n',
+                    'Time Signature: 4/4\nm1 G:\nm2 I\n'):
+            s = converter.parse(src, format='romanText')
+            measures = list(s.recurse().getElementsByClass(stream.Measure))
+            self.assertEqual(len(measures), 2)
+            # the empty first measure has no chord; the second parses as I
+            self.assertEqual(len(measures[0].getElementsByClass(roman.RomanNumeral)), 0)
+            secondMeasureRNs = list(measures[1].getElementsByClass(roman.RomanNumeral))
+            self.assertEqual(len(secondMeasureRNs), 1)
+            self.assertEqual(secondMeasureRNs[0].figure, 'I')
+
+    def testRepeats(self):
         from music21 import converter
 
         def _repeat_tester(
