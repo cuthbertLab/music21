@@ -257,16 +257,16 @@ def safeToParallize() -> bool:
 
 # pickleable testing functions.
 
-def _countN(fn: str) -> int:
+def _countN(filename: str) -> int:
     from music21 import corpus
-    c = corpus.parse(fn)
+    c = corpus.parse(filename)
     return len(c.recurse().notes)
 
 
-def _countUnpacked(i: int, fn: str) -> bool:
+def _countUnpacked(i: int, filename: str) -> bool:
     if i >= 3:
         return False
-    if fn not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
+    if filename not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
         return False
     return True
 
@@ -299,9 +299,9 @@ class Test(unittest.TestCase):
         self.assertIn(output, [165, 50, 131])
 
     def _customUpdate2(
-        self, i: int, unused_total: int, unused_output: int, fn: str
+        self, i: int, unused_total: int, unused_output: int, filename: str
     ) -> None:
-        self.assertIn(fn, ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel'])
+        self.assertIn(filename, ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel'])
 
 
 if __name__ == '__main__':
