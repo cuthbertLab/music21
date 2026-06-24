@@ -684,7 +684,7 @@ class AbstractScale(Scale):
         if fmt is not None:
             fileFormat, ext = common.findFormat(fmt)
             if fp is None:
-                fpLocal: str|pathlib.Path|IOBase = environLocal.getTempFile(ext)
+                fpLocal: str|pathlib.Path|IOBase = environLocal.getTempFile(ext or '')
             else:
                 fpLocal = fp
 

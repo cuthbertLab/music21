@@ -15,7 +15,7 @@ import re
 # when Python 3.12 is minimum, will not need StrEnumMeta at all -- contains will work.
 
 class StrEnumMeta(EnumType):
-    def __contains__(cls, item):
+    def __contains__(cls, item: object) -> bool:
         if isinstance(item, str):
             if item in cls.__members__.values():
                 return True
@@ -33,7 +33,7 @@ class ContainsMeta(EnumType):
 
     This will be removed when Python 3.12 is the minimum version for music21.
     '''
-    def __contains__(cls, item):
+    def __contains__(cls, item: object) -> bool:
         try:
             cls(item)  # pylint: disable=no-value-for-parameter
             return True
@@ -58,12 +58,12 @@ class ContainsEnum(IntEnum):
     True
     >>> ChannelVoiceMessages._value2member_map_
     '''
-    def __repr__(self):
+    def __repr__(self) -> str:
         val = super().__repr__()
         return re.sub(r'(\d+)', lambda m: f'0x{int(m.group(1)):X}', val)
 
     @classmethod
-    def hasValue(cls, val):
+    def hasValue(cls, val: object) -> bool:
         return val in cls._value2member_map_
 
 
@@ -109,13 +109,13 @@ class BooleanEnum(Enum):
     True
     '''
     @staticmethod
-    def is_bool_tuple(v):
+    def is_bool_tuple(v: object) -> bool:
         if isinstance(v, tuple) and len(v) == 2 and isinstance(v[0], bool):
             return True
         else:
             return False
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
             return super().__eq__(other)
         v = self.value
@@ -127,13 +127,13 @@ class BooleanEnum(Enum):
             return v[1] == other
         return False
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         v = self.value
         if self.is_bool_tuple(v):
             return v[0]
         return bool(self.value)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<{self.__class__.__name__}.{self.name}>'
 
 
@@ -151,10 +151,10 @@ class StrEnum(str, Enum, metaclass=StrEnumMeta):
       will no longer be used internally and will eventually become
       deprecated (2027?) and removed (2030?).
     '''
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<{self.__class__.__name__}.{self.name}>'
 
-    def __str__(self):
+    def __str__(self) -> str:
         '''
         >>> from music21.common.enums import OffsetSpecial
         >>> str(OffsetSpecial.AT_END)
