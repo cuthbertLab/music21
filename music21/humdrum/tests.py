@@ -30,6 +30,7 @@ from music21 import roman
 from music21 import stream
 from music21.humdrum import testFiles
 from music21.humdrum.spineParser import (
+    GlobalComment,
     HumdrumDataCollection,
     KernSpine,
     SpineComment,
@@ -826,6 +827,34 @@ class Test(unittest.TestCase):
         md = c.metadata
         self.assertIsNotNone(md.composer)
         self.assertIn('Palestrina', md.composer)
+
+    def testGlobalEventsReachStream(self):
+        # !!! references become metadata; !! comments become GlobalComment
+        # objects in the stream; a blank line is ignored without error.
+        src = '\n'.join([
+            '!!!COM: Test Composer',
+            '!!!OTL: Test Title',
+            '!! a global comment here',
+            '',  # blank line in the middle
+            '**kern',
+            '4c',
+            '4d',
+            '*-',
+            '!! comment at the end',
+        ])
+        hdc = HumdrumDataCollection(src)
+        hdc.parse()
+        s = hdc.stream
+
+        comments = [gc.comment for gc in s.recurse().getElementsByClass(GlobalComment)]
+        self.assertEqual(comments, ['a global comment here', 'comment at the end'])
+
+        self.assertIsNotNone(s.metadata)
+        self.assertEqual(str(s.metadata.composer), 'Test Composer')
+        self.assertEqual(str(s.metadata.title), 'Test Title')
+
+        # the blank line did not derail parsing
+        self.assertEqual(len(s.recurse().notes), 2)
 
     def testFlavors(self):
         prevFlavor = flavors['JRP']
