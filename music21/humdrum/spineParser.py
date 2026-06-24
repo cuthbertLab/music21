@@ -73,7 +73,6 @@ from music21 import base
 from music21 import beam  # cast only, can use 'beam' if it ever becomes circular.
 from music21 import chord
 from music21 import clef
-from music21 import common
 from music21 import dynamics
 from music21 import duration
 from music21 import environment
@@ -607,13 +606,17 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
         # currentSpineList is a list of currently active
         # spines ordered from left to right.
-        currentSpineList = common.defaultlist(lambda: None)
+        currentSpineList: list[HumdrumSpine|None] = []
         spineCollection = SpineCollection()
 
         # go through the event collections line by line
         for i in range(len(eventCollections)):
             thisEventCollection = eventCollections[i]
             lineNumber = thisEventCollection.lineNumber
+            # ensure a slot for every spine position; positions never assigned
+            # (or dropped by a previous merge) read back as None.
+            if len(currentSpineList) < maxSpines:
+                currentSpineList += [None] * (maxSpines - len(currentSpineList))
             for j in range(maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
 
@@ -641,12 +644,12 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             # thus, this is illegal.  The C#4 will be ignored:
             # *x     *x     C#4
 
-            newSpineList = common.defaultlist(lambda: None)
+            newSpineList: list[HumdrumSpine|None] = []
 
             # These are either False OR the spine being merged/exchanged.
             # TODO: separate the two concepts.
-            mergerActive = False
-            exchangeActive = False
+            mergerActive: bool|HumdrumSpine = False
+            exchangeActive: HumdrumSpine|None = None
             for j in range(maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
                 currentSpine = currentSpineList[j]
@@ -657,6 +660,9 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                     continue
                 elif thisEvent is None:
                     continue
+                # a spine-path token at this position always has a spine
+                # assigned from the first pass above.
+                assert currentSpine is not None
                 if thisEvent.contents == '*-':  # terminate spine
                     currentSpine.endingPoint = lineNumber
                 elif thisEvent.contents == '*^':  # split spine assume they are voices
@@ -704,7 +710,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         mergerActive = False
 
                 elif thisEvent.contents == '*x':  # exchange spine
-                    if exchangeActive is False:
+                    if exchangeActive is None:
                         exchangeActive = currentSpine
                     else:
                         # if second exchange is not found, then both
@@ -714,11 +720,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         # is totally finished by the time the second happens
                         newSpineList.append(currentSpine)
                         newSpineList.append(exchangeActive)
-                        exchangeActive = False
+                        exchangeActive = None
                 else:  # null processing code '*'
                     newSpineList.append(currentSpine)
 
-            if exchangeActive is not False:
+            if exchangeActive is not None:
                 raise HumdrumException('ProtoSpine found with unpaired exchange instruction '
                                        f'at line {lineNumber} [{thisEventCollection.events}]')
             currentSpineList = newSpineList
@@ -2229,8 +2235,8 @@ class EventCollection(prebase.ProtoM21Object):
     * New in v10: lineNumber.
     '''
     def __init__(self, maxSpines: int = 0, lineNumber: int = 0) -> None:
-        self.events: common.defaultlist = common.defaultlist(lambda: None)
-        self.lastEvents: common.defaultlist = common.defaultlist(lambda: None)
+        self.events: list[SpineEvent|None] = [None] * maxSpines
+        self.lastEvents: dict[int, SpineEvent] = {}
         self.maxSpines: int = maxSpines
         self.lineNumber: int = lineNumber
         self.spinePathData: bool = False
@@ -2248,7 +2254,10 @@ class EventCollection(prebase.ProtoM21Object):
 
     def addGlobalEvent(self, globalEvent: HumdrumLine) -> None:
         for i in range(self.maxSpines):
-            self.events[i] = globalEvent
+            # global lines fill every cell, but the caller immediately overwrites
+            # each cell with a placeholder SpineEvent, so a HumdrumLine never
+            # survives in self.events (which is therefore typed SpineEvent|None).
+            self.events[i] = globalEvent  # type: ignore[call-overload]
 
     def getSpineEvent(self, spineNum: int) -> SpineEvent|None:
         return self.events[spineNum]
@@ -2257,10 +2266,10 @@ class EventCollection(prebase.ProtoM21Object):
         # returns the lastEvent if set (
         # should only happen if currentEvent is '.')
         # or the current event
-        if self.lastEvents[spineNum] is not None:
-            return self.lastEvents[spineNum]
-        else:
-            return self.events[spineNum]
+        lastEvent = self.lastEvents.get(spineNum)
+        if lastEvent is not None:
+            return lastEvent
+        return self.events[spineNum]
 
     def getAllOccurring(self) -> list[SpineEvent|None]:
         retEvents: list[SpineEvent|None] = []
