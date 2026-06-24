@@ -9,11 +9,9 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
-import enum
+from enum import Enum, StrEnum
 
-from music21.common.enums import StrEnum
-
-class StaffType(enum.Enum):
+class StaffType(Enum):
     '''
     These are the same as MusicXML staff-type, except uppercase and "other"
     which reflects any other type.  Probably the best way of using "other"

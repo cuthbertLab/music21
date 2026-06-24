@@ -22,6 +22,7 @@ For instance, TextExpressions.
 from __future__ import annotations
 
 import copy
+from enum import StrEnum
 import string
 import typing as t
 from fractions import Fraction
@@ -323,13 +324,13 @@ class RehearsalMark(Expression):
 
 
 # ------------------------------------------------------------------------------
-class PedalType(common.StrEnum):
+class PedalType(StrEnum):
     Sustain = 'sustain'
     Sostenuto = 'sostenuto'
     Soft = 'soft'
     Silent = 'silent'
 
-class PedalForm(common.StrEnum):
+class PedalForm(StrEnum):
     Line = 'line'
     Symbol = 'symbol'
     SymbolAlt = 'symbolalt'
