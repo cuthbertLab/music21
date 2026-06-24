@@ -770,8 +770,9 @@ class Converter:
                 raise ConverterException(f'cannot determine file format of url: {url}')
         else:
             unused_formatType, ext = common.findFormat(format)
-            if ext is None:
-                ext = '.txt'
+
+        if ext is None:
+            ext = '.txt'
 
         directory = environLocal.getRootTempDir()
         fp = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path

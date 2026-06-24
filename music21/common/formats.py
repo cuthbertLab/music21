@@ -86,7 +86,7 @@ def findSubConverterForFormat(fmt: str) -> type[SubConverter]|None:
 
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
-def findFormat(fmt):
+def findFormat(fmt: str) -> tuple[str|None, str|None]:
     '''
     Given a format defined either by a format name, abbreviation, or
     an extension, return the regularized format name as well as
@@ -224,7 +224,7 @@ def findInputExtension(fmt: str) -> tuple[str, ...]:
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 
 
-def findFormatFile(fp):
+def findFormatFile(fp: str|pathlib.Path) -> str|None:
     r'''
     Given a file path (relative or absolute) return the format
 
@@ -249,7 +249,7 @@ def findFormatFile(fp):
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 
 
-def findFormatExtFile(fp):
+def findFormatExtFile(fp: str|pathlib.Path) -> tuple[str|None, str|None]:
     r'''
     Given a file path (relative or absolute)
     find format and extension used (not the output extension)
@@ -286,7 +286,7 @@ def findFormatExtFile(fp):
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 
 
-def findFormatExtURL(url):
+def findFormatExtURL(url: str) -> tuple[str|None, str|None]:
     '''
     Given a URL, attempt to find the extension.
     This may scrub arguments in a URL, or simply look at the last characters.

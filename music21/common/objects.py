@@ -20,9 +20,11 @@ __all__ = [
     'Timer',
 ]
 
+from collections.abc import Callable, Iterator
 import collections
 import inspect
 import time
+import typing as t
 import weakref
 
 
@@ -64,15 +66,17 @@ class RelativeCounter(collections.Counter):
     '''
     # pylint:disable=abstract-method
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[t.Any]:
         sortedKeys = sorted(super().__iter__(), key=lambda x: self[x], reverse=True)
         yield from sortedKeys
 
-    def items(self):
+    # deliberately a generator (not dict's re-iterable ItemsView) so that the
+    # pairs follow the most-common-first order of the overridden __iter__.
+    def items(self) -> Iterator[tuple[t.Any, t.Any]]:  # type: ignore[override]
         for k in self:
             yield k, self[k]
 
-    def asProportion(self):
+    def asProportion(self) -> RelativeCounter:
         selfLen = sum(self[x] for x in self)
         outDict = {}
         for y in self:
@@ -81,7 +85,7 @@ class RelativeCounter(collections.Counter):
         new = self.__class__(outDict)
         return new
 
-    def asPercentage(self):
+    def asPercentage(self) -> RelativeCounter:
         selfLen = sum(self[x] for x in self)
         outDict = {}
         for y in self:
@@ -99,19 +103,19 @@ class defaultlist(list):
     >>> a[5]
     True
     '''
-    def __init__(self, fx):
+    def __init__(self, fx: Callable[[], t.Any]) -> None:
         super().__init__()
         self._fx = fx
 
-    def _fill(self, index):
+    def _fill(self, index: int) -> None:
         while len(self) <= index:
             self.append(self._fx())
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: int, value: t.Any) -> None:  # type: ignore[override]
         self._fill(index)
         list.__setitem__(self, index, value)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> t.Any:  # type: ignore[override]
         self._fill(index)
         return list.__getitem__(self, index)
 
@@ -136,10 +140,10 @@ class SingletonCounter:
     >>> v2 > v1
     True
     '''
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def __call__(self):
+    def __call__(self) -> int:
         post = _singletonCounter['value']
         _singletonCounter['value'] += 1
         return post
@@ -191,7 +195,7 @@ class SlottedObjectMixin:
 
     # SPECIAL METHODS #
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict[str, t.Any]:
         if getattr(self, '__dict__', None) is not None:
             state = self.__dict__.copy()
         else:
@@ -206,11 +210,11 @@ class SlottedObjectMixin:
             state[slot] = sValue
         return state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict[str, t.Any]) -> None:
         for slot, value in state.items():
             setattr(self, slot, value)
 
-    def _getSlotsRecursive(self):
+    def _getSlotsRecursive(self) -> set[str]:
         '''
         Find all slots recursively.
 
@@ -237,7 +241,7 @@ class SlottedObjectMixin:
         ['_editorial', '_style', 'direction', 'funkiness', 'groovability',
             'id', 'independentAngle', 'number', 'type']
         '''
-        slots = set()
+        slots: set[str] = set()
         for cls in self.__class__.mro():
             slots.update(getattr(cls, '__slots__', ()))
         return slots
@@ -253,7 +257,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
     '''
     __slots__: tuple[str, ...] = ()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if type(self) is not type(other):
             return False
         for thisSlot in self._getSlotsRecursive():
@@ -263,7 +267,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
                 return False
         return True
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         '''
         Defining __ne__ explicitly so that it inherits the same as __eq__
         '''
@@ -275,7 +279,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 class FrozenObject(EqualSlottedObjectMixin):
     __slots__: tuple[str, ...] = ()
 
-    def _check_init(self, key=None) -> bool:
+    def _check_init(self, key: str|None = None) -> bool:
         if key == '__class__':
             return True
         if not getattr(self, 'frozen', True):
@@ -288,24 +292,24 @@ class FrozenObject(EqualSlottedObjectMixin):
                 return True
         raise TypeError(f'This {self.__class__.__name__} instance is immutable.')
 
-    def __setattr__(self, key: str, value):
+    def __setattr__(self, key: str, value: t.Any) -> None:
         self._check_init(key)
         super().__setattr__(key, value)
 
-    def __delattr__(self, key: str):
+    def __delattr__(self, key: str) -> None:
         self._check_init(key)
         super().__delattr__(key)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: t.Any, value: t.Any) -> None:
         if hasattr(super(), '__setitem__'):
             self._check_init()
-            super().__setitem__(key, value)
+            super().__setitem__(key, value)  # type: ignore[misc]
         raise TypeError(f'{self.__class__} object is not subscriptable')
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: t.Any) -> None:
         if hasattr(super(), '__delitem__'):
             self._check_init()
-            super().__delitem__(key)
+            super().__delitem__(key)  # type: ignore[misc]
         raise TypeError(f'{self.__class__} object is not subscriptable')
 
     def __hash__(self) -> int:
@@ -341,13 +345,13 @@ class Timer:
     >>> stopTime < 1
     True
     '''
-    def __init__(self):
+    def __init__(self) -> None:
         # start on init
-        self._tStart = time.time()
-        self._tDif = 0
-        self._tStop = None
+        self._tStart: float = time.time()
+        self._tDif: float = 0
+        self._tStop: float|None = None
 
-    def start(self):
+    def start(self) -> None:
         '''
         Explicit start method; will clear previous values.
 
@@ -357,16 +361,16 @@ class Timer:
         self._tStop = None  # show that a new run has started so __call__ works
         self._tDif = 0
 
-    def stop(self):
+    def stop(self) -> None:
         self._tStop = time.time()
         self._tDif = self._tStop - self._tStart
 
-    def clear(self):
+    def clear(self) -> None:
+        self._tStart = time.time()
         self._tStop = None
         self._tDif = 0
-        self._tStart = None
 
-    def __call__(self):
+    def __call__(self) -> float:
         '''
         Reports current time or, if stopped, stopped time.
         '''
@@ -377,7 +381,7 @@ class Timer:
             timeDifference = self._tDif
         return timeDifference
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self._tStop is None:  # if not stopped yet
             timeDifference = time.time() - self._tStart
         else:

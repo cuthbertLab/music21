@@ -3889,7 +3889,7 @@ class RomanNumeral(harmony.Harmony):
         if evaluateSecondaryNumeral and self.secondaryRomanNumeral:
             return self.secondaryRomanNumeral.isMixture(evaluateSecondaryNumeral=True)
 
-        if (not self.isTriad) and (not self.isSeventh):
+        if (not self.isTriad()) and (not self.isSeventh()):
             return False
 
         if not self.key or not isinstance(self.key, key.Key):
@@ -4454,6 +4454,12 @@ class Test(unittest.TestCase):
             self.assertFalse(RomanNumeral(fig, 'A').isMixture())
             # True, minor key:
             self.assertTrue(RomanNumeral(fig, 'a').isMixture())
+
+        # Anything that is neither a triad nor a seventh returns False early.
+        rn = romanNumeralFromChord(chord.Chord('C4 D4 E4'))
+        self.assertFalse(rn.isTriad())
+        self.assertFalse(rn.isSeventh())
+        self.assertFalse(rn.isMixture())
 
     def testMinorTonic7InMajor(self):
         rn = RomanNumeral('i7', 'C')

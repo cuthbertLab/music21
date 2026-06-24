@@ -23,7 +23,7 @@ from music21 import defaults
 from music21.common.types import OffsetQLIn, OffsetQL
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence, Collection
+    from collections.abc import Callable, Sequence, Collection
 
 
 __all__ = [
@@ -359,7 +359,7 @@ def opFrac(num: OffsetQLIn) -> OffsetQL:
 
 
 def mixedNumeral(expr: numbers.Real,
-                 limitDenominator=defaults.limitOffsetDenominator):
+                 limitDenominator: int = defaults.limitOffsetDenominator) -> str:
     '''
     Returns a string representing a mixedNumeral form of a number
 
@@ -472,7 +472,7 @@ def roundToHalfInteger(num: float|int) -> float|int:
     return intVal + floatVal
 
 
-def addFloatPrecision(x, grain=1e-2) -> float|Fraction:
+def addFloatPrecision(x: str|float, grain: float = 1e-2) -> float|Fraction:
     '''
     Given a value that suggests a floating point fraction, like 0.33,
     return a Fraction or float that provides greater specification, such as Fraction(1, 3)
@@ -656,7 +656,7 @@ def decimalToTuplet(decNum: float) -> tuple[int, int]:
     Traceback (most recent call last):
     ZeroDivisionError: number must be greater than zero
     '''
-    def findSimpleFraction(inner_working):
+    def findSimpleFraction(inner_working: float) -> tuple[int, int]:
         '''
         Utility function.
         '''
@@ -681,15 +681,15 @@ def decimalToTuplet(decNum: float) -> tuple[int, int]:
     if iy == 0:
         raise ValueError('No such luck')
 
-    jy *= multiplier
-    my_gcd = gcd(int(jy), int(iy))
-    jy = jy / my_gcd
-    iy = iy / my_gcd
+    jyFloat = jy * multiplier
+    my_gcd = gcd(int(jyFloat), int(iy))
+    numerator = jyFloat / my_gcd
+    denominator = iy / my_gcd
 
     if flipNumerator is False:
-        return (int(jy), int(iy))
+        return (int(numerator), int(denominator))
     else:
-        return (int(iy), int(jy))
+        return (int(denominator), int(numerator))
 
 
 def unitNormalizeProportion(values: Sequence[int|float]) -> list[float]:
@@ -755,7 +755,7 @@ def unitBoundaryProportion(
 
 def weightedSelection(values: list[int],
                       weights: list[int|float],
-                      randomGenerator=None) -> int:
+                      randomGenerator: Callable[[], float]|None = None) -> int:
     '''
     Given a list of values and an equal-sized list of weights,
     return a randomly selected value using the weight.
@@ -853,7 +853,7 @@ def approximateGCD(values: Collection[int|float|Fraction], grain: float = 1e-4) 
 
 
 
-def contiguousList(inputListOrTuple) -> bool:
+def contiguousList(inputListOrTuple: Sequence[int]) -> bool:
     '''
     returns bool True or False if a list containing ints
     contains only contiguous (increasing) values
@@ -930,7 +930,7 @@ def groupContiguousIntegers(src: list[int]) -> list[list[int]]:
 
 
 # noinspection SpellCheckingInspection
-def fromRoman(num: str, *, strictModern=False) -> int:
+def fromRoman(num: str, *, strictModern: bool = False) -> int:
     '''
 
     Convert a Roman numeral (upper or lower) to an int
@@ -1035,7 +1035,7 @@ def toRoman(num: int) -> str:
     return result
 
 
-def ordinalAbbreviation(value: int, plural=False) -> str:
+def ordinalAbbreviation(value: int, plural: bool = False) -> str:
     '''
     Return the ordinal abbreviations for integers
 
@@ -1093,14 +1093,14 @@ class Test(unittest.TestCase):
     Tests not requiring file output.
     '''
 
-    def setUp(self):
+    def setUp(self) -> None:
         pass
 
-    def testToRoman(self):
+    def testToRoman(self) -> None:
         for src, dst in [(1, 'I'), (3, 'III'), (5, 'V')]:
             self.assertEqual(dst, toRoman(src))
 
-    def testOrdinalsToNumbers(self):
+    def testOrdinalsToNumbers(self) -> None:
         self.assertEqual(ordinalsToNumbers['unison'], 1)
         self.assertEqual(ordinalsToNumbers['Unison'], 1)
         self.assertEqual(ordinalsToNumbers['first'], 1)
@@ -1112,7 +1112,7 @@ class Test(unittest.TestCase):
         self.assertEqual(ordinalsToNumbers['Eighth'], 8)
         self.assertEqual(ordinalsToNumbers['8th'], 8)
 
-    def testWeightedSelection(self):
+    def testWeightedSelection(self) -> None:
         # test equal selection
         for j in range(10):
             x = 0
