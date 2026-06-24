@@ -362,6 +362,10 @@ class PartTranslator:
         # measure-0 sentinel; always overwritten with the real token before use
         self.lastMeasureToken: rtObjects.RTMeasure = rtObjects.RTMeasure('m0')
         self.lastMeasureNumber = 0
+        # TODO: make previousRn start as a note.Rest (dropping the None option)
+        #    so that a piece beginning before its first chord -- e.g. one that
+        #    starts with N.C. -- gets leading rests instead of a gap at the
+        #    start of the stream.
         self.previousRn: roman.RomanNumeral|note.Rest|None = None
         self.keySigCurrent: key.KeySignature|None = None
         self.setKeySigFromFirstKeyToken = True  # set a keySignature
