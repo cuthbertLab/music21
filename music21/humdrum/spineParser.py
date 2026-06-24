@@ -647,10 +647,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             # A merge or exchange spine-path op spans two cells on this line.
             # mergerActive flags an open merge; mergerParentSpine is the first
             # spine's parent to merge back into (None if it had none).
-            # exchangeActive is the first spine of an open exchange.
             mergerActive = False
             mergerParentSpine: HumdrumSpine|None = None
-            exchangeActive: HumdrumSpine|None = None
+            # the HumdrumSpine awaiting another one to exchange with.
+            # Or None if no exchange is active.
+            exchangeAwaitingSpine: HumdrumSpine|None = None
             for j in range(maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
                 currentSpine = currentSpineList[j]
@@ -712,8 +713,8 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         mergerParentSpine = None
 
                 elif thisEvent.contents == '*x':  # exchange spine
-                    if exchangeActive is None:
-                        exchangeActive = currentSpine
+                    if exchangeAwaitingSpine is None:
+                        exchangeAwaitingSpine = currentSpine
                     else:
                         # if second exchange is not found, then both
                         # lines disappear and exception is raised
@@ -721,12 +722,12 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         # in a line so long as the first
                         # is totally finished by the time the second happens
                         newSpineList.append(currentSpine)
-                        newSpineList.append(exchangeActive)
-                        exchangeActive = None
+                        newSpineList.append(exchangeAwaitingSpine)
+                        exchangeAwaitingSpine = None
                 else:  # null processing code '*'
                     newSpineList.append(currentSpine)
 
-            if exchangeActive is not None:
+            if exchangeAwaitingSpine is not None:
                 raise HumdrumException('ProtoSpine found with unpaired exchange instruction '
                                        f'at line {lineNumber} [{thisEventCollection.events}]')
             currentSpineList = newSpineList
