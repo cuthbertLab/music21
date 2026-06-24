@@ -362,7 +362,7 @@ class PartTranslator:
         # measure-0 sentinel; always overwritten with the real token before use
         self.lastMeasureToken: rtObjects.RTMeasure = rtObjects.RTMeasure('m0')
         self.lastMeasureNumber = 0
-        self.previousRn: note.GeneralNote|None = None
+        self.previousRn: roman.RomanNumeral|note.Rest|None = None
         self.keySigCurrent: key.KeySignature|None = None
         self.setKeySigFromFirstKeyToken = True  # set a keySignature
         self.foundAKeySignatureSoFar = False
