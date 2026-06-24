@@ -19,11 +19,22 @@ from music21 import exceptions21
 
 __all__ = ['optional_arg_decorator', 'deprecated', 'cacheMethod']
 
+
+class _DeprecatedCallInfo(t.TypedDict):
+    calledAlready: bool
+    message: str
+
+
+class _HasCache(t.Protocol):
+    '''An object exposing the `._cache` dict that :func:`cacheMethod` reads and writes.'''
+    _cache: dict[str, t.Any]
+
+
 # from Ryne Everett
 # http://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
 
 
-def optional_arg_decorator(fn: t.Any) -> Callable[..., t.Any]:
+def optional_arg_decorator(fn: Callable[..., t.Any]) -> Callable[..., t.Any]:
     '''
     a decorator for decorators.  Allows them to either have or not have arguments.
     '''
@@ -44,7 +55,7 @@ def optional_arg_decorator(fn: t.Any) -> Callable[..., t.Any]:
                 return fn(arguments[0])
 
         else:
-            def real_decorator(toBeDecorated: t.Any) -> t.Any:
+            def real_decorator(toBeDecorated: Callable[..., t.Any]) -> t.Any:
                 if is_bound_method:
                     return fn(klass, toBeDecorated, *arguments, **keywords)
                 else:
@@ -55,7 +66,7 @@ def optional_arg_decorator(fn: t.Any) -> Callable[..., t.Any]:
 
 @optional_arg_decorator
 def deprecated(
-    method: t.Any,
+    method: Callable[..., t.Any],
     startDate: str|None = None,
     removeDate: str|None = None,
     message: str|None = None
@@ -116,7 +127,7 @@ def deprecated(
     else:
         funcName = method.__name__
 
-    method._isDeprecated = True
+    method._isDeprecated = True  # type: ignore[attr-defined]
 
     if startDate is not None:
         startDate = ' on ' + startDate
@@ -132,8 +143,8 @@ def deprecated(
         message = 'Find alternative methods.'
 
     m = f'{funcName} was deprecated{startDate} and will disappear {removeDate}. {message}'
-    callInfo: dict[str, t.Any] = {'calledAlready': False,
-                                  'message': m}
+    callInfo: _DeprecatedCallInfo = {'calledAlready': False,
+                                     'message': m}
 
     @wraps(method)
     def func_wrapper(*arguments: t.Any, **keywords: t.Any) -> t.Any:
@@ -160,7 +171,7 @@ def deprecated(
     return func_wrapper
 
 
-def cacheMethod(method: t.Any) -> Callable[..., t.Any]:
+def cacheMethod(method: Callable[..., t.Any]) -> Callable[..., t.Any]:
     '''
     A decorator for music21Objects or other objects that
     assumes that there is a ._cache Dictionary in the instance
@@ -183,7 +194,7 @@ def cacheMethod(method: t.Any) -> Callable[..., t.Any]:
         funcName = method.__name__
 
     @wraps(method)
-    def inner(instance: t.Any, *arguments: t.Any, **keywords: t.Any) -> t.Any:
+    def inner(instance: _HasCache, *arguments: t.Any, **keywords: t.Any) -> t.Any:
         if funcName in instance._cache:
             return instance._cache[funcName]
 
