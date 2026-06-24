@@ -31,6 +31,7 @@ from music21 import stream
 from music21.humdrum import testFiles
 from music21.humdrum.spineParser import (
     GlobalComment,
+    GlobalReference,
     HumdrumDataCollection,
     KernSpine,
     SpineComment,
@@ -829,8 +830,9 @@ class Test(unittest.TestCase):
         self.assertIn('Palestrina', md.composer)
 
     def testGlobalEventsReachStream(self):
-        # !!! references become metadata; !! comments become GlobalComment
-        # objects in the stream; a blank line is ignored without error.
+        # !! comments become GlobalComment objects in the stream; !!! references
+        # become metadata (known codes proper, unknown ones custom) and do not
+        # stay in the stream; a blank line is ignored without error.
         src = '\n'.join([
             '!!!COM: Test Composer',
             '!!!OTL: Test Title',
@@ -841,6 +843,7 @@ class Test(unittest.TestCase):
             '4d',
             '*-',
             '!! comment at the end',
+            '!!!XYZ: trailing free-form ref',
         ])
         hdc = HumdrumDataCollection(src)
         hdc.parse()
@@ -855,9 +858,13 @@ class Test(unittest.TestCase):
             commentInfo,
             [('a global comment here', 0.0), ('comment at the end', 2.0)])
 
+        # references go to metadata and are removed from the stream entirely.
+        self.assertFalse(list(s.recurse().getElementsByClass(GlobalReference)))
         self.assertIsNotNone(s.metadata)
         self.assertEqual(str(s.metadata.composer), 'Test Composer')
         self.assertEqual(str(s.metadata.title), 'Test Title')
+        # an unknown code (even trailing) is kept as custom metadata, not lost.
+        self.assertEqual(str(s.metadata.getCustom('XYZ')[0]), 'trailing free-form ref')
 
         # the blank line did not derail parsing
         self.assertEqual(len(s.recurse().notes), 2)
