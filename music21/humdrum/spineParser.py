@@ -662,7 +662,9 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                     continue
                 # a spine-path token at this position always has a spine
                 # assigned from the first pass above.
-                assert currentSpine is not None
+                if currentSpine is None:  # pragma: no cover
+                    raise ValueError(
+                        f'spine-path token at line {lineNumber} has no active spine')
                 if thisEvent.contents == '*-':  # terminate spine
                     currentSpine.endingPoint = lineNumber
                 elif thisEvent.contents == '*^':  # split spine assume they are voices
