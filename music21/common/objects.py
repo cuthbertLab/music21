@@ -27,6 +27,8 @@ import time
 import typing as t
 import weakref
 
+from music21.common.decorators import deprecated
+
 
 class RelativeCounter(collections.Counter):
     '''
@@ -102,7 +104,13 @@ class defaultlist(list):
     >>> a = common.defaultlist(lambda:True)
     >>> a[5]
     True
+
+    * Deprecated in v11: use a plain list or a dict instead.  This was a
+      transitional helper from when music21 was ported from Perl, where you
+      could read or assign past the end of a list and get default values.
+      Work within normal Python types instead.
     '''
+    @deprecated('v11', 'v12', 'use a plain list or a dict instead')
     def __init__(self, fx: Callable[[], t.Any]) -> None:
         super().__init__()
         self._fx = fx
