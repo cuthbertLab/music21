@@ -773,6 +773,9 @@ class PartTranslator:
                     f'under timeSignature {self.tsCurrent} '
                     f'in line {currentMeasureToken.src}'
                 ) from ve
+            # Back-fills the measure start from a tied-forward chord -- but not
+            # at the start of a piece (previousRn is None there).  See the
+            # previousRn TODO: starting it as a Rest would fix the leading gap.
             if (self.previousChordInMeasure is None
                     and self.previousRn is not None
                     and newOffset > 0):
