@@ -548,10 +548,8 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
             # placeholder cell: either a SpineLine with no data this far over,
             # or a global line (GlobalComment, GlobalReference, or BlankLine).
-            if not isinstance(currentLine, SpineLine) and j == 0:
-                # not SpineLine = GlobalComment, GlobalReference, or BlankLine.
-                # global events register once, against the first column
-                thisEventCollection.addGlobalEvent(currentLine)
+            # Global lines are inserted separately by insertGlobalEvents() reading
+            # self.eventList, so nothing is recorded against this EventCollection.
             placeholder = SpineEvent('', currentLine.lineNumber)
             placeholder.protoSpineId = j
             thisEventCollection.addSpineEvent(j, placeholder)
@@ -2253,13 +2251,6 @@ class EventCollection(prebase.ProtoM21Object):
     def addLastSpineEvent(self, spineNum: int, spineEvent: SpineEvent) -> None:
         # should only add if current 'event' is '.' or a comment
         self.lastEvents[spineNum] = spineEvent
-
-    def addGlobalEvent(self, globalEvent: HumdrumLine) -> None:
-        for i in range(self.maxSpines):
-            # global lines fill every cell, but the caller immediately overwrites
-            # each cell with a placeholder SpineEvent, so a HumdrumLine never
-            # survives in self.events (which is therefore typed SpineEvent|None).
-            self.events[i] = globalEvent  # type: ignore[call-overload]
 
     def getSpineEvent(self, spineNum: int) -> SpineEvent|None:
         return self.events[spineNum]
