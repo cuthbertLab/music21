@@ -3889,7 +3889,7 @@ class RomanNumeral(harmony.Harmony):
         if evaluateSecondaryNumeral and self.secondaryRomanNumeral:
             return self.secondaryRomanNumeral.isMixture(evaluateSecondaryNumeral=True)
 
-        if (not self.isTriad) and (not self.isSeventh):
+        if (not self.isTriad()) and (not self.isSeventh()):
             return False
 
         if not self.key or not isinstance(self.key, key.Key):

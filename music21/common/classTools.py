@@ -230,7 +230,10 @@ def classToClassStr(classObj: type) -> str:
     return str(classObj).rsplit('.', maxsplit=1)[-1][:-2]
 
 
-def getClassSet(instance, classNameTuple=None):
+def getClassSet(
+    instance: object,
+    classNameTuple: tuple[str, ...]|None = None
+) -> frozenset[str|type]:
     '''
     Return the classSet for an instance (whether a Music21Object or something else).
     See base.Music21Object.classSet for more details.
@@ -280,7 +283,11 @@ TEMP_ATTRIBUTE_SENTINEL = object()
 
 
 @contextlib.contextmanager
-def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
+def tempAttribute(
+    obj: object,
+    attribute: str,
+    new_val: t.Any = TEMP_ATTRIBUTE_SENTINEL
+) -> t.Generator[None, None, None]:
     '''
     Temporarily set an attribute in an object to another value
     and then restore it afterwards.
@@ -309,7 +316,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
         setattr(obj, attribute, tempStorage)
 
 @contextlib.contextmanager
-def saveAttributes(obj, *attributeList: str) -> t.Generator[None, None, None]:
+def saveAttributes(obj: object, *attributeList: str) -> t.Generator[None, None, None]:
     '''
     Save a number of attributes in an object and then restore them afterwards.
 

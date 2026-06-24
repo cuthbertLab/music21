@@ -766,7 +766,7 @@ class Converter:
         # we do need the file extension to construct file path below
         if format is None:
             formatFromURL, ext = common.findFormatExtURL(url)
-            if formatFromURL is None:  # cannot figure out what it is
+            if formatFromURL is None or ext is None:  # cannot figure out what it is
                 raise ConverterException(f'cannot determine file format of url: {url}')
         else:
             unused_formatType, ext = common.findFormat(format)
