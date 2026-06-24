@@ -1735,8 +1735,6 @@ m1 C: I'''
         self.assertEqual(s.duration.quarterLength, 10)
 
     def testCopySingleMeasureTargetNotFound(self) -> None:
-        from music21 import key, stream
-        from music21.romanText import rtObjects
         # m2 copies from m9, which does not exist in the part
         rtm = rtObjects.RTMeasure('m2=m9')
         p = stream.Part()
@@ -1745,8 +1743,6 @@ m1 C: I'''
             _copySingleMeasure(rtm, p, key.Key('C'))
 
     def testCopyMultipleMeasuresTargetNotFound(self) -> None:
-        from music21 import key, stream
-        from music21.romanText import rtObjects
         # m20-21 copies from m2-3, which do not exist in the part
         rtm = rtObjects.RTMeasure('m20-21=m2-3')
         p = stream.Part()
@@ -1759,7 +1755,7 @@ m1 C: I'''
         # (empty or key-only).  The last-chord duration adjustment in
         # translateSingleMeasure must be skipped rather than crash with
         # AttributeError because no previous RomanNumeral exists yet.
-        from music21 import converter, roman, stream
+        from music21 import converter
         for src in ('Time Signature: 4/4\nm1\nm2 I\n',
                     'Time Signature: 4/4\nm1 G:\nm2 I\n'):
             s = converter.parse(src, format='romanText')
