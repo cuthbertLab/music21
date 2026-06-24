@@ -30,6 +30,11 @@ class _HasCache(t.Protocol):
     _cache: dict[str, t.Any]
 
 
+_CacheP = t.ParamSpec('_CacheP')
+_CacheReturn = t.TypeVar('_CacheReturn')
+_CacheInstance = t.TypeVar('_CacheInstance', bound=_HasCache)
+
+
 # from Ryne Everett
 # http://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
 
@@ -127,7 +132,7 @@ def deprecated(
     else:
         funcName = method.__name__
 
-    method._isDeprecated = True  # type: ignore[attr-defined]
+    method.__dict__['_isDeprecated'] = True
 
     if startDate is not None:
         startDate = ' on ' + startDate
@@ -171,7 +176,9 @@ def deprecated(
     return func_wrapper
 
 
-def cacheMethod(method: Callable[..., t.Any]) -> Callable[..., t.Any]:
+def cacheMethod(
+    method: Callable[t.Concatenate[_CacheInstance, _CacheP], _CacheReturn]
+) -> Callable[t.Concatenate[_CacheInstance, _CacheP], _CacheReturn]:
     '''
     A decorator for music21Objects or other objects that
     assumes that there is a ._cache Dictionary in the instance
@@ -194,7 +201,11 @@ def cacheMethod(method: Callable[..., t.Any]) -> Callable[..., t.Any]:
         funcName = method.__name__
 
     @wraps(method)
-    def inner(instance: _HasCache, *arguments: t.Any, **keywords: t.Any) -> t.Any:
+    def inner(
+        instance: _CacheInstance,
+        *arguments: _CacheP.args,
+        **keywords: _CacheP.kwargs
+    ) -> _CacheReturn:
         if funcName in instance._cache:
             return instance._cache[funcName]
 
