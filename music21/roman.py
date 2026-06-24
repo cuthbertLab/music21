@@ -4455,6 +4455,12 @@ class Test(unittest.TestCase):
             # True, minor key:
             self.assertTrue(RomanNumeral(fig, 'a').isMixture())
 
+        # Anything that is neither a triad nor a seventh returns False early.
+        rn = romanNumeralFromChord(chord.Chord('C4 D4 E4'))
+        self.assertFalse(rn.isTriad())
+        self.assertFalse(rn.isSeventh())
+        self.assertFalse(rn.isMixture())
+
     def testMinorTonic7InMajor(self):
         rn = RomanNumeral('i7', 'C')
         pitchStrings = [p.name for p in rn.pitches]
