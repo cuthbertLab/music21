@@ -858,8 +858,9 @@ class Test(unittest.TestCase):
             commentInfo,
             [('a global comment here', 0.0), ('comment at the end', 2.0)])
 
-        # references go to metadata and are removed from the stream entirely.
-        self.assertFalse(list(s.recurse().getElementsByClass(GlobalReference)))
+        # references become metadata only (GlobalReference is not a stream
+        # object), so none of them appear among the stream's elements.
+        self.assertFalse([el for el in s.recurse() if isinstance(el, GlobalReference)])
         self.assertIsNotNone(s.metadata)
         self.assertEqual(str(s.metadata.composer), 'Test Composer')
         self.assertEqual(str(s.metadata.title), 'Test Title')

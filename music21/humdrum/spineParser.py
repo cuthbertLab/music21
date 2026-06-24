@@ -166,6 +166,8 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         self.protoSpines: list[ProtoSpine] = []
         self.eventCollections: list[EventCollection] = []
         self.spineCollection: SpineCollection|None = None
+        # populated by insertGlobalEvents(), consumed by parseMetadata()
+        self.globalReferences: list[GlobalReference] = []
 
         if isinstance(dataStream, str):
             dataStream = dataStream.splitlines()
@@ -739,8 +741,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
     def insertGlobalEvents(self) -> None:
         '''
-        Insert the Global Events (GlobalReferenceLines and GlobalCommentLines) into an appropriate
-        place in the outer Stream.
+        Insert GlobalComments (from GlobalCommentLines) into the outer Stream,
+        and collect GlobalReferences (from GlobalReferenceLines) into
+        `self.globalReferences`.  References become metadata in
+        :meth:`parseMetadata`, not Stream objects, so they are not inserted here.
 
         Run after `self.spineCollection.createMusic21Streams()`.
         Is run automatically by `self.parse()`.
@@ -755,11 +759,17 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         eventList = self.eventList
         maxEventList = len(eventList)
         numberOfGlobalEventsInARow = 0
-        insertList: list[tuple[OffsetQL, GlobalReference|GlobalComment]] = []
-        appendList: list[GlobalReference|GlobalComment] = []
+        insertList: list[tuple[OffsetQL, GlobalComment]] = []
+        appendList: list[GlobalComment] = []
+        references: list[GlobalReference] = []
 
         for i, event in enumerate(eventList):
-            if isinstance(event, (GlobalReferenceLine, GlobalCommentLine)):
+            if isinstance(event, GlobalReferenceLine):
+                # references become metadata, not Stream objects, but are still
+                # counted so neighbouring comments keep the same priority.
+                numberOfGlobalEventsInARow += 1
+                references.append(GlobalReference(event.code, event.value))
+            elif isinstance(event, GlobalCommentLine):
                 numberOfGlobalEventsInARow += 1
                 insertOffset: OffsetQL|None = None
                 insertPriority = 0
@@ -771,31 +781,25 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                                           - 40
                                           + numberOfGlobalEventsInARow)
                         break
-                el: GlobalReference|GlobalComment
-                if isinstance(event, GlobalReferenceLine):
-                    # TODO: Fix GlobalReference (added in 2012; as of 2016 not sure what to fix)
-                    #    might add language?
-                    el = GlobalReference(event.code, event.value)
-                else:
-                    el = GlobalComment(event.value)
-                el.priority = insertPriority
+                comment = GlobalComment(event.value)
+                comment.priority = insertPriority
                 if insertOffset is None:
-                    appendList.append(el)
+                    appendList.append(comment)
                 else:
-                    insertTuple = (insertOffset, el)
-                    insertList.append(insertTuple)
-                # self.stream.insert(insertOffset, el)
+                    insertList.append((insertOffset, comment))
             else:
                 numberOfGlobalEventsInARow = 0
 
-        for offset, el in insertList:
-            self.stream.coreInsert(offset, el)
+        self.globalReferences = references
+
+        for offset, comment in insertList:
+            self.stream.coreInsert(offset, comment)
 
         if insertList:
             self.stream.coreElementsChanged()
 
-        for el in appendList:
-            self.stream.coreAppend(el)
+        for comment in appendList:
+            self.stream.coreAppend(comment)
 
         if appendList:
             self.stream.coreElementsChanged()
@@ -828,20 +832,15 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
     def parseMetadata(self, s: stream.Stream|None = None) -> None:
         '''
-        Create a metadata object for the file.
+        Create a metadata object for the file from the GlobalReferences
+        collected by :meth:`insertGlobalEvents`.
         '''
         if s is None:
             s = self.stream
         md = metadata.Metadata()
         s.metadata = md
-        grToRemove: list[GlobalReference] = []
-
-        for gr in s[GlobalReference]:
+        for gr in self.globalReferences:
             gr.updateMetadata(md)
-            grToRemove.append(gr)
-
-        if grToRemove:
-            s.remove(grToRemove, recurse=True)
 
 
 class HumdrumFile(HumdrumDataCollection):
@@ -2970,11 +2969,13 @@ class GlobalComment(base.Music21Object):
         return repr(self.comment)
 
 
-class GlobalReference(base.Music21Object):
+class GlobalReference(prebase.ProtoM21Object):
     # noinspection SpellCheckingInspection
     '''
-    A Music21Object that represents a reference in the score, called a "reference record"
-    in Humdrum.  See Humdrum User's Guide Chapter 2.
+    Represents a reference record in the score (Humdrum's term).  Unlike a
+    GlobalComment, a GlobalReference is never placed in the stream -- it is
+    converted to metadata -- so it is a plain ProtoM21Object, not a
+    Music21Object.  See Humdrum User's Guide Chapter 2.
 
     >>> sc = humdrum.spineParser.GlobalReference('!!!REF:this is a global reference')
     >>> sc
@@ -3016,9 +3017,7 @@ class GlobalReference(base.Music21Object):
         self,
         codeOrAll: str = '',
         valueOrNone: str|None = None,
-        **keywords,
     ) -> None:
-        super().__init__(**keywords)
         codeOrAll = re.sub(r'^!!!+', '', codeOrAll)
         codeOrAll = codeOrAll.strip()
         if valueOrNone is None and ':' in codeOrAll:
