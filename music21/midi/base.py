@@ -47,7 +47,7 @@ import typing as t
 if t.TYPE_CHECKING:
     import pathlib
 
-from music21.common.enums import ContainsEnum
+from music21.common.enums import HexEnum
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
@@ -361,7 +361,7 @@ def putNumbersAsList(numList: Iterable[int]) -> bytes:
     return bytes(post)
 
 
-class ChannelVoiceMessages(ContainsEnum):
+class ChannelVoiceMessages(HexEnum):
     '''
     ChannelVoiceMessages are the main MIDI messages for channel 1-16, such as
     NOTE_ON, NOTE_OFF, etc.
@@ -375,7 +375,7 @@ class ChannelVoiceMessages(ContainsEnum):
     PITCH_BEND = 0xE0
 
 
-class ChannelModeMessages(ContainsEnum):
+class ChannelModeMessages(HexEnum):
     ALL_SOUND_OFF = 0x78
     RESET_ALL_CONTROLLERS = 0x79
     LOCAL_CONTROL = 0x7A
@@ -386,7 +386,7 @@ class ChannelModeMessages(ContainsEnum):
     POLY_MODE_ON = 0x7F
 
 
-class MetaEvents(ContainsEnum):
+class MetaEvents(HexEnum):
     SEQUENCE_NUMBER = 0x00
     TEXT_EVENT = 0x01
     COPYRIGHT_NOTICE = 0x02
@@ -413,7 +413,7 @@ class MetaEvents(ContainsEnum):
     UNKNOWN = 0xFF  # Container for any unknown code
 
 
-class SysExEvents(ContainsEnum):
+class SysExEvents(HexEnum):
     F0_SYSEX_EVENT = 0xF0
     F7_SYSEX_EVENT = 0xF7
 
@@ -551,7 +551,7 @@ class MidiEvent(prebase.ProtoM21Object):
             trackIndex = self.track.index
 
         printType: str
-        if isinstance(self.type, ContainsEnum):
+        if isinstance(self.type, HexEnum):
             printType = self.type.name
         elif self.type is None:
             printType = 'None'
@@ -857,7 +857,7 @@ class MidiEvent(prebase.ProtoM21Object):
             return midiBytes[2:]
         elif self.type == ChannelVoiceMessages.CONTROLLER_CHANGE:
             specificDataSet = False
-            if ChannelModeMessages.hasValue(byte1):
+            if byte1 in ChannelModeMessages:
                 self.type = ChannelModeMessages(byte1)
                 if self.type == ChannelModeMessages.LOCAL_CONTROL:
                     specificDataSet = True
@@ -945,11 +945,11 @@ class MidiEvent(prebase.ProtoM21Object):
         #    'MidiEvent.read(): trying to parse a MIDI event, looking at first two chars:',
         #    'hex(byte0)', hex(byte0), 'hex(byte[1])', hex(byte[1]),])
 
-        if ChannelVoiceMessages.hasValue(msgType):
+        if msgType in ChannelVoiceMessages:
             # NOTE_ON and NOTE_OFF and PROGRAM_CHANGE, PITCH_BEND, etc.
             return self.parseChannelVoiceMessage(midiBytes)
 
-        elif SysExEvents.hasValue(byte0):
+        elif byte0 in SysExEvents:
             self.type = SysExEvents(byte0)
             length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[1:])
             self.data = midiBytesAfterLength[:length]
@@ -957,7 +957,7 @@ class MidiEvent(prebase.ProtoM21Object):
 
         # SEQUENCE_TRACK_NAME and other MetaEvents are here
         elif byte0 == METAEVENT_MARKER:  # 0xFF
-            if MetaEvents.hasValue(byte1):
+            if byte1 in MetaEvents:
                 self.type = MetaEvents(byte1)
             else:
                 # environLocal.printDebug([f' unknown meta event: FF {byte1:02X}'])
@@ -1012,7 +1012,7 @@ class MidiEvent(prebase.ProtoM21Object):
         '''
         if t.TYPE_CHECKING:
             # no DeltaTime here.
-            assert isinstance(self.type, ContainsEnum)
+            assert isinstance(self.type, HexEnum)
 
         if self.type in ChannelVoiceMessages:
             # environLocal.printDebug(['writing channelVoiceMessages', self.type])

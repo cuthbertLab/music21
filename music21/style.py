@@ -13,6 +13,7 @@ etc. such that precise positioning information, layout, size, etc. can be specif
 '''
 from __future__ import annotations
 
+from enum import StrEnum
 import typing as t
 import unittest
 
@@ -29,7 +30,7 @@ class TextFormatException(exceptions21.Music21Exception):
     pass
 
 
-class Enclosure(common.StrEnum):
+class Enclosure(StrEnum):
     RECTANGLE = 'rectangle'
     SQUARE = 'square'
     OVAL = 'oval'

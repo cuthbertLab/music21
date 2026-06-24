@@ -1629,10 +1629,10 @@ class Test(unittest.TestCase):
         self.assertEqual(getEndEvents()[0].time, defaults.ticksAtStart)
         self.assertEqual(getEndEvents(addEndDelay=False)[0].time, 0)
 
-    def testContainsWorksWithIntEnum(self):
+    def testContainsWorksWithHexEnum(self):
         '''
         Make sure that our previous ContainsEnums now work with Python 3.12
-        IntEnums
+        IntEnums such as HexEnum (ChannelVoiceMessages)
         '''
         c = ChannelVoiceMessages.NOTE_OFF
         self.assertIn(c, ChannelVoiceMessages)

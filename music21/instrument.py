@@ -24,6 +24,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from collections.abc import Iterable
+from enum import StrEnum
 import importlib
 import unittest
 import typing as t
@@ -2312,7 +2313,7 @@ def _combinations(instrumentString):
     return allComb
 
 
-class SearchLanguage(common.enums.StrEnum):
+class SearchLanguage(StrEnum):
     ALL = 'all'
     ENGLISH = 'english'
     FRENCH = 'french'

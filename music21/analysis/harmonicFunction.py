@@ -9,15 +9,15 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
+from enum import StrEnum
 import unittest
 
-from music21 import common
 from music21 import key
 from music21 import roman
 from music21 import scale
 
 
-class HarmonicFunction(common.enums.StrEnum):
+class HarmonicFunction(StrEnum):
     TONIC_MAJOR = 'T'
     TONIC_MAJOR_PARALLELKLANG_MINOR = 'Tp'
     TONIC_MAJOR_GEGENKLANG_MINOR = 'Tg'

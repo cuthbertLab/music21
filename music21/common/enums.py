@@ -9,62 +9,41 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from enum import Enum, EnumType, IntEnum
+from enum import Enum, IntEnum, StrEnum
 import re
 
-# when Python 3.12 is minimum, will not need StrEnumMeta at all -- contains will work.
 
-class StrEnumMeta(EnumType):
-    def __contains__(cls, item: object) -> bool:
-        if isinstance(item, str):
-            if item in cls.__members__.values():
-                return True
-            else:
-                return False
-        try:
-            return super().__contains__(item)
-        except TypeError:  # pragma: no cover
-            return False
-
-
-class ContainsMeta(EnumType):
+class HexEnum(IntEnum):
     '''
-    This is a backport of the Python 3.12 `EnumType` class's contains method.
-
-    This will be removed when Python 3.12 is the minimum version for music21.
-    '''
-    def __contains__(cls, item: object) -> bool:
-        try:
-            cls(item)  # pylint: disable=no-value-for-parameter
-            return True
-        except ValueError:
-            # Python 3.12 does some more subtle things but not backward compatible.
-            return False
-
-
-class ContainsEnum(IntEnum):
-    '''
-    An IntEnum that allows "in" checks against the values of the enum with
-    hasValue.
+    An IntEnum that displays its repr in hex.
 
     >>> from music21.midi import ChannelVoiceMessages
-    >>> issubclass(ChannelVoiceMessages, common.enums.ContainsEnum)
-    True
     >>> ChannelVoiceMessages.NOTE_ON
     <ChannelVoiceMessages.NOTE_ON: 0x90>
     >>> ChannelVoiceMessages.NOTE_ON in ChannelVoiceMessages
     True
     >>> 0x90 in ChannelVoiceMessages
     True
-    >>> ChannelVoiceMessages._value2member_map_
+
+    Note: before v11 this was called `ContainsEnum` and had a `hasValue` to check for
+        containment.  Not necessary with Python 3.12 being the minimum version.
+        `ContainsEnum` alias will be removed in v12.
     '''
     def __repr__(self) -> str:
+        '''
+        Display the repr in hex.
+        '''
         val = super().__repr__()
         return re.sub(r'(\d+)', lambda m: f'0x{int(m.group(1)):X}', val)
 
     @classmethod
-    def hasValue(cls, val: object) -> bool:
-        return val in cls._value2member_map_
+    def hasValue(cls, item: object|int) -> bool:
+        '''
+        Deprecated -- to be removed in v12.  Just do `item in cls`
+        '''
+        return item in cls
+
+ContainsEnum = HexEnum
 
 
 class BooleanEnum(Enum):
@@ -135,32 +114,6 @@ class BooleanEnum(Enum):
 
     def __repr__(self) -> str:
         return f'<{self.__class__.__name__}.{self.name}>'
-
-
-class StrEnum(str, Enum, metaclass=StrEnumMeta):
-    '''
-    An enumeration where strings can equal the value, and strings
-    can be found "in" the enum.
-
-    See :class:`music21.common.enums.OffsetSpecial` for an
-    example of how subclassing this would work.
-
-    * Note: This class predates the equivalent StrEnum in Python 3.11
-      and the changes to Enum `__contains__` in 3.12.  Once
-      Python 3.12 is the minimum version of music21, this class
-      will no longer be used internally and will eventually become
-      deprecated (2027?) and removed (2030?).
-    '''
-    def __repr__(self) -> str:
-        return f'<{self.__class__.__name__}.{self.name}>'
-
-    def __str__(self) -> str:
-        '''
-        >>> from music21.common.enums import OffsetSpecial
-        >>> str(OffsetSpecial.AT_END)
-        'highestTime'
-        '''
-        return str(self.value)
 
 
 class ElementSearch(StrEnum):
