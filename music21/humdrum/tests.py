@@ -846,8 +846,14 @@ class Test(unittest.TestCase):
         hdc.parse()
         s = hdc.stream
 
-        comments = [gc.comment for gc in s.recurse().getElementsByClass(GlobalComment)]
-        self.assertEqual(comments, ['a global comment here', 'comment at the end'])
+        # the leading comment lands at 0.0; the trailing one at the end of the
+        # music (the two quarter notes total 2.0), not back at 0.0.
+        flat = s.flatten()
+        commentInfo = [(gc.comment, gc.offset)
+                       for gc in flat.getElementsByClass(GlobalComment)]
+        self.assertEqual(
+            commentInfo,
+            [('a global comment here', 0.0), ('comment at the end', 2.0)])
 
         self.assertIsNotNone(s.metadata)
         self.assertEqual(str(s.metadata.composer), 'Test Composer')

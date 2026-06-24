@@ -217,12 +217,15 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         self.spineCollection = self.createHumdrumSpines()
         spineCollection = t.cast(SpineCollection, self.spineCollection)
         spineCollection.createMusic21Streams()
-        self.insertGlobalEvents()
         for thisSpine in spineCollection:
             thisSpine.stream.id = 'spine_' + str(thisSpine.id)
         for thisSpine in spineCollection:
             if thisSpine.parentSpine is None and thisSpine.spineType == 'kern':
                 score.insert(thisSpine.stream)
+        # insert global events after the parts are in the score, so that
+        # trailing comments (appended at highestTime) land at the end of the
+        # music rather than at 0.0 in an empty score.
+        self.insertGlobalEvents()
 
         self.parseMetadata()
         return score
