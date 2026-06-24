@@ -704,11 +704,11 @@ class PartTranslator:
             isLastAtomInMeasure = (i == self.numberOfAtomsInCurrentMeasure - 1)
             self.translateSingleMeasureAtom(a, m, isLastAtomInMeasure=isLastAtomInMeasure)
 
-        # may need to adjust duration of last chord added
-        if self.tsCurrent is not None:
-            previousRn = t.cast(note.GeneralNote, self.previousRn)
-            previousRn.quarterLength = (self.tsCurrent.barDuration.quarterLength
-                                                - self.currentOffsetInMeasure)
+        # may need to adjust duration of last chord added (if any chord was added)
+        if self.tsCurrent is not None and self.previousRn is not None:
+            self.previousRn.quarterLength = (
+                self.tsCurrent.barDuration.quarterLength - self.currentOffsetInMeasure
+            )
         m.coreElementsChanged()
         return m
 
@@ -1746,6 +1746,17 @@ m1 C: I'''
         with self.assertRaisesRegex(
                 RomanTextTranslateException, 'Could not find measures 2-3'):
             _copyMultipleMeasures(rtm, p, key.Key('C'))
+
+    def testLeadingMeasureWithoutChord(self) -> None:
+        # a piece may begin with measures that have no chord atoms (empty or
+        # key-only); the last-chord duration adjustment must be skipped rather
+        # than crash because no previous RomanNumeral exists yet.
+        from music21 import converter, stream
+        for src in ('Time Signature: 4/4\nm1\nm2 I\n',
+                    'Time Signature: 4/4\nm1 G:\nm2 I\n'):
+            s = converter.parse(src, format='romanText')
+            measures = list(s.recurse().getElementsByClass(stream.Measure))
+            self.assertEqual(len(measures), 2)
 
     def testRepeats(self):
         from music21 import converter
