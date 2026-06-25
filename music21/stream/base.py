@@ -99,6 +99,18 @@ class StreamDeprecationWarning(UserWarning):
 OffsetMap = namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex'])
 
 
+class SecondsMapEntry(t.TypedDict):
+    '''
+    A typed dictionary describing the real-time characteristics of one element,
+    as returned in the list produced by :attr:`~music21.stream.base.Stream.secondsMap`.
+    '''
+    offsetSeconds: float
+    durationSeconds: float
+    endTimeSeconds: float
+    element: base.Music21Object
+    voiceIndex: int|None
+
+
 # -----------------------------------------------------------------------------
 class Stream[M21ObjType: base.Music21Object](core.StreamCore):
     '''
@@ -8773,7 +8785,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                 activeStart = activeEnd
         return totalSeconds
 
-    def _getSecondsMap(self, srcObj=None):
+    def _getSecondsMap(self, srcObj=None) -> list[SecondsMapEntry]:
         '''
         Return a list of dictionaries for all elements in this Stream,
         where each dictionary defines the real-time characteristics of
@@ -8789,7 +8801,8 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         # not sure if this should be taken from the flat representation
         lowestOffset = srcObj.lowestOffset
 
-        secondsMap = []  # list of start, start+dur, element
+        secondsMap: list[SecondsMapEntry] = []  # list of start, start+dur, element
+        groups: list[tuple[Stream, int|None]]
         if srcObj.hasVoices():
             groups = []
             for i, v in enumerate(srcObj.voices):
@@ -8805,20 +8818,16 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                     continue
                 dur = e.duration.quarterLength
                 offset = round(e.getOffsetBySite(group), 8)
-                # calculate all time regions given this offset
-
-                # all stored values are seconds
-                # noinspection PyDictCreation
-                secondsDict = {}
-                secondsDict['offsetSeconds'] = srcObj._accumulatedSeconds(
-                    mmBoundaries, lowestOffset, offset)
-                secondsDict['durationSeconds'] = srcObj._accumulatedSeconds(
-                    mmBoundaries, offset, offset + dur)
-                secondsDict['endTimeSeconds'] = (secondsDict['offsetSeconds']
-                                                 + secondsDict['durationSeconds'])
-                secondsDict['element'] = e
-                secondsDict['voiceIndex'] = voiceIndex
-                secondsMap.append(secondsDict)
+                # calculate all time regions given this offset; all values are seconds
+                offsetSeconds = srcObj._accumulatedSeconds(mmBoundaries, lowestOffset, offset)
+                durationSeconds = srcObj._accumulatedSeconds(mmBoundaries, offset, offset + dur)
+                secondsMap.append(SecondsMapEntry(
+                    offsetSeconds=offsetSeconds,
+                    durationSeconds=durationSeconds,
+                    endTimeSeconds=offsetSeconds + durationSeconds,
+                    element=e,
+                    voiceIndex=voiceIndex,
+                ))
         return secondsMap
 
     # do not make a property decorator since _getSecondsMap takes arguments
