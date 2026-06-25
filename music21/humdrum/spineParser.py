@@ -765,8 +765,8 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
         for i, event in enumerate(eventList):
             if isinstance(event, GlobalReferenceLine):
-                # references become metadata, not Stream objects, but are still
-                # counted so neighbouring comments keep the same priority.
+                # References become metadata, not Stream objects, but are still
+                # counted so neighboring comments keep the same priority.
                 numberOfGlobalEventsInARow += 1
                 references.append(GlobalReference(event.code, event.value))
             elif isinstance(event, GlobalCommentLine):
@@ -928,7 +928,7 @@ class GlobalReferenceLine(HumdrumLine):
     # noinspection SpellCheckingInspection
     r'''
     A GlobalReferenceLine is a type of HumdrumLine that contains
-    information/metadata about the Humdrum document.
+    a Reference Record or information/metadata about the Humdrum document.
 
     In Humdrum it is represented by three exclamation points
     followed by non-whitespace followed by a colon.  Examples::
@@ -963,8 +963,8 @@ class GlobalReferenceLine(HumdrumLine):
 
     TODO: add parsing of three-digit Kern comment codes into fuller metadata
     TODO: parse ``@``/``@@`` language tags here (e.g. ``!!!OPT@@RUS:``, ``!!!OPT@FRE:``)
-    and propagate language/isPrimary so that GlobalReference.updateMetadata
-    can attach ``metadata.Text(value, language=...)`` instead of bare strings.
+      and propagate language/isPrimary so that GlobalReference.updateMetadata
+      can attach ``metadata.Text(value, language=...)`` instead of bare strings.
     '''
     def __init__(self, lineNumber: int = 0, contents: str = '!!! NUL: None') -> None:
         self.lineNumber = lineNumber
@@ -2972,10 +2972,16 @@ class GlobalComment(base.Music21Object):
 class GlobalReference(prebase.ProtoM21Object):
     # noinspection SpellCheckingInspection
     '''
-    Represents a reference record in the score (Humdrum's term).  Unlike a
-    GlobalComment, a GlobalReference is never placed in the stream -- it is
-    converted to metadata -- so it is a plain ProtoM21Object, not a
-    Music21Object.  See Humdrum User's Guide Chapter 2.
+    An item of metadata or "library-type information' called a "Reference Record"
+    in Humdrum.  The music21 term `GlobalReference` uses Global in the sense that
+    it applies to all spines, but also to the score as a whole.
+
+    All GlobalReferences are stored in SpineParser's .globalReferences array
+    during parsing and then stored in the Score's metadata at the end of parsing.
+    The position of a GlobalReference in the Humdrum file does not affect
+    where it is placed in the score's metadata (though later ones will overwrite
+    earlier ones). Humdrum tradition is to place most important reference records
+    at the top of the file and less important ones at the end.
 
     >>> sc = humdrum.spineParser.GlobalReference('!!!REF:this is a global reference')
     >>> sc
@@ -3012,6 +3018,9 @@ class GlobalReference(prebase.ProtoM21Object):
     'FRE'
     >>> sc.isPrimary
     False
+
+    Changed in v11: GlobalReferences are no longer Music21Object subclasses, since they
+        should not be placed in locations in a Stream.
     '''
     def __init__(
         self,
@@ -3145,9 +3154,9 @@ class GlobalReference(prebase.ProtoM21Object):
 
     def updateMetadata(self, md: metadata.Metadata) -> None:
         '''
-        update a metadata object according to information in this GlobalReference
+        Update a metadata object according to information in this GlobalReference.
 
-        See Humdrum guide Appendix I for information
+        See Humdrum guide Appendix I for information.
         '''
         c = self.code
         v = self.value
