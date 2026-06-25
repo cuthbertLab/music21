@@ -9,11 +9,14 @@
 # ------------------------------------------------------------------------------
 '''
 The features implemented here are based on those found in jSymbolic and
-defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recordings"
+defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recordings".
+
+Type annotations in this module were added with AI assistance (Claude).
 '''
 from __future__ import annotations
 
 from collections import OrderedDict
+from collections.abc import Sequence
 import copy
 import math
 from math import isclose
@@ -51,7 +54,7 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M1'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Melodic Interval Histogram'
@@ -61,10 +64,12 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
         self.dimensions = 128
         self.normalize = True
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         for i, value in enumerate(self.data['midiIntervalHistogram']):
             self.feature.vector[i] = value
 
@@ -81,18 +86,19 @@ class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M2'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Average Melodic Interval'
         self.description = 'Average melodic interval (in semitones).'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         values = []
         # already summed by part if parts exist
         histo = self.data['midiIntervalHistogram']
@@ -115,18 +121,19 @@ class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M3'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Most Common Melodic Interval'
         self.description = 'Melodic interval with the highest frequency.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # already summed by part if parts exist
         histo = self.data['midiIntervalHistogram']
         maxValue = max(histo)
@@ -146,7 +153,7 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
     '''
     id = 'M4'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Distance Between Most Common Melodic Intervals'
@@ -154,12 +161,13 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
                             'most common melodic interval and the second most '
                             'common melodic interval.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # copy b/c will manipulate
         histo = copy.deepcopy(self.data['midiIntervalHistogram'])
         maxValue = max(histo)
@@ -184,18 +192,19 @@ class MostCommonMelodicIntervalPrevalenceFeature(
     '''
     id = 'M5'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Most Common Melodic Interval Prevalence'
         self.description = 'Fraction of melodic intervals that belong to the most common interval.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # copy b/c will manipulate
         histo = copy.deepcopy(self.data['midiIntervalHistogram'])
         maxValue = max(histo)
@@ -217,7 +226,7 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
     '''
     id = 'M6'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Relative Strength of Most Common Intervals'
@@ -225,12 +234,13 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
                             'to the second most common interval divided by the '
                             'fraction of melodic intervals belonging to the most common interval.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # copy b/c will manipulate
         histo = copy.deepcopy(self.data['midiIntervalHistogram'])
         count = sum(histo)
@@ -256,19 +266,20 @@ class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M7'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Number of Common Melodic Intervals'
         self.description = ('Number of melodic intervals that represent '
                             'at least 9% of all melodic intervals.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if not total:
@@ -295,7 +306,7 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M8'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Amount of Arpeggiation'
@@ -303,12 +314,13 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
                             'minor thirds, major thirds, perfect fifths, minor sevenths, '
                             'major sevenths, octaves, minor tenths or major tenths.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if total == 0:
@@ -326,7 +338,7 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
 
 class RepeatedNotesFeature(featuresModule.FeatureExtractor):
     '''
-    Fraction of notes that are repeated melodically
+    Fraction of notes that are repeated melodically.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RepeatedNotesFeature(s)
@@ -336,18 +348,19 @@ class RepeatedNotesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M9'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Repeated Notes'
         self.description = 'Fraction of notes that are repeated melodically.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if total == 0:
@@ -375,18 +388,19 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
     '''
     id = 'm10'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Chromatic Motion'
         self.description = 'Fraction of melodic intervals corresponding to a semi-tone.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if not total:
@@ -401,7 +415,7 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
 
 class StepwiseMotionFeature(featuresModule.FeatureExtractor):
     '''
-    Fraction of melodic intervals that corresponded to a minor or major second
+    Fraction of melodic intervals that correspond to a minor or major second.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.StepwiseMotionFeature(s)
@@ -411,19 +425,20 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M11'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Stepwise Motion'
         self.description = ('Fraction of melodic intervals that corresponded '
                             'to a minor or major second.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if not total:
@@ -438,7 +453,7 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
 
 class MelodicThirdsFeature(featuresModule.FeatureExtractor):
     '''
-    Fraction of melodic intervals that are major or minor thirds
+    Fraction of melodic intervals that are major or minor thirds.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MelodicThirdsFeature(s)
@@ -448,18 +463,19 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M12'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Melodic Thirds'
         self.description = 'Fraction of melodic intervals that are major or minor thirds.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if not total:
@@ -474,7 +490,7 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
 
 class MelodicFifthsFeature(featuresModule.FeatureExtractor):
     '''
-    Fraction of melodic intervals that are perfect fifths
+    Fraction of melodic intervals that are perfect fifths.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MelodicFifthsFeature(s)
@@ -484,18 +500,19 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M13'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Melodic Fifths'
         self.description = 'Fraction of melodic intervals that are perfect fifths.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if not total:
@@ -510,7 +527,7 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
 
 class MelodicTritonesFeature(featuresModule.FeatureExtractor):
     '''
-    Fraction of melodic intervals that are tritones
+    Fraction of melodic intervals that are tritones.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MelodicTritonesFeature(s)
@@ -520,18 +537,19 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M14'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Melodic Tritones'
         self.description = 'Fraction of melodic intervals that are tritones.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if not total:
@@ -546,7 +564,7 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
 
 class MelodicOctavesFeature(featuresModule.FeatureExtractor):
     '''
-    Fraction of melodic intervals that are octaves
+    Fraction of melodic intervals that are octaves.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MelodicOctavesFeature(s)
@@ -556,18 +574,19 @@ class MelodicOctavesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M15'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Melodic Octaves'
         self.description = 'Fraction of melodic intervals that are octaves.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if not total:
@@ -593,18 +612,19 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
     '''
     id = 'm17'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Direction of Motion'
         self.description = 'Fraction of melodic intervals that are rising rather than falling.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         rising = 0
         falling = 0
         cBundle = []
@@ -652,7 +672,7 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M18'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Duration of Melodic Arcs'
@@ -661,12 +681,13 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
                             'total number of intervals (not counting unisons) divided '
                             'by the number of times the melody changes direction.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # `cList` contains a list of melodic intervals in a part.
         # For example, C4 E4 G4 E4 C4 results in a cList of [4, 3, -3, -4].
         # Each part is encoded in a separate cList; cBundle contains all
@@ -706,6 +727,7 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
                     elif interval < 0:
                         current_direction = DESCENDING
         # Duration of melodic arcs is 0 if it never changes direction
+        duration_of_melodic_arcs: float
         if direction_changes == 0:
             duration_of_melodic_arcs = 0
         else:
@@ -743,7 +765,7 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M19'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Size of Melodic Arcs'
@@ -755,12 +777,13 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
                             'the start of the melody and the first change of'
                             'direction - divided by the number of direction changes.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # `cList` contains a list of melodic intervals in a part.
         # For example, C4 E4 G4 E4 C4 results in a cList of [4, 3, -3, -4].
         # Each part is encoded in a separate cList; cBundle contains all
@@ -814,6 +837,7 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
                         this_arc_interval += abs(interval)
 
         # If it never changes direction, the size of melodic arcs is defined to be 0
+        size_of_melodic_arcs: float
         if direction_changes == 0:
             size_of_melodic_arcs = 0
         else:
@@ -836,19 +860,20 @@ class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P1'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Most Common Pitch Prevalence'
         self.description = 'Fraction of Note Ons corresponding to the most common pitch.'
         self.isSequential = True
-        self.dimensions = 1
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.midiPitchHistogram']
         if not histo:
             raise JSymbolicFeatureException('input lacks notes')
@@ -871,19 +896,20 @@ class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P2'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Most Common Pitch Class Prevalence'
         self.description = 'Fraction of Note Ons corresponding to the most common pitch class.'
         self.isSequential = True
-        self.dimensions = 1
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.pitchClassHistogram']
         # if a tie this will return the first
         # if all zeros will return zero
@@ -906,20 +932,21 @@ class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P3'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Relative Strength of Top Pitches'
         self.description = ('The frequency of the 2nd most common pitch '
                             'divided by the frequency of the most common pitch.')
         self.isSequential = True
-        self.dimensions = 1
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.midiPitchHistogram']
         # if a tie this will return the first
         # if all zeros will return zero
@@ -942,20 +969,21 @@ class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P4'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Relative Strength of Top Pitch Classes'
         self.description = ('The frequency of the 2nd most common pitch class '
                             'divided by the frequency of the most common pitch class.')
         self.isSequential = True
-        self.dimensions = 1
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # copy b/c will edit
         histo = copy.deepcopy(self.data['pitches.pitchClassHistogram'])
         # if a tie this will return the first
@@ -983,19 +1011,20 @@ class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P5'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Interval Between Strongest Pitches'
         self.description = ('Absolute value of the difference between '
                             'the pitches of the two most common MIDI pitches.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.midiPitchHistogram']
         # if a tie this will return the first
         # if all zeros will return zero
@@ -1018,19 +1047,20 @@ class IntervalBetweenStrongestPitchClassesFeature(
     '''
     id = 'P6'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Interval Between Strongest Pitch Classes'
         self.description = ('Absolute value of the difference between the pitch '
                             'classes of the two most common MIDI pitch classes.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = copy.deepcopy(self.data['pitches.pitchClassHistogram'])
         # if a tie this will return the first
         # if all zeros will return zero
@@ -1054,19 +1084,20 @@ class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P7'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Number of Common Pitches'
         self.description = ('Number of pitches that account individually '
                             'for at least 9% of all notes.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.midiPitchHistogram']
         total = sum(histo.values())
         post = 0
@@ -1087,18 +1118,19 @@ class PitchVarietyFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P8'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Pitch Variety'
         self.description = 'Number of pitches used at least once.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.midiPitchHistogram']
         post = 0
         for i, count in enumerate(histo):
@@ -1118,18 +1150,19 @@ class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P9'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Pitch Class Variety'
         self.description = 'Number of pitch classes used at least once.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.pitchClassHistogram']
         post = 0
         for i, count in enumerate(histo):
@@ -1140,7 +1173,7 @@ class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
 
 class RangeFeature(featuresModule.FeatureExtractor):
     '''
-    Difference between highest and lowest pitches. In semitones
+    Difference between highest and lowest pitches, in semitones.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RangeFeature(s)
@@ -1149,18 +1182,19 @@ class RangeFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P10'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Range'
         self.description = 'Difference between highest and lowest pitches.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.midiPitchHistogram']
         if not histo:
             raise JSymbolicFeatureException('input lacks notes')
@@ -1181,19 +1215,20 @@ class MostCommonPitchFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P11'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Most Common Pitch'
         self.description = 'Bin label of the most common pitch.'
         self.isSequential = True
-        self.dimensions = 1
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.midiPitchHistogram']
         try:
             pNumberMax = histo.most_common(1)[0][0]
@@ -1213,19 +1248,20 @@ class PrimaryRegisterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P12'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Primary Register'
         self.description = 'Average MIDI pitch.'
         self.isSequential = True
-        self.dimensions = 1
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches']
         if not histo:
             raise JSymbolicFeatureException('input lacks notes')
@@ -1243,19 +1279,20 @@ class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P13'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Importance of Bass Register'
         self.description = 'Fraction of Note Ons between MIDI pitches 0 and 54.'
         self.isSequential = True
-        self.dimensions = 1
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.midiPitchHistogram']
         if not histo:
             raise JSymbolicFeatureException('input lacks notes')
@@ -1271,7 +1308,7 @@ class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
 
 class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
     '''
-    Fraction of Notes between MIDI pitches 55 and 72
+    Fraction of Notes between MIDI pitches 55 and 72.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.ImportanceOfMiddleRegisterFeature(s)
@@ -1280,19 +1317,20 @@ class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P14'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Importance of Middle Register'
         self.description = 'Fraction of Note Ons between MIDI pitches 55 and 72.'
         self.isSequential = True
-        self.dimensions = 1
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.midiPitchHistogram']
         if not histo:
             raise JSymbolicFeatureException('input lacks notes')
@@ -1317,19 +1355,20 @@ class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P15'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Importance of High Register'
         self.description = 'Fraction of Note Ons between MIDI pitches 73 and 127.'
         self.isSequential = True
-        self.dimensions = 1
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.midiPitchHistogram']
         if not histo:
             raise JSymbolicFeatureException('input lacks notes')
@@ -1354,18 +1393,19 @@ class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P16'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Most Common Pitch Class'
         self.description = 'Bin label of the most common pitch class.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['pitches.pitchClassHistogram']
         pIndexMax = histo.index(max(histo))
         self.feature.vector[0] = pIndexMax
@@ -1373,46 +1413,48 @@ class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
 
 class DominantSpreadFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     Largest number of consecutive pitch classes separated by perfect
     5ths that accounted for at least 9% each of the notes.
     '''
     id = 'P17'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Dominant Spread'
         self.description = ('Largest number of consecutive pitch classes separated by '
                             'perfect 5ths that accounted for at least 9% each of the notes.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
 
 class StrongTonalCentresFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     Number of peaks in the fifths pitch histogram that each account
     for at least 9% of all Note Ons.
     '''
     id = 'P18'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Strong Tonal Centres'
         self.description = ('Number of peaks in the fifths pitch histogram that each account '
                             'for at least 9% of all Note Ons.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
@@ -1441,7 +1483,7 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P19'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Basic Pitch Histogram'
@@ -1451,10 +1493,12 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
         self.dimensions = 128
         self.normalize = True
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         for i, count in self.data['pitches.midiPitchHistogram'].items():
             self.feature.vector[i] = count
 
@@ -1475,7 +1519,7 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P20'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Pitch Class Distribution'
@@ -1488,10 +1532,12 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
         self.discrete = False
         self.normalize = True
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # Create vector with [C, C#, D, etc.]
         temp = [0] * self.dimensions
         for i, count in enumerate(self.data['pitches.pitchClassHistogram']):
@@ -1522,7 +1568,7 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P21'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Fifths Pitch Histogram'
@@ -1537,10 +1583,12 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
         for i in range(12):
             self._mapping[i] = (7 * i) % 12
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         for i, count in enumerate(self.data['pitches.pitchClassHistogram']):
             self.feature.vector[self._mapping[i]] = count
 
@@ -1569,7 +1617,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P22'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Quality'
@@ -1579,12 +1627,13 @@ class QualityFeature(featuresModule.FeatureExtractor):
             that it is minor and set to 0 if key signature is unknown.
             '''
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         allKeys = self.data['flat.getElementsByClass(Key)']
         keyFeature = None
         for x in allKeys:
@@ -1602,30 +1651,31 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
 class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
-    Not yet implemented in music21
+    Not yet implemented in music21.
 
     Number of Note Ons that have at least one MIDI Pitch Bend associated
     with them divided by total number of pitched Note Ons.
     '''
     id = 'P23'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Glissando Prevalence'
         self.description = ('Number of Note Ons that have at least one MIDI Pitch Bend '
                             'associated with them divided by total number of pitched Note Ons.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
 
 class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
     '''
-    Not yet implemented in music21
+    Not yet implemented in music21.
 
     Average range of MIDI Pitch Bends, where "range" is defined
     as the greatest value of the absolute difference between 64 and the
@@ -1634,7 +1684,7 @@ class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P24'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Average Range Of Glissandos'
@@ -1644,16 +1694,17 @@ class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
                             'messages falling between the Note On and Note Off messages '
                             'of any note.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
 
 class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
-    Not yet implemented in music21
+    Not yet implemented in music21.
 
     Number of notes for which Pitch Bend messages change direction at least twice divided by
     total number of notes that have Pitch Bend messages associated with them.
@@ -1661,7 +1712,7 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P25'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Vibrato Prevalence'
@@ -1669,16 +1720,17 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
                             'direction at least twice divided by total number of notes '
                             'that have Pitch Bend messages associated with them.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
 
 class PrevalenceOfMicrotonesFeature(featuresModule.FeatureExtractor):
     '''
-    not yet implemented
+    Not yet implemented.
 
     Number of Note Ons that are preceded by isolated MIDI Pitch Bend
     messages as a fraction of the total number of Note Ons.'
@@ -1686,7 +1738,7 @@ class PrevalenceOfMicrotonesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P26'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream,
                          **keywords)
 
@@ -1694,9 +1746,10 @@ class PrevalenceOfMicrotonesFeature(featuresModule.FeatureExtractor):
         self.description = ('Number of Note Ons that are preceded by isolated MIDI Pitch '
                             'Bend messages as a fraction of the total number of Note Ons.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
@@ -1725,15 +1778,16 @@ class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 
     id = 'R1'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Strongest Rhythmic Pulse'
         self.description = 'Bin label of the beat bin with the highest frequency.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         beatHisto = self.data['flat.secondsMap.beatHistogram']
         self.feature.vector[0] = beatHisto.index(max(beatHisto))
 
@@ -1759,16 +1813,17 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R2'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Second Strongest Rhythmic Pulse'
         self.description = ('Bin label of the beat bin of the peak '
                             'with the second highest frequency.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         beatHisto = copy.copy(self.data['flat.secondsMap.beatHistogram'])
         highestIndex = beatHisto.index(max(beatHisto))
         beatHisto[highestIndex] = 0
@@ -1799,7 +1854,7 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
     '''
     id = 'R3'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Harmonicity of Two Strongest Rhythmic Pulses'
@@ -1807,9 +1862,10 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
                             'two beat bins of the peaks with the highest frequency '
                             'divided by the bin label of the lower.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         beatHisto = copy.copy(self.data['flat.secondsMap.beatHistogram'])
         highestIndex = beatHisto.index(max(beatHisto))
         beatHisto[highestIndex] = 0
@@ -1831,15 +1887,16 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R4'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Strength of Strongest Rhythmic Pulse'
         self.description = 'Frequency of the beat bin with the highest frequency.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         beatHisto = self.data['flat.secondsMap.beatHistogram']
         self.feature.vector[0] = max(beatHisto) / sum(beatHisto)
 
@@ -1858,16 +1915,17 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(
     '''
     id = 'R5'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Strength of Second Strongest Rhythmic Pulse'
         self.description = ('Frequency of the beat bin of the peak '
                             'with the second highest frequency.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         beatHisto = copy.copy(self.data['flat.secondsMap.beatHistogram'])
         sumHisto = sum(beatHisto)
 
@@ -1894,7 +1952,7 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
     '''
     id = 'R6'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Strength Ratio of Two Strongest Rhythmic Pulses'
@@ -1902,9 +1960,10 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
                             'beat bins corresponding to the peaks with the highest '
                             'frequency divided by the frequency of the lower.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         beatHisto = copy.copy(self.data['flat.secondsMap.beatHistogram'])
 
         theHighest = max(beatHisto)
@@ -1929,16 +1988,17 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
     '''
     id = 'R7'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Combined Strength of Two Strongest Rhythmic Pulses'
         self.description = ('The sum of the frequencies of the two beat bins '
                             'of the peaks with the highest frequencies.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         beatHisto = copy.copy(self.data['flat.secondsMap.beatHistogram'])
         sumHisto = sum(beatHisto)
 
@@ -1952,69 +2012,70 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
 
 class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
-    Not yet implemented
+    Not yet implemented.
 
     Number of beat peaks with normalized frequencies over 0.1.
 
     '''
     id = 'R8'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Number of Strong Pulses'
         self.description = 'Number of beat peaks with normalized frequencies over 0.1.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
 
 class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
     '''
-    Not yet implemented
+    Not yet implemented.
 
     Number of beat peaks with normalized frequencies over 0.01.
     '''
     id = 'R9'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Number of Moderate Pulses'
         self.description = 'Number of beat peaks with normalized frequencies over 0.01.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
 
 class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
-    not yet implemented
+    Not yet implemented.
 
     Number of beat peaks with frequencies at least 30% as high as the
     frequency of the bin with the highest frequency.
     '''
     id = 'R10'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Number of Relatively Strong Pulses'
         self.description = ('Number of beat peaks with frequencies at least 30% as high as '
                             'the frequency of the bin with the highest frequency.')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
     '''
-    not yet implemented
+    Not yet implemented.
 
     Average width of beat histogram peaks (in beats per minute).
     Width is measured for all peaks with frequencies at least 30% as high as the highest peak,
@@ -2023,7 +2084,7 @@ class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R11'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Rhythmic Looseness'
@@ -2033,16 +2094,17 @@ class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
             highest peak, and is defined by the distance between the points on the peak in
             question that are 30% of the height of the peak.''')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
 
 class PolyrhythmsFeature(featuresModule.FeatureExtractor):
     '''
-    Not yet implemented
+    Not yet implemented.
 
     Number of beat peaks with frequencies at least 30% of the highest frequency
     whose bin labels are not integer multiples or factors
@@ -2053,7 +2115,7 @@ class PolyrhythmsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R12'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         featuresModule.FeatureExtractor.__init__(self,
                                                  dataOrStream=dataOrStream,
                                                  **keywords)
@@ -2067,37 +2129,39 @@ class PolyrhythmsFeature(featuresModule.FeatureExtractor):
         This number is then divided by the total number of beat bins with frequencies
         over 30% of the highest frequency.'''
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
 
 class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
     '''
-    Not yet implemented
+    Not yet implemented.
 
     Standard deviation of the bin values (except the first 40 empty ones).
     '''
     id = 'R13'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Rhythmic Variability'
         self.description = 'Standard deviation of the bin values (except the first 40 empty ones).'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
 
 class BeatHistogramFeature(featuresModule.FeatureExtractor):
     '''
-    Not yet implemented
+    Not yet implemented.
 
     A feature extractor that finds a feature array with entries corresponding to the frequency
     values of each of the bins of the beat histogram (except the first 40 empty ones).
@@ -2105,7 +2169,7 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R14'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Beat Histogram'
@@ -2116,7 +2180,9 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
         self.dimensions = 161
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
@@ -2137,15 +2203,16 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R15'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Note Density'
         self.description = 'Average number of notes per second.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         secondsMap = self.data['flat.secondsMap']
         # The average number of notes per second in the piece is calculated
         # by taking the total number of notes in the piece and dividing by
@@ -2178,15 +2245,16 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
 
     id = 'R17'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Average Note Duration'
         self.description = 'Average duration of notes in seconds.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         secondsMap = self.data['flat.secondsMap']
         if not secondsMap:
             raise JSymbolicFeatureException('input lacks notes')
@@ -2218,15 +2286,16 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R18'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Variability of Note Duration'
         self.description = 'Standard deviation of note durations in seconds.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         secondsMap = self.data['flat.secondsMap']
         if not secondsMap:
             raise JSymbolicFeatureException('input lacks notes')
@@ -2249,15 +2318,16 @@ class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
 
     id = 'R19'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Maximum Note Duration'
         self.description = 'Duration of the longest note (in seconds).'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         secondsMap = self.data['flat.secondsMap']
         if not secondsMap:
             raise JSymbolicFeatureException('input lacks notes')
@@ -2280,15 +2350,16 @@ class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R20'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Minimum Note Duration'
         self.description = 'Duration of the shortest note (in seconds).'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         secondsMap = self.data['flat.secondsMap']
         if not secondsMap:
             raise JSymbolicFeatureException('input lacks notes')
@@ -2314,16 +2385,17 @@ class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
 
     id = 'R21'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Staccato Incidence'
         self.description = ('Number of notes with durations of less than a 10th '
                             'of a second divided by the total number of notes in the recording.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         secondsMap = self.data['flat.secondsMap']
         if not secondsMap:
             raise JSymbolicFeatureException('input lacks notes')
@@ -2349,15 +2421,16 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
 
     id = 'R22'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Average Time Between Attacks'
         self.description = 'Average time in seconds between Note On events (regardless of channel).'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         secondsMap = self.data['flat.secondsMap']
         # Get a list of note onset times
         onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
@@ -2390,16 +2463,17 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
 
     id = 'R23'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Variability of Time Between Attacks'
         self.description = ('Standard deviation of the times, in seconds, '
                             'between Note On events (regardless of channel).')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         secondsMap = self.data['flat.secondsMap']
         # Create a list of difference in time offset between consecutive notes
         onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
@@ -2434,16 +2508,17 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
     '''
     id = 'R24'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Average Time Between Attacks For Each Voice'
         self.description = ('Average of average times in seconds between Note On events '
                             'on individual channels that contain at least one note.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         onsetsByPart = []
         avgByPart = []
         if self.data.partsCount > 0:
@@ -2492,7 +2567,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 
     id = 'R25'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Average Variability of Time Between Attacks For Each Voice'
@@ -2500,9 +2575,10 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
                             'Note On events on individual channels that contain '
                             'at least one note.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         onsetsByPart = []
         stdDeviationByPart = []
 
@@ -2611,15 +2687,16 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
 
     id = 'R30'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Initial Tempo'
         self.description = 'Tempo in beats per minute at the start of the recording.'
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         triples = self.data['metronomeMarkBoundaries']
         # the first is the default, if necessary; also provides start/end time
         mm = triples[0][2]
@@ -2648,7 +2725,7 @@ class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
 
     id = 'R31'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Initial Time Signature'
@@ -2659,7 +2736,9 @@ class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 2
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         elements = self.data['flat.getElementsByClass(TimeSignature)']
         if not elements:
             return  # vector already zero
@@ -2696,7 +2775,7 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
 
     id = 'R32'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Compound Or Simple Meter'
@@ -2705,9 +2784,10 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
                             'and is evenly divisible by 3) and to 0 if it is simple '
                             '(if the above condition is not fulfilled).')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         elements = self.data['flat.getElementsByClass(TimeSignature)']
 
         if elements:
@@ -2744,16 +2824,17 @@ class TripleMeterFeature(featuresModule.FeatureExtractor):
 
     id = 'R33'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Triple Meter'
         self.description = ('Set to 1 if numerator of initial time signature is 3, '
                             'set to 0 otherwise.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         elements = self.data['flat.getElementsByClass(TimeSignature)']
         # not: not looking at other triple meters
         if elements and elements[0].numerator == 3:
@@ -2785,16 +2866,17 @@ class QuintupleMeterFeature(featuresModule.FeatureExtractor):
 
     id = 'R34'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Quintuple Meter'
         self.description = ('Set to 1 if numerator of initial time signature is 5, '
                             'set to 0 otherwise.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         elements = self.data['flat.getElementsByClass(TimeSignature)']
         if elements and elements[0].numerator == 5:
             self.feature.vector[0] = 1
@@ -2826,16 +2908,17 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R35'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Changes of Meter'
         self.description = ('Set to 1 if the time signature is changed one or more '
-                            'times during the recording')
+                            'times during the recording.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         elements = self.data['flat.getElementsByClass(TimeSignature)']
         if len(elements) <= 1:
             return  # vector already zero
@@ -2860,16 +2943,17 @@ class DurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R36'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Duration'
         self.description = 'The total duration in seconds of the music.'
         self.isSequential = False  # this is the only jSymbolic non seq feature
-        self.dimensions = 1
         self.discrete = False
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         secondsMap = self.data['flat.secondsMap']
         if not secondsMap:
             raise JSymbolicFeatureException('input lacks duration')
@@ -2886,7 +2970,7 @@ class DurationFeature(featuresModule.FeatureExtractor):
 
 class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     The maximum loudness minus the minimum loudness value.
 
@@ -2894,18 +2978,17 @@ class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
     '''
     id = 'D1'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Overall Dynamic Range'
         self.description = 'The maximum loudness minus the minimum loudness value.'
         self.isSequential = True
-        self.dimensions = 1
 
 
 class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     Standard deviation of loudness levels of all notes.
 
@@ -2914,18 +2997,17 @@ class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'D2'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Variation of Dynamics'
         self.description = 'Standard deviation of loudness levels of all notes.'
         self.isSequential = True
-        self.dimensions = 1
 
 
 class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     The average of the standard deviations of loudness levels within each
     channel that contains at least one note.
@@ -2935,19 +3017,18 @@ class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'D3'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Variation of Dynamics In Each Voice'
         self.description = ('The average of the standard deviations of loudness '
                             'levels within each channel that contains at least one note.')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     Average change of loudness from one note to the next note in the
     same channel (in MIDI velocity units).
@@ -2958,14 +3039,13 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
 
     id = 'D4'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Average Note To Note Dynamics Change'
         self.description = ('Average change of loudness from one note to the next note '
                             'in the same channel (in MIDI velocity units).')
         self.isSequential = True
-        self.dimensions = 1
 
 
 # ------------------------------------------------------------------------------
@@ -2992,16 +3072,17 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
 
     id = 'T1'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Maximum Number of Independent Voices'
         self.description = ('Maximum number of different channels in which notes '
                             'have sounded simultaneously. Here, Parts are treated as channels.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # for each chordify, find the largest number different groups
         found = 0
         for c in self.data['chordify.flat.getElementsByClass(Chord)']:
@@ -3018,7 +3099,7 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
 class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     Average number of different channels in which notes have sounded simultaneously.
-    Rests are not included in this calculation. Here, Parts are treated as voices
+    Rests are not included in this calculation. Here, Parts are treated as voices.
 
     >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga')
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
@@ -3034,17 +3115,18 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T2'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Average Number of Independent Voices'
         self.description = ('Average number of different channels in which notes have '
                             'sounded simultaneously. Rests are not included in this '
-                            'calculation. Here, Parts are treated as voices')
+                            'calculation. Here, Parts are treated as voices.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # for each chordify, find the largest number different groups
         found = []
         for c in self.data['chordify.flat.getElementsByClass(Chord)']:
@@ -3074,7 +3156,7 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
     '''
     id = 'T3'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Variability of Number of Independent Voices'
@@ -3082,9 +3164,10 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
                             'in which notes have sounded simultaneously. Rests are '
                             'not included in this calculation.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # for each chordify, find the largest number different groups
         found = []
         for c in self.data['chordify.flat.getElementsByClass(Chord)']:
@@ -3103,7 +3186,7 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
 
 class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     TODO: implement
 
@@ -3112,64 +3195,61 @@ class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T4'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Voice Equality - Number of Notes'
         self.description = ('Standard deviation of the total number of Note Ons '
                             'in each channel that contains at least one note.')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     TODO: implement
 
     '''
     id = 'T5'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Voice Equality - Note Duration'
         self.description = ('Standard deviation of the total duration of notes in seconds '
                             'in each channel that contains at least one note.')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     TODO: implement
 
     '''
     id = 'T6'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Voice Equality - Dynamics'
         self.description = ('Standard deviation of the average volume of notes '
                             'in each channel that contains at least one note.')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     TODO: implement
 
     '''
     id = 'T7'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Voice Equality - Melodic Leaps'
@@ -3178,19 +3258,18 @@ class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
             of the average melodic leap in MIDI pitches
             for each channel that contains at least one note.''')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     Standard deviation of the differences between the highest and lowest
     pitches in each channel that contains at least one note.
     '''
     id = 'T8'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Voice Equality - Range'
@@ -3198,18 +3277,17 @@ class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
             Standard deviation of the differences between the
             highest and lowest pitches in each channel that contains at least one note.''')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     TODO: implement
     '''
     id = 'T9'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Importance of Loudest Voice'
@@ -3218,18 +3296,17 @@ class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
             of the loudest channel and the average loudness of the other channels
             that contain at least one note.''')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     TODO: implement
     '''
     id = 'T10'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Relative Range of Loudest Voice'
@@ -3238,18 +3315,17 @@ class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
             played in the channel with the highest average loudness divided by the difference
             between the highest note and the lowest note overall in the piece.''')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     TODO: implement
     '''
     id = 'T12'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Range of Highest Line'
@@ -3258,19 +3334,18 @@ class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
             played in the channel with the highest average pitch divided by the difference
             between the highest note and the lowest note in the piece.''')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     TODO: implement
 
     '''
     id = 'T13'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Relative Note Density of Highest Line'
@@ -3279,18 +3354,17 @@ class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
             pitch divided by the average number of Note Ons in all channels that contain at
             least one note.''')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     TODO: implement
     '''
     id = 'T15'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Melodic Intervals in Lowest Line'
@@ -3299,19 +3373,18 @@ class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
             with the lowest average pitch divided by the average melodic interval of all
             channels that contain at least two notes.''')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class VoiceSeparationFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     Average separation in semitones between the average pitches of consecutive
     channels (after sorting based/non-average pitch) that contain at least one note.
     '''
     id = 'T20'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Voice Separation'
@@ -3320,7 +3393,6 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
             consecutive channels (after sorting based/non average pitch) that contain at
             least one note.''')
         self.isSequential = True
-        self.dimensions = 1
 
 
 # ------------------------------------------------------------------------------
@@ -3363,7 +3435,7 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
     id = 'I1'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Pitched Instruments Present'
@@ -3375,10 +3447,12 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 128
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         s = self.data['partitionByInstrument']
         # each part has content for each instrument
         # count = 0
@@ -3396,7 +3470,7 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
 
 class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
-    Not yet implemented
+    Not yet implemented.
 
     Which unpitched MIDI Percussion Key Map instruments are present.
     There is one entry for each instrument, which is set to 1.0 if there is
@@ -3410,7 +3484,7 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
 
     id = 'I2'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Unpitched Instruments Present'
@@ -3423,7 +3497,9 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 47
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
 
@@ -3457,7 +3533,7 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
     '''
     id = 'I3'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Note Prevalence of Pitched Instruments'
@@ -3469,10 +3545,12 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
         self.isSequential = True
         self.dimensions = 128
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         s = self.data['partitionByInstrument']
         total = sum(self.data['pitches.pitchClassHistogram'])
         # each part has content for each instrument
@@ -3493,14 +3571,14 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
 class NotePrevalenceOfUnpitchedInstrumentsFeature(
         featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     TODO: implement
 
     '''
     id = 'I4'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Note Prevalence of Unpitched Instruments'
@@ -3520,7 +3598,7 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
 class TimePrevalenceOfPitchedInstrumentsFeature(
         featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     The fraction of the total time of the recording in
     which a note was sounding for each (pitched) General
@@ -3534,7 +3612,7 @@ class TimePrevalenceOfPitchedInstrumentsFeature(
     '''
     id = 'I5'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Time Prevalence of Pitched Instruments'
@@ -3567,7 +3645,7 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
     '''
     id = 'I6'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Variability of Note Prevalence of Pitched Instruments'
@@ -3575,9 +3653,10 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
                             'by each (pitched) General MIDI instrument that is '
                             'used to play at least one note.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         s = self.data['partitionByInstrument']
         total = sum(self.data['pitches.pitchClassHistogram'])
         if not s:
@@ -3603,7 +3682,7 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
 class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
         featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     Standard deviation of the fraction of Note Ons played by each (unpitched) MIDI Percussion Key
     Map instrument that is used to play at least one note. It should be noted that only
@@ -3615,7 +3694,7 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
     '''
     id = 'I7'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Variability of Note Prevalence of Unpitched Instruments'
@@ -3625,7 +3704,6 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
             'It should be noted that only instruments 35 to 81 are included here, '
             'as they are the ones that are included in the official standard.')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
@@ -3644,19 +3722,20 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'I8'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Number of Pitched Instruments'
         self.description = ('Total number of General MIDI patches that are used to '
                             'play at least one note.')
         self.isSequential = True
-        self.dimensions = 1
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         s = self.data['partitionByInstrument']
         # each part has content for each instrument
         count = 0
@@ -3670,7 +3749,7 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
 
 class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     Number of distinct MIDI Percussion Key Map patches that were used to play at
     least one note. It should be noted that only instruments 35 to 81 are
@@ -3681,7 +3760,7 @@ class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
 
     id = 'I9'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Number of Unpitched Instruments'
@@ -3690,12 +3769,11 @@ class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
                             'instruments 35 to 81 are included here, as they are the ones '
                             'that are included in the official standard.')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
-    Not implemented
+    Not implemented.
 
     Total number of Note Ons corresponding to unpitched percussion instruments
     divided by the total number of Note Ons in the recording.
@@ -3703,14 +3781,13 @@ class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
 
     id = 'I10'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Percussion Prevalence'
         self.description = ('Total number of Note Ons corresponding to unpitched percussion '
                             'instruments divided by total number of Note Ons in the recording.')
         self.isSequential = True
-        self.dimensions = 1
 
 
 class InstrumentFractionFeature(featuresModule.FeatureExtractor):
@@ -3721,16 +3798,18 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
     look at the proportional usage of an Instrument
     '''
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         # subclasses must define
-        self._targetPrograms = []
+        self._targetPrograms: Sequence[int] = []
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         s = self.data['partitionByInstrument']
         total = sum(self.data['pitches.pitchClassHistogram'])
         count = 0
@@ -3762,14 +3841,13 @@ class StringKeyboardFractionFeature(InstrumentFractionFeature):
 
     id = 'I11'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'String Keyboard Fraction'
         self.description = ('Fraction of all Note Ons belonging to string keyboard patches '
                             '(General MIDI patches 1 to 8).')
         self.isSequential = True
-        self.dimensions = 1
 
         self._targetPrograms = range(8)
 
@@ -3791,14 +3869,13 @@ class AcousticGuitarFractionFeature(InstrumentFractionFeature):
 
     id = 'I12'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Acoustic Guitar Fraction'
         self.description = ('Fraction of all Note Ons belonging to acoustic guitar patches '
                             '(General MIDI patches 25 and 26).')
         self.isSequential = True
-        self.dimensions = 1
 
         self._targetPrograms = [24, 25]
 
@@ -3817,14 +3894,13 @@ class ElectricGuitarFractionFeature(InstrumentFractionFeature):
 
     id = 'I13'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Electric Guitar Fraction'
         self.description = ('Fraction of all Note Ons belonging to '
                             'electric guitar patches (General MIDI patches 27 to 32).')
         self.isSequential = True
-        self.dimensions = 1
 
         self._targetPrograms = list(range(26, 32))
 
@@ -3846,14 +3922,13 @@ class ViolinFractionFeature(InstrumentFractionFeature):
 
     id = 'I14'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Violin Fraction'
         self.description = ('Fraction of all Note Ons belonging to violin patches '
                             '(General MIDI patches 41 or 111).')
         self.isSequential = True
-        self.dimensions = 1
 
         self._targetPrograms = [40, 110]
 
@@ -3875,14 +3950,13 @@ class SaxophoneFractionFeature(InstrumentFractionFeature):
     '''
     id = 'I15'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Saxophone Fraction'
         self.description = ('Fraction of all Note Ons belonging to saxophone patches '
                             '(General MIDI patches 65 through 68).')
         self.isSequential = True
-        self.dimensions = 1
 
         self._targetPrograms = [64, 65, 66, 67]
 
@@ -3906,14 +3980,13 @@ class BrassFractionFeature(InstrumentFractionFeature):
 
     id = 'I16'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Brass Fraction'
         self.description = ('Fraction of all Note Ons belonging to brass patches '
                             '(General MIDI patches 57 through 68).')  # note: incorrect
         self.isSequential = True
-        self.dimensions = 1
 
         self._targetPrograms = list(range(56, 62))
 
@@ -3937,14 +4010,13 @@ class WoodwindsFractionFeature(InstrumentFractionFeature):
 
     id = 'I17'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Woodwinds Fraction'
         self.description = ('Fraction of all Note Ons belonging to woodwind patches '
                             '(General MIDI patches 69 through 76).')
         self.isSequential = True
-        self.dimensions = 1
 
         self._targetPrograms = list(range(68, 80))  # include ocarina!
 
@@ -3966,21 +4038,20 @@ class OrchestralStringsFractionFeature(InstrumentFractionFeature):
 
     id = 'I18'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Orchestral Strings Fraction'
         self.description = ('Fraction of all Note Ons belonging to orchestral strings patches '
                             '(General MIDI patches 41 or 47).')
         self.isSequential = True
-        self.dimensions = 1
 
         self._targetPrograms = list(range(41, 46))
 
 
 class StringEnsembleFractionFeature(InstrumentFractionFeature):
     '''
-    Not implemented
+    Not implemented.
 
     Fraction of all Note Ons belonging to string ensemble patches
     (General MIDI patches 49 to 52).
@@ -3989,14 +4060,13 @@ class StringEnsembleFractionFeature(InstrumentFractionFeature):
 
     id = 'I19'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'String Ensemble Fraction'
         self.description = ('Fraction of all Note Ons belonging to string ensemble patches '
                             '(General MIDI patches 49 to 52).')
         self.isSequential = True
-        self.dimensions = 1
 
         self._targetPrograms = [48, 49, 50, 51]
 
@@ -4017,14 +4087,13 @@ class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
     '''
     id = 'I20'
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
 
         self.name = 'Electric Instrument Fraction'
         self.description = ('Fraction of all Note Ons belonging to electric instrument patches '
                             '(General MIDI patches 5, 6, 17, 19, 27 to 32 or 34 to 40).')
         self.isSequential = True
-        self.dimensions = 1
 
         self._targetPrograms = [4, 5, 16, 18, 26, 27, 28, 29,
                                 30, 31, 33, 34, 35, 36, 37, 38, 39]  # accept synth bass

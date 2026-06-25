@@ -15,8 +15,10 @@ from collections.abc import KeysView
 import os
 import pathlib
 import pickle
+import typing as t
 import unittest
 
+from music21 import chord
 from music21 import common
 from music21.common.parallel import safeToParallize
 from music21.common.types import StreamType
@@ -29,6 +31,9 @@ from music21 import stream
 from music21 import text
 
 from music21.metadata.bundles import MetadataEntry
+
+if t.TYPE_CHECKING:
+    from music21.features import outputFormats
 
 environLocal = environment.Environment('features.base')
 # ------------------------------------------------------------------------------
@@ -46,6 +51,8 @@ class Feature:
     Feature objects are simple. It is FeatureExtractors that store all metadata and processing
     routines for creating Feature objects.  Normally you wouldn't create one of these yourself.
 
+    * Changed in v11: the `.vector` starts out as an empty list rather than None.
+
     >>> myFeature = features.Feature()
     >>> myFeature.dimensions = 3
     >>> myFeature.name = 'Random arguments'
@@ -55,12 +62,12 @@ class Feature:
 
     >>> myFeature.discrete = False
 
-    The .vector is the most important part of the feature, and it starts out as None.
+    The .vector is the most important part of the feature, and it starts out empty.
 
-    >>> myFeature.vector is None
-    True
+    >>> myFeature.vector
+    []
 
-    Calling .prepareVector() gives it a list of Zeros of the length of dimensions.
+    Calling .prepareVectors() gives it a list of zeros of the length of the dimensions.
 
     >>> myFeature.prepareVectors()
 
@@ -88,30 +95,30 @@ class Feature:
     def __init__(self) -> None:
         # these values will be filled by the extractor
         self.dimensions: int = 1  # number of dimensions
-        # data storage; possibly use numpy array
-        self.vector = None
+        # data storage; possibly use numpy array. Populated by prepareVectors().
+        self.vector: list[int|float] = []
 
-        # consider not storing this values, as may not be necessary
-        self.name = None  # string name representation
-        self.description = None  # string description
-        self.isSequential = None  # True or False
-        self.discrete = None  # is discrete or continuous
+        # consider not storing these values, as they may not be necessary
+        self.name: str|None = None  # string name representation
+        self.description: str|None = None  # string description
+        self.isSequential: bool|None = None  # True or False
+        self.discrete: bool|None = None  # is discrete or continuous
 
     def _getVectors(self) -> list[int|float]:
         '''
-        Prepare a vector of appropriate size and return
+        Prepare a vector of appropriate size and return it.
         '''
         return [0] * self.dimensions
 
-    def prepareVectors(self):
+    def prepareVectors(self) -> None:
         '''
         Prepare the vector stored in this feature.
         '''
         self.vector = self._getVectors()
 
-    def normalize(self):
+    def normalize(self) -> None:
         '''
-        Normalizes the vector so that the sum of its elements is 1.
+        Normalize the vector so that the sum of its elements is 1.
         '''
         s = sum(self.vector)
         try:
@@ -134,31 +141,38 @@ class FeatureExtractor:
     All Streams are internally converted to a DataInstance if necessary.
     Usage of a DataInstance offers significant performance advantages, as common forms of
     the Stream are cached for easy processing.
+
+    * Changed in v11: `dimensions` now defaults to 1, so single-dimension
+      extractors no longer need to set it.
+
+    This module's type annotations were added with AI assistance (Claude).
     '''
+    id: str = ''  # string identifier; subclasses override
+
     def __init__(self,
-                 dataOrStream=None,
+                 dataOrStream: stream.Stream|DataInstance|None = None,
                  **keywords
                  ) -> None:
-        self.stream = None  # the original Stream, or None
+        self.stream: stream.Stream|None = None  # the original Stream, or None
         self.data: DataInstance|None = None  # a DataInstance object: use to get data
         self.setData(dataOrStream)
 
-        self.feature = None  # Feature object that results from processing
+        self.feature: Feature|None = None  # Feature object that results from processing
 
         if not hasattr(self, 'name'):
-            self.name = None  # string name representation
+            self.name: str|None = None  # string name representation
         if not hasattr(self, 'description'):
-            self.description = None  # string description
+            self.description: str|None = None  # string description
         if not hasattr(self, 'isSequential'):
-            self.isSequential = None  # True or False
+            self.isSequential: bool|None = None  # True or False
         if not hasattr(self, 'dimensions'):
-            self.dimensions = None  # number of dimensions
+            self.dimensions: int = 1  # number of dimensions
         if not hasattr(self, 'discrete'):
-            self.discrete = True  # default
+            self.discrete: bool = True  # default
         if not hasattr(self, 'normalize'):
-            self.normalize = False  # default is no
+            self.normalize: bool = False  # default is no
 
-    def setData(self, dataOrStream):
+    def setData(self, dataOrStream: stream.Stream|DataInstance|None) -> None:
         '''
         Set the data that this FeatureExtractor will process.
         Either a Stream or a DataInstance object can be provided.
@@ -177,9 +191,9 @@ class FeatureExtractor:
                 self.stream = None
                 self.data = dataOrStream
 
-    def getAttributeLabels(self):
+    def getAttributeLabels(self) -> list[str]:
         '''
-        Return a list of string in a form that is appropriate for data storage.
+        Return a list of strings in a form that is appropriate for data storage.
 
         >>> fe = features.jSymbolic.AmountOfArpeggiationFeature()
         >>> fe.getAttributeLabels()
@@ -193,15 +207,16 @@ class FeatureExtractor:
          'Fifths_Pitch_Histogram_9', 'Fifths_Pitch_Histogram_10', 'Fifths_Pitch_Histogram_11']
 
         '''
-        post = []
+        name = self.name or ''
+        post: list[str] = []
         if self.dimensions == 1:
-            post.append(self.name.replace(' ', '_'))
+            post.append(name.replace(' ', '_'))
         else:
             for i in range(self.dimensions):
-                post.append(f"{self.name.replace(' ', '_')}_{i}")
+                post.append(f"{name.replace(' ', '_')}_{i}")
         return post
 
-    def fillFeatureAttributes(self, feature=None):
+    def fillFeatureAttributes(self, feature: Feature|None = None) -> Feature:
         # noinspection GrazieInspection
         '''
         Fill the attributes of a Feature with the descriptors in the FeatureExtractor.
@@ -209,6 +224,8 @@ class FeatureExtractor:
         # operate on passed-in feature or self.feature
         if feature is None:
             feature = self.feature
+        if feature is None:  # pragma: no cover
+            raise FeatureException('cannot fill attributes without a feature')
         feature.name = self.name
         feature.description = self.description
         feature.isSequential = self.isSequential
@@ -216,7 +233,7 @@ class FeatureExtractor:
         feature.discrete = self.discrete
         return feature
 
-    def prepareFeature(self):
+    def prepareFeature(self) -> None:
         '''
         Prepare a new Feature object for data acquisition.
 
@@ -234,14 +251,14 @@ class FeatureExtractor:
         self.fillFeatureAttributes()  # will fill self.feature
         self.feature.prepareVectors()  # will vector with necessary zeros
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in _feature.
         '''
         # do work in subclass, calling on self.data
         pass
 
-    def extract(self, source=None):
+    def extract(self, source: stream.Stream|None = None) -> Feature:
         '''
         Extract the feature and return the result.
         '''
@@ -250,13 +267,15 @@ class FeatureExtractor:
         # preparing the feature always sets self.feature to a new instance
         self.prepareFeature()
         self.process()  # will set Feature object to _feature
+        if self.feature is None:  # pragma: no cover
+            raise FeatureException('process() failed to produce a feature')
         if self.normalize:
             self.feature.normalize()
         return self.feature
 
-    def getBlankFeature(self):
+    def getBlankFeature(self) -> Feature:
         '''
-        Return a properly configured plain feature as a placeholder
+        Return a properly configured plain feature as a placeholder.
 
         >>> fe = features.jSymbolic.InitialTimeSignatureFeature()
         >>> fe.name
@@ -386,18 +405,18 @@ class StreamForms:
         return histo
 # ----------------------------------------------------------------------------
 
-    def formPartitionByInstrument(self, prepared: stream.Stream):
+    def formPartitionByInstrument(self, prepared: stream.Stream) -> stream.Stream:
         from music21 import instrument
         return instrument.partitionByInstrument(prepared)
 
-    def formSetClassHistogram(self, prepared):
+    def formSetClassHistogram(self, prepared: stream.Stream) -> Counter:
         return Counter([c.forteClassTnI for c in prepared])
 
-    def formPitchClassSetHistogram(self, prepared):
+    def formPitchClassSetHistogram(self, prepared: stream.Stream) -> Counter:
         return Counter([c.orderedPitchClassesString for c in prepared])
 
-    def formTypesHistogram(self, prepared):
-        histo = {}
+    def formTypesHistogram(self, prepared: stream.Stream) -> dict[str, int]:
+        histo: dict[str, int] = {}
 
         # keys are methods on Chord
         keys = ['isTriad', 'isSeventh', 'isMajorTriad', 'isMinorTriad',
@@ -414,7 +433,8 @@ class StreamForms:
                     histo[thisKey] += 1
         return histo
 
-    def formGetElementsByClassMeasure(self, prepared):
+    def formGetElementsByClassMeasure(self, prepared: stream.Stream) -> stream.Stream:
+        post: stream.Stream
         if isinstance(prepared, stream.Score):
             post = stream.Stream()
             for p in prepared.parts:
@@ -422,10 +442,10 @@ class StreamForms:
                 for m in p.getElementsByClass(stream.Measure):
                     post.insert(m.getOffsetBySite(p), m)
         else:
-            post = prepared.getElementsByClass(stream.Measure)
+            post = prepared.getElementsByClass(stream.Measure).stream()
         return post
 
-    def formChordify(self, prepared):
+    def formChordify(self, prepared: stream.Stream) -> stream.Stream:
         if isinstance(prepared, stream.Score):
             # options here permit getting part information out
             # of chordified representation
@@ -436,28 +456,29 @@ class StreamForms:
             # in the part?
             return prepared
 
-    def formQuarterLengthHistogram(self, prepared):
+    def formQuarterLengthHistogram(self, prepared: stream.Stream) -> Counter:
         return Counter([float(n.quarterLength) for n in prepared])
 
-    def formMidiPitchHistogram(self, pitches):
+    def formMidiPitchHistogram(self, pitches) -> Counter:
         return Counter([p.midi for p in pitches])
 
-    def formPitchClassHistogram(self, pitches):
+    def formPitchClassHistogram(self, pitches) -> list[int]:
         cc = Counter([p.pitchClass for p in pitches])
         histo = [0] * 12
         for k in cc:
             histo[k] = cc[k]
         return histo
 
-    def formMidiIntervalHistogram(self, unused):
+    def formMidiIntervalHistogram(self, unused) -> list[int]:
         return self._getIntervalHistogram('midi')
 
-    def formContourList(self, prepared):
+    def formContourList(self, prepared: stream.Stream) -> list[int]:
         # list of all directed half steps
-        cList = []
+        cList: list[int] = []
         # if we have parts, must add one at a time
+        parts: list[stream.Stream]
         if prepared.hasPartLikeStreams():
-            parts = prepared.parts
+            parts = list(t.cast('stream.Score', prepared).parts)
         else:
             parts = [prepared]  # emulate a list
 
@@ -474,21 +495,21 @@ class StreamForms:
                     iNext = i + 1
                     nNext = post[iNext]
 
-                    if n.isChord:
+                    if isinstance(n, chord.Chord):
                         ps = n.sortDiatonicAscending().pitches[-1].midi
                     else:  # normal note
-                        ps = n.pitch.midi
-                    if nNext.isChord:
+                        ps = t.cast('note.Note', n).pitch.midi
+                    if isinstance(nNext, chord.Chord):
                         psNext = nNext.sortDiatonicAscending().pitches[-1].midi
                     else:  # normal note
-                        psNext = nNext.pitch.midi
+                        psNext = t.cast('note.Note', nNext).pitch.midi
 
                     cList.append(psNext - ps)
         # environLocal.printDebug(['contourList', cList])
         return cList
 
-    def formSecondsMap(self, prepared):
-        post = []
+    def formSecondsMap(self, prepared: stream.Stream) -> list[dict]:
+        post: list[dict] = []
         secondsMap = prepared.secondsMap
         # filter only notes; all elements would otherwise be gathered
         for bundle in secondsMap:
@@ -496,7 +517,7 @@ class StreamForms:
                 post.append(bundle)
         return post
 
-    def formBeatHistogram(self, secondsMap):
+    def formBeatHistogram(self, secondsMap) -> list[int]:
         secondsList = [d['durationSeconds'] for d in secondsMap]
         bpmList = [round(60.0 / d) for d in secondsList]
         histogram = [0] * 200
@@ -541,7 +562,8 @@ class DataInstance:
     '''
     # pylint: disable=redefined-builtin
     # noinspection PyShadowingBuiltins
-    def __init__(self, streamOrPath=None, id=None):
+    def __init__(self, streamOrPath=None, id=None) -> None:
+        self.stream: stream.Stream|None
         if isinstance(streamOrPath, stream.Stream):
             self.stream = streamOrPath
             self.streamPath = None
@@ -551,6 +573,7 @@ class DataInstance:
 
         # store an id for the source stream: file path url, corpus url
         # or metadata title
+        self._id: t.Any
         if id is not None:
             self._id = id
         elif ((s := self.stream) is not None
@@ -570,24 +593,24 @@ class DataInstance:
             self._id = ''
 
         # the attribute name in the data set for this label
-        self.classLabel = None
+        self.classLabel: str|None = None
         # store the class value for this data instance
-        self._classValue = None
+        self._classValue: t.Any = None
 
         self.partsCount = 0
-        self.forms = None
+        self.forms: StreamForms|None = None
 
         # store a list of voices, extracted from each part,
-        self.formsByVoice = []
+        self.formsByVoice: list[StreamForms] = []
         # if parts exist, store a forms for each
-        self.formsByPart = []
+        self.formsByPart: list[StreamForms] = []
 
-        self.featureExtractorClassesForParallelRunning = []
+        self.featureExtractorClassesForParallelRunning: list[type[FeatureExtractor]] = []
 
         if self.stream is not None:
             self.setupPostStreamParse()
 
-    def setupPostStreamParse(self):
+    def setupPostStreamParse(self) -> None:
         '''
         Set up the StreamForms objects and other things that
         need to be done after a Stream is passed in but before
@@ -598,12 +621,15 @@ class DataInstance:
         # perform basic operations that are performed on all
         # streams
 
+        if self.stream is None:  # pragma: no cover
+            return
+
         # store a dictionary of StreamForms
         self.forms = StreamForms(self.stream)
 
         # if parts exist, store a forms for each
         self.formsByPart = []
-        if hasattr(self.stream, 'parts'):
+        if isinstance(self.stream, stream.Score):
             self.partsCount = len(self.stream.parts)
             for p in self.stream.parts:
                 # note that this will join ties and expand rests again
@@ -614,7 +640,7 @@ class DataInstance:
         for v in self.stream[stream.Voice]:
             self.formsByPart.append(StreamForms(v))
 
-    def setClassLabel(self, classLabel, classValue=None):
+    def setClassLabel(self, classLabel: str|None, classValue=None) -> None:
         '''
         Set the class label, as well as the class value if known.
         The class label is the attribute name used to define the class of this data instance.
@@ -627,7 +653,7 @@ class DataInstance:
         self.classLabel = classLabel
         self._classValue = classValue
 
-    def getClassValue(self):
+    def getClassValue(self) -> t.Any:
         if self._classValue is None or callable(self._classValue) and self.stream is None:
             return ''
 
@@ -636,7 +662,7 @@ class DataInstance:
 
         return self._classValue
 
-    def getId(self):
+    def getId(self) -> str:
         if self._id is None or callable(self._id) and self.stream is None:
             return ''
 
@@ -649,7 +675,7 @@ class DataInstance:
         except AttributeError as e:
             raise AttributeError(str(self._id)) from e
 
-    def parseStream(self):
+    def parseStream(self) -> None:
         '''
         If a path to a Stream has been passed in at creation,
         then this will parse it (whether it's a corpus string,
@@ -679,7 +705,7 @@ class DataInstance:
         self.stream = s
         self.setupPostStreamParse()
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str):
         '''
         Get a form of this Stream, using a cached version if available.
 
@@ -704,6 +730,8 @@ class DataInstance:
             return self.formsByVoice
         # try to create by calling the attribute
         # will raise an attribute error if there is a problem
+        if self.forms is None:  # pragma: no cover
+            raise FeatureException('cannot get a form from an unparsed DataInstance')
         return self.forms[key]
 
 
@@ -742,17 +770,17 @@ class DataSet:
     Set ds.quiet = False to print them regardless of debug mode.
     '''
 
-    def __init__(self, classLabel=None, featureExtractors=()):
+    def __init__(self, classLabel: str|None = None, featureExtractors=()) -> None:
         # assume a two dimensional array
-        self.dataInstances = []
+        self.dataInstances: list[DataInstance] = []
 
         # order of feature extractors is the order used in the presentations
-        self._featureExtractors = []
-        self._instantiatedFeatureExtractors = []
+        self._featureExtractors: list[type[FeatureExtractor]] = []
+        self._instantiatedFeatureExtractors: list[FeatureExtractor] = []
         # the label of the class
         self._classLabel = classLabel
         # store a multidimensional storage of all features
-        self.features = []
+        self.features: list[list[Feature]] = []
 
         self.failFast = False
         self.quiet = True
@@ -761,10 +789,10 @@ class DataSet:
         # set extractors
         self.addFeatureExtractors(featureExtractors)
 
-    def getClassLabel(self):
+    def getClassLabel(self) -> str|None:
         return self._classLabel
 
-    def addFeatureExtractors(self, values):
+    def addFeatureExtractors(self, values) -> None:
         '''
         Add one or more FeatureExtractor objects, either as a list or as an individual object.
         '''
@@ -778,7 +806,7 @@ class DataSet:
             self._instantiatedFeatureExtractors.append(sub())
 
     def getAttributeLabels(self, includeClassLabel=True,
-                           includeId=True):
+                           includeId=True) -> list[str]:
         '''
         Return a list of all attribute labels. Optionally add a class
         label field and/or an id field.
@@ -805,7 +833,7 @@ class DataSet:
             post.append(self._classLabel.replace(' ', '_'))
         return post
 
-    def getDiscreteLabels(self, includeClassLabel=True, includeId=True):
+    def getDiscreteLabels(self, includeClassLabel=True, includeId=True) -> list[bool|None]:
         '''
         Return column labels for discrete status.
 
@@ -816,7 +844,7 @@ class DataSet:
         [None, False, False, False, False, False, False, False, False, False,
          False, False, False, True, True]
         '''
-        post = []
+        post: list[bool|None] = []
         if includeId:
             post.append(None)  # just a spacer
         for fe in self._instantiatedFeatureExtractors:
@@ -827,9 +855,9 @@ class DataSet:
             post.append(True)
         return post
 
-    def getClassPositionLabels(self, includeId=True):
+    def getClassPositionLabels(self, includeId=True) -> list[bool|None]:
         '''
-        Return column labels for the presence of a class definition
+        Return column labels for the presence of a class definition.
 
         >>> f = [features.jSymbolic.PitchClassDistributionFeature,
         ...      features.jSymbolic.ChangesOfMeterFeature]
@@ -838,7 +866,7 @@ class DataSet:
         [None, False, False, False, False, False, False, False, False,
          False, False, False, False, False, True]
         '''
-        post = []
+        post: list[bool|None] = []
         if includeId:
             post.append(None)  # just a spacer
         for fe in self._instantiatedFeatureExtractors:
@@ -849,9 +877,9 @@ class DataSet:
             post.append(True)
         return post
 
-    def addMultipleData(self, dataList, classValues, ids=None):
+    def addMultipleData(self, dataList, classValues, ids=None) -> None:
         '''
-        add multiple data points at the same time.
+        Add multiple data points at the same time.
 
         Requires an iterable (including MetadataBundle) for dataList holding
         types that can be passed to addData, and an equally sized list of dataValues
@@ -898,7 +926,7 @@ class DataSet:
 
     # pylint: disable=redefined-builtin
     # noinspection PyShadowingBuiltins
-    def addData(self, dataOrStreamOrPath, classValue=None, id=None):
+    def addData(self, dataOrStreamOrPath, classValue=None, id=None) -> None:
         '''
         Add a Stream, DataInstance, MetadataEntry, or path (Posix or str)
         to a corpus or local file to this data set.
@@ -924,17 +952,17 @@ class DataSet:
         di.setClassLabel(self._classLabel, classValue)
         self.dataInstances.append(di)
 
-    def process(self):
+    def process(self) -> None:
         '''
         Process all Data with all FeatureExtractors.
         Processed data is stored internally as numerous Feature objects.
         '''
         if self.runParallel and safeToParallize():
-            return self._processParallel()
+            self._processParallel()
         else:
-            return self._processNonParallel()
+            self._processNonParallel()
 
-    def _processParallel(self):
+    def _processParallel(self) -> None:
         '''
         Run a set of processes in parallel.
         '''
@@ -957,7 +985,7 @@ class DataSet:
                 environLocal.printDebug(e)
             else:
                 environLocal.warn(e)
-        self.features = featureData
+        self.features = list(featureData)
 
         for i, di in enumerate(self.dataInstances):
             if callable(di._classValue):
@@ -965,9 +993,9 @@ class DataSet:
             if callable(di._id):
                 di._id = ids[i]
 
-    def _processNonParallel(self):
+    def _processNonParallel(self) -> None:
         '''
-        The traditional way: run non-parallel
+        The traditional way: run non-parallel.
         '''
         # clear features
         self.features = []
@@ -994,14 +1022,15 @@ class DataSet:
             # rows will align with data the order of DataInstances
             self.features.append(row)
 
-    def getFeaturesAsList(self, includeClassLabel=True, includeId=True, concatenateLists=True):
+    def getFeaturesAsList(self, includeClassLabel=True, includeId=True,
+                          concatenateLists=True) -> list:
         '''
         Get processed data as a list of lists, merging any sub-lists
         in multidimensional features.
         '''
-        post = []
+        post: list = []
         for i, row in enumerate(self.features):
-            v = []
+            v: list = []
             di = self.dataInstances[i]
 
             if includeId:
@@ -1020,7 +1049,7 @@ class DataSet:
         else:
             return post
 
-    def getUniqueClassValues(self):
+    def getUniqueClassValues(self) -> list:
         '''
         Return a list of unique class values.
         '''
@@ -1031,8 +1060,9 @@ class DataSet:
                 post.append(v)
         return post
 
-    def _getOutputFormat(self, featureFormat):
+    def _getOutputFormat(self, featureFormat: str) -> outputFormats.OutputFormat|None:
         from music21.features import outputFormats
+        outputFormat: outputFormats.OutputFormat
         if featureFormat.lower() in ['tab', 'orange', 'taborange', None]:
             outputFormat = outputFormats.OutputTabOrange(dataSet=self)
         elif featureFormat.lower() in ['csv', 'comma']:
@@ -1043,7 +1073,7 @@ class DataSet:
             return None
         return outputFormat
 
-    def _getOutputFormatFromFilePath(self, fp):
+    def _getOutputFormatFromFilePath(self, fp: str) -> outputFormats.OutputFormat|None:
         '''
         Get an output format from a file path if possible, otherwise return None.
 
@@ -1062,12 +1092,14 @@ class DataSet:
                 of = self._getOutputFormat(fp.split('.')[-1])
         return of
 
-    def getString(self, outputFmt='tab'):
+    def getString(self, outputFmt='tab') -> str:
         '''
         Get a string representation of the data set in a specific format.
         '''
         # pass reference to self to output
         outputFormat = self._getOutputFormat(outputFmt)
+        if outputFormat is None:  # pragma: no cover
+            raise DataSetException(f'no output format could be defined from {outputFmt}')
         return outputFormat.getString()
 
     # pylint: disable=redefined-builtin
@@ -1089,7 +1121,7 @@ class DataSet:
         return outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
 
-def _dataSetParallelSubprocess(dataInstance, failFast):
+def _dataSetParallelSubprocess(dataInstance: DataInstance, failFast: bool) -> tuple:
     row = []
     errors = []
     # howBigWeCopied = len(pickle.dumps(dataInstance))
@@ -1113,12 +1145,12 @@ def _dataSetParallelSubprocess(dataInstance, failFast):
     return row, errors, dataInstance.getClassValue(), dataInstance.getId()
 
 
-def allFeaturesAsList(streamInput):
+def allFeaturesAsList(streamInput) -> list:
     # noinspection PyShadowingNames
     '''
-    returns a list containing ALL currently implemented feature extractors
+    Returns a list containing ALL currently implemented feature extractors.
 
-    streamInput can be a Stream, DataInstance, or path to a corpus or local
+    `streamInput` can be a Stream, DataInstance, or path to a corpus or local
     file to this data set.
 
     >>> s = converter.parse('tinynotation: 4/4 c4 d e2')
@@ -1142,10 +1174,10 @@ def allFeaturesAsList(streamInput):
 
 
 # ------------------------------------------------------------------------------
-def extractorsById(idOrList, library=('jSymbolic', 'native')):
+def extractorsById(idOrList, library=('jSymbolic', 'native')) -> list[type[FeatureExtractor]]:
     '''
     Given one or more :class:`~music21.features.FeatureExtractor` ids, return the
-    appropriate  subclass. An optional `library` argument can be added to define which
+    appropriate subclass. An optional `library` argument can be added to define which
     module is used. Current options are jSymbolic and native.
 
     >>> features.extractorsById('p20')
@@ -1174,7 +1206,7 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
     if not common.isIterable(library):
         library = [library]
 
-    featureExtractors = []
+    featureExtractors: list[type[FeatureExtractor]] = []
     for lib in library:
         if lib.lower() in ['jsymbolic', 'all']:
             featureExtractors += jSymbolic.featureExtractors
@@ -1184,14 +1216,14 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
     if not common.isIterable(idOrList):
         idOrList = [idOrList]
 
-    flatIds = []
+    flatIds: list[str] = []
     for featureId in idOrList:
         featureId = featureId.strip().lower()
         featureId.replace('-', '')
         featureId.replace(' ', '')
         flatIds.append(featureId)
 
-    post = []
+    post: list[type[FeatureExtractor]] = []
     if not flatIds:
         return post
 
@@ -1201,7 +1233,7 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
     return post
 
 
-def extractorById(idOrList, library=('jSymbolic', 'native')):
+def extractorById(idOrList, library=('jSymbolic', 'native')) -> type[FeatureExtractor]|None:
     '''
     Get the first feature matched by extractorsById().
 
@@ -1218,29 +1250,30 @@ def extractorById(idOrList, library=('jSymbolic', 'native')):
     return None  # no match
 
 
-def vectorById(streamObj, vectorId, library=('jSymbolic', 'native')):
+def vectorById(streamObj, vectorId, library=('jSymbolic', 'native')) -> list[int|float]|None:
     '''
-    Utility function to get a vector from an extractor
+    Utility function to get a vector from an extractor.
 
     >>> s = stream.Stream()
     >>> s.append(note.Note('A4'))
     >>> features.vectorById(s, 'p20')
     [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     '''
-    fe = extractorById(vectorId, library)(streamObj)  # call class with stream
-    if fe is None:
+    extractorClass = extractorById(vectorId, library)
+    if extractorClass is None:
         return None  # could raise exception
+    fe = extractorClass(streamObj)  # call class with stream
     return fe.extract().vector
 
 
-def getIndex(featureString, extractorType=None):
+def getIndex(featureString, extractorType=None) -> tuple[int, str]|None:
     '''
     Returns the list index of the given feature extractor and the feature extractor
-    category (jsymbolic or native). If feature extractor string is not in either
-    jsymbolic or native feature extractors, returns None
+    category (jsymbolic or native). If the feature extractor string is not in either
+    the jsymbolic or native feature extractors, returns None.
 
-    optionally include the extractorType ('jsymbolic' or 'native') if known
-    and searching will be made more efficient
+    Optionally include the extractorType ('jsymbolic' or 'native') if known
+    and searching will be made more efficient.
 
     >>> features.getIndex('Range')
     (61, 'jsymbolic')
@@ -1860,9 +1893,9 @@ class Test(unittest.TestCase):
     #         ''').strip())
 
 
-def _pickleFunctionNumPitches(bachStream):
+def _pickleFunctionNumPitches(bachStream) -> int:
     '''
-    A function for documentation testing of a pickleable function
+    A function for documentation testing of a pickleable function.
     '''
     return len(bachStream.pitches)
 
