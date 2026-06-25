@@ -43,9 +43,11 @@ environLocal = environment.Environment('features.base')
 type StreamOrPath = stream.Stream|MetadataEntry|str|pathlib.Path
 # A single datum that a DataSet/DataInstance can ingest.
 type DataSource = StreamOrPath|DataInstance
+# A concrete class label or id value: a plain scalar.
+type ClassValue = str|float|int
 # A class value or id: either a fixed value or a pickleable function of the
 # parsed Stream that produces one (evaluated lazily after parsing).
-type ValueOrFunction = str|t.Callable[[stream.Stream], t.Any]
+type ValueOrFunction = ClassValue|t.Callable[[stream.Stream], ClassValue]
 # ------------------------------------------------------------------------------
 
 
@@ -474,7 +476,7 @@ class StreamForms:
             histo[k] = cc[k]
         return histo
 
-    def formMidiIntervalHistogram(self, unused) -> list[int]:
+    def formMidiIntervalHistogram(self, unused: stream.Stream) -> list[int]:
         return self._getIntervalHistogram('midi')
 
     def formContourList(self, prepared: stream.Stream) -> list[int]:
@@ -579,7 +581,7 @@ class DataInstance:
 
         # store an id for the source stream: file path url, corpus url
         # or metadata title
-        self._id: t.Any
+        self._id: ValueOrFunction
         if id is not None:
             self._id = id
         elif ((s := self.stream) is not None
@@ -601,7 +603,7 @@ class DataInstance:
         # the attribute name in the data set for this label
         self.classLabel: str = ''
         # store the class value for this data instance
-        self._classValue: t.Any = None
+        self._classValue: ValueOrFunction|None = None
 
         self.partsCount = 0
         self.forms: StreamForms|None = None
@@ -659,27 +661,28 @@ class DataInstance:
         self.classLabel = classLabel
         self._classValue = classValue
 
-    def getClassValue(self) -> t.Any:
-        if self._classValue is None or callable(self._classValue) and self.stream is None:
+    def getClassValue(self) -> ClassValue:
+        classValue = self._classValue
+        if classValue is None:
             return ''
-
-        if callable(self._classValue) and self.stream is not None:
-            self._classValue = self._classValue(self.stream)
-
-        return self._classValue
+        if callable(classValue):
+            if self.stream is None:
+                return ''
+            classValue = classValue(self.stream)
+            self._classValue = classValue
+        return classValue
 
     def getId(self) -> str:
-        if self._id is None or callable(self._id) and self.stream is None:
-            return ''
-
-        if callable(self._id) and self.stream is not None:
-            self._id = self._id(self.stream)
-
-        # make sure there are no spaces
-        try:
-            return self._id.replace(' ', '_')
-        except AttributeError as e:
-            raise AttributeError(str(self._id)) from e
+        idValue = self._id
+        if callable(idValue):
+            if self.stream is None:
+                return ''
+            idValue = idValue(self.stream)
+            self._id = idValue
+        # make sure there are no spaces; ids that are not strings are an error
+        if isinstance(idValue, str):
+            return idValue.replace(' ', '_')
+        raise AttributeError(str(idValue))
 
     def parseStream(self) -> None:
         '''
@@ -712,6 +715,9 @@ class DataInstance:
         self.setupPostStreamParse()
 
     def __getitem__(self, key: str):
+        # the return is deliberately left untyped: a "form" can be a Stream,
+        # a Counter, a list, a float, etc., depending on the key, and any
+        # concrete annotation would be a lie that breaks the many call sites.
         '''
         Get a form of this Stream, using a cached version if available.
 
@@ -891,7 +897,7 @@ class DataSet:
     def addMultipleData(
         self,
         dataList: Sequence[DataSource]|MetadataBundle,
-        classValues: Sequence[str]|t.Callable[[stream.Stream], t.Any],
+        classValues: Sequence[ValueOrFunction]|t.Callable[[stream.Stream], ClassValue],
         ids: Sequence[ValueOrFunction|None]|t.Callable[[stream.Stream], str]|None = None,
     ) -> None:
         '''
@@ -1062,11 +1068,11 @@ class DataSet:
         else:
             return post
 
-    def getUniqueClassValues(self) -> list:
+    def getUniqueClassValues(self) -> list[ClassValue]:
         '''
         Return a list of unique class values.
         '''
-        post = []
+        post: list[ClassValue] = []
         for di in self.dataInstances:
             v = di.getClassValue()
             if v not in post:
@@ -1117,7 +1123,7 @@ class DataSet:
 
     # pylint: disable=redefined-builtin
     def write(self, fp: str|pathlib.Path|None = None, format: str|None = None,
-              includeClassLabel: bool = True):
+              includeClassLabel: bool = True) -> str|pathlib.Path:
         '''
         Set the output format object.
         '''
@@ -1135,9 +1141,11 @@ class DataSet:
         return outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
 
-def _dataSetParallelSubprocess(dataInstance: DataInstance, failFast: bool) -> tuple:
-    row = []
-    errors = []
+def _dataSetParallelSubprocess(
+    dataInstance: DataInstance, failFast: bool
+) -> tuple[list[Feature], list[str], ClassValue, str]:
+    row: list[Feature] = []
+    errors: list[str] = []
     # howBigWeCopied = len(pickle.dumps(dataInstance))
     # print('Starting ', dataInstance, ' Size: ', howBigWeCopied)
     for feClass in dataInstance.featureExtractorClassesForParallelRunning:
@@ -1159,7 +1167,7 @@ def _dataSetParallelSubprocess(dataInstance: DataInstance, failFast: bool) -> tu
     return row, errors, dataInstance.getClassValue(), dataInstance.getId()
 
 
-def allFeaturesAsList(streamInput) -> list:
+def allFeaturesAsList(streamInput: DataSource) -> list:
     # noinspection PyShadowingNames
     '''
     Returns a list containing ALL currently implemented feature extractors.
@@ -1188,7 +1196,9 @@ def allFeaturesAsList(streamInput) -> list:
 
 
 # ------------------------------------------------------------------------------
-def extractorsById(idOrList, library=('jSymbolic', 'native')) -> list[type[FeatureExtractor]]:
+def extractorsById(idOrList: str|Iterable[str],
+                   library: str|Iterable[str] = ('jSymbolic', 'native')
+                   ) -> list[type[FeatureExtractor]]:
     '''
     Given one or more :class:`~music21.features.FeatureExtractor` ids, return the
     appropriate subclass. An optional `library` argument can be added to define which
@@ -1219,21 +1229,20 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')) -> list[type[Featu
     from music21.features import jSymbolic
     from music21.features import native
 
-    if not common.isIterable(library):
-        library = [library]
+    # a bare string is a single library/id, not an iterable of them
+    libraries: Iterable[str] = [library] if isinstance(library, str) else library
 
     featureExtractors: list[type[FeatureExtractor]] = []
-    for lib in library:
+    for lib in libraries:
         if lib.lower() in ['jsymbolic', 'all']:
             featureExtractors += jSymbolic.featureExtractors
         elif lib.lower() in ['native', 'all']:
             featureExtractors += native.featureExtractors
 
-    if not common.isIterable(idOrList):
-        idOrList = [idOrList]
+    ids: Iterable[str] = [idOrList] if isinstance(idOrList, str) else idOrList
 
     flatIds: list[str] = []
-    for featureId in idOrList:
+    for featureId in ids:
         featureId = featureId.strip().lower()
         featureId = featureId.replace('-', '').replace(' ', '')
         flatIds.append(featureId)
@@ -1248,7 +1257,9 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')) -> list[type[Featu
     return post
 
 
-def extractorById(idOrList, library=('jSymbolic', 'native')) -> type[FeatureExtractor]|None:
+def extractorById(idOrList: str|Iterable[str],
+                  library: str|Iterable[str] = ('jSymbolic', 'native')
+                  ) -> type[FeatureExtractor]|None:
     '''
     Get the first feature matched by extractorsById().
 
@@ -1265,7 +1276,8 @@ def extractorById(idOrList, library=('jSymbolic', 'native')) -> type[FeatureExtr
     return None  # no match
 
 
-def vectorById(streamObj, vectorId, library=('jSymbolic', 'native')) -> list[int|float]|None:
+def vectorById(streamObj: stream.Stream|DataInstance, vectorId: str|Iterable[str],
+               library: str|Iterable[str] = ('jSymbolic', 'native')) -> list[int|float]|None:
     '''
     Utility function to get a vector from an extractor.
 
@@ -1281,7 +1293,7 @@ def vectorById(streamObj, vectorId, library=('jSymbolic', 'native')) -> list[int
     return fe.extract().vector
 
 
-def getIndex(featureString, extractorType=None) -> tuple[int, str]|None:
+def getIndex(featureString: str, extractorType: str|None = None) -> tuple[int, str]|None:
     '''
     Returns the list index of the given feature extractor and the feature extractor
     category (jsymbolic or native). If the feature extractor string is not in either

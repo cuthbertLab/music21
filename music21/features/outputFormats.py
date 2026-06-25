@@ -38,7 +38,7 @@ class OutputFormat:
         return ''  # define in subclass
 
     def write(self, fp: str|pathlib.Path|None = None,
-              includeClassLabel: bool = True, includeId: bool = True):
+              includeClassLabel: bool = True, includeId: bool = True) -> str|pathlib.Path:
         '''
         Write the file. If no file path is given, a temporary file will be written.
         '''
@@ -65,7 +65,8 @@ class OutputTabOrange(OutputFormat):
         super().__init__(dataSet=dataSet)
         self.ext = '.tab'
 
-    def getHeaderLines(self, includeClassLabel: bool = True, includeId: bool = True) -> list:
+    def getHeaderLines(self, includeClassLabel: bool = True,
+                       includeId: bool = True) -> list[list[str]]:
         # noinspection PyShadowingNames
         '''
         Get the header as a list of lines.
@@ -147,7 +148,8 @@ class OutputCSV(OutputFormat):
         super().__init__(dataSet=dataSet)
         self.ext = '.csv'
 
-    def getHeaderLines(self, includeClassLabel: bool = True, includeId: bool = True) -> list:
+    def getHeaderLines(self, includeClassLabel: bool = True,
+                       includeId: bool = True) -> list[list[str]]:
         '''
         Get the header as a list of lines.
 
@@ -199,7 +201,8 @@ class OutputARFF(OutputFormat):
         super().__init__(dataSet=dataSet)
         self.ext = '.arff'
 
-    def getHeaderLines(self, includeClassLabel: bool = True, includeId: bool = True) -> list:
+    def getHeaderLines(self, includeClassLabel: bool = True,
+                       includeId: bool = True) -> list[str]:
         '''
         Get the header as a list of lines.
 
@@ -240,7 +243,7 @@ class OutputARFF(OutputFormat):
                     post.append(f'@ATTRIBUTE {attrLabel} NUMERIC')
             else:
                 values = self._dataSet.getUniqueClassValues()
-                joined = ','.join(values)
+                joined = ','.join(str(v) for v in values)
                 post.append('@ATTRIBUTE class {' + joined + '}')
         # include start of data declaration
         post.append('@DATA')
