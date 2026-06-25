@@ -30,6 +30,8 @@ from music21 import roman
 from music21 import stream
 from music21.humdrum import testFiles
 from music21.humdrum.spineParser import (
+    GlobalComment,
+    GlobalReference,
     HumdrumDataCollection,
     KernSpine,
     SpineComment,
@@ -94,7 +96,7 @@ class Test(unittest.TestCase):
 
     def testGraceNoteKeepsWrittenDuration(self):
         '''
-        A single `q` is a slashed grace note that keeps its written duration
+        A single `q` is a slashed grace note that keeps its written duration.
         '''
         n = SpineEvent('16ccq').toNote()
         self.assertTrue(n.duration.isGrace)
@@ -240,7 +242,7 @@ class Test(unittest.TestCase):
 
     def x_testFakePiece(self):
         '''
-        test loading a fake piece with spine paths, lyrics, dynamics, etc.
+        Test loading a fake piece with spine paths, lyrics, dynamics, etc.
         '''
         hdc = HumdrumDataCollection(testFiles.fakeTest)
         hdc.parse()
@@ -826,6 +828,47 @@ class Test(unittest.TestCase):
         md = c.metadata
         self.assertIsNotNone(md.composer)
         self.assertIn('Palestrina', md.composer)
+
+    def testGlobalEventsReachStream(self):
+        # !! comments become GlobalComment objects in the stream; !!! references
+        # become metadata (known codes proper, unknown ones custom) and do not
+        # stay in the stream; a blank line is ignored without error.
+        src = '\n'.join([
+            '!!!COM: Test Composer',
+            '!!!OTL: Test Title',
+            '!! a global comment here',
+            '',  # blank line in the middle
+            '**kern',
+            '4c',
+            '4d',
+            '*-',
+            '!! comment at the end',
+            '!!!XYZ: trailing free-form ref',
+        ])
+        hdc = HumdrumDataCollection(src)
+        hdc.parse()
+        s = hdc.stream
+
+        # the leading comment lands at 0.0; the trailing one at the end of the
+        # music (the two quarter notes total 2.0), not back at 0.0.
+        flat = s.flatten()
+        commentInfo = [(gc.comment, gc.offset)
+                       for gc in flat.getElementsByClass(GlobalComment)]
+        self.assertEqual(
+            commentInfo,
+            [('a global comment here', 0.0), ('comment at the end', 2.0)])
+
+        # references become metadata only (GlobalReference is not a stream
+        # object), so none of them appear among the stream's elements.
+        self.assertFalse([el for el in s.recurse() if isinstance(el, GlobalReference)])
+        self.assertIsNotNone(s.metadata)
+        self.assertEqual(str(s.metadata.composer), 'Test Composer')
+        self.assertEqual(str(s.metadata.title), 'Test Title')
+        # an unknown code (even trailing) is kept as custom metadata, not lost.
+        self.assertEqual(str(s.metadata.getCustom('XYZ')[0]), 'trailing free-form ref')
+
+        # the blank line did not derail parsing
+        self.assertEqual(len(s.recurse().notes), 2)
 
     def testFlavors(self):
         prevFlavor = flavors['JRP']
