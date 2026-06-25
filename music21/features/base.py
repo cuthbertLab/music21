@@ -99,10 +99,10 @@ class Feature:
         self.vector: list[int|float] = []
 
         # consider not storing these values, as they may not be necessary
-        self.name: str|None = None  # string name representation
-        self.description: str|None = None  # string description
-        self.isSequential: bool|None = None  # True or False
-        self.discrete: bool|None = None  # is discrete or continuous
+        self.name: str = ''  # string name representation
+        self.description: str = ''  # string description
+        self.isSequential: bool = True  # True or False
+        self.discrete: bool = True  # is discrete or continuous
 
     def _getVectors(self) -> list[int|float]:
         '''
@@ -143,11 +143,20 @@ class FeatureExtractor:
     the Stream are cached for easy processing.
 
     * Changed in v11: `dimensions` now defaults to 1, so single-dimension
-      extractors no longer need to set it.
+      extractors no longer need to set it. `name`, `description`,
+      `isSequential`, `discrete`, and `normalize` are now class-level
+      attributes with non-None defaults; subclasses override them directly.
 
     This module's type annotations were added with AI assistance (Claude).
     '''
-    id: str = ''  # string identifier; subclasses override
+    # these class-level attributes are overridden by subclasses
+    id: str = ''  # string identifier
+    name: str = ''  # string name representation
+    description: str = ''  # string description
+    isSequential: bool = True  # True or False
+    dimensions: int = 1  # number of dimensions
+    discrete: bool = True  # is discrete or continuous
+    normalize: bool = False  # whether the feature vector is normalized
 
     def __init__(self,
                  dataOrStream: stream.Stream|DataInstance|None = None,
@@ -158,19 +167,6 @@ class FeatureExtractor:
         self.setData(dataOrStream)
 
         self.feature: Feature|None = None  # Feature object that results from processing
-
-        if not hasattr(self, 'name'):
-            self.name: str|None = None  # string name representation
-        if not hasattr(self, 'description'):
-            self.description: str|None = None  # string description
-        if not hasattr(self, 'isSequential'):
-            self.isSequential: bool|None = None  # True or False
-        if not hasattr(self, 'dimensions'):
-            self.dimensions: int = 1  # number of dimensions
-        if not hasattr(self, 'discrete'):
-            self.discrete: bool = True  # default
-        if not hasattr(self, 'normalize'):
-            self.normalize: bool = False  # default is no
 
     def setData(self, dataOrStream: stream.Stream|DataInstance|None) -> None:
         '''
@@ -207,13 +203,12 @@ class FeatureExtractor:
          'Fifths_Pitch_Histogram_9', 'Fifths_Pitch_Histogram_10', 'Fifths_Pitch_Histogram_11']
 
         '''
-        name = self.name or ''
         post: list[str] = []
         if self.dimensions == 1:
-            post.append(name.replace(' ', '_'))
+            post.append(self.name.replace(' ', '_'))
         else:
             for i in range(self.dimensions):
-                post.append(f"{name.replace(' ', '_')}_{i}")
+                post.append(f"{self.name.replace(' ', '_')}_{i}")
         return post
 
     def fillFeatureAttributes(self, feature: Feature|None = None) -> Feature:
@@ -593,7 +588,7 @@ class DataInstance:
             self._id = ''
 
         # the attribute name in the data set for this label
-        self.classLabel: str|None = None
+        self.classLabel: str = ''
         # store the class value for this data instance
         self._classValue: t.Any = None
 
@@ -640,7 +635,7 @@ class DataInstance:
         for v in self.stream[stream.Voice]:
             self.formsByPart.append(StreamForms(v))
 
-    def setClassLabel(self, classLabel: str|None, classValue=None) -> None:
+    def setClassLabel(self, classLabel: str, classValue=None) -> None:
         '''
         Set the class label, as well as the class value if known.
         The class label is the attribute name used to define the class of this data instance.

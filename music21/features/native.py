@@ -90,12 +90,8 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'P22'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Quality'
-        self.description = '''
+    name = 'Quality'
+    description = '''
             Set to 0 if the Key or KeySignature indicates that
             a recording is major, set to 1 if it indicates
             that it is minor.
@@ -103,7 +99,6 @@ class QualityFeature(featuresModule.FeatureExtractor):
             modes in the keys, analyze the piece to
             discover what mode it is most likely in.
             '''
-        self.isSequential = True
 
     def process(self) -> None:
         '''
@@ -172,14 +167,10 @@ class TonalCertainty(featuresModule.FeatureExtractor):
     [0.0]
     '''
     id = 'K1'  # TODO: need id
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Tonal Certainty'
-        self.description = ('A floating point magnitude value that suggest tonal '
-                            'certainty based on automatic key analysis.')
-        self.discrete = False
+    name = 'Tonal Certainty'
+    description = ('A floating point magnitude value that suggest tonal '
+                   'certainty based on automatic key analysis.')
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -206,14 +197,10 @@ class FirstBeatAttackPrevalence(featuresModule.FeatureExtractor):
     TODO: Implement!
     '''
     id = 'MP1'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'First Beat Attack Prevalence'
-        self.description = ('Fraction of first beats of a measure that have notes '
-                            'that start on this beat.')
-        self.discrete = False
+    name = 'First Beat Attack Prevalence'
+    description = ('Fraction of first beats of a measure that have notes '
+                   'that start on this beat.')
+    discrete = False
 
 
 # ------------------------------------------------------------------------------
@@ -228,13 +215,8 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
     [3]
     '''
     id = 'QL1'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Unique Note Quarter Lengths'
-        self.description = 'The number of unique note quarter lengths.'
-        self.discrete = True
+    name = 'Unique Note Quarter Lengths'
+    description = 'The number of unique note quarter lengths.'
 
     def process(self) -> None:
         '''
@@ -259,13 +241,9 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
     [1.0]
     '''
     id = 'QL2'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Note Quarter Length'
-        self.description = 'The value of the most common quarter length.'
-        self.discrete = False
+    name = 'Most Common Note Quarter Length'
+    description = 'The value of the most common quarter length.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -294,13 +272,9 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     [0.60...]
     '''
     id = 'QL3'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Note Quarter Length Prevalence'
-        self.description = 'Fraction of notes that have the most common quarter length.'
-        self.discrete = False
+    name = 'Most Common Note Quarter Length Prevalence'
+    description = 'Fraction of notes that have the most common quarter length.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -332,13 +306,9 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
     [1.5]
     '''
     id = 'QL4'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Range of Note Quarter Lengths'
-        self.description = 'Difference between the longest and shortest quarter lengths.'
-        self.discrete = False
+    name = 'Range of Note Quarter Lengths'
+    description = 'Difference between the longest and shortest quarter lengths.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -374,13 +344,9 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
     [27]
     '''
     id = 'CS1'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Unique Pitch Class Set Simultaneities'
-        self.description = 'Number of unique pitch class simultaneities.'
-        self.discrete = False
+    name = 'Unique Pitch Class Set Simultaneities'
+    description = 'Number of unique pitch class simultaneities.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -407,13 +373,9 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
     [14]
     '''
     id = 'CS2'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Unique Set Class Simultaneities'
-        self.description = 'Number of unique set class simultaneities.'
-        self.discrete = False
+    name = 'Unique Set Class Simultaneities'
+    description = 'Number of unique set class simultaneities.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -441,14 +403,10 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
     [0.134...]
     '''
     id = 'CS3'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Pitch Class Set Simultaneity Prevalence'
-        self.description = ('Fraction of all pitch class simultaneities that are '
-                            'the most common simultaneity.')
-        self.discrete = False
+    name = 'Most Common Pitch Class Set Simultaneity Prevalence'
+    description = ('Fraction of all pitch class simultaneities that are '
+                   'the most common simultaneity.')
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -488,14 +446,10 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.235...]
     '''
     id = 'CS4'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Set Class Simultaneity Prevalence'
-        self.description = ('Fraction of all set class simultaneities that '
-                            'are the most common simultaneity.')
-        self.discrete = False
+    name = 'Most Common Set Class Simultaneity Prevalence'
+    description = ('Fraction of all set class simultaneities that '
+                   'are the most common simultaneity.')
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -530,13 +484,9 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.46...]
     '''
     id = 'CS5'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Major Triad Simultaneity Prevalence'
-        self.description = 'Percentage of all simultaneities that are major triads.'
-        self.discrete = False
+    name = 'Major Triad Simultaneity Prevalence'
+    description = 'Percentage of all simultaneities that are major triads.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -565,13 +515,9 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.211...]
     '''
     id = 'CS6'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Minor Triad Simultaneity Prevalence'
-        self.description = 'Percentage of all simultaneities that are minor triads.'
-        self.discrete = False
+    name = 'Minor Triad Simultaneity Prevalence'
+    description = 'Percentage of all simultaneities that are minor triads.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -600,13 +546,9 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.076...]
     '''
     id = 'CS7'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Dominant Seventh Simultaneity Prevalence'
-        self.description = 'Percentage of all simultaneities that are dominant seventh.'
-        self.discrete = False
+    name = 'Dominant Seventh Simultaneity Prevalence'
+    description = 'Percentage of all simultaneities that are dominant seventh.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -635,13 +577,9 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.019...]
     '''
     id = 'CS8'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Diminished Triad Simultaneity Prevalence'
-        self.description = 'Percentage of all simultaneities that are diminished triads.'
-        self.discrete = False
+    name = 'Diminished Triad Simultaneity Prevalence'
+    description = 'Percentage of all simultaneities that are diminished triads.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -675,13 +613,9 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.02272727...]
     '''
     id = 'CS9'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Triad Simultaneity Prevalence'
-        self.description = 'Proportion of all simultaneities that form triads.'
-        self.discrete = False
+    name = 'Triad Simultaneity Prevalence'
+    description = 'Proportion of all simultaneities that form triads.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -710,13 +644,9 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.0]
     '''
     id = 'CS10'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Diminished Seventh Simultaneity Prevalence'
-        self.description = 'Percentage of all simultaneities that are diminished seventh chords.'
-        self.discrete = False
+    name = 'Diminished Seventh Simultaneity Prevalence'
+    description = 'Percentage of all simultaneities that are diminished seventh chords.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -755,13 +685,9 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
     [0.02...]
     '''
     id = 'CS11'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Incorrectly Spelled Triad Prevalence'
-        self.description = 'Percentage of all triads that are spelled incorrectly.'
-        self.discrete = False
+    name = 'Incorrectly Spelled Triad Prevalence'
+    description = 'Percentage of all triads that are spelled incorrectly.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -818,16 +744,12 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'CS12'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Chord Bass Motion'
-        self.description = ('12-element vector showing the fraction of chords that move '
-                            'by x semitones (where x=0 is always 0 unless there are 0 '
-                            'or 1 harmonies, in which case it is 1).')
-        self.dimensions = 12
-        self.discrete = False
+    name = 'Chord Bass Motion'
+    description = ('12-element vector showing the fraction of chords that move '
+                   'by x semitones (where x=0 is always 0 unless there are 0 '
+                   'or 1 harmonies, in which case it is 1).')
+    dimensions = 12
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -896,14 +818,10 @@ class LandiniCadence(featuresModule.FeatureExtractor):
     Return a boolean if one or more Parts end with a Landini-like cadential figure.
     '''
     id = 'MC1'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Ends With Landini Melodic Contour'
-        self.description = ('Boolean that indicates the presence of a Landini-like '
-                            'cadential figure in one or more parts.')
-        self.discrete = False
+    name = 'Ends With Landini Melodic Contour'
+    description = ('Boolean that indicates the presence of a Landini-like '
+                   'cadential figure in one or more parts.')
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -965,14 +883,12 @@ class LanguageFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'TX1'
+    name = 'Language Feature'
+    description = ('Language of the lyrics of the piece given as a numeric '
+                   'value from text.LanguageDetector.mostLikelyLanguageNumeric().')
 
     def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Language Feature'
-        self.description = ('Language of the lyrics of the piece given as a numeric '
-                            'value from text.LanguageDetector.mostLikelyLanguageNumeric().')
-        self.discrete = True
         self.languageDetector = text.LanguageDetector()
 
     def process(self) -> None:

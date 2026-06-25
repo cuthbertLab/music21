@@ -53,16 +53,11 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     [0.144..., 0.220..., 0.364..., 0.062..., 0.050...]
     '''
     id = 'M1'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Melodic Interval Histogram'
-        self.description = ('A features array with bins corresponding to '
-                            'the values of the melodic interval histogram.')
-        self.isSequential = True
-        self.dimensions = 128
-        self.normalize = True
+    name = 'Melodic Interval Histogram'
+    description = ('A features array with bins corresponding to '
+                   'the values of the melodic interval histogram.')
+    dimensions = 128
+    normalize = True
 
     def process(self) -> None:
         '''
@@ -85,13 +80,8 @@ class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
     [2.44...]
     '''
     id = 'M2'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Average Melodic Interval'
-        self.description = 'Average melodic interval (in semitones).'
-        self.isSequential = True
+    name = 'Average Melodic Interval'
+    description = 'Average melodic interval (in semitones).'
 
     def process(self) -> None:
         '''
@@ -120,13 +110,8 @@ class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
     [2]
     '''
     id = 'M3'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Melodic Interval'
-        self.description = 'Melodic interval with the highest frequency.'
-        self.isSequential = True
+    name = 'Most Common Melodic Interval'
+    description = 'Melodic interval with the highest frequency.'
 
     def process(self) -> None:
         '''
@@ -152,15 +137,10 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
     [1]
     '''
     id = 'M4'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Distance Between Most Common Melodic Intervals'
-        self.description = ('Absolute value of the difference between the '
-                            'most common melodic interval and the second most '
-                            'common melodic interval.')
-        self.isSequential = True
+    name = 'Distance Between Most Common Melodic Intervals'
+    description = ('Absolute value of the difference between the '
+                   'most common melodic interval and the second most '
+                   'common melodic interval.')
 
     def process(self) -> None:
         '''
@@ -191,13 +171,8 @@ class MostCommonMelodicIntervalPrevalenceFeature(
     [0.364...]
     '''
     id = 'M5'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Melodic Interval Prevalence'
-        self.description = 'Fraction of melodic intervals that belong to the most common interval.'
-        self.isSequential = True
+    name = 'Most Common Melodic Interval Prevalence'
+    description = 'Fraction of melodic intervals that belong to the most common interval.'
 
     def process(self) -> None:
         '''
@@ -225,15 +200,10 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
     [0.603...]
     '''
     id = 'M6'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Relative Strength of Most Common Intervals'
-        self.description = ('Fraction of melodic intervals that belong '
-                            'to the second most common interval divided by the '
-                            'fraction of melodic intervals belonging to the most common interval.')
-        self.isSequential = True
+    name = 'Relative Strength of Most Common Intervals'
+    description = ('Fraction of melodic intervals that belong '
+                   'to the second most common interval divided by the '
+                   'fraction of melodic intervals belonging to the most common interval.')
 
     def process(self) -> None:
         '''
@@ -265,14 +235,9 @@ class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
     [3]
     '''
     id = 'M7'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Number of Common Melodic Intervals'
-        self.description = ('Number of melodic intervals that represent '
-                            'at least 9% of all melodic intervals.')
-        self.isSequential = True
+    name = 'Number of Common Melodic Intervals'
+    description = ('Number of melodic intervals that represent '
+                   'at least 9% of all melodic intervals.')
 
     def process(self) -> None:
         '''
@@ -305,15 +270,10 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
     [0.333...]
     '''
     id = 'M8'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Amount of Arpeggiation'
-        self.description = ('Fraction of horizontal intervals that are repeated notes, '
-                            'minor thirds, major thirds, perfect fifths, minor sevenths, '
-                            'major sevenths, octaves, minor tenths or major tenths.')
-        self.isSequential = True
+    name = 'Amount of Arpeggiation'
+    description = ('Fraction of horizontal intervals that are repeated notes, '
+                   'minor thirds, major thirds, perfect fifths, minor sevenths, '
+                   'major sevenths, octaves, minor tenths or major tenths.')
 
     def process(self) -> None:
         '''
@@ -347,13 +307,8 @@ class RepeatedNotesFeature(featuresModule.FeatureExtractor):
     [0.144...]
     '''
     id = 'M9'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Repeated Notes'
-        self.description = 'Fraction of notes that are repeated melodically.'
-        self.isSequential = True
+    name = 'Repeated Notes'
+    description = 'Fraction of notes that are repeated melodically.'
 
     def process(self) -> None:
         '''
@@ -387,13 +342,8 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
     [0.220...]
     '''
     id = 'm10'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Chromatic Motion'
-        self.description = 'Fraction of melodic intervals corresponding to a semi-tone.'
-        self.isSequential = True
+    name = 'Chromatic Motion'
+    description = 'Fraction of melodic intervals corresponding to a semi-tone.'
 
     def process(self) -> None:
         '''
@@ -424,14 +374,9 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
     [0.584...]
     '''
     id = 'M11'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Stepwise Motion'
-        self.description = ('Fraction of melodic intervals that corresponded '
-                            'to a minor or major second.')
-        self.isSequential = True
+    name = 'Stepwise Motion'
+    description = ('Fraction of melodic intervals that corresponded '
+                   'to a minor or major second.')
 
     def process(self) -> None:
         '''
@@ -462,13 +407,8 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
     [0.113...]
     '''
     id = 'M12'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Melodic Thirds'
-        self.description = 'Fraction of melodic intervals that are major or minor thirds.'
-        self.isSequential = True
+    name = 'Melodic Thirds'
+    description = 'Fraction of melodic intervals that are major or minor thirds.'
 
     def process(self) -> None:
         '''
@@ -499,13 +439,8 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
     [0.056...]
     '''
     id = 'M13'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Melodic Fifths'
-        self.description = 'Fraction of melodic intervals that are perfect fifths.'
-        self.isSequential = True
+    name = 'Melodic Fifths'
+    description = 'Fraction of melodic intervals that are perfect fifths.'
 
     def process(self) -> None:
         '''
@@ -536,13 +471,8 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
     [0.012...]
     '''
     id = 'M14'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Melodic Tritones'
-        self.description = 'Fraction of melodic intervals that are tritones.'
-        self.isSequential = True
+    name = 'Melodic Tritones'
+    description = 'Fraction of melodic intervals that are tritones.'
 
     def process(self) -> None:
         '''
@@ -573,13 +503,8 @@ class MelodicOctavesFeature(featuresModule.FeatureExtractor):
     [0.018...]
     '''
     id = 'M15'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Melodic Octaves'
-        self.description = 'Fraction of melodic intervals that are octaves.'
-        self.isSequential = True
+    name = 'Melodic Octaves'
+    description = 'Fraction of melodic intervals that are octaves.'
 
     def process(self) -> None:
         '''
@@ -611,13 +536,8 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
     [0.470...]
     '''
     id = 'm17'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Direction of Motion'
-        self.description = 'Fraction of melodic intervals that are rising rather than falling.'
-        self.isSequential = True
+    name = 'Direction of Motion'
+    description = 'Fraction of melodic intervals that are rising rather than falling.'
 
     def process(self) -> None:
         '''
@@ -671,16 +591,11 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     [1.74...]
     '''
     id = 'M18'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Duration of Melodic Arcs'
-        self.description = ('Average number of notes that separate melodic '
-                            'peaks and troughs in any part. This is calculated as the '
-                            'total number of intervals (not counting unisons) divided '
-                            'by the number of times the melody changes direction.')
-        self.isSequential = True
+    name = 'Duration of Melodic Arcs'
+    description = ('Average number of notes that separate melodic '
+                   'peaks and troughs in any part. This is calculated as the '
+                   'total number of intervals (not counting unisons) divided '
+                   'by the number of times the melody changes direction.')
 
     def process(self) -> None:
         '''
@@ -764,19 +679,14 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     [4.84...]
     '''
     id = 'M19'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Size of Melodic Arcs'
-        self.description = ('Average span (in semitones) between melodic peaks '
-                            'and troughs in any part. Each time the melody changes '
-                            'direction begins a new arc. The average size of'
-                            'melodic arcs is defined as the total size of melodic'
-                            'intervals between changes of directions - or between'
-                            'the start of the melody and the first change of'
-                            'direction - divided by the number of direction changes.')
-        self.isSequential = True
+    name = 'Size of Melodic Arcs'
+    description = ('Average span (in semitones) between melodic peaks '
+                   'and troughs in any part. Each time the melody changes '
+                   'direction begins a new arc. The average size of'
+                   'melodic arcs is defined as the total size of melodic'
+                   'intervals between changes of directions - or between'
+                   'the start of the melody and the first change of'
+                   'direction - divided by the number of direction changes.')
 
     def process(self) -> None:
         '''
@@ -859,14 +769,9 @@ class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
     0.116...
     '''
     id = 'P1'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Pitch Prevalence'
-        self.description = 'Fraction of Note Ons corresponding to the most common pitch.'
-        self.isSequential = True
-        self.discrete = False
+    name = 'Most Common Pitch Prevalence'
+    description = 'Fraction of Note Ons corresponding to the most common pitch.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -895,14 +800,9 @@ class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
     [0.196...]
     '''
     id = 'P2'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Pitch Class Prevalence'
-        self.description = 'Fraction of Note Ons corresponding to the most common pitch class.'
-        self.isSequential = True
-        self.discrete = False
+    name = 'Most Common Pitch Class Prevalence'
+    description = 'Fraction of Note Ons corresponding to the most common pitch class.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -931,15 +831,10 @@ class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
     [0.947...]
     '''
     id = 'P3'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Relative Strength of Top Pitches'
-        self.description = ('The frequency of the 2nd most common pitch '
-                            'divided by the frequency of the most common pitch.')
-        self.isSequential = True
-        self.discrete = False
+    name = 'Relative Strength of Top Pitches'
+    description = ('The frequency of the 2nd most common pitch '
+                   'divided by the frequency of the most common pitch.')
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -968,15 +863,10 @@ class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
     [0.906...]
     '''
     id = 'P4'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Relative Strength of Top Pitch Classes'
-        self.description = ('The frequency of the 2nd most common pitch class '
-                            'divided by the frequency of the most common pitch class.')
-        self.isSequential = True
-        self.discrete = False
+    name = 'Relative Strength of Top Pitch Classes'
+    description = ('The frequency of the 2nd most common pitch class '
+                   'divided by the frequency of the most common pitch class.')
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -1010,14 +900,9 @@ class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
     [5]
     '''
     id = 'P5'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Interval Between Strongest Pitches'
-        self.description = ('Absolute value of the difference between '
-                            'the pitches of the two most common MIDI pitches.')
-        self.isSequential = True
+    name = 'Interval Between Strongest Pitches'
+    description = ('Absolute value of the difference between '
+                   'the pitches of the two most common MIDI pitches.')
 
     def process(self) -> None:
         '''
@@ -1046,14 +931,9 @@ class IntervalBetweenStrongestPitchClassesFeature(
     [5]
     '''
     id = 'P6'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Interval Between Strongest Pitch Classes'
-        self.description = ('Absolute value of the difference between the pitch '
-                            'classes of the two most common MIDI pitch classes.')
-        self.isSequential = True
+    name = 'Interval Between Strongest Pitch Classes'
+    description = ('Absolute value of the difference between the pitch '
+                   'classes of the two most common MIDI pitch classes.')
 
     def process(self) -> None:
         '''
@@ -1083,14 +963,9 @@ class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
     [3]
     '''
     id = 'P7'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Number of Common Pitches'
-        self.description = ('Number of pitches that account individually '
-                            'for at least 9% of all notes.')
-        self.isSequential = True
+    name = 'Number of Common Pitches'
+    description = ('Number of pitches that account individually '
+                   'for at least 9% of all notes.')
 
     def process(self) -> None:
         '''
@@ -1117,13 +992,8 @@ class PitchVarietyFeature(featuresModule.FeatureExtractor):
     [24]
     '''
     id = 'P8'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Pitch Variety'
-        self.description = 'Number of pitches used at least once.'
-        self.isSequential = True
+    name = 'Pitch Variety'
+    description = 'Number of pitches used at least once.'
 
     def process(self) -> None:
         '''
@@ -1149,13 +1019,8 @@ class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
     [10]
     '''
     id = 'P9'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Pitch Class Variety'
-        self.description = 'Number of pitch classes used at least once.'
-        self.isSequential = True
+    name = 'Pitch Class Variety'
+    description = 'Number of pitch classes used at least once.'
 
     def process(self) -> None:
         '''
@@ -1181,13 +1046,8 @@ class RangeFeature(featuresModule.FeatureExtractor):
     [34]
     '''
     id = 'P10'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Range'
-        self.description = 'Difference between highest and lowest pitches.'
-        self.isSequential = True
+    name = 'Range'
+    description = 'Difference between highest and lowest pitches.'
 
     def process(self) -> None:
         '''
@@ -1214,14 +1074,9 @@ class MostCommonPitchFeature(featuresModule.FeatureExtractor):
     [61]
     '''
     id = 'P11'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Pitch'
-        self.description = 'Bin label of the most common pitch.'
-        self.isSequential = True
-        self.discrete = False
+    name = 'Most Common Pitch'
+    description = 'Bin label of the most common pitch.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -1247,14 +1102,9 @@ class PrimaryRegisterFeature(featuresModule.FeatureExtractor):
     [61.12...]
     '''
     id = 'P12'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Primary Register'
-        self.description = 'Average MIDI pitch.'
-        self.isSequential = True
-        self.discrete = False
+    name = 'Primary Register'
+    description = 'Average MIDI pitch.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -1278,14 +1128,9 @@ class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
     [0.184...]
     '''
     id = 'P13'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Importance of Bass Register'
-        self.description = 'Fraction of Note Ons between MIDI pitches 0 and 54.'
-        self.isSequential = True
-        self.discrete = False
+    name = 'Importance of Bass Register'
+    description = 'Fraction of Note Ons between MIDI pitches 0 and 54.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -1316,14 +1161,9 @@ class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
     [0.766...]
     '''
     id = 'P14'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Importance of Middle Register'
-        self.description = 'Fraction of Note Ons between MIDI pitches 55 and 72.'
-        self.isSequential = True
-        self.discrete = False
+    name = 'Importance of Middle Register'
+    description = 'Fraction of Note Ons between MIDI pitches 55 and 72.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -1354,14 +1194,9 @@ class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
     [0.049...]
     '''
     id = 'P15'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Importance of High Register'
-        self.description = 'Fraction of Note Ons between MIDI pitches 73 and 127.'
-        self.isSequential = True
-        self.discrete = False
+    name = 'Importance of High Register'
+    description = 'Fraction of Note Ons between MIDI pitches 73 and 127.'
+    discrete = False
 
     def process(self) -> None:
         '''
@@ -1392,13 +1227,8 @@ class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
     [1]
     '''
     id = 'P16'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Pitch Class'
-        self.description = 'Bin label of the most common pitch class.'
-        self.isSequential = True
+    name = 'Most Common Pitch Class'
+    description = 'Bin label of the most common pitch class.'
 
     def process(self) -> None:
         '''
@@ -1419,14 +1249,9 @@ class DominantSpreadFeature(featuresModule.FeatureExtractor):
     5ths that accounted for at least 9% each of the notes.
     '''
     id = 'P17'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Dominant Spread'
-        self.description = ('Largest number of consecutive pitch classes separated by '
-                            'perfect 5ths that accounted for at least 9% each of the notes.')
-        self.isSequential = True
+    name = 'Dominant Spread'
+    description = ('Largest number of consecutive pitch classes separated by '
+                   'perfect 5ths that accounted for at least 9% each of the notes.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1443,14 +1268,9 @@ class StrongTonalCentresFeature(featuresModule.FeatureExtractor):
     for at least 9% of all Note Ons.
     '''
     id = 'P18'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Strong Tonal Centres'
-        self.description = ('Number of peaks in the fifths pitch histogram that each account '
-                            'for at least 9% of all Note Ons.')
-        self.isSequential = True
+    name = 'Strong Tonal Centres'
+    description = ('Number of peaks in the fifths pitch histogram that each account '
+                   'for at least 9% of all Note Ons.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1482,16 +1302,11 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     '''
     id = 'P19'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Basic Pitch Histogram'
-        self.description = ('A features array with bins corresponding to the '
-                            'values of the basic pitch histogram.')
-        self.isSequential = True
-        self.dimensions = 128
-        self.normalize = True
+    name = 'Basic Pitch Histogram'
+    description = ('A features array with bins corresponding to the '
+                   'values of the basic pitch histogram.')
+    dimensions = 128
+    normalize = True
 
     def process(self) -> None:
         '''
@@ -1518,19 +1333,14 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
      0.085..., 0.134..., 0.018..., 0.171..., 0.0]
     '''
     id = 'P20'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Pitch Class Distribution'
-        self.description = ('A feature array with 12 entries where the first holds '
-                            'the frequency of the bin of the pitch class histogram with '
-                            'the highest frequency, and the following entries holding '
-                            'the successive bins of the histogram, wrapping around if necessary.')
-        self.isSequential = True
-        self.dimensions = 12
-        self.discrete = False
-        self.normalize = True
+    name = 'Pitch Class Distribution'
+    description = ('A feature array with 12 entries where the first holds '
+                   'the frequency of the bin of the pitch class histogram with '
+                   'the highest frequency, and the following entries holding '
+                   'the successive bins of the histogram, wrapping around if necessary.')
+    dimensions = 12
+    discrete = False
+    normalize = True
 
     def process(self) -> None:
         '''
@@ -1567,21 +1377,13 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
      0.085..., 0.006..., 0.018..., 0.036...]
     '''
     id = 'P21'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Fifths Pitch Histogram'
-        self.description = ('A feature array with bins corresponding to the values of the '
-                            '5ths pitch class histogram.')
-        self.isSequential = True
-        self.dimensions = 12
-        self.normalize = True
-
-        # create pc to index mapping
-        self._mapping = {}
-        for i in range(12):
-            self._mapping[i] = (7 * i) % 12
+    name = 'Fifths Pitch Histogram'
+    description = ('A feature array with bins corresponding to the values of the '
+                   '5ths pitch class histogram.')
+    dimensions = 12
+    normalize = True
+    # pitch-class to circle-of-fifths index mapping
+    _mapping = {i: (7 * i) % 12 for i in range(12)}
 
     def process(self) -> None:
         '''
@@ -1616,17 +1418,12 @@ class QualityFeature(featuresModule.FeatureExtractor):
     [1]
     '''
     id = 'P22'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Quality'
-        self.description = '''
+    name = 'Quality'
+    description = '''
             Set to 0 if the key signature indicates that
             a recording is major, set to 1 if it indicates
             that it is minor and set to 0 if key signature is unknown.
             '''
-        self.isSequential = True
 
     def process(self) -> None:
         '''
@@ -1657,14 +1454,9 @@ class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
     with them divided by total number of pitched Note Ons.
     '''
     id = 'P23'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Glissando Prevalence'
-        self.description = ('Number of Note Ons that have at least one MIDI Pitch Bend '
-                            'associated with them divided by total number of pitched Note Ons.')
-        self.isSequential = True
+    name = 'Glissando Prevalence'
+    description = ('Number of Note Ons that have at least one MIDI Pitch Bend '
+                   'associated with them divided by total number of pitched Note Ons.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1683,17 +1475,12 @@ class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
     Note On and Note Off messages of any note
     '''
     id = 'P24'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Average Range Of Glissandos'
-        self.description = ('Average range of MIDI Pitch Bends, where "range" is '
-                            'defined as the greatest value of the absolute difference '
-                            'between 64 and the second data byte of all MIDI Pitch Bend '
-                            'messages falling between the Note On and Note Off messages '
-                            'of any note.')
-        self.isSequential = True
+    name = 'Average Range Of Glissandos'
+    description = ('Average range of MIDI Pitch Bends, where "range" is '
+                   'defined as the greatest value of the absolute difference '
+                   'between 64 and the second data byte of all MIDI Pitch Bend '
+                   'messages falling between the Note On and Note Off messages '
+                   'of any note.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1711,15 +1498,10 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'P25'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Vibrato Prevalence'
-        self.description = ('Number of notes for which Pitch Bend messages change '
-                            'direction at least twice divided by total number of notes '
-                            'that have Pitch Bend messages associated with them.')
-        self.isSequential = True
+    name = 'Vibrato Prevalence'
+    description = ('Number of notes for which Pitch Bend messages change '
+                   'direction at least twice divided by total number of notes '
+                   'that have Pitch Bend messages associated with them.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1737,15 +1519,9 @@ class PrevalenceOfMicrotonesFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'P26'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream,
-                         **keywords)
-
-        self.name = 'Prevalence Of Microtones'
-        self.description = ('Number of Note Ons that are preceded by isolated MIDI Pitch '
-                            'Bend messages as a fraction of the total number of Note Ons.')
-        self.isSequential = True
+    name = 'Prevalence Of Microtones'
+    description = ('Number of Note Ons that are preceded by isolated MIDI Pitch '
+                   'Bend messages as a fraction of the total number of Note Ons.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1777,13 +1553,8 @@ class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R1'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Strongest Rhythmic Pulse'
-        self.description = 'Bin label of the beat bin with the highest frequency.'
-        self.isSequential = True
+    name = 'Strongest Rhythmic Pulse'
+    description = 'Bin label of the beat bin with the highest frequency.'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1812,14 +1583,9 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'R2'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Second Strongest Rhythmic Pulse'
-        self.description = ('Bin label of the beat bin of the peak '
-                            'with the second highest frequency.')
-        self.isSequential = True
+    name = 'Second Strongest Rhythmic Pulse'
+    description = ('Bin label of the beat bin of the peak '
+                   'with the second highest frequency.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1853,15 +1619,10 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
 
     '''
     id = 'R3'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Harmonicity of Two Strongest Rhythmic Pulses'
-        self.description = ('The bin label of the higher (in terms of bin label) of the '
-                            'two beat bins of the peaks with the highest frequency '
-                            'divided by the bin label of the lower.')
-        self.isSequential = True
+    name = 'Harmonicity of Two Strongest Rhythmic Pulses'
+    description = ('The bin label of the higher (in terms of bin label) of the '
+                   'two beat bins of the peaks with the highest frequency '
+                   'divided by the bin label of the lower.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1886,13 +1647,8 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     0.853...
     '''
     id = 'R4'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Strength of Strongest Rhythmic Pulse'
-        self.description = 'Frequency of the beat bin with the highest frequency.'
-        self.isSequential = True
+    name = 'Strength of Strongest Rhythmic Pulse'
+    description = 'Frequency of the beat bin with the highest frequency.'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1914,14 +1670,9 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(
     0.121...
     '''
     id = 'R5'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Strength of Second Strongest Rhythmic Pulse'
-        self.description = ('Frequency of the beat bin of the peak '
-                            'with the second highest frequency.')
-        self.isSequential = True
+    name = 'Strength of Second Strongest Rhythmic Pulse'
+    description = ('Frequency of the beat bin of the peak '
+                   'with the second highest frequency.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1951,15 +1702,10 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
 
     '''
     id = 'R6'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Strength Ratio of Two Strongest Rhythmic Pulses'
-        self.description = ('The frequency of the higher (in terms of frequency) of the two '
-                            'beat bins corresponding to the peaks with the highest '
-                            'frequency divided by the frequency of the lower.')
-        self.isSequential = True
+    name = 'Strength Ratio of Two Strongest Rhythmic Pulses'
+    description = ('The frequency of the higher (in terms of frequency) of the two '
+                   'beat bins corresponding to the peaks with the highest '
+                   'frequency divided by the frequency of the lower.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -1987,14 +1733,9 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
     0.975...
     '''
     id = 'R7'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Combined Strength of Two Strongest Rhythmic Pulses'
-        self.description = ('The sum of the frequencies of the two beat bins '
-                            'of the peaks with the highest frequencies.')
-        self.isSequential = True
+    name = 'Combined Strength of Two Strongest Rhythmic Pulses'
+    description = ('The sum of the frequencies of the two beat bins '
+                   'of the peaks with the highest frequencies.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2018,13 +1759,8 @@ class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'R8'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Number of Strong Pulses'
-        self.description = 'Number of beat peaks with normalized frequencies over 0.1.'
-        self.isSequential = True
+    name = 'Number of Strong Pulses'
+    description = 'Number of beat peaks with normalized frequencies over 0.1.'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2040,13 +1776,8 @@ class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
     Number of beat peaks with normalized frequencies over 0.01.
     '''
     id = 'R9'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Number of Moderate Pulses'
-        self.description = 'Number of beat peaks with normalized frequencies over 0.01.'
-        self.isSequential = True
+    name = 'Number of Moderate Pulses'
+    description = 'Number of beat peaks with normalized frequencies over 0.01.'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2063,14 +1794,9 @@ class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
     frequency of the bin with the highest frequency.
     '''
     id = 'R10'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Number of Relatively Strong Pulses'
-        self.description = ('Number of beat peaks with frequencies at least 30% as high as '
-                            'the frequency of the bin with the highest frequency.')
-        self.isSequential = True
+    name = 'Number of Relatively Strong Pulses'
+    description = ('Number of beat peaks with frequencies at least 30% as high as '
+                   'the frequency of the bin with the highest frequency.')
 
 
 class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
@@ -2083,17 +1809,12 @@ class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
     30% of the height of the peak.
     '''
     id = 'R11'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Rhythmic Looseness'
-        self.description = dedent('''
+    name = 'Rhythmic Looseness'
+    description = dedent('''
             Average width of beat histogram peaks (in beats per minute).
             Width is measured for all peaks with frequencies at least 30% as high as the
             highest peak, and is defined by the distance between the points on the peak in
             question that are 30% of the height of the peak.''')
-        self.isSequential = True
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2114,21 +1835,14 @@ class PolyrhythmsFeature(featuresModule.FeatureExtractor):
     over 30% of the highest frequency.
     '''
     id = 'R12'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        featuresModule.FeatureExtractor.__init__(self,
-                                                 dataOrStream=dataOrStream,
-                                                 **keywords)
-
-        self.name = 'Polyrhythms'
-        self.description = '''
+    name = 'Polyrhythms'
+    description = '''
         Number of beat peaks with frequencies at least 30% of the highest frequency
         whose bin labels are not integer multiples or factors
         (using only multipliers of 1, 2, 3, 4, 6 and 8) (with an accepted
         error of +/- 3 bins) of the bin label of the peak with the highest frequency.
         This number is then divided by the total number of beat bins with frequencies
         over 30% of the highest frequency.'''
-        self.isSequential = True
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2144,13 +1858,8 @@ class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
     Standard deviation of the bin values (except the first 40 empty ones).
     '''
     id = 'R13'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Rhythmic Variability'
-        self.description = 'Standard deviation of the bin values (except the first 40 empty ones).'
-        self.isSequential = True
+    name = 'Rhythmic Variability'
+    description = 'Standard deviation of the bin values (except the first 40 empty ones).'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2168,17 +1877,12 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'R14'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Beat Histogram'
-        self.description = ('A feature array with entries corresponding to the '
-                            'frequency values of each of the bins of the beat histogram '
-                            '(except the first 40 empty ones).')
-        self.isSequential = True
-        self.dimensions = 161
-        self.discrete = False
+    name = 'Beat Histogram'
+    description = ('A feature array with entries corresponding to the '
+                   'frequency values of each of the bins of the beat histogram '
+                   '(except the first 40 empty ones).')
+    dimensions = 161
+    discrete = False
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2202,13 +1906,8 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
     [7.244...]
     '''
     id = 'R15'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Note Density'
-        self.description = 'Average number of notes per second.'
-        self.isSequential = True
+    name = 'Note Density'
+    description = 'Average number of notes per second.'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2244,13 +1943,8 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R17'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Average Note Duration'
-        self.description = 'Average duration of notes in seconds.'
-        self.isSequential = True
+    name = 'Average Note Duration'
+    description = 'Average duration of notes in seconds.'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2285,13 +1979,8 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
     0.178...
     '''
     id = 'R18'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Variability of Note Duration'
-        self.description = 'Standard deviation of note durations in seconds.'
-        self.isSequential = True
+    name = 'Variability of Note Duration'
+    description = 'Standard deviation of note durations in seconds.'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2317,13 +2006,8 @@ class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R19'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Maximum Note Duration'
-        self.description = 'Duration of the longest note (in seconds).'
-        self.isSequential = True
+    name = 'Maximum Note Duration'
+    description = 'Duration of the longest note (in seconds).'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2349,13 +2033,8 @@ class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     [0.3125]
     '''
     id = 'R20'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Minimum Note Duration'
-        self.description = 'Duration of the shortest note (in seconds).'
-        self.isSequential = True
+    name = 'Minimum Note Duration'
+    description = 'Duration of the shortest note (in seconds).'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2384,14 +2063,9 @@ class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R21'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Staccato Incidence'
-        self.description = ('Number of notes with durations of less than a 10th '
-                            'of a second divided by the total number of notes in the recording.')
-        self.isSequential = True
+    name = 'Staccato Incidence'
+    description = ('Number of notes with durations of less than a 10th '
+                   'of a second divided by the total number of notes in the recording.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2420,13 +2094,8 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R22'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Average Time Between Attacks'
-        self.description = 'Average time in seconds between Note On events (regardless of channel).'
-        self.isSequential = True
+    name = 'Average Time Between Attacks'
+    description = 'Average time in seconds between Note On events (regardless of channel).'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2462,14 +2131,9 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R23'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Variability of Time Between Attacks'
-        self.description = ('Standard deviation of the times, in seconds, '
-                            'between Note On events (regardless of channel).')
-        self.isSequential = True
+    name = 'Variability of Time Between Attacks'
+    description = ('Standard deviation of the times, in seconds, '
+                   'between Note On events (regardless of channel).')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2507,14 +2171,9 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
     0.442...
     '''
     id = 'R24'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Average Time Between Attacks For Each Voice'
-        self.description = ('Average of average times in seconds between Note On events '
-                            'on individual channels that contain at least one note.')
-        self.isSequential = True
+    name = 'Average Time Between Attacks For Each Voice'
+    description = ('Average of average times in seconds between Note On events '
+                   'on individual channels that contain at least one note.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2566,15 +2225,10 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
     '''
 
     id = 'R25'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Average Variability of Time Between Attacks For Each Voice'
-        self.description = ('Average standard deviation, in seconds, of time between '
-                            'Note On events on individual channels that contain '
-                            'at least one note.')
-        self.isSequential = True
+    name = 'Average Variability of Time Between Attacks For Each Voice'
+    description = ('Average standard deviation, in seconds, of time between '
+                   'Note On events on individual channels that contain '
+                   'at least one note.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2686,13 +2340,8 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R30'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Initial Tempo'
-        self.description = 'Tempo in beats per minute at the start of the recording.'
-        self.isSequential = True
+    name = 'Initial Tempo'
+    description = 'Tempo in beats per minute at the start of the recording.'
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2724,17 +2373,12 @@ class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R31'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Initial Time Signature'
-        self.description = ('A feature array with two elements. '
-                            'The first is the numerator of the first occurring time signature '
-                            'and the second is the denominator of the first occurring time '
-                            'signature. Both are set to 0 if no time signature is present.')
-        self.isSequential = True
-        self.dimensions = 2
+    name = 'Initial Time Signature'
+    description = ('A feature array with two elements. '
+                   'The first is the numerator of the first occurring time signature '
+                   'and the second is the denominator of the first occurring time '
+                   'signature. Both are set to 0 if no time signature is present.')
+    dimensions = 2
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2774,16 +2418,11 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R32'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Compound Or Simple Meter'
-        self.description = ('Set to 1 if the initial meter is compound '
-                            '(numerator of time signature is greater than or equal to 6 '
-                            'and is evenly divisible by 3) and to 0 if it is simple '
-                            '(if the above condition is not fulfilled).')
-        self.isSequential = True
+    name = 'Compound Or Simple Meter'
+    description = ('Set to 1 if the initial meter is compound '
+                   '(numerator of time signature is greater than or equal to 6 '
+                   'and is evenly divisible by 3) and to 0 if it is simple '
+                   '(if the above condition is not fulfilled).')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2823,14 +2462,9 @@ class TripleMeterFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R33'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Triple Meter'
-        self.description = ('Set to 1 if numerator of initial time signature is 3, '
-                            'set to 0 otherwise.')
-        self.isSequential = True
+    name = 'Triple Meter'
+    description = ('Set to 1 if numerator of initial time signature is 3, '
+                   'set to 0 otherwise.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2865,14 +2499,9 @@ class QuintupleMeterFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'R34'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Quintuple Meter'
-        self.description = ('Set to 1 if numerator of initial time signature is 5, '
-                            'set to 0 otherwise.')
-        self.isSequential = True
+    name = 'Quintuple Meter'
+    description = ('Set to 1 if numerator of initial time signature is 5, '
+                   'set to 0 otherwise.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2907,14 +2536,9 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
     [0]
     '''
     id = 'R35'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Changes of Meter'
-        self.description = ('Set to 1 if the time signature is changed one or more '
-                            'times during the recording.')
-        self.isSequential = True
+    name = 'Changes of Meter'
+    description = ('Set to 1 if the time signature is changed one or more '
+                   'times during the recording.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2942,14 +2566,10 @@ class DurationFeature(featuresModule.FeatureExtractor):
     18.0
     '''
     id = 'R36'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Duration'
-        self.description = 'The total duration in seconds of the music.'
-        self.isSequential = False  # this is the only jSymbolic non seq feature
-        self.discrete = False
+    name = 'Duration'
+    description = 'The total duration in seconds of the music.'
+    isSequential = False  # this is the only jSymbolic non seq feature
+    discrete = False
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -2977,13 +2597,8 @@ class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
     TODO: implement
     '''
     id = 'D1'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Overall Dynamic Range'
-        self.description = 'The maximum loudness minus the minimum loudness value.'
-        self.isSequential = True
+    name = 'Overall Dynamic Range'
+    description = 'The maximum loudness minus the minimum loudness value.'
 
 
 class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
@@ -2996,13 +2611,8 @@ class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'D2'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Variation of Dynamics'
-        self.description = 'Standard deviation of loudness levels of all notes.'
-        self.isSequential = True
+    name = 'Variation of Dynamics'
+    description = 'Standard deviation of loudness levels of all notes.'
 
 
 class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
@@ -3016,14 +2626,9 @@ class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'D3'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Variation of Dynamics In Each Voice'
-        self.description = ('The average of the standard deviations of loudness '
-                            'levels within each channel that contains at least one note.')
-        self.isSequential = True
+    name = 'Variation of Dynamics In Each Voice'
+    description = ('The average of the standard deviations of loudness '
+                   'levels within each channel that contains at least one note.')
 
 
 class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
@@ -3038,14 +2643,9 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'D4'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Average Note To Note Dynamics Change'
-        self.description = ('Average change of loudness from one note to the next note '
-                            'in the same channel (in MIDI velocity units).')
-        self.isSequential = True
+    name = 'Average Note To Note Dynamics Change'
+    description = ('Average change of loudness from one note to the next note '
+                   'in the same channel (in MIDI velocity units).')
 
 
 # ------------------------------------------------------------------------------
@@ -3071,14 +2671,9 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'T1'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Maximum Number of Independent Voices'
-        self.description = ('Maximum number of different channels in which notes '
-                            'have sounded simultaneously. Here, Parts are treated as channels.')
-        self.isSequential = True
+    name = 'Maximum Number of Independent Voices'
+    description = ('Maximum number of different channels in which notes '
+                   'have sounded simultaneously. Here, Parts are treated as channels.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -3114,15 +2709,10 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     [3.90...]
     '''
     id = 'T2'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Average Number of Independent Voices'
-        self.description = ('Average number of different channels in which notes have '
-                            'sounded simultaneously. Rests are not included in this '
-                            'calculation. Here, Parts are treated as voices.')
-        self.isSequential = True
+    name = 'Average Number of Independent Voices'
+    description = ('Average number of different channels in which notes have '
+                   'sounded simultaneously. Rests are not included in this '
+                   'calculation. Here, Parts are treated as voices.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -3155,15 +2745,10 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
     [0.449...]
     '''
     id = 'T3'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Variability of Number of Independent Voices'
-        self.description = ('Standard deviation of number of different channels '
-                            'in which notes have sounded simultaneously. Rests are '
-                            'not included in this calculation.')
-        self.isSequential = True
+    name = 'Variability of Number of Independent Voices'
+    description = ('Standard deviation of number of different channels '
+                   'in which notes have sounded simultaneously. Rests are '
+                   'not included in this calculation.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -3194,14 +2779,9 @@ class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
     that contains at least one note.
     '''
     id = 'T4'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Voice Equality - Number of Notes'
-        self.description = ('Standard deviation of the total number of Note Ons '
-                            'in each channel that contains at least one note.')
-        self.isSequential = True
+    name = 'Voice Equality - Number of Notes'
+    description = ('Standard deviation of the total number of Note Ons '
+                   'in each channel that contains at least one note.')
 
 
 class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
@@ -3212,14 +2792,9 @@ class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'T5'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Voice Equality - Note Duration'
-        self.description = ('Standard deviation of the total duration of notes in seconds '
-                            'in each channel that contains at least one note.')
-        self.isSequential = True
+    name = 'Voice Equality - Note Duration'
+    description = ('Standard deviation of the total duration of notes in seconds '
+                   'in each channel that contains at least one note.')
 
 
 class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
@@ -3230,14 +2805,9 @@ class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'T6'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Voice Equality - Dynamics'
-        self.description = ('Standard deviation of the average volume of notes '
-                            'in each channel that contains at least one note.')
-        self.isSequential = True
+    name = 'Voice Equality - Dynamics'
+    description = ('Standard deviation of the average volume of notes '
+                   'in each channel that contains at least one note.')
 
 
 class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
@@ -3248,16 +2818,11 @@ class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'T7'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Voice Equality - Melodic Leaps'
-        self.description = dedent('''
+    name = 'Voice Equality - Melodic Leaps'
+    description = dedent('''
             Standard deviation
             of the average melodic leap in MIDI pitches
             for each channel that contains at least one note.''')
-        self.isSequential = True
 
 
 class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
@@ -3268,15 +2833,10 @@ class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
     pitches in each channel that contains at least one note.
     '''
     id = 'T8'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Voice Equality - Range'
-        self.description = dedent('''
+    name = 'Voice Equality - Range'
+    description = dedent('''
             Standard deviation of the differences between the
             highest and lowest pitches in each channel that contains at least one note.''')
-        self.isSequential = True
 
 
 class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
@@ -3286,16 +2846,11 @@ class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     TODO: implement
     '''
     id = 'T9'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Importance of Loudest Voice'
-        self.description = dedent('''
+    name = 'Importance of Loudest Voice'
+    description = dedent('''
             Difference between the average loudness
             of the loudest channel and the average loudness of the other channels
             that contain at least one note.''')
-        self.isSequential = True
 
 
 class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
@@ -3305,16 +2860,11 @@ class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     TODO: implement
     '''
     id = 'T10'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Relative Range of Loudest Voice'
-        self.description = dedent('''
+    name = 'Relative Range of Loudest Voice'
+    description = dedent('''
             Difference between the highest note and the lowest note
             played in the channel with the highest average loudness divided by the difference
             between the highest note and the lowest note overall in the piece.''')
-        self.isSequential = True
 
 
 class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
@@ -3324,16 +2874,11 @@ class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
     TODO: implement
     '''
     id = 'T12'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Range of Highest Line'
-        self.description = dedent('''
+    name = 'Range of Highest Line'
+    description = dedent('''
             Difference between the highest note and the lowest note
             played in the channel with the highest average pitch divided by the difference
             between the highest note and the lowest note in the piece.''')
-        self.isSequential = True
 
 
 class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
@@ -3344,16 +2889,11 @@ class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'T13'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Relative Note Density of Highest Line'
-        self.description = dedent('''
+    name = 'Relative Note Density of Highest Line'
+    description = dedent('''
             Number of Note Ons in the channel with the highest average
             pitch divided by the average number of Note Ons in all channels that contain at
             least one note.''')
-        self.isSequential = True
 
 
 class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
@@ -3363,16 +2903,11 @@ class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
     TODO: implement
     '''
     id = 'T15'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Melodic Intervals in Lowest Line'
-        self.description = dedent('''
+    name = 'Melodic Intervals in Lowest Line'
+    description = dedent('''
             Average melodic interval in semitones of the channel
             with the lowest average pitch divided by the average melodic interval of all
             channels that contain at least two notes.''')
-        self.isSequential = True
 
 
 class VoiceSeparationFeature(featuresModule.FeatureExtractor):
@@ -3383,16 +2918,11 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
     channels (after sorting based/non-average pitch) that contain at least one note.
     '''
     id = 'T20'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Voice Separation'
-        self.description = dedent('''
+    name = 'Voice Separation'
+    description = dedent('''
             Average separation in semi-tones between the average pitches of
             consecutive channels (after sorting based/non average pitch) that contain at
             least one note.''')
-        self.isSequential = True
 
 
 # ------------------------------------------------------------------------------
@@ -3434,18 +2964,13 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     <music21.instrument.Instrument ''> lacks a midiProgram
     '''
     id = 'I1'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Pitched Instruments Present'
-        self.description = dedent('''
+    name = 'Pitched Instruments Present'
+    description = dedent('''
             Which pitched General MIDI Instruments are present.
             There is one entry for each instrument, which is set to 1.0 if there is at
             least one Note On in the recording corresponding to the instrument and to
             0.0 if there is not.''')
-        self.isSequential = True
-        self.dimensions = 128
+    dimensions = 128
 
     def process(self) -> None:
         '''
@@ -3483,19 +3008,14 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     # values in for events on midi program channel 10
 
     id = 'I2'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Unpitched Instruments Present'
-        self.description = dedent('''
+    name = 'Unpitched Instruments Present'
+    description = dedent('''
             Which unpitched MIDI Percussion Key Map instruments are present.
             There is one entry for each instrument, which is set to 1.0 if there is at least one
             Note On in the recording corresponding to the instrument and to 0.0 if there is not.
             It should be noted that only instruments 35 to 81 are included here, as they are the
             ones that meet the official standard. They are numbered in this array from 0 to 46.''')
-        self.isSequential = True
-        self.dimensions = 47
+    dimensions = 47
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -3532,18 +3052,13 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
     music21.features.jSymbolic.JSymbolicFeatureException: Acoustic Guitar lacks a midiProgram
     '''
     id = 'I3'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Note Prevalence of Pitched Instruments'
-        self.description = ('The fraction of (pitched) notes played by each '
-                            'General MIDI Instrument. There is one entry for '
-                            'each instrument, which is set to the number of '
-                            'Note Ons played using the corresponding MIDI patch '
-                            'divided by the total number of Note Ons in the recording.')
-        self.isSequential = True
-        self.dimensions = 128
+    name = 'Note Prevalence of Pitched Instruments'
+    description = ('The fraction of (pitched) notes played by each '
+                   'General MIDI Instrument. There is one entry for '
+                   'each instrument, which is set to the number of '
+                   'Note Ons played using the corresponding MIDI patch '
+                   'divided by the total number of Note Ons in the recording.')
+    dimensions = 128
 
     def process(self) -> None:
         '''
@@ -3577,20 +3092,15 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
 
     '''
     id = 'I4'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Note Prevalence of Unpitched Instruments'
-        self.description = dedent('''
+    name = 'Note Prevalence of Unpitched Instruments'
+    description = dedent('''
             The fraction of (unpitched) notes played by each General MIDI
             Percussion Key Map Instrument. There is one entry for each instrument, which is set
             to the number of Note Ons played using the corresponding MIDI note value divided by
             the total number of Note Ons in the recording. It should be noted that only instruments
             35 to 81 are included here, as they are the ones that meet the official standard.
             They are numbered in this array from 0 to 46.''')
-        self.isSequential = True
-        self.dimensions = 47
+    dimensions = 47
 
     # TODO: need to find events in channel 10.
 
@@ -3611,18 +3121,13 @@ class TimePrevalenceOfPitchedInstrumentsFeature(
 
     '''
     id = 'I5'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Time Prevalence of Pitched Instruments'
-        self.description = ('The fraction of the total time of the recording in which a note '
-                            'was sounding for each (pitched) General MIDI Instrument. '
-                            'There is one entry for each instrument, which is set to the total '
-                            'time in seconds during which a given instrument was sounding one '
-                            'or more notes divided by the total length in seconds of the piece.')
-        self.isSequential = True
-        self.dimensions = 128
+    name = 'Time Prevalence of Pitched Instruments'
+    description = ('The fraction of the total time of the recording in which a note '
+                   'was sounding for each (pitched) General MIDI Instrument. '
+                   'There is one entry for each instrument, which is set to the total '
+                   'time in seconds during which a given instrument was sounding one '
+                   'or more notes divided by the total length in seconds of the piece.')
+    dimensions = 128
     # TODO: this can be done by symbolic duration in native.py
 
 
@@ -3644,15 +3149,10 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
 
     '''
     id = 'I6'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Variability of Note Prevalence of Pitched Instruments'
-        self.description = ('Standard deviation of the fraction of Note Ons played '
-                            'by each (pitched) General MIDI instrument that is '
-                            'used to play at least one note.')
-        self.isSequential = True
+    name = 'Variability of Note Prevalence of Pitched Instruments'
+    description = ('Standard deviation of the fraction of Note Ons played '
+                   'by each (pitched) General MIDI instrument that is '
+                   'used to play at least one note.')
 
     def process(self) -> None:
         if self.data is None or self.feature is None:  # pragma: no cover
@@ -3693,17 +3193,12 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
 
     '''
     id = 'I7'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Variability of Note Prevalence of Unpitched Instruments'
-        self.description = (
-            'Standard deviation of the fraction of Note Ons played by each (unpitched) '
-            'MIDI Percussion Key Map instrument that is used to play at least one note. '
-            'It should be noted that only instruments 35 to 81 are included here, '
-            'as they are the ones that are included in the official standard.')
-        self.isSequential = True
+    name = 'Variability of Note Prevalence of Unpitched Instruments'
+    description = (
+        'Standard deviation of the fraction of Note Ons played by each (unpitched) '
+        'MIDI Percussion Key Map instrument that is used to play at least one note. '
+        'It should be noted that only instruments 35 to 81 are included here, '
+        'as they are the ones that are included in the official standard.')
 
 
 class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
@@ -3721,14 +3216,9 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'I8'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Number of Pitched Instruments'
-        self.description = ('Total number of General MIDI patches that are used to '
-                            'play at least one note.')
-        self.isSequential = True
+    name = 'Number of Pitched Instruments'
+    description = ('Total number of General MIDI patches that are used to '
+                   'play at least one note.')
 
     def process(self) -> None:
         '''
@@ -3759,16 +3249,11 @@ class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'I9'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Number of Unpitched Instruments'
-        self.description = ('Number of distinct MIDI Percussion Key Map patches that were '
-                            'used to play at least one note. It should be noted that only '
-                            'instruments 35 to 81 are included here, as they are the ones '
-                            'that are included in the official standard.')
-        self.isSequential = True
+    name = 'Number of Unpitched Instruments'
+    description = ('Number of distinct MIDI Percussion Key Map patches that were '
+                   'used to play at least one note. It should be noted that only '
+                   'instruments 35 to 81 are included here, as they are the ones '
+                   'that are included in the official standard.')
 
 
 class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
@@ -3780,14 +3265,9 @@ class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
 
     id = 'I10'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Percussion Prevalence'
-        self.description = ('Total number of Note Ons corresponding to unpitched percussion '
-                            'instruments divided by total number of Note Ons in the recording.')
-        self.isSequential = True
+    name = 'Percussion Prevalence'
+    description = ('Total number of Note Ons corresponding to unpitched percussion '
+                   'instruments divided by total number of Note Ons in the recording.')
 
 
 class InstrumentFractionFeature(featuresModule.FeatureExtractor):
@@ -3797,12 +3277,7 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
     This subclass is in-turn subclassed by all FeatureExtractors that
     look at the proportional usage of an Instrument
     '''
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        # subclasses must define
-        self._targetPrograms: Sequence[int] = []
+    _targetPrograms: Sequence[int] = []
 
     def process(self) -> None:
         '''
@@ -3840,16 +3315,10 @@ class StringKeyboardFractionFeature(InstrumentFractionFeature):
     '''
 
     id = 'I11'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'String Keyboard Fraction'
-        self.description = ('Fraction of all Note Ons belonging to string keyboard patches '
-                            '(General MIDI patches 1 to 8).')
-        self.isSequential = True
-
-        self._targetPrograms = range(8)
+    name = 'String Keyboard Fraction'
+    description = ('Fraction of all Note Ons belonging to string keyboard patches '
+                   '(General MIDI patches 1 to 8).')
+    _targetPrograms = range(8)
 
 
 class AcousticGuitarFractionFeature(InstrumentFractionFeature):
@@ -3868,16 +3337,10 @@ class AcousticGuitarFractionFeature(InstrumentFractionFeature):
     '''
 
     id = 'I12'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Acoustic Guitar Fraction'
-        self.description = ('Fraction of all Note Ons belonging to acoustic guitar patches '
-                            '(General MIDI patches 25 and 26).')
-        self.isSequential = True
-
-        self._targetPrograms = [24, 25]
+    name = 'Acoustic Guitar Fraction'
+    description = ('Fraction of all Note Ons belonging to acoustic guitar patches '
+                   '(General MIDI patches 25 and 26).')
+    _targetPrograms = [24, 25]
 
 
 class ElectricGuitarFractionFeature(InstrumentFractionFeature):
@@ -3893,16 +3356,10 @@ class ElectricGuitarFractionFeature(InstrumentFractionFeature):
     '''
 
     id = 'I13'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Electric Guitar Fraction'
-        self.description = ('Fraction of all Note Ons belonging to '
-                            'electric guitar patches (General MIDI patches 27 to 32).')
-        self.isSequential = True
-
-        self._targetPrograms = list(range(26, 32))
+    name = 'Electric Guitar Fraction'
+    description = ('Fraction of all Note Ons belonging to '
+                   'electric guitar patches (General MIDI patches 27 to 32).')
+    _targetPrograms = list(range(26, 32))
 
 
 class ViolinFractionFeature(InstrumentFractionFeature):
@@ -3921,16 +3378,10 @@ class ViolinFractionFeature(InstrumentFractionFeature):
     '''
 
     id = 'I14'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Violin Fraction'
-        self.description = ('Fraction of all Note Ons belonging to violin patches '
-                            '(General MIDI patches 41 or 111).')
-        self.isSequential = True
-
-        self._targetPrograms = [40, 110]
+    name = 'Violin Fraction'
+    description = ('Fraction of all Note Ons belonging to violin patches '
+                   '(General MIDI patches 41 or 111).')
+    _targetPrograms = [40, 110]
 
 
 class SaxophoneFractionFeature(InstrumentFractionFeature):
@@ -3949,16 +3400,10 @@ class SaxophoneFractionFeature(InstrumentFractionFeature):
     0.6
     '''
     id = 'I15'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Saxophone Fraction'
-        self.description = ('Fraction of all Note Ons belonging to saxophone patches '
-                            '(General MIDI patches 65 through 68).')
-        self.isSequential = True
-
-        self._targetPrograms = [64, 65, 66, 67]
+    name = 'Saxophone Fraction'
+    description = ('Fraction of all Note Ons belonging to saxophone patches '
+                   '(General MIDI patches 65 through 68).')
+    _targetPrograms = [64, 65, 66, 67]
 
 
 class BrassFractionFeature(InstrumentFractionFeature):
@@ -3979,16 +3424,10 @@ class BrassFractionFeature(InstrumentFractionFeature):
     '''
 
     id = 'I16'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Brass Fraction'
-        self.description = ('Fraction of all Note Ons belonging to brass patches '
-                            '(General MIDI patches 57 through 68).')  # note: incorrect
-        self.isSequential = True
-
-        self._targetPrograms = list(range(56, 62))
+    name = 'Brass Fraction'
+    description = ('Fraction of all Note Ons belonging to brass patches '
+                   '(General MIDI patches 57 through 68).')  # note: incorrect
+    _targetPrograms = list(range(56, 62))
 
 
 class WoodwindsFractionFeature(InstrumentFractionFeature):
@@ -4009,16 +3448,10 @@ class WoodwindsFractionFeature(InstrumentFractionFeature):
     '''
 
     id = 'I17'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Woodwinds Fraction'
-        self.description = ('Fraction of all Note Ons belonging to woodwind patches '
-                            '(General MIDI patches 69 through 76).')
-        self.isSequential = True
-
-        self._targetPrograms = list(range(68, 80))  # include ocarina!
+    name = 'Woodwinds Fraction'
+    description = ('Fraction of all Note Ons belonging to woodwind patches '
+                   '(General MIDI patches 69 through 76).')
+    _targetPrograms = list(range(68, 80))  # include ocarina!
 
 
 class OrchestralStringsFractionFeature(InstrumentFractionFeature):
@@ -4037,16 +3470,10 @@ class OrchestralStringsFractionFeature(InstrumentFractionFeature):
     '''
 
     id = 'I18'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Orchestral Strings Fraction'
-        self.description = ('Fraction of all Note Ons belonging to orchestral strings patches '
-                            '(General MIDI patches 41 or 47).')
-        self.isSequential = True
-
-        self._targetPrograms = list(range(41, 46))
+    name = 'Orchestral Strings Fraction'
+    description = ('Fraction of all Note Ons belonging to orchestral strings patches '
+                   '(General MIDI patches 41 or 47).')
+    _targetPrograms = list(range(41, 46))
 
 
 class StringEnsembleFractionFeature(InstrumentFractionFeature):
@@ -4059,16 +3486,10 @@ class StringEnsembleFractionFeature(InstrumentFractionFeature):
     # TODO: add tests, do not yet have instrument to model
 
     id = 'I19'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'String Ensemble Fraction'
-        self.description = ('Fraction of all Note Ons belonging to string ensemble patches '
-                            '(General MIDI patches 49 to 52).')
-        self.isSequential = True
-
-        self._targetPrograms = [48, 49, 50, 51]
+    name = 'String Ensemble Fraction'
+    description = ('Fraction of all Note Ons belonging to string ensemble patches '
+                   '(General MIDI patches 49 to 52).')
+    _targetPrograms = [48, 49, 50, 51]
 
 
 class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
@@ -4086,17 +3507,11 @@ class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
     0.8
     '''
     id = 'I20'
-
-    def __init__(self, dataOrStream=None, **keywords) -> None:
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Electric Instrument Fraction'
-        self.description = ('Fraction of all Note Ons belonging to electric instrument patches '
-                            '(General MIDI patches 5, 6, 17, 19, 27 to 32 or 34 to 40).')
-        self.isSequential = True
-
-        self._targetPrograms = [4, 5, 16, 18, 26, 27, 28, 29,
-                                30, 31, 33, 34, 35, 36, 37, 38, 39]  # accept synth bass
+    name = 'Electric Instrument Fraction'
+    description = ('Fraction of all Note Ons belonging to electric instrument patches '
+                   '(General MIDI patches 5, 6, 17, 19, 27 to 32 or 34 to 40).')
+    _targetPrograms = [4, 5, 16, 18, 26, 27, 28, 29,
+                       30, 31, 33, 34, 35, 36, 37, 38, 39]  # accept synth bass
 
 
 # -----------------------------------------------------------------------------
