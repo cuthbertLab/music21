@@ -85,7 +85,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         # write recording to disk
         data = b''.join(storedWaveSampleList)
         try:
-            # wave.open does not take a path-like object as of 3.12
+            # wave.open does not take a path-like object until Python 3.15
             wf = wave.open(waveFilename, 'wb')
             wf.setnchannels(recordChannels)
             wf.setsampwidth(p_audio.get_sample_size(recordFormat))

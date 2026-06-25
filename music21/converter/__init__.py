@@ -244,7 +244,7 @@ class ArchiveManager:
                 # this was f.open(subFp, 'rU') for universal newline support
                 # but that was removed in Python 3.6 and while it is supposed
                 # to be fixed with io.TextIOWrapper, there are no docs that
-                # show how to do so.  -- hopefully fixed
+                # show how to do so.  -- hopefully fixed -- no problems for years, maybe okay.
                 try:
                     with f.open(subFp, 'r') as zipOpen:
                         lines = list(io.TextIOWrapper(zipOpen, newline=None))
