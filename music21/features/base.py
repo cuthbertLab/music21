@@ -1076,7 +1076,7 @@ class DataSet:
     def _getOutputFormat(self, featureFormat: str) -> outputFormats.OutputFormat|None:
         from music21.features import outputFormats
         outputFormat: outputFormats.OutputFormat
-        if featureFormat.lower() in ['tab', 'orange', 'taborange', None]:
+        if featureFormat.lower() in ['tab', 'orange', 'taborange']:
             outputFormat = outputFormats.OutputTabOrange(dataSet=self)
         elif featureFormat.lower() in ['csv', 'comma']:
             outputFormat = outputFormats.OutputCSV(dataSet=self)
@@ -1202,10 +1202,12 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')) -> list[type[Featu
     >>> [x.id for x in features.extractorsById(['p19', 'p20'])]
     ['P19', 'P20']
 
-    Normalizes case:
+    Normalizes case, and strips hyphens and spaces from the given ids:
 
     >>> [x.id for x in features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2'])]
     ['R31', 'R32', 'R33', 'R34', 'R35', 'P1', 'P2']
+    >>> [x.id for x in features.extractorsById(['p-20', 'p 21'])]
+    ['P20', 'P21']
 
     Get all feature extractors from all libraries:
 
@@ -1233,8 +1235,7 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')) -> list[type[Featu
     flatIds: list[str] = []
     for featureId in idOrList:
         featureId = featureId.strip().lower()
-        featureId.replace('-', '')
-        featureId.replace(' ', '')
+        featureId = featureId.replace('-', '').replace(' ', '')
         flatIds.append(featureId)
 
     post: list[type[FeatureExtractor]] = []
