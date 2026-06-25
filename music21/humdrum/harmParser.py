@@ -37,7 +37,8 @@ def convertHarmToRoman(harmStr: str) -> str|None:
     >>> [convertHarmToRoman(x) for x in diatonicTriads]
     ['I', 'V64', 'I6', 'ii6', 'V', 'viio6', 'vi6']
 
-    A few seventh-chord inversions.
+    A few seventh-chord inversions:
+
     >>> diatonicSevenths = ['V7', 'viio7c', 'V7d', 'viio7b', 'V7c']
     >>> [convertHarmToRoman(x) for x in diatonicSevenths]
     ['V7', 'viio43', 'V2', 'viio65', 'V43']

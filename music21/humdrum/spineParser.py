@@ -27,8 +27,7 @@ SpineParsing consists of several steps.
     Protospines that separate become new Protospines with their parentSpine indicated.  Protospines
     that merge again are then followed by the same Protospine as before.  This will cause problems
     if a voice re-merges with another staff, but in practice I have not
-    seen a .krn file that does this, and it
-    should be avoided in any case.
+    seen a .krn file that does this, and it should be avoided in any case.
 * HumdrumSpines are reclassed according to their exclusive definition.
     :samp:`**kern` becomes KernSpines, etc.
 * All reclassed HumdrumSpines are filled with music21 objects in their .stream property.
@@ -415,7 +414,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         >>> print(eList[0].value)
         Beethoven, Ludwig van
 
-        Print line number 4 (which is eList[3] zero-indexed)
+        Print line number 4 (which is eList[3] in Python's zero-indexed format)
 
         >>> print(eList[3].spineData)
         ['C4', 'pp']

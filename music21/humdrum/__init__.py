@@ -19,8 +19,8 @@ Humdrum programs and their closest music21 equivalents:
 ============  =================================================  =========================================================================================================================================================================
 Humdrum       music21                                            notes
 ============  =================================================  =========================================================================================================================================================================
-assemble_     Not needed                                         Use python commands to unite objects and `s.insert(0, p)` to put a part at the beginning of a multipart score.
-census_       Not needed                                         Use python to create census equivalents.
+assemble_     Not needed                                         Use Python commands to unite objects and `s.insert(0, p)` to put a part at the beginning of a multipart score.
+census_       Not needed                                         Use Python to create census equivalents.
 cents_        `interval.ChromaticInterval.cents`
 cleave_       Not needed                                         kern specific, not needed
 context_      Not needed                                         Use object.next and object.prev to get some context for many objects and :meth:`~music21.base.Music21Object.getContextByClass` to find the most recent object of a given type
@@ -30,7 +30,7 @@ degree_       see above for "`deg`"
 diss_         Spectral analysis.  Out of scope for m21.          Would be "analysis.kkdiss" for Kameoka and Kuriyagawa.
 ditto_        see Notes                                          :meth:`~music21.stream.Stream.chordify` and the offsetTree objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object.
 encode_       `midi.(severaltools)`                              Multifunction Humdrum program.  See the midi directory for some replacements.  Or for simple conversion, `converter.parse` and `show('midi')` do this automatically.
-extract_      Not needed                                         Use python commands to extract objects with certain properties.
+extract_      Not needed                                         Use Python commands to extract objects with certain properties.
 fields_       Not needed
 fin2hum_      `music21.converter.parse` (filename)               Enigma Transport Format did not take off and is rarely used. Software to convert Enigma to MusicXML is available from Recordare.
 freq_         see :meth:`~music21.pitch.Pitch.frequency`
@@ -39,7 +39,7 @@ hum2fin_      `.write('musicxml')`                               Writes to Music
 humdrum_      Not needed                                         The `spineParser` will report errors when parsing.
 humsed_       Not needed
 humver_       Not needed
-infot_        Not needed                                         Use general purpose python information theory models.
+infot_        Not needed                                         Use general purpose Python information theory models.
 iv_           :meth:`~music21.chord.Chord.intervalVector`
 kern_         None                                               Output to Humdrum is not currently supported
 key_          :meth:`~music21.stream.Stream.analyze` ('key')
