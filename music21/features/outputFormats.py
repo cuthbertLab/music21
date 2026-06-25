@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pathlib
 import typing as t
+import unittest
 
 from music21 import environment
 from music21 import exceptions21
@@ -270,6 +271,38 @@ class OutputARFF(OutputFormat):
                 sub.append(str(e))
             msg.append(','.join(sub))
         return lineBreak.join(msg)
+
+
+class Test(unittest.TestCase):
+
+    def testARFFNumericClassValues(self):
+        '''
+        Regression test: numeric (non-string) class values must not crash
+        ARFF header generation. Previously the class declaration was built
+        with ','.join(values), which raised a TypeError when the class
+        values were ints or floats rather than strings.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import converter
+        from music21 import features
+
+        ds = features.DataSet(classLabel='Meter')
+        ds.addFeatureExtractors(features.extractorsById(['r31']))
+        s1 = converter.parse('tinynotation: 4/4 c4 d e f')
+        s2 = converter.parse('tinynotation: 3/4 c4 d e')
+        # integer class values, not strings
+        ds.addMultipleData([s1, s2], classValues=[3, 4])
+        ds.process()
+
+        self.assertEqual(ds.getUniqueClassValues(), [3, 4])
+
+        of = features.outputFormats.OutputARFF(dataSet=ds)
+        classLines = [line for line in of.getHeaderLines()
+                      if line.startswith('@ATTRIBUTE class')]
+        self.assertEqual(classLines, ['@ATTRIBUTE class {3,4}'])
+        # building the full string must not raise either
+        self.assertIn('@ATTRIBUTE class {3,4}', of.getString())
 
 
 if __name__ == '__main__':
