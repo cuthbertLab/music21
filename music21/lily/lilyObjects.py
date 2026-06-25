@@ -204,7 +204,7 @@ class LyObject(prebase.ProtoM21Object):
 
     def _reprInternal(self) -> str:
         msg = str(self)
-        msg.replace('\n', '  ')
+        msg = msg.replace('\n', '  ')
         if len(msg) >= 13:
             msg = msg[:10] + '...'
         return msg
