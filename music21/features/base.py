@@ -11,7 +11,7 @@
 from __future__ import annotations
 
 from collections import Counter
-from collections.abc import Collection, Iterable, KeysView
+from collections.abc import Collection, Iterable, KeysView, Sequence
 import os
 import pathlib
 import pickle
@@ -31,13 +31,21 @@ from music21 import pitch
 from music21 import stream
 from music21 import text
 
-from music21.metadata.bundles import MetadataEntry
+from music21.metadata.bundles import MetadataBundle, MetadataEntry
 
 if t.TYPE_CHECKING:
     from music21.features import outputFormats
     from music21.stream.base import SecondsMapEntry
 
 environLocal = environment.Environment('features.base')
+
+# A Stream or a path/reference that can be parsed into one.
+type StreamOrPath = stream.Stream|MetadataEntry|str|pathlib.Path
+# A single datum that a DataSet/DataInstance can ingest.
+type DataSource = StreamOrPath|DataInstance
+# A class value or id: either a fixed value or a pickleable function of the
+# parsed Stream that produces one (evaluated lazily after parsing).
+type ValueOrFunction = str|t.Callable[[stream.Stream], t.Any]
 # ------------------------------------------------------------------------------
 
 
@@ -559,7 +567,8 @@ class DataInstance:
     '''
     # pylint: disable=redefined-builtin
     # noinspection PyShadowingBuiltins
-    def __init__(self, streamOrPath=None, id=None) -> None:
+    def __init__(self, streamOrPath: StreamOrPath|None = None,
+                 id: ValueOrFunction|None = None) -> None:
         self.stream: stream.Stream|None
         if isinstance(streamOrPath, stream.Stream):
             self.stream = streamOrPath
@@ -637,7 +646,7 @@ class DataInstance:
         for v in self.stream[stream.Voice]:
             self.formsByPart.append(StreamForms(v))
 
-    def setClassLabel(self, classLabel: str, classValue=None) -> None:
+    def setClassLabel(self, classLabel: str, classValue: ValueOrFunction|None = None) -> None:
         '''
         Set the class label, as well as the class value if known.
         The class label is the attribute name used to define the class of this data instance.
@@ -879,13 +888,18 @@ class DataSet:
             post.append(True)
         return post
 
-    def addMultipleData(self, dataList, classValues, ids=None) -> None:
+    def addMultipleData(
+        self,
+        dataList: Sequence[DataSource]|MetadataBundle,
+        classValues: Sequence[str]|t.Callable[[stream.Stream], t.Any],
+        ids: Sequence[ValueOrFunction|None]|t.Callable[[stream.Stream], str]|None = None,
+    ) -> None:
         '''
         Add multiple data points at the same time.
 
-        Requires an iterable (including MetadataBundle) for dataList holding
-        types that can be passed to addData, and an equally sized list of dataValues
-        and an equally sized list of ids (or None)
+        Requires a sequence (including MetadataBundle) for dataList holding
+        types that can be passed to addData, an equally sized sequence of
+        classValues, and an equally sized sequence of ids (or None).
 
         classValues can also be a pickleable function that will be called on
         each instance after parsing, as can ids.
@@ -900,35 +914,38 @@ class DataSet:
             raise DataSetException(
                 'If ids is not a function or None, it must have the same length as dataList')
 
+        classValueList: Sequence[ValueOrFunction|None]
         if callable(classValues):
             try:
                 pickle.dumps(classValues)
             except pickle.PicklingError:
                 raise DataSetException('classValues if a function must be pickleable. '
                                        + 'Lambda and some other functions are not.')
+            classValueList = [classValues] * len(dataList)
+        else:
+            classValueList = classValues
 
-            classValues = [classValues] * len(dataList)
-
+        idList: Sequence[ValueOrFunction|None]
         if callable(ids):
             try:
                 pickle.dumps(ids)
             except pickle.PicklingError:
                 raise DataSetException('ids if a function must be pickleable. '
                                        + 'Lambda and some other functions are not.')
-
-            ids = [ids] * len(dataList)
+            idList = [ids] * len(dataList)
         elif ids is None:
-            ids = [None] * len(dataList)
+            idList = [None] * len(dataList)
+        else:
+            idList = ids
 
         for i in range(len(dataList)):
-            d = dataList[i]
-            cv = classValues[i]
-            thisId = ids[i]
-            self.addData(d, cv, thisId)
+            self.addData(dataList[i], classValueList[i], idList[i])
 
     # pylint: disable=redefined-builtin
     # noinspection PyShadowingBuiltins
-    def addData(self, dataOrStreamOrPath, classValue=None, id=None) -> None:
+    def addData(self, dataOrStreamOrPath: DataSource,
+                classValue: ValueOrFunction|None = None,
+                id: ValueOrFunction|None = None) -> None:
         '''
         Add a Stream, DataInstance, MetadataEntry, or path (Posix or str)
         to a corpus or local file to this data set.
@@ -940,15 +957,9 @@ class DataSet:
             raise DataSetException(
                 'cannot add data unless a class label for this DataSet has been set.')
 
-        s = None
         if isinstance(dataOrStreamOrPath, DataInstance):
             di = dataOrStreamOrPath
-            s = di.stream
-            if s is None:
-                s = di.streamPath
         else:
-            # all else are stored directly
-            s = dataOrStreamOrPath
             di = DataInstance(dataOrStreamOrPath, id=id)
 
         di.setClassLabel(self._classLabel, classValue)
