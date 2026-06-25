@@ -502,27 +502,27 @@ class Test(unittest.TestCase):
         t4 = tie.Tie()
         t5 = tie.Tie()
 
-        c1.setTie(t3, c1.pitches[0])
-        c1.setTie(t4, c1.pitches[1])
-        c1.setTie(t5, c1.pitches[2])
+        c1[0].tie = t3
+        c1[1].tie = t4
+        c1[2].tie = t5
 
-        self.assertEqual(id(c1.getTie(c1.pitches[0])), id(t3))
-        self.assertEqual(id(c1.getTie(c1.pitches[1])), id(t4))
-        self.assertEqual(id(c1.getTie(c1.pitches[2])), id(t5))
+        self.assertEqual(id(c1[0].tie), id(t3))
+        self.assertEqual(id(c1[1].tie), id(t4))
+        self.assertEqual(id(c1[2].tie), id(t5))
 
         s = converter.parse(testPrimitive.chordIndependentTies)
         chords = s.flatten().getElementsByClass(chord.Chord)
         # the middle pitch should have a tie
-        self.assertEqual(chords[0].getTie(pitch.Pitch('a4')).type, 'start')
-        self.assertEqual(chords[0].getTie(pitch.Pitch('c5')), None)
-        self.assertEqual(chords[0].getTie(pitch.Pitch('f4')), None)
+        self.assertEqual(chords[0]['A4'].tie.type, 'start')
+        self.assertEqual(chords[0]['C5'].tie, None)
+        self.assertEqual(chords[0]['F4'].tie, None)
 
-        self.assertEqual(chords[1].getTie(pitch.Pitch('a4')).type, 'continue')
-        self.assertEqual(chords[1].getTie(pitch.Pitch('g5')), None)
+        self.assertEqual(chords[1]['a4'].tie.type, 'continue')
+        self.assertEqual(chords[1]['g5'].tie, None)
 
-        self.assertEqual(chords[2].getTie(pitch.Pitch('a4')).type, 'continue')
-        self.assertEqual(chords[2].getTie(pitch.Pitch('f4')).type, 'start')
-        self.assertEqual(chords[2].getTie(pitch.Pitch('c5')), None)
+        self.assertEqual(chords[2]['a4'].tie.type, 'continue')
+        self.assertEqual(chords[2]['f4'].tie.type, 'start')
+        self.assertEqual(chords[2]['c5'].tie, None)
 
         # s.show()
         GEX = m21ToXml.GeneralObjectExporter()
@@ -543,14 +543,14 @@ class Test(unittest.TestCase):
             tiePos = list(range(i + 1))  # py3 = list
             c = sc.getChord('c4', 'c5', quarterLength=1)
             for pos in tiePos:
-                c.setTie(tie.Tie('start'), c.pitches[pos])
+                c[pos].tie = tie.Tie('start')
             s.append(c)
         # s.show()
 
     def testTiesC(self):
         c2 = Chord(['D4', 'D4'])
         secondD4 = c2.pitches[1]
-        c2.setTie('start', secondD4)
+        c2[secondD4].tie = tie.Tie('start')
         self.assertIsNone(c2._notes[0].tie)
         self.assertEqual(c2._notes[1].tie.type, 'start')
 
@@ -674,33 +674,30 @@ class Test(unittest.TestCase):
 
     def testGetItemA(self):
         c = Chord(['c4', 'd-4', 'g4'])
+        # an integer index returns the live component Note
         self.assertEqual(str(c[0].pitch), 'C4')
         self.assertEqual(str(c[1].pitch), 'D-4')
         self.assertEqual(str(c[2].pitch), 'G4')
-        self.assertEqual(str(c['0.pitch']), 'C4')
-        self.assertEqual(str(c['1.pitch']), 'D-4')
-        self.assertEqual(str(c['2.pitch']), 'G4')
-        # cannot do this, as this provides raw access
-        # self.assertEqual(str(c[0]['volume']), 'C4')
-        self.assertEqual(str(c['0.volume']), '<music21.volume.Volume realized=0.71>')
-        self.assertEqual(str(c['1.volume']), '<music21.volume.Volume realized=0.71>')
-        self.assertEqual(str(c['1.volume']), '<music21.volume.Volume realized=0.71>')
-        c['0.volume'].velocity = 20
-        c['1.volume'].velocity = 80
-        c['2.volume'].velocity = 120
-        self.assertEqual(c['0.volume'].velocity, 20)
-        self.assertEqual(c['1.volume'].velocity, 80)
-        self.assertEqual(c['2.volume'].velocity, 120)
-        self.assertEqual([x.volume.velocity for x in c], [20, 80, 120])
-        cCopy = copy.deepcopy(c)
-        self.assertEqual([x.volume.velocity for x in cCopy], [20, 80, 120])
-        velocities = [11, 22, 33]
-        for i, x in enumerate(cCopy):
-            x.volume.velocity = velocities[i]
-        self.assertEqual([x.volume.velocity for x in cCopy], [11, 22, 33])
-        self.assertEqual([x.volume.velocity for x in c], [20, 80, 120])
-        self.assertEqual([x.volume.client for x in cCopy], [cCopy, cCopy, cCopy])
-        self.assertEqual([x.volume.client for x in c], [c, c, c])
+        self.assertIs(c[1], c.notes[1])
+
+        # a string key is a pitch name with octave and returns the matching Note
+        self.assertIs(c['D-4'], c[1])
+        self.assertEqual(c['G4'].pitch.nameWithOctave, 'G4')
+
+        # a Pitch matches the component by value
+        self.assertIs(c[pitch.Pitch('D-4')], c[1])
+
+        # the returned Note is the live component, so mutating it persists
+        c[0].volume.velocity = 20
+        c[1].volume.velocity = 80
+        c[2].volume.velocity = 120
+        self.assertEqual([n.volume.velocity for n in c], [20, 80, 120])
+
+        # an out-of-range index raises IndexError; an unmatched pitch name raises KeyError
+        with self.assertRaises(IndexError):
+            _ = c[5]
+        with self.assertRaises(KeyError):
+            _ = c['E4']
 
     def testChordComponentsA(self):
         c = Chord(['d2', 'e-1', 'b-6'])

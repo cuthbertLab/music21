@@ -26,30 +26,48 @@ Speed notes:
 from __future__ import annotations
 
 from collections import OrderedDict
+from collections.abc import Callable
 import difflib
 from functools import partial
 import json
 import math
 import pathlib
 import random
+import typing as t
 
 from music21 import common
 from music21 import converter
 from music21 import corpus
 from music21 import environment
 
+if t.TYPE_CHECKING:
+    from music21 import stream
+
 environLocal = environment.Environment('search.segment')
+
+
+class PartIndex(t.TypedDict):
+    '''
+    The result of indexing one part: the segment strings and the matching
+    (startMeasure, endMeasure) tuples, one tuple per segment.
+    '''
+    segmentList: list[str]
+    measureList: list[tuple[int, int]]
+
+
+# indexScoreParts returns one PartIndex per part of a score.
+type ScoreIndex = list[PartIndex]
 
 
 # noinspection SpellCheckingInspection
 def translateMonophonicPartToSegments(
-    inputStream,
+    inputStream: stream.Stream,
     *,
-    segmentLengths=30,
-    overlap=12,
-    algorithm=None,
-    jitter=0,
-):
+    segmentLengths: int = 30,
+    overlap: int = 12,
+    algorithm: Callable[..., t.Any] | None = None,
+    jitter: int = 0,
+) -> tuple[list[str], list[tuple[int, int]]]:
     '''
     Translates a monophonic part with measures to a set of segments of length
     `segmentLengths` (measured in number of notes) with an overlap of `overlap` notes
@@ -93,8 +111,8 @@ def translateMonophonicPartToSegments(
     segmentStarts = [i * (segmentLengths - overlap) for i in range(numberOfSegments)]
     # print(totalLength, numberOfSegments, segmentStarts)
 
-    segmentList = []
-    measureList = []
+    segmentList: list[str] = []
+    measureList: list[tuple[int, int]] = []
 
     for segmentStart in segmentStarts:
         segmentStart += random.randint(-1 * jitter, jitter)
@@ -103,7 +121,11 @@ def translateMonophonicPartToSegments(
 
         segmentEnd = min(segmentStart + segmentLengths, totalLength)
         currentSegment = outputStr[segmentStart:segmentEnd]
-        measureTuple = (measures[segmentStart], measures[segmentEnd - 1])
+        # measures come from note.measureNumber; within an indexed part they are set.
+        measureTuple = t.cast(
+            'tuple[int, int]',
+            (measures[segmentStart], measures[segmentEnd - 1]),
+        )
 
         segmentList.append(currentSegment)
         measureList.append(measureTuple)
@@ -111,7 +133,7 @@ def translateMonophonicPartToSegments(
 
 
 # noinspection SpellCheckingInspection
-def indexScoreParts(scoreFile, **keywords):
+def indexScoreParts(scoreFile: stream.Score, **keywords) -> ScoreIndex:
     r'''
     Creates segment and measure lists for each part of a score
     Returns list of dictionaries of segment and measure lists
@@ -124,7 +146,7 @@ def indexScoreParts(scoreFile, **keywords):
     [(0, 7), (4, 9), (8, 9)]
     '''
     scoreFileParts = scoreFile.parts
-    indexedList = []
+    indexedList: ScoreIndex = []
     for part in scoreFileParts:
         segmentList, measureList = translateMonophonicPartToSegments(
             part, **keywords)
@@ -135,7 +157,11 @@ def indexScoreParts(scoreFile, **keywords):
     return indexedList
 
 
-def _indexSingleMulticore(filePath, failFast=False, **keywords):
+def _indexSingleMulticore(
+    filePath: str | pathlib.Path,
+    failFast: bool = False,
+    **keywords,
+) -> tuple[str, ScoreIndex | str, pathlib.Path]:
     '''
     Index one path in the context of multicore.
     '''
@@ -144,6 +170,7 @@ def _indexSingleMulticore(filePath, failFast=False, **keywords):
 
     shortFp = filePath.name
 
+    indexOutput: ScoreIndex | str
     try:
         indexOutput = indexOnePath(filePath, **keywords)
     except Exception as e:  # pylint: disable=broad-exception-caught
@@ -155,16 +182,22 @@ def _indexSingleMulticore(filePath, failFast=False, **keywords):
     return (shortFp, indexOutput, filePath)
 
 
-def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
+def _giveUpdatesMulticore(
+    numRun: int,
+    totalRun: int,
+    latestOutput: tuple[str, ScoreIndex | str, pathlib.Path],
+) -> None:
     print(f'Indexed {latestOutput[0]} ({numRun}/{totalRun})')
 
 
 # noinspection SpellCheckingInspection
-def indexScoreFilePaths(scoreFilePaths,
-                        *,
-                        giveUpdates=False,
-                        runMulticore=True,
-                        **keywords):
+def indexScoreFilePaths(
+    scoreFilePaths: list[str | pathlib.Path],
+    *,
+    giveUpdates: bool = False,
+    runMulticore: bool = True,
+    **keywords,
+) -> OrderedDict[str, ScoreIndex | str]:
     # noinspection PyShadowingNames
     '''
     Returns a dictionary of the lists from indexScoreParts for each score in
@@ -186,6 +219,7 @@ def indexScoreFilePaths(scoreFilePaths,
     >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
     'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
     '''
+    updateFunction: Callable[[int, int, t.Any], None] | None
     if giveUpdates is True:
         updateFunction = _giveUpdatesMulticore
     else:
@@ -209,20 +243,23 @@ def indexScoreFilePaths(scoreFilePaths,
             updateFunction=updateFunction)
 
     # ensure that orderedDict is sorted by original scoreFiles
-    rpDict = {}
+    rpDict: dict[pathlib.Path, tuple[str, ScoreIndex | str]] = {}
     for outShortName, outData, originalPathlib in rpListUnOrdered:
         rpDict[originalPathlib] = (outShortName, outData)
 
-    rpList = []
+    # OrderedDict is built from the (shortName, data) pairs, keying on the
+    # short filename and mapping it to the per-part ScoreIndex.
+    rpList: list[tuple[str, ScoreIndex | str]] = []
     for p in scoreFilePaths:
-        rpList.append(rpDict[p])
+        # every element was converted to a pathlib.Path in the loop above.
+        rpList.append(rpDict[t.cast(pathlib.Path, p)])
 
-    scoreDict = OrderedDict(rpList)
+    scoreDict: OrderedDict[str, ScoreIndex | str] = OrderedDict(rpList)
 
     return scoreDict
 
 
-def indexOnePath(filePath, **keywords):
+def indexOnePath(filePath: str | pathlib.Path, **keywords) -> ScoreIndex:
     '''
     Index a single path.  Returns a scoreDictEntry
     '''
@@ -238,7 +275,10 @@ def indexOnePath(filePath, **keywords):
     return scoreDictEntry
 
 
-def saveScoreDict(scoreDict, filePath=None):
+def saveScoreDict(
+    scoreDict: t.Any,
+    filePath: str | pathlib.Path | None = None,
+) -> pathlib.Path:
     '''
     Save the score dict from indexScoreFilePaths as a .json file for quickly
     reloading
@@ -251,54 +291,56 @@ def saveScoreDict(scoreDict, filePath=None):
     elif isinstance(filePath, (str, bytes)):
         filePath = pathlib.Path(filePath)
 
-    with filePath.open('wb') as f:
+    with filePath.open('w', encoding='utf-8') as f:
         json.dump(scoreDict, f)
 
     return filePath
 
 
-def loadScoreDict(filePath):
+def loadScoreDict(filePath: str | pathlib.Path) -> t.Any:
     '''
     Load the scoreDictionary from filePath.
     '''
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
 
-    with filePath.open('rb') as f:
+    with filePath.open('r', encoding='utf-8') as f:
         scoreDict = json.load(f)
     return scoreDict
 
 
 def getDifflibOrPyLev(
-    seq2=None,
-    junk=None,
-    forceDifflib=False,
-):
+    seq2: str | None = None,
+    junk: Callable[[str], bool] | None = None,
+    forceDifflib: bool = False,
+) -> t.Any:
     '''
     Returns either a difflib.SequenceMatcher or pyLevenshtein
     StringMatcher.StringMatcher object depending on what is installed.
 
     If forceDifflib is True then use difflib even if pyLevenshtein is installed:
     '''
+    smObject: t.Any
+    seq2Seq: t.Any = seq2  # SequenceMatcher / StringMatcher accept None here at runtime
     if forceDifflib is True:
-        smObject = difflib.SequenceMatcher(junk, '', seq2)
+        smObject = difflib.SequenceMatcher(junk, '', seq2Seq)
     else:
         try:
             # noinspection PyPackageRequirements
             from Levenshtein import StringMatcher as pyLevenshtein  # type: ignore
-            smObject = pyLevenshtein.StringMatcher(junk, '', seq2)
+            smObject = pyLevenshtein.StringMatcher(junk, '', seq2Seq)
         except ImportError:
-            smObject = difflib.SequenceMatcher(junk, '', seq2)
+            smObject = difflib.SequenceMatcher(junk, '', seq2Seq)
     return smObject
 
 
 def scoreSimilarity(
-    scoreDict,
-    minimumLength=20,
-    giveUpdates=False,
-    includeReverse=False,
-    forceDifflib=False,
-):
+    scoreDict: t.Mapping[str, ScoreIndex],
+    minimumLength: int = 20,
+    giveUpdates: bool = False,
+    includeReverse: bool = False,
+    forceDifflib: bool = False,
+) -> list[tuple]:
     # noinspection PyShadowingNames
     r'''
     Find the level of similarity between each pair of segments in a scoreDict.
@@ -328,14 +370,14 @@ def scoreSimilarity(
     ('bwv197.5.mxl', 1, 1, (4, 10), 'bwv197.10.mxl', 1, 0, (0, 7), 0.266...)
     ('bwv197.5.mxl', 1, 1, (4, 10), 'bwv197.10.mxl', 1, 1, (4, 9), 0.307...)
     '''
-    similarityScores = []
+    similarityScores: list[tuple] = []
     scoreIndex = 0
     totalScores = len(scoreDict)
     scoreDictKeys = list(scoreDict.keys())
-    pNum = None
-    segmentNumber = None
+    pNum: int | None = None
+    segmentNumber: int | None = None
 
-    def doOneSegment(thisSegment):
+    def doOneSegment(thisSegment: str) -> None:
         dl = getDifflibOrPyLev(thisSegment, forceDifflib=forceDifflib)
         # dl = difflib.SequenceMatcher(None, '', thisSegment)
         for thatScoreNumber in range(scoreIndex, totalScores):

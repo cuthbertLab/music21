@@ -16,18 +16,20 @@ __all__ = [
     'safeToParallize',
 ]
 
+from collections.abc import Callable, Sequence
 import multiprocessing
 import os
+import typing as t
 import unittest
 
 
-def runParallel(iterable,
-                parallelFunction,
+def runParallel(iterable: Sequence[t.Any],
+                parallelFunction: Callable[..., t.Any],
                 *,
-                updateFunction=None,
-                updateMultiply=3,
-                unpackIterable=False,
-                updateSendsIterable=False):
+                updateFunction: Callable[..., t.Any]|bool|None = None,
+                updateMultiply: int = 3,
+                unpackIterable: bool = False,
+                updateSendsIterable: bool = False) -> list[t.Any]:
     '''
     runs parallelFunction over iterable in parallel, optionally calling updateFunction after
     each common.cpus * updateMultiply calls.
@@ -124,13 +126,13 @@ def runParallel(iterable,
         # if there is no need for updates, run at max speed
         #    -- do the whole list at once.
 
-    resultsList = []
+    resultsList: list[t.Any] = []
 
-    def callUpdate(ii):
+    def callUpdate(ii: int) -> None:
         if updateFunction is True:
             tasksDone = min([ii, iterLength])
             print(f'Done {tasksDone} tasks of {iterLength}')
-        elif updateFunction not in (False, None):
+        elif callable(updateFunction):
             for thisPosition in range(ii - (updateMultiply * numCpus), ii):
                 if thisPosition < 0:
                     continue
@@ -166,13 +168,13 @@ def runParallel(iterable,
     return resultsList
 
 
-def runNonParallel(iterable,
-                   parallelFunction,
+def runNonParallel(iterable: Sequence[t.Any],
+                   parallelFunction: Callable[..., t.Any],
                    *,
-                   updateFunction=None,
-                   updateMultiply=3,
-                   unpackIterable=False,
-                   updateSendsIterable=False):
+                   updateFunction: Callable[..., t.Any]|bool|None = None,
+                   updateMultiply: int = 3,
+                   unpackIterable: bool = False,
+                   updateSendsIterable: bool = False) -> list[t.Any]:
     '''
     This is intended to be a perfect drop in replacement for runParallel, except that
     it runs on one core only, and not in parallel.
@@ -180,16 +182,16 @@ def runNonParallel(iterable,
     Used automatically if we're already in a parallelized function.
     '''
     iterLength = len(iterable)
-    resultsList = []
+    resultsList: list[t.Any] = []
 
-    def callUpdate(ii):
+    def callUpdate(ii: int) -> None:
         if ii % updateMultiply != 0:
             return
 
         if updateFunction is True:
             tasksDone = min([ii, iterLength])
             print(f'Done {tasksDone} tasks of {iterLength}')
-        elif updateFunction not in (False, None):
+        elif callable(updateFunction):
             for thisPosition in range(ii - updateMultiply, ii):
                 if thisPosition < 0:
                     continue
@@ -218,7 +220,7 @@ def runNonParallel(iterable,
     return resultsList
 
 
-def cpus():
+def cpus() -> int:
     '''
     Returns the number of CPUs or if >= 3, one less (to leave something out for multiprocessing)
     '''
@@ -255,23 +257,23 @@ def safeToParallize() -> bool:
 
 # pickleable testing functions.
 
-def _countN(fn):
+def _countN(filename: str) -> int:
     from music21 import corpus
-    c = corpus.parse(fn)
+    c = corpus.parse(filename)
     return len(c.recurse().notes)
 
 
-def _countUnpacked(i, fn):
+def _countUnpacked(i: int, filename: str) -> bool:
     if i >= 3:
         return False
-    if fn not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
+    if filename not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
         return False
     return True
 
 
 class Test(unittest.TestCase):
     # pylint: disable=redefined-outer-name
-    def x_figure_out_segfault_testMultiprocess(self):
+    def x_figure_out_segfault_testMultiprocess(self) -> None:
         files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
         # for importing into testSingleCoreAll we need the full path to the modules
         from music21.common.parallel import _countN, _countUnpacked
@@ -291,13 +293,15 @@ class Test(unittest.TestCase):
         self.assertNotIn(False, passed)
 
     # testing functions
-    def _customUpdate1(self, i, total, output):
+    def _customUpdate1(self, i: int, total: int, output: int) -> None:
         self.assertEqual(total, 3)
         self.assertLess(i, 3)
         self.assertIn(output, [165, 50, 131])
 
-    def _customUpdate2(self, i, unused_total, unused_output, fn):
-        self.assertIn(fn, ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel'])
+    def _customUpdate2(
+        self, i: int, unused_total: int, unused_output: int, filename: str
+    ) -> None:
+        self.assertIn(filename, ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel'])
 
 
 if __name__ == '__main__':

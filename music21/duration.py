@@ -77,8 +77,8 @@ DENOM_LIMIT = defaults.limitOffsetDenominator
 
 POSSIBLE_DOTS_IN_TUPLETS = (0, 1)
 
-TupletType = t.Literal['start', 'stop', 'startStop', False, None]
-TupletShowOptions = t.Literal['number', 'type', 'both', None]
+type TupletType = t.Literal['start', 'stop', 'startStop', False, None]
+type TupletShowOptions = t.Literal['number', 'type', 'both', None]
 
 class DurationException(exceptions21.Music21Exception):
     pass
@@ -800,7 +800,7 @@ class DurationTuple(t.NamedTuple):
 
     Most Durations have one DurationTuple stored in `.components`.  Tuplet notes
     have a DurationTuple and a Tuplet object. A complex Duration (like
-    a quarter tied to an sixteenth) can have tow or more DurationTuples.
+    a quarter tied to a sixteenth) can have two or more DurationTuples.
 
     A DurationTuple's `quarterLength` is also stored alongside `type` and `dots`
     for quick computation.  For `inexpressible` DurationTuples, `quarterLength`
@@ -872,7 +872,7 @@ def durationTupleFromQuarterLength(ql=1.0) -> DurationTuple:
             return DurationTuple('inexpressible', 0, ql)
 
 
-def durationTupleFromTypeDots(durType='quarter', dots=0):
+def durationTupleFromTypeDots(durType: str = 'quarter', dots: int = 0) -> DurationTuple:
     '''
     Returns a DurationTuple (which knows its quarterLength) for
     a given type and dots (no tuplets)
@@ -1271,7 +1271,7 @@ class Tuplet(prebase.ProtoM21Object):
 
         '''
         self._checkFrozen()
-        if common.isNum(durType) and not isinstance(durType, str):
+        if not isinstance(durType, str):
             durType = convertQuarterLengthToType(durType)
 
         self.durationActual = durationTupleFromTypeDots(durType, dots)
@@ -1633,7 +1633,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                  /,
                  *,
                  type: str|None = None,  # pylint: disable=redefined-builtin
-                 dots: int|None = 0,
+                 dots: int = 0,
                  quarterLength: OffsetQLIn|None = None,
                  durationTuple: DurationTuple|None = None,
                  components: Iterable[DurationTuple]|None = None,
@@ -1697,6 +1697,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
 
     # SPECIAL METHODS #
+
     def __eq__(self, other):
         '''
         Two durations are the same if their type, dots, tuplets, and
@@ -1991,7 +1992,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         ValueError: amountToScale must be greater than zero
 
         Note: for unlinked durations w/ tuplet scaling, amountToScale must already
-        by a Fraction.
+        be a Fraction.
         '''
         if not amountToScale > 0:
             raise ValueError('amountToScale must be greater than zero')
@@ -2043,7 +2044,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def componentIndexAtQtrPosition(self, quarterPosition):
         '''
-        returns the index number of the duration component sounding at
+        Returns the index number of the duration component sounding at
         the given quarter position.
 
         Note that for 0 and the last value, the object is returned.
@@ -2359,7 +2360,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Advanced Method:
 
-        returns the current components WITHOUT running the component updater.
+        Returns the current components WITHOUT running the component updater.
 
         Needed by some internal methods.  Components are made on the fly.
 
@@ -2386,7 +2387,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def splitDotGroups(self, *, inPlace=False):
         '''
-        splits a dotGroup-duration (of 1 component) into a new duration of two
+        Splits a dotGroup-duration (of 1 component) into a new duration of two
         components.  Returns a new duration
 
         Probably does not handle properly tuplets of dot-groups.
@@ -2795,7 +2796,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Returns True if this Duration has more than one DurationTuple object on
         the `component` list.  That is to say if it's a single Duration that
-        need multiple tied noteheads to represent.
+        needs multiple tied noteheads to represent.
 
         >>> aDur = duration.Duration()
         >>> aDur.quarterLength = 1.375

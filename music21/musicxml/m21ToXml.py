@@ -903,9 +903,9 @@ class XMLExporterBase:
 
         conforms to attr-group %font in the MusicXML DTD
 
-        >>> from xml.etree.ElementTree import fromstring as El
+        >>> from xml.etree.ElementTree import fromstring as EL
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
-        >>> mxObj = El('<text>hi</text>')
+        >>> mxObj = EL('<text>hi</text>')
         >>> te = expressions.TextExpression('hi!')
         >>> te.style.fontFamily = ['Courier', 'monospaced']
         >>> te.style.fontStyle = 'italic'
@@ -915,7 +915,7 @@ class XMLExporterBase:
         <text font-family="Courier,monospaced" font-size="24" font-style="italic">hi</text>
 
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
-        >>> mxObj = El('<text>hi</text>')
+        >>> mxObj = EL('<text>hi</text>')
         >>> te = expressions.TextExpression('hi!')
         >>> te.style.fontStyle = 'bold'
         >>> XB.setFont(mxObj, te)
@@ -964,9 +964,9 @@ class XMLExporterBase:
 
     def setEditorial(self, mxObject, m21Object):
         '''
-        >>> from xml.etree.ElementTree import fromstring as El
+        >>> from xml.etree.ElementTree import fromstring as EL
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
-        >>> mxObj = El('<note />')
+        >>> mxObj = EL('<note />')
         >>> n = note.Note('C-5')
 
         Most common case: does nothing
@@ -988,7 +988,7 @@ class XMLExporterBase:
 
         Placing information in `.editorial.comments` only puts out the level:
 
-        >>> mxObj = El('<note />')
+        >>> mxObj = EL('<note />')
         >>> n = note.Note('C-5')
         >>> com = editorial.Comment('flat is obvious error for sharp')
         >>> com.levelInformation = 'hello'
@@ -1399,7 +1399,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.instrumentList: list[instrument.Instrument] = []
         self.instrumentIdList: list[str|None] = []
-        self.midiChannelList: list[int|None] = []
+        self.midiChannelList: list[int|None] = []  # TODO: just list[int]?
 
         self.parts: list[stream.Part] = []
 
@@ -1533,9 +1533,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         music21.musicxml.xmlObjects.MusicXMLExportException:
         Exporting scores nested inside scores is not supported
         '''
-        s = self.stream
-        if t.TYPE_CHECKING:
-            assert isinstance(s, stream.Score)
+        s = t.cast(stream.Score, self.stream)
 
         # environLocal.printDebug('streamToMx(): interpreting multipart')
         streamOfStreams = s.getElementsByClass(stream.Stream)
@@ -1806,9 +1804,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # TODO: link/bookmark in credit-words
         self.setPrintStyleAlign(mxCreditWords, textBox)
         if textBox.hasStyleInformation:
-            sty = textBox.style
-            if t.TYPE_CHECKING:
-                assert isinstance(sty, style.TextStyle)
+            sty = t.cast(style.TextStyle, textBox.style)
             if sty.justify is not None:
                 mxCreditWords.set('justify', sty.justify)
         mxCredit.append(mxCreditWords)
@@ -1927,14 +1923,17 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         Demonstrating round tripping:
 
         >>> import xml.etree.ElementTree as ET
-        >>> defaults = ET.fromstring('<defaults>'
-        ...          + '<music-font font-family="Maestro, Opus" font-weight="bold" />'
-        ...          + '<word-font font-family="Garamond" font-style="italic" />'
-        ...          + '<lyric-font name="verse" font-size="12" />'
-        ...          + '<lyric-font name="chorus" font-size="14" />'
-        ...          + '<lyric-language name="verse" xml:lang="fr" />'
-        ...          + '<lyric-language name="chorus" xml:lang="en" />'
-        ...          + '</defaults>')
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> defaults = ET.fromstring(
+        ...     '<defaults>'
+        ...     '<music-font font-family="Maestro, Opus" font-weight="bold" />'
+        ...     '<word-font font-family="Garamond" font-style="italic" />'
+        ...     '<lyric-font name="verse" font-size="12" />'
+        ...     '<lyric-font name="chorus" font-size="14" />'
+        ...     '<lyric-language name="verse" xml:lang="fr" />'
+        ...     '<lyric-language name="chorus" xml:lang="en" />'
+        ...     '</defaults>'
+        ... )
 
         >>> MI = musicxml.xmlToM21.MusicXMLImporter()
         >>> MI.styleFromXmlDefaults(defaults)
@@ -2596,6 +2595,8 @@ class PartExporter(XMLExporterBase):
             in the :class:`~music21.layout.StaffGroup`, if any. (E.g. if this is
             the left hand, store a reference to the right hand.)''',
     }
+    midiChannelList: list[int|None]  # TODO: just list[int]?
+    meterStream: stream.Stream[meter.TimeSignatureBase]
 
     def __init__(self,
                  partObj: stream.Part|stream.Score|None = None,
@@ -2611,14 +2612,15 @@ class PartExporter(XMLExporterBase):
         self.xmlRoot = Element('part')
 
         if parent is None:
-            self.meterStream: stream.Stream[meter.TimeSignatureBase] = stream.Stream()
+            self.meterStream = stream.Stream[meter.TimeSignatureBase]()
             self.refStreamOrTimeRange = [0.0, 0.0]
             self.midiChannelList = []
             self.makeNotation = True
         else:
+            # else should not be executed.
             self.meterStream = (parent.meterStream
                                 if parent.meterStream is not None
-                                else stream.Stream())  # else should not be executed.
+                                else stream.Stream[meter.TimeSignatureBase]())
             self.refStreamOrTimeRange = parent.refStreamOrTimeRange
             self.midiChannelList = parent.midiChannelList  # shared list
             self.makeNotation = parent.makeNotation
@@ -2626,7 +2628,7 @@ class PartExporter(XMLExporterBase):
         self.previousPartStaffInGroup: stream.PartStaff|None = None
 
         self.instrumentStream: stream.Stream[instrument.Instrument]|None = None
-        self.firstInstrumentObject = None
+        self.firstInstrumentObject: instrument.Instrument|None = None
 
         # keep track of this so that we only put out new attributes when something
         # has changed
@@ -2737,16 +2739,18 @@ class PartExporter(XMLExporterBase):
         else:
             # get a default instrument if not assigned
             self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)
-        self.firstInstrumentObject = self.instrumentStream[0]  # store first, as handled differently
+        # store first, as handled differently
+        firstInstrumentObject = t.cast(instrument.Instrument, self.instrumentStream[0])
+        self.firstInstrumentObject = firstInstrumentObject
 
         if self.parent is not None:
             instIdList = [x.partId for x in self.parent.instrumentList]
         else:
             instIdList = [self.stream.id]
 
-        firstInstId = self.firstInstrumentObject.partId
+        firstInstId = firstInstrumentObject.partId
         if firstInstId in instIdList or firstInstId is None:  # must have unique ids
-            self.firstInstrumentObject.partIdRandomize()  # set new random id
+            firstInstrumentObject.partIdRandomize()  # set new random id
 
         should_short_circuit = self.mergeInstrumentStreamPartStaffAware()
         if should_short_circuit:
@@ -2769,6 +2773,7 @@ class PartExporter(XMLExporterBase):
 
             # this is shared among all PartExporters, so long as they are created by a
             # ScoreExporter
+            # TODO: skip if .midiChannel is None?
             self.midiChannelList.append(thisInstrument.midiChannel)
             # environLocal.printDebug(['midiChannel list', self.midiChannelList])
 
@@ -2781,7 +2786,7 @@ class PartExporter(XMLExporterBase):
             # add to the lists for checking on next part
             if self.parent is not None:
                 self.parent.instrumentIdList.append(thisInstrument.instrumentId)
-                if thisInstrument is self.firstInstrumentObject:
+                if thisInstrument is firstInstrumentObject:
                     self.parent.instrumentList.append(thisInstrument)
 
     def mergeInstrumentStreamPartStaffAware(self) -> bool:
@@ -3541,11 +3546,10 @@ class MeasureExporter(XMLExporterBase):
 
                     if m21spannerClass == 'PedalMark' and posSub == 'first':
                         # check to see if we also need to start a line
-                        if t.TYPE_CHECKING:
-                            assert isinstance(thisSpanner, expressions.PedalMark)
-                        if thisSpanner.pedalForm == expressions.PedalForm.SymbolLine:
+                        pedalMark = t.cast(expressions.PedalMark, thisSpanner)
+                        if pedalMark.pedalForm == expressions.PedalForm.SymbolLine:
                             mxPedalLine = (
-                                self.makePedalResumeLineXml(thisSpanner)
+                                self.makePedalResumeLineXml(pedalMark)
                             )
                             preList.append(mxPedalLine)
 
@@ -3586,42 +3590,38 @@ class MeasureExporter(XMLExporterBase):
         '''
         post: dict[str, t.Any] = {'type': 'start'}
         if spannerClass == 'Ottava':
-            if t.TYPE_CHECKING:
-                assert isinstance(sp, spanner.Ottava)
-            post['size'] = sp.shiftMagnitude()
-            post['type'] = sp.shiftDirection(reverse=True)  # up or down
+            ottava = t.cast(spanner.Ottava, sp)
+            post['size'] = ottava.shiftMagnitude()
+            post['type'] = ottava.shiftDirection(reverse=True)  # up or down
         elif spannerClass == 'Line':
-            if t.TYPE_CHECKING:
-                assert isinstance(sp, spanner.Line)
-            post['line-end'] = sp.startTick
-            post['end-length'] = sp.startHeight
+            line = t.cast(spanner.Line, sp)
+            post['line-end'] = line.startTick
+            post['end-length'] = line.startHeight
         elif spannerClass == 'DynamicWedge':
-            if t.TYPE_CHECKING:
-                assert isinstance(sp, dynamics.DynamicWedge)
-            post['type'] = sp.type
-            if sp.type == 'crescendo':
+            wedge = t.cast(dynamics.DynamicWedge, sp)
+            post['type'] = wedge.type
+            if wedge.type == 'crescendo':
                 post['spread'] = 0
-                if sp.niente:
+                if wedge.niente:
                     post['niente'] = 'yes'
             else:
-                post['spread'] = sp.spread
+                post['spread'] = wedge.spread
         elif spannerClass == 'PedalMark':
-            if t.TYPE_CHECKING:
-                assert isinstance(sp, expressions.PedalMark)
-            if sp.pedalType == expressions.PedalType.Sostenuto:
+            pedalMark = t.cast(expressions.PedalMark, sp)
+            if pedalMark.pedalType == expressions.PedalType.Sostenuto:
                 post['type'] = 'sostenuto'
             else:
-                # non-Sostenuto sp.pedalType might be Sustain, Soft, or Silent.
+                # non-Sostenuto pedalMark.pedalType might be Sustain, Soft, or Silent.
                 # But MusicXML only has 'start', which implies Sustain,
                 # so that's what we do here, hoping there is a text
                 # direction describing which pedal to use.
                 post['type'] = 'start'
-            if sp.pedalForm == expressions.PedalForm.Line:
+            if pedalMark.pedalForm == expressions.PedalForm.Line:
                 post['line'] = 'yes'
             else:
                 # 'symbol', 'altsymbol', and 'symline' all start with a sign
                 post['sign'] = 'yes'
-            if sp.abbreviated:
+            if pedalMark.abbreviated:
                 post['abbreviated'] = 'yes'
         return post
 
@@ -3639,27 +3639,25 @@ class MeasureExporter(XMLExporterBase):
         '''
         post: dict[str, t.Any] = {'type': 'stop'}
         if spannerClass == 'Ottava':
-            if t.TYPE_CHECKING:
-                assert isinstance(sp, spanner.Ottava)
-            post['size'] = sp.shiftMagnitude()
+            ottava = t.cast(spanner.Ottava, sp)
+            post['size'] = ottava.shiftMagnitude()
         elif spannerClass == 'Line':
-            if t.TYPE_CHECKING:
-                assert isinstance(sp, spanner.Line)
-            post['line-end'] = sp.endTick
-            post['end-length'] = sp.endHeight
+            line = t.cast(spanner.Line, sp)
+            post['line-end'] = line.endTick
+            post['end-length'] = line.endHeight
         elif spannerClass == 'DynamicWedge':
-            if t.TYPE_CHECKING:
-                assert isinstance(sp, dynamics.DynamicWedge)
-            if sp.type == 'crescendo':
-                post['spread'] = sp.spread
+            wedge = t.cast(dynamics.DynamicWedge, sp)
+            if wedge.type == 'crescendo':
+                post['spread'] = wedge.spread
             else:
                 post['spread'] = 0
-                if sp.niente:
+                if wedge.niente:
                     post['niente'] = 'yes'
         elif spannerClass == 'PedalMark':
-            if t.TYPE_CHECKING:
-                assert isinstance(sp, expressions.PedalMark)
-            if sp.pedalForm in (expressions.PedalForm.Line, expressions.PedalForm.SymbolLine):
+            pedalMark = t.cast(expressions.PedalMark, sp)
+            if pedalMark.pedalForm in (
+                expressions.PedalForm.Line, expressions.PedalForm.SymbolLine
+            ):
                 post['line'] = 'yes'
             else:
                 # 'symbol', 'altsymbol' both end with a sign
@@ -4394,8 +4392,7 @@ class MeasureExporter(XMLExporterBase):
                 currentClef = clef.TrebleClef()
                 # this should not be common enough to
                 # worry about the overhead
-            if t.TYPE_CHECKING:
-                assert isinstance(currentClef, clef.PitchClef)
+            currentClef = t.cast(clef.PitchClef, currentClef)
             midLineDNN = currentClef.lowestLine + 4
             restObjectPseudoDNN = midLineDNN + r.stepShift
             tempPitch = pitch.Pitch()
@@ -5431,16 +5428,14 @@ class MeasureExporter(XMLExporterBase):
             mxArticulationMark.set('placement', articulationMark.placement)
         self.setPrintStyle(mxArticulationMark, articulationMark)
         if musicXMLArticulationName == 'strong-accent':
-            if t.TYPE_CHECKING:
-                assert isinstance(articulationMark, articulations.StrongAccent)
-            mxArticulationMark.set('type', articulationMark.pointDirection)
+            strongAccent = t.cast(articulations.StrongAccent, articulationMark)
+            mxArticulationMark.set('type', strongAccent.pointDirection)
         if musicXMLArticulationName in ('doit', 'falloff', 'plop', 'scoop'):
             self.setLineStyle(mxArticulationMark, articulationMark)
         if musicXMLArticulationName == 'breath-mark':
-            if t.TYPE_CHECKING:
-                assert isinstance(articulationMark, articulations.BreathMark)
-            if articulationMark.symbol is not None:
-                mxArticulationMark.text = articulationMark.symbol
+            breathMark = t.cast(articulations.BreathMark, articulationMark)
+            if breathMark.symbol is not None:
+                mxArticulationMark.text = breathMark.symbol
         if (musicXMLArticulationName == 'other-articulation'
                 and articulationMark.displayText is not None):
             mxArticulationMark.text = articulationMark.displayText
@@ -5527,11 +5522,10 @@ class MeasureExporter(XMLExporterBase):
         if articulationMark.placement is not None:
             mxTechnicalMark.set('placement', articulationMark.placement)
         if musicXMLTechnicalName == 'fingering':
-            if t.TYPE_CHECKING:
-                assert isinstance(articulationMark, articulations.Fingering)
-            mxTechnicalMark.text = str(articulationMark.fingerNumber)
+            fingering = t.cast(articulations.Fingering, articulationMark)
+            mxTechnicalMark.text = str(fingering.fingerNumber)
             mxTechnicalMark.set('alternate',
-                                xmlObjects.booleanToYesNo(articulationMark.alternate))
+                                xmlObjects.booleanToYesNo(fingering.alternate))
         if (musicXMLTechnicalName in ('handbell', 'other-technical')
                 and articulationMark.displayText is not None):
             #     The handbell element represents notation for various
@@ -5547,23 +5541,19 @@ class MeasureExporter(XMLExporterBase):
             mxTechnicalMark.set('substitution',
                                 xmlObjects.booleanToYesNo(articulationMark.substitution))
         if musicXMLTechnicalName == 'string':
-            if t.TYPE_CHECKING:
-                assert isinstance(articulationMark, articulations.StringIndication)
-            mxTechnicalMark.text = str(articulationMark.number)
+            stringIndication = t.cast(articulations.StringIndication, articulationMark)
+            mxTechnicalMark.text = str(stringIndication.number)
         if musicXMLTechnicalName == 'fret':
-            if t.TYPE_CHECKING:
-                assert isinstance(articulationMark, articulations.FretIndication)
-            mxTechnicalMark.text = str(articulationMark.number)
+            fretIndication = t.cast(articulations.FretIndication, articulationMark)
+            mxTechnicalMark.text = str(fretIndication.number)
         if musicXMLTechnicalName == 'bend':
-            if t.TYPE_CHECKING:
-                assert isinstance(articulationMark, articulations.FretBend)
-            self.setBend(mxTechnicalMark, articulationMark)
+            fretBend = t.cast(articulations.FretBend, articulationMark)
+            self.setBend(mxTechnicalMark, fretBend)
         # harmonic needs to check for whether it is artificial or natural, and
         # whether it is base-pitch, sounding-pitch, or touching-pitch
         if musicXMLTechnicalName == 'harmonic':
-            if t.TYPE_CHECKING:
-                assert isinstance(articulationMark, articulations.StringHarmonic)
-            self.setHarmonic(mxTechnicalMark, articulationMark)
+            stringHarmonic = t.cast(articulations.StringHarmonic, articulationMark)
+            self.setHarmonic(mxTechnicalMark, stringHarmonic)
 
         if (musicXMLTechnicalName == 'other-technical'
                 and articulationMark.displayText is not None):

@@ -19,7 +19,7 @@ The model for these layout objects is taken directly (perhaps too directly?)
 from MusicXML.  These objects all inherit from a BaseLayout class, primarily
 as an aid to finding all of these objects as a group.  ScoreLayouts give defaults
 for each page, system, and staff.  Thus, they contain PageLayout, SystemLayout, and
-currently one or more StaffLayout objects (but probably just one. MusicXML allows more than
+currently one or more StaffLayout objects (but probably just one. MusicXML allows more than one
 StaffLayout object because multiple staves can be in a Part.  Music21 uses
 the concept of a PartStaff for a Part that is played by the same performer as another.
 e.g., the left hand of the Piano is a PartStaff paired with the right hand).
@@ -43,7 +43,7 @@ properties such as .duration, .beat, will probably not apply.
 When exporting to MusicXML (which is currently the only format in which music21 can and
 does preserve these markings), many MusicXML readers will ignore these tags (or worse,
 add a new page or system when PageLayout and SystemLayout objects are found but also
-add theme wherever they want).  In Finale, this behavior disappears if the MusicXML
+add them wherever they want).  In Finale, this behavior disappears if the MusicXML
 document notes that it <supports> new-page and new-system markings.  Music21 will add
 the appropriate <supports> tags if the containing Stream has `.definesExplicitPageBreaks`
 and `.definesExplicitSystemBreaks` set to True.  When importing a score that has the
@@ -177,12 +177,12 @@ class ScoreLayout(LayoutBase):
 
     def tenthsToMillimeters(self, tenths: int|float) -> int|float:
         '''
-        given the scalingMillimeters and scalingTenths,
+        Given the scalingMillimeters and scalingTenths,
         return the value in millimeters of a number of
         musicxml "tenths" where a tenth is a tenth of the distance
         from one staff line to another.
 
-        returns 0.0 if either of scalingMillimeters or scalingTenths
+        Returns 0.0 if either of scalingMillimeters or scalingTenths
         is undefined.
 
         >>> sl = layout.ScoreLayout(scalingMillimeters=2.0, scalingTenths=10)
@@ -521,7 +521,7 @@ def divideByPages(
     >>> len(lt.parts[0].getElementsByClass(stream.Measure))
     80
 
-    Divide the score up into layout.Page objects
+    Divide the score up into layout.Page objects.
 
     >>> layoutScore = layout.divideByPages(lt, fastMeasures=True)
     >>> len(layoutScore.pages)
@@ -532,14 +532,14 @@ def divideByPages(
     >>> lastPage.measureEnd
     80
 
-    the layoutScore is a subclass of stream.Opus:
+    The layoutScore is a subclass of stream.Opus:
 
     >>> layoutScore
     <music21.layout.LayoutScore ...>
     >>> 'Opus' in layoutScore.classes
     True
 
-    Pages are subclasses of Opus also, since they contain Scores
+    Pages are subclasses of Opus also, since they contain Scores.
 
     >>> lastPage
     <music21.layout.Page ...>
@@ -564,7 +564,7 @@ def divideByPages(
     >>> isinstance(firstSystem, stream.Score)
     True
 
-    Each System has staves (layout.Staff objects) not parts, though Staff is a subclass of Part
+    Each System has staves (layout.Staff objects) not parts, though Staff is a subclass of Part.
 
     >>> secondStaff = firstSystem.staves[1]
     >>> print(len(secondStaff.getElementsByClass(stream.Measure)))
@@ -703,7 +703,7 @@ def getSystemRegionMeasureNumbers(scoreIn):
 
 def getRegionMeasureNumbers(scoreIn, region='Page'):
     '''
-    get a list where each entry is a 2-tuplet whose first number
+    Get a list where each entry is a 2-tuplet whose first number
     refers to the first measure on a page and whose second number
     is the last measure on the page.
     '''
@@ -777,7 +777,7 @@ class LayoutScore(stream.Opus):
         of (pageId, systemId).  Note that pageId is probably one less than the page number,
         assuming that the first page number is 1, the pageId for the first page will be 0.
 
-        Similarly, the first systemId on each page will be 0
+        Similarly, the first systemId on each page will be 0.
 
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> l = layout.divideByPages(lt, fastMeasures=True)
@@ -821,10 +821,10 @@ class LayoutScore(stream.Opus):
 
     def getMarginsAndSizeForPageId(self, pageId):
         '''
-        return a namedtuple of (top, left, bottom, right, width, height)
-        margins for a given pageId in tenths
+        Return a namedtuple of (top, left, bottom, right, width, height)
+        margins for a given pageId in tenths.
 
-        Default of (100, 100, 100, 100, 850, 1100) if undefined
+        Default of (100, 100, 100, 100, 850, 1100) if undefined.
 
         >>> #_DOCS_SHOW g = corpus.parse('luca/gloria')
         >>> #_DOCS_SHOW m22 = g.parts[0].getElementsByClass(stream.Measure)[22]
@@ -891,13 +891,13 @@ class LayoutScore(stream.Opus):
 
     def getPositionForSystem(self, pageId: int, systemId: int) -> SystemSize:
         '''
-        first systems on a page use a different positioning.
+        First systems on a page use a different positioning.
 
-        returns a Named tuple of the (top, left, right, and bottom) where each unit is
-        relative to the page margins
+        Returns a Named tuple of the (top, left, right, and bottom) where each unit is
+        relative to the page margins.
 
         N.B. right is NOT the width -- it is different.  It is the offset to the right margin.
-        weird, inconsistent, but most useful.  Bottom, however, is the hard part to compute.
+        Weird, inconsistent, but most useful.  Bottom, however, is the hard part to compute.
 
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
@@ -979,28 +979,28 @@ class LayoutScore(stream.Opus):
 
     def getPositionForStaff(self, pageId, systemId, staffId):
         '''
-        return a tuple of (top, bottom) for a staff, specified by a given pageId,
+        Return a tuple of (top, bottom) for a staff, specified by a given pageId,
         systemId, and staffId in tenths of a staff-space.
 
         This distance is specified with respect to the top of the system.
 
         Staff scaling (<staff-details> in musicxml inside an <attributes> object) is
         taken into account, but not non-five-line staves.  Thus, a normally sized staff
-        is always of height 40 (4 spaces of 10-tenths each)
+        is always of height 40 (4 spaces of 10-tenths each).
 
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures=True)
 
         The first staff (staff 0) of each page/system always begins at height 0 and should end at
-        height 40 if it is a 5-line staff (not taken into account) with no staffSize changes
+        height 40 if it is a 5-line staff (not taken into account) with no staffSize changes.
 
         >>> ls.getPositionForStaff(0, 0, 0)
         (0.0, 40.0)
         >>> ls.getPositionForStaff(1, 0, 0)
         (0.0, 40.0)
 
-        The second staff (staff 1) begins at the end of staff 0 (40.0) +
-        the appropriate staffDistance
+        The second staff (staff 1) begins at the end of
+        staff 0 (40.0) plus the appropriate staffDistance
         and adds the height of the staff.  Staff 1 here has a size of 80 which means
         80% of the normal staff size.  40 * 0.8 = 32.0:
 
@@ -1008,7 +1008,7 @@ class LayoutScore(stream.Opus):
         (133.0, 165.0)
 
         The third staff (staff 2) begins after the second staff (staff 1) but is a normal
-        size staff
+        size staff.
 
         >>> ls.getPositionForStaff(0, 0, 2)
         (266.0, 306.0)
@@ -1028,7 +1028,7 @@ class LayoutScore(stream.Opus):
         (356.0, 396.0)
 
         In the third system (system 2), the staff distance reverts to the distance
-        of system 0, but the staffSize is now 120 or 48 tenths (40 * 1.2 = 48)
+        of system 0, but the staffSize is now 120 or 48 tenths (40 * 1.2 = 48).
 
         >>> ls.getPositionForStaff(0, 2, 1)
         (117.0, 165.0)
@@ -1108,9 +1108,9 @@ class LayoutScore(stream.Opus):
 
     def getStaffDistanceFromPrevious(self, pageId, systemId, staffId):
         '''
-        return the distance of this staff from the previous staff in the same system
+        Return the distance of this staff from the previous staff in the same system.
 
-        for staffId = 0, this is always 0.0
+        For staffId = 0, this is always 0.0.
 
         TODO:tests, now that this is out from previous
         '''
@@ -1177,7 +1177,7 @@ class LayoutScore(stream.Opus):
         Get the currently active staff-size for a given pageId, systemId, and staffId.
 
         Note that this does not take into account the hidden state of the staff, which,
-        if True, makes the effective size 0.0 -- see getStaffHiddenAttribute
+        if True, makes the effective size 0.0 -- see getStaffHiddenAttribute.
 
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures=True)
@@ -1238,7 +1238,7 @@ class LayoutScore(stream.Opus):
 
     def getStaffHiddenAttribute(self, pageId: int, systemId: int, staffId: int) -> bool:
         '''
-        returns the staffLayout.hidden attribute for a staffId, or if it is not
+        Returns the staffLayout.hidden attribute for a staffId, or if it is not
         defined, recursively search through previous staves until one is found.
 
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
@@ -1287,12 +1287,12 @@ class LayoutScore(stream.Opus):
     ) -> tuple[int|None, int]:
         # noinspection PyShadowingNames
         '''
-        given a pageId and systemId, get the (pageId, systemId) for the previous system.
+        Given a pageId and systemId, get the (pageId, systemId) for the previous system.
 
-        return (None, None) if it's the first system on the first page
+        Return (None, None) if it's the first system on the first page.
 
         This test score has five systems on the first page,
-        three on the second, and two on the third
+        three on the second, and two on the third.
 
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
@@ -1328,7 +1328,7 @@ class LayoutScore(stream.Opus):
         The first measure of staff one begins at 336 tenths from the top (125 for the
         margin top and 211 for the top-staff-distance).  It begins 170.0 from the
         left (100 for the page-margin-left, 70 for staff-margin-left).  It ends
-        40.0 below that (staffHeight) and 247.0 to the right (measure width)
+        40.0 below that (staffHeight) and 247.0 to the right (measure width).
 
         >>> ls.getPositionForStaffMeasure(0, 1)
         ((336.0, 170.0), (376.0, 417.0), 0)
@@ -1405,10 +1405,10 @@ class LayoutScore(stream.Opus):
         Given a measure number, find the start and end X positions (with respect to
         the system margins) for the measure.
 
-        if pageId and systemId are given, then it will speed up the search. But not necessary
+        If pageId and systemId are given, then it will speed up the search. But not necessary.
 
-        no staffId is needed since (at least for now) all measures begin and end at the same
-        X position
+        No staffId is needed since (at least for now) all measures begin and end at the same
+        X position.
 
         >>> l = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(l, fastMeasures = True)
@@ -1419,7 +1419,7 @@ class LayoutScore(stream.Opus):
         >>> ls.measurePositionWithinSystem(3, 0, 0)
         (544.0, 841.0)
 
-        Measure positions reset at the start of a new system
+        Measure positions reset at the start of a new system.
 
         >>> ls.measurePositionWithinSystem(6)
         (0.0, 331.0)
@@ -1462,7 +1462,7 @@ class LayoutScore(stream.Opus):
 
     def getAllMeasurePositionsInDocument(self, returnFormat='tenths', printUpdates=False):
         '''
-        returns a list of dictionaries, where each dictionary gives the measure number
+        Returns a list of dictionaries, where each dictionary gives the measure number
         and other information, etc. in the document.
 
         # >>> g = corpus.parse('luca/gloria')
@@ -1655,7 +1655,7 @@ class Test(unittest.TestCase):
 
     def testGetStaffLayoutFromStaff(self):
         '''
-        we have had problems with attributes disappearing.
+        We have had problems with attributes disappearing.
         '''
         from music21 import corpus
         from music21 import layout

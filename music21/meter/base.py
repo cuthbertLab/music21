@@ -1434,9 +1434,7 @@ class TimeSignature(TimeSignatureBase):
             beams = beamsList[i]
             if beams is None:
                 return
-
-            if t.TYPE_CHECKING:
-                assert isinstance(beams, beam.Beams)
+            beams = t.cast(beam.Beams, beams)
 
             beamNumber = depth + 1
             # see if there is a component defined for this beam number

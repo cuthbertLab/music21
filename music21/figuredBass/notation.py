@@ -16,7 +16,15 @@ from music21 import exceptions21
 from music21 import pitch
 from music21 import prebase
 
-shorthandNotation = {(None,): (5, 3),
+EXTENDER_SENTINEL: int = -1
+'''
+Sentinel value used in a :class:`~music21.figuredBass.notation.Notation`'s
+``numbers`` and ``origNumbers`` for an extender ("``_``") figure that carries no
+number of its own.
+'''
+
+shorthandNotation: dict[tuple[int|None, ...], tuple[int, ...]] = {
+                     (None,): (5, 3),
                      (5,): (5, 3),
                      (6,): (6, 3),
                      (7,): (7, 5, 3),
@@ -208,9 +216,12 @@ class Notation(prebase.ProtoM21Object):
         # Parse notation string
         self.notationColumn: str = notationColumn or ''
         self.figureStrings: list[str] = []
+        # numbers are usually strings cast as int()s, but an extender-only figure stores
+        # the int EXTENDER_SENTINEL (see _parseNotationColumn), and a figure with a modifier
+        # but no number stores None until longhand expansion.
         self.origNumbers: tuple[int|None, ...] = ()
         self.origModStrings: tuple[str|None, ...] = ()
-        self.numbers: list[int] = []
+        self.numbers: tuple[int|None, ...] = ()
         self.modifierStrings: tuple[str|None, ...] = ()
         self.extenders: list[bool] = []
         self.hasExtenders: bool = False
@@ -224,10 +235,10 @@ class Notation(prebase.ProtoM21Object):
         self._getModifiers()
         self._getFigures()
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         return str(self.notationColumn)
 
-    def _parseNotationColumn(self):
+    def _parseNotationColumn(self) -> None:
         '''
         Given a notation column below a pitch, defines both self.numbers
         and self.modifierStrings, which provide the intervals above the
@@ -282,9 +293,9 @@ class Notation(prebase.ProtoM21Object):
         figures = re.split(delimiter, self.notationColumn)
         patternA1 = '([0-9_]*)'
         patternA2 = '([^0-9_]*)'
-        numbers = []
-        modifierStrings = []
-        figureStrings = []
+        numbers: list[int|None] = []
+        modifierStrings: list[str|None] = []
+        figureStrings: list[str] = []
 
         for figure in figures:
             figure = figure.strip()
@@ -298,14 +309,14 @@ class Notation(prebase.ProtoM21Object):
             if not (len(m1) <= 1 or len(m2) <= 1):
                 raise NotationException('Invalid Notation: ' + figure)
 
-            number = None
-            modifierString = None
+            number: int|None = None
+            modifierString: str|None = None
             extender = False
             if m1:
                 # if no number is there and only an extender is found.
                 if '_' in m1:
                     self.hasExtenders = True
-                    number = '_'
+                    number = EXTENDER_SENTINEL
                     extender = True
                 else:
                     # is an extender part of the number string?
@@ -322,16 +333,16 @@ class Notation(prebase.ProtoM21Object):
             modifierStrings.append(modifierString)
             self.extenders.append(extender)
 
-        numbers = tuple(numbers)
-        modifierStrings = tuple(modifierStrings)
+        numbersTuple = tuple(numbers)
+        modifierStringsTuple = tuple(modifierStrings)
 
-        self.origNumbers = numbers  # Keep original numbers
-        self.numbers = numbers  # Will be converted to longhand
-        self.origModStrings = modifierStrings  # Keep original modifier strings
-        self.modifierStrings = modifierStrings  # Will be converted to longhand
+        self.origNumbers = numbersTuple  # Keep original numbers
+        self.numbers = numbersTuple  # Will be converted to longhand
+        self.origModStrings = modifierStringsTuple  # Keep original modifier strings
+        self.modifierStrings = modifierStringsTuple  # Will be converted to longhand
         self.figureStrings = figureStrings
 
-    def _translateToLonghand(self):
+    def _translateToLonghand(self) -> None:
         '''
         Provided the numbers and modifierStrings of a parsed notation column,
         translates it to longhand.
@@ -349,47 +360,35 @@ class Notation(prebase.ProtoM21Object):
         ('-', '-')
         '''
         oldNumbers = self.numbers
-        newNumbers = oldNumbers
+        newNumbers: tuple[int|None, ...] = oldNumbers
         oldModifierStrings = self.modifierStrings
-        newModifierStrings = oldModifierStrings
+        newModifierStrings: tuple[str|None, ...] = oldModifierStrings
 
         try:
             newNumbers = shorthandNotation[oldNumbers]
-            newModifierStrings = []
+            modStrings: list[str|None] = []
 
-            oldNumbers = list(oldNumbers)
-            temp = []
-            for number in oldNumbers:
-                if number is None:
-                    temp.append(3)
-                else:
-                    temp.append(number)
-
-            oldNumbers = tuple(temp)
+            expandedOldNumbers = tuple(
+                3 if number is None else number for number in oldNumbers
+            )
 
             for number in newNumbers:
-                newModifierString = None
-                if number in oldNumbers:
-                    modifierStringIndex = oldNumbers.index(number)
+                newModifierString: str|None = None
+                if number in expandedOldNumbers:
+                    modifierStringIndex = expandedOldNumbers.index(number)
                     newModifierString = oldModifierStrings[modifierStringIndex]
-                newModifierStrings.append(newModifierString)
+                modStrings.append(newModifierString)
 
-            newModifierStrings = tuple(newModifierStrings)
+            newModifierStrings = tuple(modStrings)
         except KeyError:
-            newNumbers = list(newNumbers)
-            temp = []
-            for number in newNumbers:
-                if number is None:
-                    temp.append(3)
-                else:
-                    temp.append(number)
-
-            newNumbers = tuple(temp)
+            newNumbers = tuple(
+                3 if number is None else number for number in newNumbers
+            )
 
         self.numbers = newNumbers
         self.modifierStrings = newModifierStrings
 
-    def _getModifiers(self):
+    def _getModifiers(self) -> None:
         '''
         Turns the modifier strings into Modifier objects.
         A modifier object keeps track of both the modifier string
@@ -406,7 +405,7 @@ class Notation(prebase.ProtoM21Object):
         >>> notation1.modifiers[2]
         <music21.figuredBass.notation.Modifier + sharp>
         '''
-        modifiers = []
+        modifiers: list[Modifier] = []
 
         for i in range(len(self.numbers)):
             modifierString = self.modifierStrings[i]
@@ -514,7 +513,7 @@ class Figure(prebase.ProtoM21Object):
         modifierString: str|None = '',
         *,
         extender: bool = False
-    ):
+    ) -> None:
         self.number: int|None = number
         self.modifierString: str|None = modifierString
         self.modifier: Modifier = Modifier(modifierString)
@@ -542,12 +541,12 @@ class Figure(prebase.ProtoM21Object):
         '''
         return self.number == 1 and self.hasExtender
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         if self.isPureExtender:
             num = 'pure-extender'
             ext = ''
         else:
-            num = str(self.number)
+            num = '_' if self.number == EXTENDER_SENTINEL else str(self.number)
             ext = '(extender)' if self.hasExtender else ''
         mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')
         return f'{num}{ext} {mod}'
@@ -629,18 +628,18 @@ class Modifier(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, modifierString=None):
-        self.modifierString = modifierString
-        self.accidental = self._toAccidental()
+    def __init__(self, modifierString: str|None = None) -> None:
+        self.modifierString: str|None = modifierString
+        self.accidental: pitch.Accidental|None = self._toAccidental()
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         if self.accidental is not None:
             acc = self.accidental.name
         else:
             acc = None
         return f'{self.modifierString} {acc}'
 
-    def _toAccidental(self):
+    def _toAccidental(self) -> pitch.Accidental|None:
         '''
 
         >>> from music21.figuredBass import notation as n
@@ -677,7 +676,7 @@ class Modifier(prebase.ProtoM21Object):
 
         return a
 
-    def modifyPitchName(self, pitchNameToAlter):
+    def modifyPitchName(self, pitchNameToAlter: str) -> str:
         '''
         Given a pitch name, modify its accidental given the Modifier's
         :attr:`~music21.figuredBass.notation.Modifier.accidental`.
@@ -697,7 +696,12 @@ class Modifier(prebase.ProtoM21Object):
         self.modifyPitch(pitchToAlter, inPlace=True)
         return pitchToAlter.name
 
-    def modifyPitch(self, pitchToAlter, *, inPlace=False):
+    def modifyPitch(
+        self,
+        pitchToAlter: pitch.Pitch,
+        *,
+        inPlace: bool = False
+    ) -> pitch.Pitch|None:
         '''
         Given a :class:`~music21.pitch.Pitch`, modify its :attr:`~music21.pitch.Pitch.accidental`
         given the Modifier's :attr:`~music21.figuredBass.notation.Modifier.accidental`.
@@ -751,7 +755,7 @@ class ModifierException(exceptions21.Music21Exception):
 # Helper Methods
 
 
-def convertToPitch(pitchString):
+def convertToPitch(pitchString: str|pitch.Pitch) -> pitch.Pitch:
     '''
     Converts a pitchString to a :class:`~music21.pitch.Pitch`, only if necessary.
 
@@ -780,7 +784,31 @@ _DOC_ORDER = [Notation, Figure, Modifier]
 
 
 class Test(unittest.TestCase):
-    pass
+    def testExtenderOnlyFigureUsesSentinel(self):
+        # A bare underscore is an extender that carries no number of its own,
+        # so its number is EXTENDER_SENTINEL in both origNumbers and numbers.
+        n = Notation('_')
+        self.assertTrue(n.hasExtenders)
+        self.assertEqual(n.extenders, [True])
+        self.assertEqual(n.origNumbers, (EXTENDER_SENTINEL,))
+        self.assertEqual(n.numbers, (EXTENDER_SENTINEL,))
+
+    def testNumberWithExtenderKeepsItsNumber(self):
+        # A number directly followed by '_' keeps the number and flags the extender;
+        # the sentinel is only for extenders with no number.
+        n = Notation('7_')
+        self.assertTrue(n.hasExtenders)
+        self.assertEqual(n.extenders, [True])
+        self.assertEqual(n.origNumbers, (7,))
+        self.assertEqual(n.numbers, (7, 5, 3))
+        self.assertNotIn(EXTENDER_SENTINEL, n.numbers)
+
+    def testExtenderSentinelRendersAsUnderscore(self):
+        # The sentinel is shown as '_' in repr, never as its raw -1 value.
+        f = Figure(EXTENDER_SENTINEL, extender=True)
+        self.assertEqual(f.number, EXTENDER_SENTINEL)
+        self.assertIn('_(extender)', repr(f))
+        self.assertNotIn('-1', repr(f))
 
 
 if __name__ == '__main__':

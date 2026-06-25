@@ -155,7 +155,7 @@ class SortTuple(_SortTupleBase):
 
     def shortRepr(self):
         '''
-        Returns a nice representation of a SortTuple
+        Returns a nice representation of a SortTuple.
 
         >>> st = sorting.SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20,
         ...           isNotGrace=1, insertIndex=323)
@@ -186,7 +186,7 @@ class SortTuple(_SortTupleBase):
 
     def modify(self, **keywords):
         '''
-        return a new SortTuple identical to the previous, except with
+        Return a new SortTuple identical to the previous, except with
         the given keyword modified.  Works only with keywords.
 
         >>> st = sorting.SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20,

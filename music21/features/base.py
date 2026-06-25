@@ -85,9 +85,9 @@ class Feature:
     And that's it! FeatureExtractors are much more interesting.
     '''
 
-    def __init__(self):
+    def __init__(self) -> None:
         # these values will be filled by the extractor
-        self.dimensions = None  # number of dimensions
+        self.dimensions: int = 1  # number of dimensions
         # data storage; possibly use numpy array
         self.vector = None
 
@@ -97,7 +97,7 @@ class Feature:
         self.isSequential = None  # True or False
         self.discrete = None  # is discrete or continuous
 
-    def _getVectors(self):
+    def _getVectors(self) -> list[int|float]:
         '''
         Prepare a vector of appropriate size and return
         '''
@@ -553,12 +553,12 @@ class DataInstance:
         # or metadata title
         if id is not None:
             self._id = id
-        elif (self.stream is not None
-              and hasattr(self.stream, 'metadata')
-              and self.stream.metadata is not None
-              and self.stream.metadata.title is not None
+        elif ((s := self.stream) is not None
+              and hasattr(s, 'metadata')
+              and (md := s.metadata) is not None
+              and md.title is not None
               ):
-            self._id = self.stream.metadata.title
+            self._id = md.title
         elif self.stream is not None and hasattr(self.stream, 'sourcePath'):
             self._id = self.stream.sourcePath
         elif self.streamPath is not None:
@@ -1077,8 +1077,11 @@ class DataSet:
         '''
         if format is None and fp is not None:
             outputFormat = self._getOutputFormatFromFilePath(fp)
+        elif format is None:
+            raise ValueError('Specify a format or a file path')
         else:
             outputFormat = self._getOutputFormat(format)
+
         if outputFormat is None:
             raise DataSetException('no output format could be defined from file path '
                                    f'{fp} or format {format}')

@@ -25,6 +25,7 @@ from collections.abc import Sequence
 import copy
 import difflib
 import unittest
+import warnings
 
 from music21 import base
 from music21 import clef
@@ -136,7 +137,7 @@ class Variant(base.Music21Object):
         #               + attr + ' to private Stream'])
 
         # must mask pitches so as not to recurse
-        # TODO: check tt recurse does not go into this
+        # TODO: check that recurse does not go into this
         if attr in ['flat', 'pitches']:
             raise AttributeError
 
@@ -297,6 +298,11 @@ class Variant(base.Music21Object):
         return self.replacementQuarterLength
 
     def _setReplacementDuration(self, value):
+        warnings.warn(
+            "'replacementDuration' is deprecated as of v11 and will be removed in v12; "
+            + 'use the synonym replacementQuarterLength instead.',
+            exceptions21.Music21DeprecationWarning,
+            stacklevel=2)
         self.replacementQuarterLength = value
 
     replacementDuration = property(
@@ -307,9 +313,9 @@ class Variant(base.Music21Object):
 
         .. note::
 
-            ``replacementDuration`` is pending deprecation as of v10.3 (music21
-            avoids referring to an offset/quarterLength value as a "Duration"). It will be
-            fully deprecated in v11 and removed in v12.  Use
+            ``replacementDuration`` is deprecated as of v11 (music21
+            avoids referring to an offset/quarterLength value as a "Duration").
+            Setting it raises a deprecation warning, and it will be removed in v12.  Use
             :attr:`replacementQuarterLength` instead.
         ''')
 
@@ -513,7 +519,7 @@ class Variant(base.Music21Object):
 
     def removeReplacedElementsFromStream(self, referenceStream=None, classList=None):
         '''
-        remove replaced elements from a referenceStream or activeSite
+        Remove replaced elements from a referenceStream or activeSite.
 
         >>> v = variant.Variant()
         >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
@@ -1400,8 +1406,9 @@ def addVariant(
     None, this is a deletion.
 
     * Changed in v10.3: the ``replacementDuration`` keyword renamed to
-      ``replacementQuarterLength``.  The old name is pending deprecation:
-      will warn in v11 and be removed in v12.
+      ``replacementQuarterLength``.
+    * Changed in v11: passing the old ``replacementDuration`` keyword now raises a
+      deprecation warning; it will be removed in v12.
 
     >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'),
     ...            ('a', 'quarter'), ('a', 'quarter')]
@@ -1468,7 +1475,13 @@ def addVariant(
     '''
     if replacementDuration is not None:
         # 'replacementDuration' was renamed to 'replacementQuarterLength' in v10.3.
-        # Pending deprecation: still accepted in v10, will warn in v11, be removed in v12.
+        # Deprecated as of v11, to be removed in v12.
+        warnings.warn(
+            "addVariant()'s 'replacementDuration' keyword was renamed to "
+            + "'replacementQuarterLength' in v10.3; 'replacementDuration' is deprecated "
+            + 'and will be removed in v12.',
+            exceptions21.Music21DeprecationWarning,
+            stacklevel=2)
         if replacementQuarterLength is not None:
             raise TypeError(
                 "addVariant() received both 'replacementQuarterLength' and its former "
@@ -1519,7 +1532,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
     Calling refineVariant on this stream and that variant object would result in a variant object
     in the measures for each F#/F pair, and a variant object containing the added bar at the end.
     For a more detailed explanation of how similar measures are properly associated with each other
-    look at the documentation for _getBestListAndScore
+    look at the documentation for _getBestListAndScore.
 
     Note that this code does not work properly yet.
 
@@ -1626,8 +1639,8 @@ def refineVariant(s, sVariant, *, inPlace=False):
     # each region is processed for variants.
     for regionType, returnStart, returnEnd, variantStart, variantEnd in regions:
         startOffset = returnRegion[returnStart].getOffsetBySite(returnRegion)
-        # endOffset = (returnRegion[returnEnd-1].getOffsetBySite(returnRegion) +
-        #              returnRegion[returnEnd-1].duration.quarterLength)
+        # endOffset = (returnRegion[returnEnd - 1].getOffsetBySite(returnRegion)
+        #              + returnRegion[returnEnd - 1].duration.quarterLength)
         variantSubRegion = None
         if regionType == 'equal':
             returnSubRegion = returnRegion.measures(returnStart + 1, returnEnd)
@@ -1749,7 +1762,7 @@ def getMeasureHashes(s):
     '''
     Takes in a stream containing measures and returns a list of hashes,
     one for each measure. This is currently implemented
-    with search.translateStreamToString()
+    with search.translateStreamToString().
 
     >>> s = converter.parse("tinynotation: 2/4 c4 d8. e16 FF4 a'4 b-2")
     >>> sm = s.makeMeasures()
@@ -2593,7 +2606,7 @@ class Test(unittest.TestCase):
         self.assertEqual(v.highestTime, 0.0)
 
         self.assertEqual(len(v.notes), 2)
-        self.assertTrue(v.hasElementOfClass('Note'))
+        self.assertTrue(v.getElementsByClass('Note'))
         v.pop(1)  # remove the last item
 
         self.assertEqual(v.highestOffset, 0.0)
@@ -2620,8 +2633,8 @@ class Test(unittest.TestCase):
 
         self.assertIn('Variant', v1.classes)
 
-        self.assertFalse(v1.hasElementOfClass(Variant))
-        self.assertTrue(v1.hasElementOfClass(stream.Measure))
+        self.assertFalse(v1.getElementsByClass(Variant))
+        self.assertTrue(v1.getElementsByClass(stream.Measure))
 
     def testDeepCopyVariantA(self):
         from music21 import variant

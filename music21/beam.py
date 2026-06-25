@@ -21,7 +21,7 @@ attributes.  Beams objects can largely be treated as a list.
 See `meter.TimeSignature`. :meth:`~music21.meter.TimeSignature.getBeams` for a
 way of getting beam information for a measure given the meter.  The
 `meter.TimeSignature`. :attr:`~music21.meter.TimeSignature.beamSequence`
-attribute holds information about how to beam given the TimeSignature
+attribute holds information about how to beam given the TimeSignature.
 
 Run `Stream`. :meth:`~music21.stream.Stream.makeBeams` to set beaming
 information automatically given the current meter.
@@ -255,7 +255,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         Given a list or iterator of elements, return a list of None or Beams for
         each element: None if the element is a quarter or larger or
         if the element is a Rest, and the fullest possible set of beams
-        for the duration if it is a beamable.  Each beam object has type of None
+        for the duration if it is a beamable.  Each beam object has type of None.
 
         staticmethod, does not need instance:
 
@@ -295,7 +295,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         Go through the naiveBeamsList and remove beams from objects surrounded
         by None objects -- you can't beam to nothing!
 
-        Modifies beamsList in place
+        Modifies beamsList in place.
 
         >>> N = note.Note
         >>> R = note.Rest
@@ -342,7 +342,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     def mergeConnectingPartialBeams(beamsList):
         '''
         Partial-right followed by partial-left must also be connected, even if otherwise
-        over a archetypeSpan, such as 16th notes 2 and 3 in a quarter note span where
+        over an archetypeSpan, such as 16th notes 2 and 3 in a quarter note span where
         16ths are not beamed by default.
         '''
         # sanitize two partials in a row:
@@ -594,7 +594,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
     def getTypeByNumber(self, number):
         '''
-        Get beam type, with direction, by number
+        Get beam type, with direction, by number.
 
         >>> a = beam.Beams()
         >>> a.fill('16th')
@@ -614,7 +614,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
     def getTypes(self):
         '''
-        Returns a list of all beam types defined for the current beams
+        Returns a list of all beam types defined for the current beams.
 
         >>> a = beam.Beams()
         >>> a.fill('16th')
@@ -629,7 +629,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         `setAll` is a method of convenience that sets the type
         of each of the beam objects within the beamsList to the specified type.
         It also takes an optional "direction" attribute that sets the direction
-        for each beam (otherwise the direction of each beam is set to None)
+        for each beam (otherwise the direction of each beam is set to None).
         Acceptable directions (start, stop, continue, etc.) are listed under
         Beam() above.
 

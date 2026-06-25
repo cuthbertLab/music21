@@ -577,7 +577,7 @@ class NoteHash(tuple):
     >>> b
     2
     >>> nh.__class__
-    <... 'music21.alpha.analysis.hasher.NoteHash'>
+    <class 'music21.alpha.analysis.hasher.NoteHash'>
     '''
     def __new__(cls, tupEls):
         return super(NoteHash, cls).__new__(cls, tuple(tupEls))

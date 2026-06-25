@@ -21,7 +21,6 @@ import typing as t
 import warnings
 
 from music21 import chord
-from music21 import common
 from music21.common.numberTools import opFrac
 from music21 import defaults
 from music21 import duration
@@ -48,6 +47,7 @@ from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
 
 if t.TYPE_CHECKING:
+    import pathlib
     from music21 import base
     from music21.common.types import OffsetQLIn
 
@@ -227,10 +227,10 @@ def getStartEvents(
     events: list[DeltaTime|MidiEvent] = []
     if isinstance(instrumentObj, Conductor):
         return events
-    elif instrumentObj is None or instrumentObj.bestName() is None:
+    elif instrumentObj is None or (bestName := instrumentObj.bestName()) is None:
         partName = ''
     else:
-        partName = instrumentObj.bestName()
+        partName = bestName
 
     dt = DeltaTime(midiTrack, channel=channel)
     events.append(dt)
@@ -300,8 +300,8 @@ def getEndEvents(
 def music21ObjectToMidiFile(
     music21Object: base.Music21Object,
     *,
-    addStartDelay=False,
-    addEndDelay=True,
+    addStartDelay: bool = False,
+    addEndDelay: bool = True,
     encoding: str = 'utf-8',
 ) -> MidiFile:
     '''
@@ -448,10 +448,11 @@ def midiEventsToNote(
     )
 
     if isinstance(nr, note.Note):
-        nr.pitch.midi = midiOnEvent.pitch
+        nr.pitch.midi = t.cast(int, midiOnEvent.pitch)
     elif isinstance(nr, note.Unpitched):
+        onPitch = t.cast(int, midiOnEvent.pitch)
         try:
-            i = PERCUSSION_MAPPER.midiPitchToInstrument(midiOnEvent.pitch)
+            i = PERCUSSION_MAPPER.midiPitchToInstrument(onPitch)
         except MIDIPercussionException:
             i = instrument.UnpitchedPercussion()
         nr.storedInstrument = i
@@ -663,7 +664,7 @@ def midiEventsToChord(
         if midiOnEvent.channel == 10:
             any_channel_10 = True
         p = pitch.Pitch()
-        p.midi = midiOnEvent.pitch
+        p.midi = t.cast(int, midiOnEvent.pitch)
         pitches.append(p)
         v = volume.Volume(velocity=midiOnEvent.velocity)
         v.velocityIsRelative = False  # velocity is absolute coming from MIDI
@@ -845,7 +846,7 @@ def instrumentToMidiEvents(
     includeDeltaTime: bool = True,
     midiTrack: MidiTrack|None = None,
     channel: int = 1,
-):
+) -> list[MidiEvent|DeltaTime]:
     '''
     Converts a :class:`~music21.instrument.Instrument` object to a list of MidiEvents
 
@@ -873,19 +874,6 @@ def instrumentToMidiEvents(
 
 # ------------------------------------------------------------------------------
 # Meta events
-
-@common.deprecated('v10', 'v11', 'passing a list was never used; use midiEventToInstrument instead')
-def midiEventsToInstrument(
-    eventList: MidiEvent|tuple[int, MidiEvent],
-    *,
-    encoding: str = 'utf-8',
-) -> instrument.Instrument:
-    if not common.isListLike(eventList):
-        event = t.cast(MidiEvent, eventList)
-    else:  # get the second event; first is delta time
-        event = eventList[1]
-    return midiEventToInstrument(event, encoding=encoding)
-
 
 def midiEventToInstrument(
     event: MidiEvent,
@@ -975,7 +963,9 @@ def midiEventToInstrument(
     return i
 
 
-def midiEventsToTimeSignature(eventList):
+def midiEventsToTimeSignature(
+    eventList: MidiEvent|Sequence[MidiEvent]
+) -> meter.TimeSignature:
     # noinspection PyShadowingNames
     '''
     Convert a single MIDI event into a music21 TimeSignature object.
@@ -1016,13 +1006,14 @@ def midiEventsToTimeSignature(eventList):
     # Time Signature Event should appear in the first track chunk (or all track
     # chunks in a Type 2 file) before any non-zero delta time events. If one
     # is not specified 4/4, 24, 8 should be assumed.
-    if not common.isListLike(eventList):
+    if isinstance(eventList, MidiEvent):
         event = eventList
     else:  # get the second event; first is delta time
         event = eventList[1]
 
     # time signature is 4 byte encoding
-    post = list(event.data)
+    eventData = t.cast(bytes, event.data)
+    post = list(eventData)
 
     n = post[0]
     d = pow(2, post[1])
@@ -1030,7 +1021,10 @@ def midiEventsToTimeSignature(eventList):
     return ts
 
 
-def timeSignatureToMidiEvents(ts, includeDeltaTime=True) -> list[DeltaTime|MidiEvent]:
+def timeSignatureToMidiEvents(
+    ts: meter.TimeSignature,
+    includeDeltaTime: bool = True
+) -> list[DeltaTime|MidiEvent]:
     # noinspection PyShadowingNames
     '''
     Translate a :class:`~music21.meter.TimeSignature` to a pair of events: a DeltaTime and
@@ -1089,7 +1083,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True) -> list[DeltaTime|MidiE
     return eventList
 
 
-def midiEventsToKey(eventList) -> key.Key:
+def midiEventsToKey(eventList: MidiEvent|Sequence[MidiEvent]) -> key.Key:
     # noinspection PyShadowingNames
     r'''
     Convert a single MIDI event into a :class:`~music21.key.KeySignature` object.
@@ -1124,11 +1118,12 @@ def midiEventsToKey(eventList) -> key.Key:
     # the key specifies the number of sharps and a negative value specifies
     # the number of flats. A value of 0 for the scale specifies a major key
     # and a value of 1 specifies a minor key.
-    if not common.isListLike(eventList):
+    if isinstance(eventList, MidiEvent):
         event = eventList
     else:  # get the second event; first is delta time
         event = eventList[1]
-    post = list(event.data)
+    eventData = t.cast(bytes, event.data)
+    post = list(eventData)
 
     # first value is number of sharp, or neg for number of flat
     if post[0] > 12:
@@ -1150,7 +1145,7 @@ def midiEventsToKey(eventList) -> key.Key:
 
 def keySignatureToMidiEvents(
     ks: key.KeySignature,
-    includeDeltaTime=True
+    includeDeltaTime: bool = True
 ) -> list[DeltaTime|MidiEvent]:
     # noinspection PyShadowingNames
     r'''
@@ -1211,18 +1206,19 @@ def keySignatureToMidiEvents(
     return eventList
 
 
-def midiEventsToTempo(eventList):
+def midiEventsToTempo(eventList: MidiEvent|Sequence[MidiEvent]) -> tempo.MetronomeMark:
     '''
     Convert a single MIDI event into a music21 Tempo object.
 
     TODO: Need Tests
     '''
-    if not common.isListLike(eventList):
+    if isinstance(eventList, MidiEvent):
         event = eventList
     else:  # get the second event; first is delta time
         event = eventList[1]
     # get microseconds per quarter
-    mspq = getNumber(event.data, 3)[0]  # first data is number
+    eventData = t.cast(bytes, event.data)
+    mspq = getNumber(eventData, 3)[0]  # first data is number
     bpm = round(60_000_000 / mspq, 2)
     # post = list(event.data)
     # environLocal.printDebug(['midiEventsToTempo, got bpm', bpm])
@@ -1232,7 +1228,7 @@ def midiEventsToTempo(eventList):
 
 def tempoToMidiEvents(
     tempoIndication: tempo.MetronomeMark,
-    includeDeltaTime=True,
+    includeDeltaTime: bool = True,
 ) -> list[DeltaTime|MidiEvent]|None:
     # noinspection PyShadowingNames
     r'''
@@ -1503,11 +1499,11 @@ def streamToPackets(
 
 
 def assignPacketsToChannels(
-    packets,
-    channelByInstrument=None,
-    channelsDynamic=None,
-    initTrackIdToChannelMap=None,
-):
+    packets: list[dict[str, t.Any]],
+    channelByInstrument: dict[int|None, int]|None = None,
+    channelsDynamic: list[int]|None = None,
+    initTrackIdToChannelMap: dict[int, int|None]|None = None,
+) -> list[dict[str, t.Any]]:
     '''
     Given a list of packets, assign each to a channel.
 
@@ -1534,9 +1530,10 @@ def assignPacketsToChannels(
     if initTrackIdToChannelMap is None:
         initTrackIdToChannelMap = {}
 
-    uniqueChannelEvents = {}  # dict of (start, stop, usedChannel) : channel
-    post = []
-    usedTracks = []
+    # dict of (start, stop, usedChannel) : list of cent shifts
+    uniqueChannelEvents: dict[tuple[int, int, int], list[int]] = {}
+    post: list[dict[str, t.Any]] = []
+    usedTracks: list[int] = []
 
     for p in packets:
         # environLocal.printDebug(['assignPacketsToChannels', p['midiEvent'].track, p['trackId']])
@@ -1703,8 +1700,10 @@ def assignPacketsToChannels(
         if trackId == 0:
             continue  # Conductor track: do not add pitch bend
         ch = initTrackIdToChannelMap[trackId]
-        # use None for track; will get updated later
-        me = MidiEvent(track=trackId,
+        if ch is None:
+            continue  # no channel assigned: do not add pitch bend
+        # use None for track; will get updated later by MidiTrack.updateEvents()
+        me = MidiEvent(track=None,
                        type=ChannelVoiceMessages.PITCH_BEND,
                        channel=ch)
         me.setPitchBend(0)
@@ -1796,7 +1795,14 @@ def packetsToDeltaSeparatedEvents(
     return events
 
 
-def packetsToMidiTrack(packets, trackId=1, channel=1, instrumentObj=None, *, addEndDelay=True):
+def packetsToMidiTrack(
+    packets: list[dict[str, t.Any]],
+    trackId: int = 1,
+    channel: int = 1,
+    instrumentObj: instrument.Instrument|None = None,
+    *,
+    addEndDelay: bool = True,
+) -> MidiTrack:
     '''
     Given packets already allocated with channel
     and/or instrument assignments, place these in a MidiTrack.
@@ -2029,7 +2035,7 @@ def insertConductorEvents(
     target: stream.Part,
     *,
     isFirst: bool = False,
-):
+) -> None:
     '''
     Insert a deepcopy of any TimeSignature, KeySignature, or MetronomeMark
     found in the `conductorPart` into the `target` Part at the same offset.
@@ -2047,16 +2053,16 @@ def insertConductorEvents(
         target.insert(conductorPart.elementOffset(e), eventCopy)
 
 def midiTrackToStream(
-    mt,
+    mt: MidiTrack,
     *,
     ticksPerQuarter: int = defaults.ticksPerQuarter,
-    quantizePost=True,
-    inputM21=None,
+    quantizePost: bool = True,
+    inputM21: stream.Part|None = None,
     conductorPart: stream.Part|None = None,
     isFirst: bool = False,
     quarterLengthDivisors: Sequence[int] = (),
     encoding: str = 'utf-8',
-    **keywords
+    **keywords: t.Any
 ) -> stream.Part:
     # noinspection PyShadowingNames
     '''
@@ -2258,7 +2264,7 @@ def midiTrackToStream(
     return s
 
 
-def prepareStreamForMidi(s) -> stream.Stream:
+def prepareStreamForMidi(s: stream.Stream) -> stream.Stream:
     # noinspection PyShadowingNames
     '''
     Given a score, prepare it for MIDI processing, and return a new Stream:
@@ -2510,9 +2516,9 @@ def channelInstrumentData(
 
 
 def packetStorageFromSubstreamList(
-    substreamList: list[stream.Part],
+    substreamList: Sequence[stream.Stream],
     *,
-    addStartDelay=False,
+    addStartDelay: bool = False,
     encoding: str = 'utf-8',
 ) -> dict[int, dict[str, t.Any]]:
     # noinspection PyShadowingNames
@@ -2613,7 +2619,7 @@ def packetStorageFromSubstreamList(
 
 def updatePacketStorageWithChannelInfo(
     packetStorage: dict[int, dict[str, t.Any]],
-    channelByInstrument: dict[int|None, int|None],
+    channelByInstrument: dict[int|None, int],
 ) -> None:
     '''
     Take the packetStorage dictionary and using information
@@ -2634,9 +2640,8 @@ def updatePacketStorageWithChannelInfo(
         elif isinstance(instObj, instrument.Conductor):
             initCh = None
         else:  # keys are midi program
-            if t.TYPE_CHECKING:
-                assert isinstance(instObj, instrument.Instrument)
-            initCh = channelByInstrument[instObj.midiProgram]
+            instObjInstrument = t.cast(instrument.Instrument, instObj)
+            initCh = channelByInstrument[instObjInstrument.midiProgram]
         bundle['initChannel'] = initCh  # set for bundle too
 
         for rawPacket in bundle['rawPackets']:
@@ -2644,13 +2649,13 @@ def updatePacketStorageWithChannelInfo(
 
 
 def streamHierarchyToMidiTracks(
-    inputM21,
+    inputM21: stream.Stream,
     *,
-    acceptableChannelList=None,
-    addStartDelay=False,
-    addEndDelay=True,
-    encoding='utf-8',
-):
+    acceptableChannelList: list[int]|None = None,
+    addStartDelay: bool = False,
+    addEndDelay: bool = True,
+    encoding: str = 'utf-8',
+) -> list[MidiTrack]:
     '''
     Given a Stream, Score, Part, etc., that may have substreams (i.e.,
     a hierarchy), return a list of :class:`~music21.midi.MidiTrack` objects.
@@ -2688,7 +2693,7 @@ def streamHierarchyToMidiTracks(
     #    Streams that do not start at same time
 
     # store streams in uniform list: prepareStreamForMidi() ensures there are substreams
-    substreamList = []
+    substreamList: list[stream.Stream] = []
     for obj in s.getElementsByClass(stream.Stream):
         # prepareStreamForMidi() supplies defaults for these
         if obj.getElementsByClass(('MetronomeMark', 'TimeSignature')):
@@ -2741,11 +2746,11 @@ def streamHierarchyToMidiTracks(
 def midiTracksToStreams(
     midiTracks: list[MidiTrack],
     ticksPerQuarter: int = defaults.ticksPerQuarter,
-    quantizePost=True,
+    quantizePost: bool = True,
     inputM21: stream.Score|None = None,
     *,
     encoding: str = 'utf-8',
-    **keywords
+    **keywords: t.Any
 ) -> stream.Score:
     '''
     Given a list of midiTracks, populate either a new stream.Score or inputM21
@@ -2841,12 +2846,12 @@ def streamToMidiFile(
 
 
 def midiFilePathToStream(
-    filePath,
+    filePath: str|pathlib.Path,
     *,
-    inputM21=None,
+    inputM21: stream.Score|None = None,
     encoding: str = 'utf-8',
-    **keywords,
-):
+    **keywords: t.Any,
+) -> stream.Score:
     '''
     Used by music21.converter:
 
@@ -2877,9 +2882,9 @@ def midiFilePathToStream(
 
 
 def midiAsciiStringToBinaryString(
-    midiFormat=1,
-    ticksPerQuarterNote=960,
-    tracksEventsList=None
+    midiFormat: int = 1,
+    ticksPerQuarterNote: int = 960,
+    tracksEventsList: list[list[str]]|None = None
 ) -> bytes:
     r'''
     Convert Ascii midi data to a bytes object (formerly binary midi string).
@@ -2910,7 +2915,7 @@ def midiAsciiStringToBinaryString(
     '''
     mf = MidiFile()
 
-    numTracks = len(tracksEventsList)
+    numTracks = len(tracksEventsList) if tracksEventsList is not None else 0
 
     if numTracks == 1:
         mf.format = 1
@@ -2960,7 +2965,7 @@ def midiAsciiStringToBinaryString(
     return midiBinStr
 
 
-def midiStringToStream(strData, **keywords):
+def midiStringToStream(strData: bytes, **keywords: t.Any) -> stream.Score:
     r'''
     Convert a string of binary midi data to a Music21 stream.Score object.
 
@@ -2994,11 +2999,11 @@ def midiStringToStream(strData, **keywords):
 def midiFileToStream(
     mf: MidiFile,
     *,
-    inputM21=None,
-    quantizePost=True,
+    inputM21: stream.Score|None = None,
+    quantizePost: bool = True,
     encoding: str = 'utf-8',
-    **keywords
-):
+    **keywords: t.Any
+) -> stream.Score:
     # noinspection PyShadowingNames
     '''
     Note: this is NOT the normal way to read a MIDI file.  The best way is generally:

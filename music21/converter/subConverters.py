@@ -346,8 +346,7 @@ class SubConverter:
 class ConverterIPython(SubConverter):
     '''
     Meta-subConverter for displaying image data in a Notebook
-    using either png (via MuseScore or LilyPond) or directly via
-    Vexflow/music21j, or MIDI using music21j.
+    using either png (via MuseScore or LilyPond) or MIDI using music21j.
     '''
     registerFormats = ('ipython', 'jupyter')
     registerOutputExtensions = ()
@@ -388,11 +387,10 @@ class ConverterIPython(SubConverter):
             )
             return None
         elif helperFormat == 'midi':
-            if t.TYPE_CHECKING:
-                assert isinstance(helperSubConverter, ConverterMidi)
+            midiSubConverter = t.cast(ConverterMidi, helperSubConverter)
             return ip21_converters.displayMusic21jMIDI(
                 obj,
-                subConverter=helperSubConverter,
+                subConverter=midiSubConverter,
                 fmt=helperFormat,
                 subformats=helperSubformats,
                 **keywords,
@@ -487,25 +485,6 @@ class ConverterBraille(SubConverter):
         dataStr = braille.translate.objectToBraille(obj, **keywords)
         if 'ascii' in subformats:
             dataStr = braille.basic.brailleUnicodeToBrailleAscii(dataStr)
-        fp = self.writeDataStream(fp, dataStr)
-        return fp
-
-
-class ConverterVexflow(SubConverter):
-    registerFormats = ('vexflow',)
-    registerOutputExtensions = ('html',)
-
-    def write(self,
-              obj,
-              fmt,
-              fp=None,
-              subformats=(),
-              *,
-              local: bool = False,
-              **keywords):  # pragma: no cover
-        # from music21 import vexflow
-        from music21.vexflow import toMusic21j as vexflow
-        dataStr = vexflow.fromObject(obj, mode='html', local=local)
         fp = self.writeDataStream(fp, dataStr)
         return fp
 
@@ -631,8 +610,8 @@ class ConverterHumdrum(SubConverter):
         Open Humdrum data from a string -- calls
         :meth:`~music21.humdrum.spineParser.HumdrumDataCollection.parse()`.
 
-        >>> humData = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n' +
-        ...     '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
+        >>> humData = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n'
+        ...            '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
         >>> c = converter.subConverters.ConverterHumdrum()
         >>> s = c.parseData(humData)
         >>> c.stream.show('text')
@@ -762,8 +741,8 @@ class ConverterNoteworthy(SubConverter):
         r'''
         Open Noteworthy data from a string or list
 
-        >>> nwcData = ('!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|' +
-        ...     'Type:Treble\n|Note|Dur:Whole|Pos:1^')
+        >>> nwcData = ('!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|'
+        ...            'Type:Treble\n|Note|Dur:Whole|Pos:1^')
         >>> c = converter.subConverters.ConverterNoteworthy()
         >>> c.parseData(nwcData)
         >>> c.stream.show('text')

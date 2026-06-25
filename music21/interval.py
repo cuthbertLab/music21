@@ -268,7 +268,7 @@ perfSpecifiers = [
     Specifier.QUADAUG,
 ]
 
-perfOffset = 4  # that is, Perfect is third on the list.s
+perfOffset = 4  # that is, Perfect is third on the list.
 
 # why is this not called imperfSpecifiers?
 specifiers = [
@@ -2331,7 +2331,7 @@ class ChromaticInterval(IntervalBase):
     @property
     def mod12(self) -> int|float:
         '''
-        The number of semitones within an octave using modulo arithmatic.
+        The number of semitones within an octave using modulo arithmetic.
 
         (see :meth:`~music21.interval.ChromaticInterval.simpleUndirected`
         for a similar method that puts musical
@@ -2454,7 +2454,7 @@ class ChromaticInterval(IntervalBase):
         transposed Pitch, that is transformed
         according to this ChromaticInterval.
 
-        Because :class:`~music21.interval.ChromaticInterval` object
+        Because :class:`~music21.interval.ChromaticInterval` objects
         do not take into account diatonic spelling,
         the new Pitch is simplified to the most common intervals.  See
         :meth:`~music21.pitch.Pitch.simplifyEnharmonic` with ``mostCommon = True``
@@ -2798,7 +2798,7 @@ def intervalFromGenericAndChromatic(
 # ------------------------------------------------------------------------------
 
 # store implicit diatonic if set from chromatic specification
-# if implicit, turing transpose, set to simplifyEnharmonic
+# if implicit, during transpose, set to simplifyEnharmonic
 
 
 class Interval(IntervalBase):
@@ -3492,7 +3492,7 @@ class Interval(IntervalBase):
                 # pitchAlt = copy.deepcopy(pitch2)
                 # pitchAlt.ps = pitch2.ps + halfStepsToFix
                 # environLocal.printDebug(
-                #    'coercing pitch due to a transposition that requires an extreme ' +
+                #    'coercing pitch due to a transposition that requires an extreme '
                 #    f'accidental: {pitch2} -> {pitchAlt}')
                 # pitch2 = pitchAlt
                 pitch2.ps = pitch2.ps + halfStepsToFix

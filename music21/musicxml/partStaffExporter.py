@@ -39,10 +39,10 @@ def addStaffTags(
     For a <measure> tag `measure`, add a <staff> grandchild to any instance of
     a child tag of a type in `tagList`.
 
-    >>> from xml.etree.ElementTree import fromstring as El
+    >>> from xml.etree.ElementTree import fromstring as EL
     >>> from music21.musicxml.partStaffExporter import addStaffTags
     >>> from music21.musicxml.helpers import dump
-    >>> elem = El("""
+    >>> elem = EL("""
     ...     <measure number="1">
     ...        <note>
     ...          <rest measure="yes" />
@@ -433,8 +433,7 @@ class PartStaffExporterMixin:
                    and helpers.measureNumberComesBefore(sourceNumber, targetNumber)):
                 if i not in insertions:
                     insertions[i] = []
-                if t.TYPE_CHECKING:
-                    assert isinstance(sourceNumber, str)
+                sourceNumber = t.cast(str, sourceNumber)
                 insertions[i] += [makeDivider(sourceNumber), sourceMeasure]
                 try:
                     sourceMeasure = next(sourceMeasures)
@@ -456,8 +455,7 @@ class PartStaffExporterMixin:
             idx = len(target)
             if idx not in insertions:
                 insertions[idx] = []
-            if t.TYPE_CHECKING:
-                assert isinstance(sourceNumber, str)
+            sourceNumber = t.cast(str, sourceNumber)
 
             insertions[idx] += [makeDivider(sourceNumber), remaining]
         return insertions
@@ -681,17 +679,17 @@ class PartStaffExporterMixin:
     def moveMeasureContents(measure: Element, otherMeasure: Element, staffNumber: int):
         # noinspection PyShadowingNames
         '''
-        Move the child elements of `measure` into `otherMeasure`;
-        create voice numbers if needed;
-        bump voice numbers if they conflict;
-        account for <backup> and <forward> tags;
-        skip <print> tags;
-        set "number" on midmeasure clef changes;
-        replace existing <barline> tags.
+        Move the child elements of `measure` into `otherMeasure`.
+        Create voice numbers if needed.
+        Bump voice numbers if they conflict.
+        Account for <backup> and <forward> tags.
+        Skip <print> tags.
+        Set "number" on mid-measure clef changes.
+        Replace existing <barline> tags.
 
-        >>> from xml.etree.ElementTree import fromstring as El
-        >>> measure = El('<measure><note /></measure>')
-        >>> otherMeasure = El('<measure><note /></measure>')
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> measure = EL('<measure><note /></measure>')
+        >>> otherMeasure = EL('<measure><note /></measure>')
         >>> SX = musicxml.m21ToXml.ScoreExporter
         >>> SX.moveMeasureContents(measure, otherMeasure, 2)
         >>> SX().dump(otherMeasure)
@@ -704,12 +702,12 @@ class PartStaffExporterMixin:
           </note>
         </measure>
 
-        >>> SX.moveMeasureContents(El('<junk />'), otherMeasure, 2)
+        >>> SX.moveMeasureContents(EL('<junk />'), otherMeasure, 2)
         Traceback (most recent call last):
         music21.musicxml.xmlObjects.MusicXMLExportException:
             moveMeasureContents() called on <Element 'junk'...
 
-        Only one <barline> should be exported per merged measure:
+        Only one `<barline>` should be exported per merged measure:
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.mixedVoices1a)

@@ -41,7 +41,7 @@ from music21 import common
 from music21.common.enums import GatherSpanners, OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21.common.types import (
-    StreamType, M21ObjType, ChangedM21ObjType, OffsetQL, OffsetQLIn, OffsetQLSpecial
+    StreamType, ChangedM21ObjType, OffsetQL, OffsetQLIn, OffsetQLSpecial
 )
 from music21 import clef
 from music21 import chord
@@ -81,7 +81,7 @@ StreamException = exceptions21.StreamException
 ImmutableStreamException = exceptions21.ImmutableStreamException
 
 T = t.TypeVar('T')
-RecursiveLyricList = note.Lyric|None|list['RecursiveLyricList']
+type RecursiveLyricList = note.Lyric|None|list[RecursiveLyricList]
 
 BestQuantizationMatch = namedtuple(
     'BestQuantizationMatch',
@@ -100,7 +100,7 @@ OffsetMap = namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex
 
 
 # -----------------------------------------------------------------------------
-class Stream(core.StreamCore, t.Generic[M21ObjType]):
+class Stream[M21ObjType: base.Music21Object](core.StreamCore):
     '''
     This is the fundamental container for Music21Objects;
     objects may be ordered and/or placed in time based on
@@ -1415,19 +1415,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
-    @common.deprecated('v9.3', 'v11', 'Use `el in stream` instead of '
-                       '`stream.hasElement(el)`')
-    def hasElement(self, obj: base.Music21Object) -> bool:
-        '''
-        DEPRECATED: just use `el in stream` instead of `stream.hasElement(el)`
-
-        Return True if an element, provided as an argument, is contained in
-        this Stream.
-        '''
-        return obj in self
-
+    @common.deprecated('v11', 'v12', 'use `bool(s.getElementsByClass(className))` instead')
     def hasElementOfClass(self, className, forceFlat=False):
         '''
+        Deprecated: use `bool(s.getElementsByClass(className))` instead.
+
         Given a single class name as string,
         return True or False if an element with the
         specified class is found.
@@ -1438,13 +1430,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.append(meter.TimeSignature('5/8'))
         >>> s.append(note.Note('d-2'))
         >>> s.insert(dynamics.Dynamic('fff'))
-        >>> s.hasElementOfClass(meter.TimeSignature)
-        True
-        >>> s.hasElementOfClass('Measure')
-        False
-
-        To be deprecated in v11 -- to be removed in v12, use:
-
         >>> bool(s.getElementsByClass(meter.TimeSignature))
         True
         >>> bool(s.getElementsByClass(stream.Measure))
@@ -1452,11 +1437,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         forceFlat does nothing, while getElementsByClass can be done on recurse()
         '''
-        # environLocal.printDebug(['calling hasElementOfClass()', className])
-        for e in self.elements:
-            if className in e.classSet:
-                return True
-        return False
+        return bool(self.getElementsByClass(className))
 
     def mergeElements(self, other, classFilterList=None):
         '''
@@ -1737,9 +1718,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         targetList: list[base.Music21Object]
         if not common.isListLike(targetOrList):
-            if t.TYPE_CHECKING:
-                assert isinstance(targetOrList, base.Music21Object)
-            targetList = [targetOrList]
+            targetObj = t.cast(base.Music21Object, targetOrList)
+            targetList = [targetObj]
         elif isinstance(targetOrList, Sequence) and len(targetOrList) > 1:
             if t.TYPE_CHECKING:
                 assert not isinstance(targetOrList, base.Music21Object)
@@ -3659,6 +3639,27 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> totalFound
         25
 
+        To test merely whether any element of a class is present, just use
+        `if` or `bool()` around the getElementsByClass call.  It will
+        scan through until it finds the first element with that class.
+        (It is a replacement for the older :meth:`hasElementOfClass`)
+
+        >>> bool(a.getElementsByClass(note.Note))
+        True
+        >>> if a.getElementsByClass(stream.Measure):
+        ...     print('has measures')
+        ... else:
+        ...     print('no measures')
+        no measures
+
+        Use `recurse()` to search nested streams as well, or the `[X]` shorthand
+        for `.recurse().getElementsByClass(X)`:
+
+        >>> bool(a.recurse().getElementsByClass(note.Rest))
+        True
+        >>> bool(a[note.Note])
+        True
+
         The class name of the Stream created is usually the same as the original:
 
         >>> found = a.getElementsByClass(note.Note).stream()
@@ -4996,11 +4997,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> alto = chorale.parts['#alto']
         >>> altoMeasures = alto.measureOffsetMap()
         >>> altoMeasures
-        OrderedDict([(0.0, [<music21.stream.Measure 1 offset=0.0>]),
-                     (4.0, [<music21.stream.Measure 2 offset=4.0>]),
-                     (8.0, [<music21.stream.Measure 3 offset=8.0>]),
+        OrderedDict({0.0: [<music21.stream.Measure 1 offset=0.0>],
+                     4.0: [<music21.stream.Measure 2 offset=4.0>],
+                     8.0: [<music21.stream.Measure 3 offset=8.0>],
                      ...
-                     (38.0, [<music21.stream.Measure 9 offset=38.0>])])
+                     38.0: [<music21.stream.Measure 9 offset=38.0>]})
         >>> list(altoMeasures.keys())
         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]
 
@@ -5025,12 +5026,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> mom = chorale.measureOffsetMap()
         >>> mom
-        OrderedDict([(0.0, [<music21.stream.Measure 1 offset=0.0>,
+        OrderedDict({0.0: [<music21.stream.Measure 1 offset=0.0>,
                             <music21.stream.Measure 1 offset=0.0>,
                             <music21.stream.Measure 1 offset=0.0>,
-                            <music21.stream.Measure 1 offset=0.0>]),
-                      (4.0, [<music21.stream.Measure 2 offset=4.0>,
-                             ...])])
+                            <music21.stream.Measure 1 offset=0.0>],
+                      4.0: [<music21.stream.Measure 2 offset=4.0>,
+                             ...]})
         >>> for measure_obj in mom[8.0]:
         ...     print(measure_obj, measure_obj.getContextByClass(stream.Part).id)
         <music21.stream.Measure 3 offset=8.0> Soprano
@@ -5532,9 +5533,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classes:
             for partLike in returnObj.getElementsByClass('Stream'):
                 # call on each part
-                if t.TYPE_CHECKING:
-                    assert isinstance(partLike, Stream)
-                partLike.toWrittenPitch(
+                partStream = t.cast(Stream, partLike)
+                partStream.toWrittenPitch(
                     inPlace=True,
                     ottavasToSounding=ottavasToSounding,
                     preserveAccidentalDisplay=preserveAccidentalDisplay
@@ -9103,9 +9103,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         elif isinstance(value, interval.DiatonicInterval):
             intv = interval.Interval(diatonic=value)
         else:
-            if t.TYPE_CHECKING:
-                assert isinstance(value, (interval.GenericInterval, interval.Interval))
-            intv = value
+            intv = t.cast(interval.GenericInterval | interval.Interval, value)
 
         # for p in post.pitches:  # includes chords
         #     # do inplace transpositions on the deepcopy

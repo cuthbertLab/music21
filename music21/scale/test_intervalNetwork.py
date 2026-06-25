@@ -10,7 +10,6 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-import sys
 import unittest
 
 from music21 import common
@@ -361,13 +360,6 @@ class Test(unittest.TestCase):
                                 [(Terminus.LOW, 0), (0, Terminus.LOW)]>,
                          1: <music21.scale.intervalNetwork.Edge Direction.BI M3
                                 [(0, Terminus.HIGH), (Terminus.HIGH, 0)]>})'''
-        if sys.version_info < (3, 12):
-            match = '''
-                OrderedDict([(0, <music21.scale.intervalNetwork.Edge Direction.BI m2
-                                    [(Terminus.LOW, 0), (0, Terminus.LOW)]>),
-                             (1, <music21.scale.intervalNetwork.Edge Direction.BI M3
-                                    [(0, Terminus.HIGH), (Terminus.HIGH, 0)]>)])'''
-
         self.assertTrue(common.whitespaceEqual(str(net.edges), match),
                         str(net.edges))
 

@@ -12,7 +12,7 @@ dynamic = [
 description = "A Toolkit for Computer-Aided Musical Analysis and Computational Musicology."
 readme = "README.md"
 license = "BSD-3-Clause"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -29,7 +29,6 @@ classifiers = [
     "Operating System :: POSIX",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
@@ -111,6 +110,12 @@ line-length = 100
 exclude = [
     'documentation/source/usersGuide/usersGuide_02_notes.ipynb',  # demonstrates invalid syntax
 ]
+
+[tool.ruff.format]
+# A nested string uses the *other* quote than the f-string delimiter, e.g.
+# f'{d["key"]}'.  This is Ruff's default, but we pin it so the choice stays
+# explicit.  See developerGuidelines for the rationale.
+nested-string-quote-style = "alternating"
 
 [tool.ruff.lint]
 # Flake8, pycodestyle, flake8-quotes + pyflakes

@@ -277,19 +277,19 @@ class State:
 
     def start(self):
         '''
-        called when the state is initiated
+        Called when the state is initiated.
         '''
         pass
 
     def end(self) -> Music21Object|None:
         '''
-        called just after removing state
+        Called just after removing state.
         '''
         return None
 
     def affectTokenBeforeParse(self, tokenStr: str) -> str:
         '''
-        called to modify the string of a token.
+        Called to modify the string of a token.
         '''
         return tokenStr
 
@@ -298,7 +298,7 @@ class State:
         m21Obj: Music21Object
     ) -> Music21Object:
         '''
-        called after the object has been acquired but before modifiers have been applied.
+        Called after the object has been acquired but before modifiers have been applied.
         '''
         return m21Obj
 
@@ -307,7 +307,7 @@ class State:
         m21Obj: Music21Object
     ) -> Music21Object:
         '''
-        called to modify the tokenObj after parsing
+        Called to modify the tokenObj after parsing.
 
         tokenObj may be None if another
         state has deleted it.
@@ -342,7 +342,7 @@ class TieState(State):
 
     def end(self):
         '''
-        end the tie state by applying tie ties to the appropriate notes
+        End the tie state by applying tie ties to the appropriate notes.
         '''
         if self.affectedTokens[0].tie is None:
             self.affectedTokens[0].tie = tie.Tie('start')
@@ -354,7 +354,7 @@ class TieState(State):
 
 class TupletState(State):
     '''
-    a tuplet state applies tuplets to notes while parsing and sets 'start' and 'stop'
+    A tuplet state applies tuplets to notes while parsing and sets 'start' and 'stop'
     on the first and last note when end is called.
     '''
     actual = 3
@@ -362,7 +362,7 @@ class TupletState(State):
 
     def end(self):
         '''
-        end a tuplet by putting start on the first note and stop on the last.
+        End a tuplet by putting start on the first note and stop on the last.
         '''
         if not self.affectedTokens:
             return None
@@ -372,7 +372,7 @@ class TupletState(State):
 
     def affectTokenAfterParse(self, n):
         '''
-        puts a tuplet on the note
+        Puts a tuplet on the note.
         '''
         super().affectTokenAfterParse(n)
         newTup = duration.Tuplet()
@@ -386,7 +386,7 @@ class TupletState(State):
 
 class TripletState(TupletState):
     '''
-    a 3:2 tuplet
+    A 3:2 tuplet.
     '''
     actual = 3
     normal = 2
@@ -394,7 +394,7 @@ class TripletState(TupletState):
 
 class QuadrupletState(TupletState):
     '''
-    a 4:3 tuplet
+    A 4:3 tuplet.
     '''
     actual = 4
     normal = 3
@@ -402,7 +402,7 @@ class QuadrupletState(TupletState):
 
 class Modifier:
     '''
-    a modifier is something that changes the current
+    A modifier is something that changes the current
     token, like setting the `.id` or Lyric.
     '''
 
@@ -413,15 +413,15 @@ class Modifier:
 
     def preParse(self, tokenString):
         '''
-        called before the tokenString has been
-        turned into an object
+        Called before the tokenString has been
+        turned into an object.
         '''
         pass
 
     def postParse(self, m21Obj):
         '''
-        called after the tokenString has been
-        turned into an m21Obj.  m21Obj may be None
+        Called after the tokenString has been
+        turned into an m21Obj.  m21Obj may be None.
 
         Important: must return the m21Obj, or a different object!
         '''
@@ -430,7 +430,7 @@ class Modifier:
 
 class IdModifier(Modifier):
     '''
-    sets the .id of the m21Obj, called with = by default
+    Sets the .id of the m21Obj, called with = by default.
     '''
 
     def postParse(self, m21Obj):
@@ -440,7 +440,7 @@ class IdModifier(Modifier):
 
 class LyricModifier(Modifier):
     '''
-    sets the .lyric of the m21Obj, called with _ by default
+    Sets the .lyric of the m21Obj, called with _ by default.
     '''
 
     def postParse(self, m21Obj):
@@ -462,15 +462,15 @@ class Token:
 
     def parse(self, parent):
         '''
-        do NOT store parent -- probably
-        too slow
+        Do NOT store parent -- probably
+        too slow.
         '''
         return None
 
 
 class TimeSignatureToken(Token):
     '''
-    Represents a single time signature, like 1/4
+    Represents a single time signature, like 1/4.
     '''
     def parse(self, parent):
         tsObj = meter.TimeSignature(self.token)
@@ -480,7 +480,7 @@ class TimeSignatureToken(Token):
 
 class NoteOrRestToken(Token):
     '''
-    represents a Note or Rest.  Chords are represented by Note objects
+    Represents a Note or Rest.  Chords are represented by Note objects.
     '''
     def __init__(self, token=''):
         super().__init__(token)
@@ -492,7 +492,7 @@ class NoteOrRestToken(Token):
 
     def applyDuration(self, n, t, parent):
         '''
-        takes the information in the string `t` and creates a Duration object for the
+        Takes the information in the string `t` and creates a Duration object for the
         note or rest `n`.
         '''
         for pm, method in self.durationMap:
@@ -534,7 +534,7 @@ class NoteOrRestToken(Token):
 
     def dots(self, element, search, pm, t, parent):
         '''
-        adds the appropriate number of dots to the right place.
+        Adds the appropriate number of dots to the right place.
 
         Subclassed in TrecentoNotation where two dots has a different meaning.
         '''
@@ -555,7 +555,7 @@ class RestToken(NoteOrRestToken):
 
 class NoteToken(NoteOrRestToken):
     '''
-    A NoteToken represents a single Note with pitch
+    A NoteToken represents a single Note with pitch.
 
     >>> c3 = tinyNotation.NoteToken('C')
     >>> c3
@@ -602,7 +602,7 @@ class NoteToken(NoteOrRestToken):
 
     def processPitchMap(self, n, t):
         '''
-        processes the pitchMap on the object.
+        Processes the pitchMap on the object.
         '''
         for method, pm in self.pitchMap.items():
             searchSuccess = re.search(pm, t)
@@ -613,7 +613,7 @@ class NoteToken(NoteOrRestToken):
 
     def editorialAccidental(self, n, search, pm, t):
         '''
-        indicates that the accidental is in parentheses, so set it up to be stored in ficta.
+        Indicates that the accidental is in parentheses, so set it up to be stored in ficta.
         '''
         self.isEditorial = True
         t = search.group(1) + search.group(2)
@@ -622,7 +622,7 @@ class NoteToken(NoteOrRestToken):
     def _addAccidental(self, n, alter, pm, t):
         # noinspection PyShadowingNames
         r'''
-        helper function for all accidental types.
+        Helper function for all accidental types.
 
         >>> nToken = tinyNotation.NoteToken('BB--')
         >>> n = note.Note('B')
@@ -654,7 +654,7 @@ class NoteToken(NoteOrRestToken):
     def sharps(self, n, search, pm, t):
         # noinspection PyShadowingNames
         r'''
-        called when one or more sharps have been found and adds the appropriate accidental to it.
+        Called when one or more sharps have been found and adds the appropriate accidental to it.
 
         >>> import re
         >>> tStr = 'C##'
@@ -674,7 +674,7 @@ class NoteToken(NoteOrRestToken):
     def flats(self, n, search, pm, t):
         # noinspection PyShadowingNames
         '''
-        called when one or more flats have been found and calls adds
+        Called when one or more flats have been found and calls adds
         the appropriate accidental to it.
 
         >>> import re
@@ -695,7 +695,7 @@ class NoteToken(NoteOrRestToken):
     def natural(self, n, search, pm, t):
         # noinspection PyShadowingNames
         '''
-        called when an explicit natural has been found.  All pitches are natural without
+        Called when an explicit natural has been found.  All pitches are natural without
         being specified, so not needed. Adds a natural accidental to it.
 
         >>> import re
@@ -1172,7 +1172,7 @@ class Converter:
         Right now just splits on spaces, but might be smarter to ignore spaces in
         quotes, etc. later.
         '''
-        self.preTokens = self.stringRep.split()  # do something better alter.
+        self.preTokens = self.stringRep.split()  # do something better later.
 
     def setupRegularExpressions(self):
         '''
@@ -1210,7 +1210,7 @@ class Converter:
 
     def parseOne(self, i: int, t: str):
         '''
-        parse a single token at position i, with
+        Parse a single token at position i, with
         text t, possibly adding it to the stream.
 
         Checks for state changes, modifiers, tokens, and end-state brackets.

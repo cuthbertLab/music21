@@ -9,14 +9,14 @@
 # ------------------------------------------------------------------------------
 '''
 music21.humdrum.spineParser is a collection of utilities for changing
-native humdrum code into music21 streams.  Most music21 users will
+native Humdrum code into music21 streams.  Most music21 users will
 simply want to call:
 
 >>> #_DOCS_SHOW myFile = converter.parse('myFile.krn')
 >>> #_DOCS_SHOW myFile.show()
 
 The methods in here are documented for developers wishing to expand
-music21's ability to parse humdrum.
+music21's ability to parse Humdrum.
 
 SpineParsing consists of several steps.
 
@@ -25,10 +25,9 @@ SpineParsing consists of several steps.
 * Protospines are parsed into HumdrumSpines by following Spine Path Indicators
     (:samp:`*^` and :samp:`*v` especially)
     Protospines that separate become new Protospines with their parentSpine indicated.  Protospines
-    that merge again then followed by the same Protospine as before.  This will cause problems if
-    a voice re-merges with another staff, but in practice I have not
-    seen a .krn file that does this and
-    should be avoided in any case.
+    that merge again are then followed by the same Protospine as before.  This will cause problems
+    if a voice re-merges with another staff, but in practice I have not
+    seen a .krn file that does this, and it should be avoided in any case.
 * HumdrumSpines are reclassed according to their exclusive definition.
     :samp:`**kern` becomes KernSpines, etc.
 * All reclassed HumdrumSpines are filled with music21 objects in their .stream property.
@@ -44,16 +43,15 @@ SpineParsing consists of several steps.
 
 * Changed in v10: flag attributes `isSpineLine, isComment, isGlobal, isReference` have been
     removed from HumdrumLine and all subclasses. `isinstance(...)` is a bit slower than
-    checking these, but adds correct typing.  Nothing is stored with weakrefs.  `.iterIndex`
-    and hand roled iterator/generators are gone now (could've gone when Python 2.4 became
+    checking these, but adds correct typing.  `.iterIndex` and hand rolled iterator/generators
+    are gone now (they could've gone away when Python 2.4 became
     the minimum version).  `HumdrumDataCollection.parsePositionInStream` is gone (was
     duplicating `numLines`); `HumdrumDataCollection.fileLength` is now the read-only
     property `numLines` (= `len(self.dataStream)`); `HumdrumLine.position` and
     `SpineEvent.position` were both renamed to `lineNumber` and now hold the 1-based
-    source line number (was eventList index for SpineEvent),
-    advancing on blank lines too.  Blank lines now produce `BlankLine` HumdrumLine
-    entries rather than being skipped, so `eventList[lineNumber - 1]` always
-    resolves to the line at that source position.
+    source line number (was eventList index for SpineEvent), advancing on blank lines too.
+    Blank lines now produce `BlankLine` HumdrumLine entries rather than being skipped,
+    in order that `eventList[lineNumber - 1]` always resolve to the line at that source position.
 '''
 from __future__ import annotations
 
@@ -62,6 +60,7 @@ import math
 import re
 import typing as t
 import unittest
+import warnings
 import weakref
 
 from music21.common.numberTools import opFrac
@@ -70,9 +69,9 @@ from music21.common.types import OffsetQL
 from music21 import articulations
 from music21 import bar
 from music21 import base
+from music21 import beam  # cast only, can use 'beam' if it ever becomes circular.
 from music21 import chord
 from music21 import clef
-from music21 import common
 from music21 import dynamics
 from music21 import duration
 from music21 import environment
@@ -83,6 +82,7 @@ from music21 import key
 from music21 import note
 from music21 import meter
 from music21 import metadata
+from music21 import pitch
 from music21 import roman
 from music21 import prebase
 from music21 import stream
@@ -99,6 +99,18 @@ if t.TYPE_CHECKING:
 environLocal = environment.Environment('humdrum.spineParser')
 
 flavors = {'JRP': False}
+'''
+Humdrum has developed several "flavors" or local varieties of parsing.
+These are unfortunately not usually indicated in the scores themselves
+(since communities mostly work within their own flavor groups).
+
+Music21 currently supports one flavor type, ``JRP`` for Stanford's
+Josquin Research Project, which interprets dots on tuplets differently
+from other parts of the Humdrum community (in a way that is more typically
+seen in early music).  Switch ``music21.humdrum.flavors['JRP'] = True`` to
+get that behavior before parsing.
+'''
+
 
 spinePathIndicators = ['*+', '*-', '*^', '*v', '*x', '*']
 
@@ -115,12 +127,12 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
     .. note:: Most users should not need to be here.  Just run `converter.parse('file.krn')`
         and it will give you a stream.Score instead.
         Intermediate users who want to get into the guts of Humdrum are still
-        probably better off running humdrum.parseFile("filename")
+        probably better off running humdrum.parseFile('filename')
         which returns a humdrum.SpineCollection directly.
 
     A HumdrumDataCollection takes in a mandatory list where each element
-    is a line of humdrum data.  Together this list represents a collection
-    of spines.  Essentially it's the contents of a humdrum file.
+    is a line of Humdrum data.  Together this list represents a collection
+    of spines.  Essentially it's the contents of a Humdrum file.
 
     Usually you will probably want to use HumdrumFile which can read
     in a file directly.  This class exists in case you have your Humdrum
@@ -128,25 +140,24 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
     have it as a string.
 
     LIMITATIONS:
-    (1) Spines cannot change definition (\*\*exclusive interpretations) mid-spine.
+    (1) Spines cannot change definition (``**exclusive`` interpretations) mid-spine.
 
-        So if you start off with \*\*kern, the rest of the spine needs to be
-        \*\*kern (actually, the first exclusive interpretation for a spine is
+        So if you start off with ``**kern``, the rest of the spine needs to be
+        ``**kern`` (actually, the first exclusive interpretation for a spine is
         used throughout).
 
         Note that, even though changing exclusive interpretations mid-spine
-        seems to be legal by the humdrum definition, it looks like none of the
-        conventional humdrum parsing tools allow for changing
+        seems to be legal by the Humdrum definition, it looks like none of the
+        conventional Humdrum parsing tools allow for changing
         definitions mid-spine, so I don't think this limitation is a problem.
         (Craig Stuart Sapp confirmed this to me.)
 
-        The Aarden/Miller Palestrina dataset uses `\*-` followed by `\*\*kern`
-        at the changes of sections thus some parsing of multiple exclusive
+        The Aarden/Miller Palestrina dataset uses ``\*-`` followed by ``**kern``
+        at the changes of sections, so some parsing of multiple exclusive
         interpretations in a protospine may be necessary.  But none change definition.
 
     (2) Split spines are assumed to be voices in a single spine staff.
     '''
-
     def __init__(self, dataStream: str|list[str]) -> None:
         # attributes
         self.eventList: list[HumdrumLine] = []
@@ -154,11 +165,13 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         self.protoSpines: list[ProtoSpine] = []
         self.eventCollections: list[EventCollection] = []
         self.spineCollection: SpineCollection|None = None
+        # populated by insertGlobalEvents(), consumed by parseMetadata()
+        self.globalReferences: list[GlobalReference] = []
 
         if isinstance(dataStream, str):
             dataStream = dataStream.splitlines()
 
-        self.dataStream: list[str] = dataStream
+        self.dataStream = t.cast(list[str], dataStream)
         # Defaults to a Score; parseOpusDataCollections will replace it with
         # an Opus if the input turns out to be a multipart file.
         self.stream: stream.Score|stream.Opus = stream.Score()
@@ -203,13 +216,17 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         self.parseEventListFromDataStream(dataStream)  # sets self.eventList
         self.parseProtoSpinesAndEventCollections()
         self.spineCollection = self.createHumdrumSpines()
-        self.spineCollection.createMusic21Streams()
-        self.insertGlobalEvents()
-        for thisSpine in self.spineCollection:
+        spineCollection = t.cast(SpineCollection, self.spineCollection)
+        spineCollection.createMusic21Streams()
+        for thisSpine in spineCollection:
             thisSpine.stream.id = 'spine_' + str(thisSpine.id)
-        for thisSpine in self.spineCollection:
+        for thisSpine in spineCollection:
             if thisSpine.parentSpine is None and thisSpine.spineType == 'kern':
                 score.insert(thisSpine.stream)
+        # insert global events after the parts are in the score, so that
+        # trailing comments (appended at highestTime) land at the end of the
+        # music rather than at 0.0 in an empty score.
+        self.insertGlobalEvents()
 
         self.parseMetadata()
         return score
@@ -222,10 +239,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         # noinspection PyShadowingNames
         r'''
         Some Humdrum files contain multiple pieces in one file
-        which are better represented as :class:`~music21.stream.Opus`
+        which are better represented as an :class:`~music21.stream.Opus`
         file containing multiple scores.
 
-        This method examines that dataStream (or `self.dataStream`) and
+        This method examines the dataStream (or `self.dataStream`) and
         if it only has a single piece then it returns (False, None).
 
         If it has multiple pieces, it returns True and a list of dataStreams.
@@ -319,7 +336,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             return (True, dataCollections)
         else:
             raise HumdrumException(
-                'Malformed humdrum data: '
+                'Malformed Humdrum data: '
                 + 'possibly multiple **tags without closing information. Or a *tandem tag '
                 + 'accidentally encoded as a **spine tag.')
 
@@ -367,20 +384,20 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         largest number of spine events found on any line
         in the file.
 
-        The difference between the dataStream and `self.eventList`
+        The differences between the dataStream and `self.eventList`
         are the following:
 
-            * Blank lines are skipped.
+            * Blank lines become :class:`~music21.humdrum.spineParser.BlankLine` objects
             * !!! lines become :class:`~music21.humdrum.spineParser.GlobalReferenceLine` objects
             * !! lines become :class:`~music21.humdrum.spineParser.GlobalCommentLine` objects
             * all other lines become :class:`~music21.humdrum.spineParser.SpineLine` objects
 
         Returns eventList in addition to setting it as `self.eventList`.
 
-        >>> eventString = ('!!! COM: Beethoven, Ludwig van\n' +
-        ...                '!! Not really a piece by Beethoven\n' +
-        ...                '**kern\t**dynam\n' +
-        ...                'C4\tpp\n' +
+        >>> eventString = ('!!! COM: Beethoven, Ludwig van\n'
+        ...                '!! Not really a piece by Beethoven\n'
+        ...                '**kern\t**dynam\n'
+        ...                'C4\tpp\n'
         ...                'D8\t.\n')
         >>> hdc = humdrum.spineParser.HumdrumDataCollection(eventString)
         >>> hdc.maxSpines = 2
@@ -397,7 +414,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         >>> print(eList[0].value)
         Beethoven, Ludwig van
 
-        Print line number 4 (which is eList[3] in zero indexed)
+        Print line number 4 (which is eList[3] in Python's zero-indexed format)
 
         >>> print(eList[3].spineData)
         ['C4', 'pp']
@@ -459,10 +476,10 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         Returns a tuple of protoSpines and eventCollections in addition to
         setting it in the calling object.
 
-        >>> eventString = ('!!!COM: Beethoven, Ludwig van\n' +
-        ...                '!! Not really a piece by Beethoven\n' +
-        ...                '**kern\t**dynam\n' +
-        ...                'C4\tpp\n' +
+        >>> eventString = ('!!!COM: Beethoven, Ludwig van\n'
+        ...                '!! Not really a piece by Beethoven\n'
+        ...                '**kern\t**dynam\n'
+        ...                'C4\tpp\n'
         ...                'D8\t.\n')
         >>> hdc = humdrum.spineParser.HumdrumDataCollection(eventString)
         >>> hdc.maxSpines = 2
@@ -535,10 +552,8 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
             # placeholder cell: either a SpineLine with no data this far over,
             # or a global line (GlobalComment, GlobalReference, or BlankLine).
-            if not isinstance(currentLine, SpineLine) and j == 0:
-                # not SpineLine = GlobalComment, GlobalReference, or BlankLine.
-                # global events register once, against the first column
-                thisEventCollection.addGlobalEvent(currentLine)
+            # Global lines are inserted separately by insertGlobalEvents() reading
+            # self.eventList, so nothing is recorded against this EventCollection.
             placeholder = SpineEvent('', currentLine.lineNumber)
             placeholder.protoSpineId = j
             thisEventCollection.addSpineEvent(j, placeholder)
@@ -593,13 +608,17 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
         # currentSpineList is a list of currently active
         # spines ordered from left to right.
-        currentSpineList = common.defaultlist(lambda: None)
+        currentSpineList: list[HumdrumSpine|None] = []
         spineCollection = SpineCollection()
 
         # go through the event collections line by line
         for i in range(len(eventCollections)):
             thisEventCollection = eventCollections[i]
             lineNumber = thisEventCollection.lineNumber
+            # ensure a slot for every spine position; positions never assigned
+            # (or dropped by a previous merge) read back as None.
+            if len(currentSpineList) < maxSpines:
+                currentSpineList += [None] * (maxSpines - len(currentSpineList))
             for j in range(maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
 
@@ -627,12 +646,16 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             # thus, this is illegal.  The C#4 will be ignored:
             # *x     *x     C#4
 
-            newSpineList = common.defaultlist(lambda: None)
+            newSpineList: list[HumdrumSpine|None] = []
 
-            # These are either False OR the spine being merged/exchanged.
-            # TODO: separate the two concepts.
+            # A merge or exchange spine-path op spans two cells on this line.
+            # mergerActive flags an open merge; mergerParentSpine is the first
+            # spine's parent to merge back into (None if it had none).
             mergerActive = False
-            exchangeActive = False
+            mergerParentSpine: HumdrumSpine|None = None
+            # the HumdrumSpine awaiting another one to exchange with.
+            # Or None if no exchange is active.
+            exchangeAwaitingSpine: HumdrumSpine|None = None
             for j in range(maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
                 currentSpine = currentSpineList[j]
@@ -643,6 +666,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                     continue
                 elif thisEvent is None:
                     continue
+                # a spine-path token at this position always has a spine
+                # assigned from the first pass above.
+                if currentSpine is None:  # pragma: no cover
+                    raise ValueError(
+                        f'spine-path token at line {lineNumber} has no active spine')
                 if thisEvent.contents == '*-':  # terminate spine
                     currentSpine.endingPoint = lineNumber
                 elif thisEvent.contents == '*^':  # split spine assume they are voices
@@ -662,14 +690,12 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                     newSpineList.append(newSpine2)
                 elif thisEvent.contents == '*v':
                     # merge spine -- n.b. we allow non-adjacent
-                    # lines to be merged. this is incorrect
-                    # per humdrum syntax, but is easily done.
-                    if mergerActive is False:
+                    # lines to be merged. This is incorrect
+                    # per Humdrum syntax, but is easily done.
+                    if not mergerActive:
                         # assume that previous spine continues
-                        if currentSpine.parentSpine is not None:
-                            mergerActive = currentSpine.parentSpine
-                        else:
-                            mergerActive = True
+                        mergerActive = True
+                        mergerParentSpine = currentSpine.parentSpine
                         currentSpine.endingPoint = lineNumber
                     else:
                         # if second merger code is not found then
@@ -678,9 +704,9 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                         # merge back to parent if possible:
                         if currentSpine.parentSpine is not None:
                             newSpineList.append(currentSpine.parentSpine)
-                        # or merge back to other spine's parent:
-                        elif mergerActive is not True:  # other spine parent set
-                            newSpineList.append(mergerActive)
+                        # or merge back to the first spine's parent:
+                        elif mergerParentSpine is not None:
+                            newSpineList.append(mergerParentSpine)
                         # or make a new spine:
                         else:
                             s = spineCollection.addSpine(streamClass=stream.Part)
@@ -688,23 +714,24 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                             newSpineList.append(s)
 
                         mergerActive = False
+                        mergerParentSpine = None
 
                 elif thisEvent.contents == '*x':  # exchange spine
-                    if exchangeActive is False:
-                        exchangeActive = currentSpine
+                    if exchangeAwaitingSpine is None:
+                        exchangeAwaitingSpine = currentSpine
                     else:
                         # if second exchange is not found, then both
-                        # lines disappear and exception is raised
+                        # lines disappear and exception is raised.
                         # n.b. we allow more than one PAIR of exchanges
                         # in a line so long as the first
                         # is totally finished by the time the second happens
                         newSpineList.append(currentSpine)
-                        newSpineList.append(exchangeActive)
-                        exchangeActive = False
+                        newSpineList.append(exchangeAwaitingSpine)
+                        exchangeAwaitingSpine = None
                 else:  # null processing code '*'
                     newSpineList.append(currentSpine)
 
-            if exchangeActive is not False:
+            if exchangeAwaitingSpine is not None:
                 raise HumdrumException('ProtoSpine found with unpaired exchange instruction '
                                        f'at line {lineNumber} [{thisEventCollection.events}]')
             currentSpineList = newSpineList
@@ -713,12 +740,14 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
     def insertGlobalEvents(self) -> None:
         '''
-        Insert the Global Events (GlobalReferenceLines and GlobalCommentLines) into an appropriate
-        place in the outer Stream.
+        Insert GlobalComments (from GlobalCommentLines) into the outer Stream,
+        and collect GlobalReferences (from GlobalReferenceLines) into
+        `self.globalReferences`.  References become metadata in
+        :meth:`parseMetadata`, not Stream objects, so they are not inserted here.
 
         Run after `self.spineCollection.createMusic21Streams()`.
         Is run automatically by `self.parse()`.
-        uses `self.spineCollection.getOffsetsAndPrioritiesByLineNumber()`
+        Uses `self.spineCollection.getOffsetsAndPrioritiesByLineNumber()`.
         '''
         spineCollection = self.spineCollection
         if spineCollection is None:
@@ -729,11 +758,17 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         eventList = self.eventList
         maxEventList = len(eventList)
         numberOfGlobalEventsInARow = 0
-        insertList: list[tuple[OffsetQL, GlobalReference|GlobalComment]] = []
-        appendList: list[GlobalReference|GlobalComment] = []
+        insertList: list[tuple[OffsetQL, GlobalComment]] = []
+        appendList: list[GlobalComment] = []
+        references: list[GlobalReference] = []
 
         for i, event in enumerate(eventList):
-            if isinstance(event, (GlobalReferenceLine, GlobalCommentLine)):
+            if isinstance(event, GlobalReferenceLine):
+                # References become metadata, not Stream objects, but are still
+                # counted so neighboring comments keep the same priority.
+                numberOfGlobalEventsInARow += 1
+                references.append(GlobalReference(event.code, event.value))
+            elif isinstance(event, GlobalCommentLine):
                 numberOfGlobalEventsInARow += 1
                 insertOffset: OffsetQL|None = None
                 insertPriority = 0
@@ -745,31 +780,25 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
                                           - 40
                                           + numberOfGlobalEventsInARow)
                         break
-                el: GlobalReference|GlobalComment
-                if isinstance(event, GlobalReferenceLine):
-                    # TODO: Fix GlobalReference (added in 2012; as of 2016 not sure what to fix)
-                    #    might add language?
-                    el = GlobalReference(event.code, event.value)
-                else:
-                    el = GlobalComment(event.value)
-                el.priority = insertPriority
+                comment = GlobalComment(event.value)
+                comment.priority = insertPriority
                 if insertOffset is None:
-                    appendList.append(el)
+                    appendList.append(comment)
                 else:
-                    insertTuple = (insertOffset, el)
-                    insertList.append(insertTuple)
-                # self.stream.insert(insertOffset, el)
+                    insertList.append((insertOffset, comment))
             else:
                 numberOfGlobalEventsInARow = 0
 
-        for offset, el in insertList:
-            self.stream.coreInsert(offset, el)
+        self.globalReferences = references
+
+        for offset, comment in insertList:
+            self.stream.coreInsert(offset, comment)
 
         if insertList:
             self.stream.coreElementsChanged()
 
-        for el in appendList:
-            self.stream.coreAppend(el)
+        for comment in appendList:
+            self.stream.coreAppend(comment)
 
         if appendList:
             self.stream.coreElementsChanged()
@@ -784,11 +813,11 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
     #     if self.spineCollection is None:
     #         raise HumdrumException('parsing got no spine collections!')
     #     elif self.spineCollection.spines is None:
-    #         raise HumdrumException('not a single spine in your data. Is this your problem? ' +
-    #                                '(File a bug report if you ' +
+    #         raise HumdrumException('not a single spine in your data. Is this your problem? '
+    #                                '(File a bug report if you '
     #                                'have doubled checked your data)')
     #     elif self.spineCollection.spines[0].stream is None:
-    #         raise HumdrumException('okay, you got at least one spine, but it does not have ' +
+    #         raise HumdrumException('okay, you got at least one spine, but it does not have '
     #                                'a stream in it; (check your data or file a bug report)')
     #     else:
     #         masterStream = stream.Score()
@@ -802,20 +831,15 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 
     def parseMetadata(self, s: stream.Stream|None = None) -> None:
         '''
-        Create a metadata object for the file.
+        Create a metadata object for the file from the GlobalReferences
+        collected by :meth:`insertGlobalEvents`.
         '''
         if s is None:
             s = self.stream
         md = metadata.Metadata()
         s.metadata = md
-        grToRemove: list[GlobalReference] = []
-
-        for gr in s[GlobalReference]:
+        for gr in self.globalReferences:
             gr.updateMetadata(md)
-            grToRemove.append(gr)
-
-        if grToRemove:
-            s.remove(grToRemove, recurse=True)
 
 
 class HumdrumFile(HumdrumDataCollection):
@@ -854,7 +878,7 @@ class HumdrumLine(prebase.ProtoM21Object):
     HumdrumLine is a dummy class for subclassing
     :class:`~music21.humdrum.spineParser.SpineLine`,
     :class:`~music21.humdrum.spineParser.GlobalCommentLine`, and
-    :class:`~music21.humdrum.spineParser.GlobalReferenceLine` classes
+    :class:`~music21.humdrum.spineParser.GlobalReferenceLine` classes,
     all of which represent one horizontal line of
     text in a :class:`~music21.humdrum.spineParser.HumdrumDataCollection`
     that is aware of its
@@ -903,9 +927,9 @@ class GlobalReferenceLine(HumdrumLine):
     # noinspection SpellCheckingInspection
     r'''
     A GlobalReferenceLine is a type of HumdrumLine that contains
-    information/metadata about the humdrum document.
+    a Reference Record or information/metadata about the Humdrum document.
 
-    In humdrum it is represented by three exclamation points
+    In Humdrum it is represented by three exclamation points
     followed by non-whitespace followed by a colon.  Examples::
 
         !!!COM: Stravinsky, Igor Fyodorovich
@@ -916,7 +940,7 @@ class GlobalReferenceLine(HumdrumLine):
 
     The GlobalReferenceLine object takes two inputs::
 
-        lineNumber   1-based line number in the humdrum file
+        lineNumber   1-based line number in the Humdrum file
         contents     string of contents
 
     And stores them as three attributes::
@@ -938,8 +962,8 @@ class GlobalReferenceLine(HumdrumLine):
 
     TODO: add parsing of three-digit Kern comment codes into fuller metadata
     TODO: parse ``@``/``@@`` language tags here (e.g. ``!!!OPT@@RUS:``, ``!!!OPT@FRE:``)
-    and propagate language/isPrimary so that GlobalReference.updateMetadata
-    can attach ``metadata.Text(value, language=...)`` instead of bare strings.
+      and propagate language/isPrimary so that GlobalReference.updateMetadata
+      can attach ``metadata.Text(value, language=...)`` instead of bare strings.
     '''
     def __init__(self, lineNumber: int = 0, contents: str = '!!! NUL: None') -> None:
         self.lineNumber = lineNumber
@@ -964,12 +988,12 @@ class GlobalReferenceLine(HumdrumLine):
 
 class GlobalCommentLine(HumdrumLine):
     '''
-    A GlobalCommentLine is a humdrum comment that pertains to all spines
-    In humdrum it is represented by two exclamation points (and usually one space)
+    A GlobalCommentLine is a Humdrum comment that pertains to all spines.
+    In Humdrum it is represented by two exclamation points (and usually one space).
 
     The GlobalComment object takes two inputs and stores them as attributes::
 
-        lineNumber (1-based line number in the humdrum file)
+        lineNumber (1-based line number in the Humdrum file)
         contents   (string of contents)
         value      (contents minus !!)
 
@@ -1001,7 +1025,7 @@ class GlobalCommentLine(HumdrumLine):
 
 class BlankLine(HumdrumLine):
     '''
-    A blank line in a humdrum source.  Humdrum forbids blank lines, but
+    A blank line in a Humdrum source.  Humdrum forbids blank lines, but
     they appear in the wild.  Storing them as BlankLine objects keeps
     `eventList` aligned with the source: `eventList[lineNumber - 1]` is
     always the HumdrumLine at that 1-based source line.
@@ -1055,11 +1079,11 @@ class ProtoSpine(prebase.ProtoM21Object):
 class HumdrumSpine(prebase.ProtoM21Object):
     r'''
     A HumdrumSpine is a representation of a generic HumdrumSpine
-    regardless of \*\*definition after spine path indicators have
+    regardless of ``**definition`` after spine path indicators have
     been simplified.
 
-    A subclass of HumdrumSpine should be defined for each \*\*type. Those
-    subclasses cannot redefine `__init__()`
+    A subclass of HumdrumSpine should be defined for each ``**type``. Those
+    subclasses cannot redefine `__init__()`.
 
     A HumdrumSpine is a collection of events arranged vertically that have a
     connection to each other.
@@ -1151,7 +1175,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
 
     def append(self, event: SpineEvent) -> None:
         '''
-        add an item to this Spine
+        Add an item to this Spine.
         '''
         self.eventList.append(event)
 
@@ -1176,7 +1200,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
 
     def _getSpineType(self) -> str:
         '''
-        searches the current and parent spineType for a search
+        Searches the current and parent spineType.
         '''
         if self._spineType:
             return self._spineType
@@ -1203,8 +1227,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
         measures.  Works with pickup measures, etc. Does not
         automatically create ties, etc.
 
-        Why not just use Stream.makeMeasures()? because
-        humdrum measures contain extra information about barlines
+        Why not just use Stream.makeMeasures()? Because
+        Humdrum measures contain extra information about barlines
         etc. and pickups are explicitly defined.
 
         >>> s1 = stream.Stream()
@@ -1327,7 +1351,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
 
 class KernSpine(HumdrumSpine):
     r'''
-    A KernSpine is a type of humdrum spine with the \*\*kern
+    A KernSpine is a type of Humdrum spine with the ``**kern``
     attribute set and thus events are processed as if they
     are kern notes.
 
@@ -1347,14 +1371,23 @@ class KernSpine(HumdrumSpine):
     currentTupletQL: OffsetQL
     desiredTupletQL: OffsetQL
 
-    def parse(self) -> None:
-        humdrumLineNumbers = self.parentSpineCollection.humdrumLineNumbers
+    def setup(self) -> None:
+        '''
+        Pre-parse setup routines for KernSpine.
+
+        These set defaults for attributes which would normally be defined in __init__
+        if we weren't reclassing spines.
+        '''
         self.lastContainer = hdStringToMeasure('=0')
         self.inTuplet = False
         self.lastNote = None
         self.currentBeamNumbers = 0
         self.currentTupletQL = 0.0
         self.desiredTupletQL = 0.0
+
+    def parse(self) -> None:
+        self.setup()
+        humdrumLineNumbers = self.parentSpineCollection.humdrumLineNumbers
 
         for event in self.eventList:
             # event is a SpineEvent object
@@ -1383,7 +1416,7 @@ class KernSpine(HumdrumSpine):
                 if thisObject is not None:
                     humdrumLineNumbers[thisObject] = event.lineNumber
                     # priority is doing double duty: real Stream sort priority
-                    # (used by insertGlobalEvents) AND a proxy for humdrum line
+                    # (used by insertGlobalEvents) AND a proxy for Humdrum line
                     # number (used by attachNonKernEvents to align spines).
                     thisObject.priority = event.lineNumber
                     self.stream.coreAppend(thisObject)
@@ -1403,7 +1436,7 @@ class KernSpine(HumdrumSpine):
 
     def processNoteEvent(self, eventC: str) -> note.GeneralNote:
         '''
-        similar to hdStringToNote, this method processes a string representing a single
+        Similar to hdStringToNote, this method processes a string representing a single
         note, but stores information about current beam and tuplet state.
         '''
         eventNote = hdStringToNote(eventC)
@@ -1416,20 +1449,45 @@ class KernSpine(HumdrumSpine):
 
     def processChordEvent(self, eventC: str) -> chord.Chord:
         '''
-        Process a single chord event
+        Process a single chord event.
 
         Like processNoteEvent, stores information about current beam and tuplet state.
+
+        The same duration object is normally used for each member of the chord
+        whether they write their duration out ('8C 8E 8G') or others omit them
+        ('8C E G' - not in spec, but often seen).  Humdrum spec does not technically
+        allow different durations ('8C 8E 4G'), but it is seen (Bach) so we support it.
         '''
         # multipleNotes
         notesToProcess = eventC.split()
         chordNotes: list[note.Note] = []
-        for noteToProcess in notesToProcess:
-            thisNote = hdStringToNote(noteToProcess)
-            if isinstance(thisNote, note.Note):
-                chordNotes.append(thisNote)
-        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams)
-        eventChord.duration = chordNotes[0].duration
 
+        # A note after the first that omits a duration, or just repeats the first
+        # note's, shares its Duration object.  A note with a genuinely different
+        # duration (the held `2g` in `4G 4e 2g`) keeps its own.
+        firstDuration: duration.Duration|None = None
+        firstDurationChars = ''
+        for noteToProcess in notesToProcess:
+            durationChars, bareContents = extractDuration(noteToProcess)
+            if firstDuration is not None and durationChars in ('', firstDurationChars):
+                thisNote = hdStringToNote(bareContents, overrideDuration=firstDuration)
+            else:
+                thisNote = hdStringToNote(noteToProcess)
+                if firstDuration is None:
+                    firstDuration = thisNote.duration
+                    firstDurationChars = durationChars
+            if isinstance(thisNote, note.Note):  # perhaps unpitched maybe also?
+                chordNotes.append(thisNote)
+            # else -- error?
+
+        if not chordNotes:  # pragma: no cover
+            # for typing.
+            raise HumdrumException(
+                'Do not call processChordEvent unless there is at least one note'
+            )
+        eventChord = chord.Chord(chordNotes,
+                                 beams=chordNotes[-1].beams,
+                                 duration=firstDuration)
         self.setBeamsForNote(eventChord)
         self.setTupletTypeForNote(eventChord)
         self.lastNote = eventChord
@@ -1438,27 +1496,28 @@ class KernSpine(HumdrumSpine):
 
     def setBeamsForNote(self, n: note.GeneralNote) -> None:
         '''
-        sets the beams for a Note (or Chord) given self.currentBeamNumbers
+        Sets the beams for a Note (or Chord) given self.currentBeamNumbers
         and updates self.currentBeamNumbers based on stop beams.
 
         Safe enough to use on elements such as rests that don't have beam info.
         '''
-        if not hasattr(n, 'beams'):
+        if not isinstance(n, note.NotRest):
             return None
 
-        if self.currentBeamNumbers != 0 and not n.beams.beamsList:
+        n_beams = t.cast(beam.Beams, n.beams)
+        if self.currentBeamNumbers != 0 and not n_beams.beamsList:
             for unused_counter in range(self.currentBeamNumbers):
-                n.beams.append('continue')
-        elif n.beams.beamsList:
-            if n.beams.beamsList[0].type == 'stop':
+                n_beams.append('continue')
+        elif n_beams.beamsList:
+            if n_beams.beamsList[0].type == 'stop':
                 self.currentBeamNumbers = 0
             else:
-                for thisBeam in n.beams.beamsList:
+                for thisBeam in n_beams.beamsList:
                     if thisBeam.type != 'stop':
                         self.currentBeamNumbers += 1
 
     def setTupletTypeForNote(self, n: note.GeneralNote) -> None:
-        # nested tuplets not supported by humdrum.
+        # nested tuplets not supported by Humdrum.
         nDur = n.duration
         nTuplets = n.duration.tuplets
 
@@ -1488,7 +1547,7 @@ class KernSpine(HumdrumSpine):
 
 class DynamSpine(HumdrumSpine):
     r'''
-    A DynamSpine is a type of humdrum spine with the \*\*dynam
+    A DynamSpine is a type of Humdrum spine with the ``**dynam``
     attribute set and thus events are processed as if they
     are dynamics.
     '''
@@ -1537,13 +1596,13 @@ class DynamSpine(HumdrumSpine):
 
 class HarmSpine(HumdrumSpine):
     r'''
-    A HarmSpine is a type of humdrum spine with the \*\*harm
+    A HarmSpine is a type of Humdrum spine with the ``**harm``
     attribute set and thus events are processed as if they
     are harmonic analysis annotations in the "harm" syntax.
 
     The harm roman numeral annotations are parsed using
-    a superset of the original \*\*harm Humdrum representation, written
-    for python and extending the syntax based on other projects like the
+    a superset of the original ``**harm`` Humdrum representation, written
+    for Python and extending the syntax based on other projects like the
     RomanText and the MuseScore roman numeral notations.
     '''
     def parse(self) -> None:
@@ -1574,12 +1633,22 @@ class HarmSpine(HumdrumSpine):
             else:
                 harmStr = event.contents
                 romanStr = harmParser.convertHarmToRoman(harmStr)
-                thisObject = roman.RomanNumeral(
-                    romanStr,
-                    currentKey,
-                    sixthMinor=roman.Minor67Default.FLAT,
-                    seventhMinor=roman.Minor67Default.SHARP
-                )
+                if romanStr is None:
+                    # Token did not parse as **harm.  Like KernSpine with an
+                    # unparseable note, warn and skip rather than emit a
+                    # spurious empty RomanNumeral at this position.
+                    environLocal.warn(
+                        f'Could not parse **harm token ({harmStr!r}) '
+                        f'at line {event.lineNumber} '
+                        f'for spine {event.spineId}; skipping.'
+                    )
+                else:
+                    thisObject = roman.RomanNumeral(
+                        romanStr,
+                        currentKey,
+                        sixthMinor=roman.Minor67Default.FLAT,
+                        seventhMinor=roman.Minor67Default.SHARP
+                    )
 
             if thisObject is not None:
                 humdrumLineNumbers[thisObject] = event.lineNumber
@@ -1594,18 +1663,18 @@ class SpineEvent(prebase.ProtoM21Object):
     '''
     A SpineEvent is an event in a HumdrumSpine or ProtoSpine.
 
-    It's .contents property contains the contents of the spine, or
+    Its .contents property contains the contents of the spine, or
     it could be '.', in which case it means that a
     particular event appears after the last event in a different spine.
     It could also be "None" indicating that there is no event at all
-    at this moment in the humdrum file.  Happens if no ProtoSpine exists
+    at this moment in the Humdrum file.  Happens if no ProtoSpine exists
     at this point in the file in this tab position.
 
     Should be initialized with its contents and 1-based source line number.
 
     These attributes are optional but likely to be very helpful::
 
-        lineNumber -- 1-based source line number in the humdrum file
+        lineNumber -- 1-based source line number in the Humdrum file
         protoSpineId -- ProtoSpine id (0 to N)
         spineId -- id of HumdrumSpine actually attached to (after SpinePaths are parsed)
 
@@ -1636,8 +1705,8 @@ class SpineEvent(prebase.ProtoM21Object):
 
     def toNote(self, convertString: str|None = None) -> note.GeneralNote:
         r'''
-        parse the object as a \*\*kern note and return a
-        :class:`~music21.note.Note` object (or Rest, or Chord)
+        Parse the object as a ``**kern`` note and return a
+        :class:`~music21.note.Note` object (or Rest, or Chord).
 
         >>> se = humdrum.spineParser.SpineEvent('DD#4')
         >>> n = se.toNote()
@@ -1645,6 +1714,9 @@ class SpineEvent(prebase.ProtoM21Object):
         <music21.note.Note D#>
         >>> n.octave
         2
+
+        Default duration is a quarter note.
+
         >>> n.duration.type
         'quarter'
         '''
@@ -1663,27 +1735,27 @@ class SpineCollection(prebase.ProtoM21Object):
     simultaneous onsets.
 
     When you iterate over a SpineCollection, it goes from right to
-    left, since that's the order that humdrum expects.
+    left, since that's the order that Humdrum expects.
     '''
     def __init__(self) -> None:
         self.spines: list[HumdrumSpine] = []
         self.nextFreeId: int = 0
         self.spineReclassDone: bool = False
         self.newSpine: HumdrumSpine|None = None
-        # Maps each parsed Music21Object to its humdrum file line position.
+        # Maps each parsed Music21Object to its Humdrum file line position.
         self.humdrumLineNumbers: weakref.WeakKeyDictionary[base.Music21Object, int] = (
             weakref.WeakKeyDictionary()
         )
 
     def __iter__(self) -> t.Iterator[HumdrumSpine]:
         '''
-        Iterates spines right-to-left, the order humdrum expects.
+        Iterates spines right-to-left, the order Humdrum expects.
         '''
         return reversed(self.spines)
 
     def addSpine(self, streamClass: type[stream.Stream] = stream.Part) -> HumdrumSpine:
         '''
-        creates a new spine in the collection and returns it.
+        Creates a new spine in the collection and returns it.
 
         By default, the underlying music21 class of the spine is
         :class:`~music21.stream.Part`.  This can be overridden
@@ -1717,15 +1789,15 @@ class SpineCollection(prebase.ProtoM21Object):
     def appendSpine(self, spine: HumdrumSpine) -> None:
         '''
         appendSpine(spine) -- appends an already existing HumdrumSpine
-        to the SpineCollection.  Returns void
+        to the SpineCollection.  Returns void.
         '''
         self.spines.append(spine)
 
     def getSpineById(self, spineId: int) -> HumdrumSpine:
         '''
-        returns the HumdrumSpine with the given id.
+        Returns the HumdrumSpine with the given id.
 
-        raises a HumdrumException if the spine with a given id is not found
+        Raises a HumdrumException if the spine with a given id is not found.
         '''
         for thisSpine in self.spines:
             if thisSpine.id == spineId:
@@ -1750,7 +1822,7 @@ class SpineCollection(prebase.ProtoM21Object):
         >>> hsc.spines
         [<music21.humdrum.spineParser.HumdrumSpine: 1>]
 
-        raises a HumdrumException if the spine with a given id is not found
+        Raises a HumdrumException if the spine with a given id is not found.
         '''
         for s in self.spines:
             if s.id == spineId:
@@ -1838,7 +1910,7 @@ class SpineCollection(prebase.ProtoM21Object):
             if not thisSpine.childSpines:
                 continue
 
-            # only spines with children spines and parent spines continue
+            # only spines with child spines and parent spines continue
             newStream = thisSpine.stream.__class__()
             insertPoints = sorted(thisSpine.childSpineInsertPoints)
             lastLineNumber = -1
@@ -1859,8 +1931,8 @@ class SpineCollection(prebase.ProtoM21Object):
             thisSpine.stream = newStream
 
             # some spines were not inserted because the
-            # insertion point was at the end of the parent spine
-            # happens in some musedata conversions, such as beethoven 5, movement 1.
+            # insertion point was at the end of the parent spine.
+            # Happens in some musedata conversions, such as Beethoven 5, movement 1.
             for i in insertPoints:
                 self.performSpineInsertion(thisSpine, newStream, i)
             # for removeMe in removeSpines:
@@ -1897,8 +1969,8 @@ class SpineCollection(prebase.ProtoM21Object):
     def reclassSpines(self) -> None:
         r'''
         Changes the classes of HumdrumSpines to more specific types
-        (KernSpine, DynamicSpine)
-        according to their spineType (e.g., \*\*kern, \*\*dynam)
+        (KernSpine, DynamSpine)
+        according to their spineType (e.g., ``**kern``, ``**dynam``).
         '''
         for thisSpine in self.spines:
             if thisSpine.spineType == 'kern':
@@ -1916,7 +1988,7 @@ class SpineCollection(prebase.ProtoM21Object):
         Iterates through the spines by location
         and records the offset and priority for each element in the spines.
 
-        Returns a dictionary keyed by humdrum line number whose values are
+        Returns a dictionary keyed by Humdrum line number whose values are
         two-element tuples: (music21 offset, list of Music21Objects at that line).
         '''
         lineNumberDict: dict[int, tuple[OffsetQL, list[base.Music21Object]]] = {}
@@ -1934,10 +2006,10 @@ class SpineCollection(prebase.ProtoM21Object):
 
     def moveObjectsToMeasures(self) -> None:
         '''
-        run moveElementsIntoMeasures for each HumdrumSpine
+        Run moveElementsIntoMeasures for each HumdrumSpine
         that is not a sub-spine.
 
-        Also fixes up the tuplets using duration.TupletFixer
+        Also fixes up the tuplets using duration.TupletFixer.
         '''
         tf = duration.TupletFixer()
 
@@ -1956,7 +2028,7 @@ class SpineCollection(prebase.ProtoM21Object):
 
     def attachNonKernEvents(self) -> None:
         '''
-        move :samp:`**dynam` and :samp:`**lyrics/**text` information to the appropriate staff.
+        Move :samp:`**dynam` and :samp:`**lyrics/**text` information to the appropriate staff.
 
         Assumes that :samp:`*staff` is consistent through the spine.
 
@@ -2051,9 +2123,9 @@ class SpineCollection(prebase.ProtoM21Object):
 
     def makeVoices(self) -> None:
         '''
-        make voices for each kernSpine -- why not just run
-        stream.makeVoices() ? because we have more information
-        here that lets us make voices more intelligently
+        Make voices for each kernSpine -- why not just run
+        stream.makeVoices() ? Because we have more information
+        here that lets us make voices more intelligently.
 
         Should be done after measures have been made.
         '''
@@ -2104,8 +2176,8 @@ class SpineCollection(prebase.ProtoM21Object):
 
     def parseMusic21(self) -> None:
         '''
-        runs spine.parse() for each Spine.
-        thus populating the spine.stream for each Spine
+        Runs spine.parse() for each Spine,
+        thus populating the spine.stream for each Spine.
         '''
         for thisSpine in self.spines:
             thisSpine.parse()
@@ -2116,14 +2188,14 @@ class SpineCollection(prebase.ProtoM21Object):
 class EventCollection(prebase.ProtoM21Object):
     '''
     An EventCollection holds every event that appears on a single source line
-    of a humdrum file -- one cell per spine, in their `events` array.
+    of a Humdrum file -- one cell per spine, in their `events` array.
 
     If a spine's cell on this line is '.' or a comment (no new event), use
     `lastEvents[spineNum]` to retrieve the previous event still sounding.
     `getSpineOccurring` returns either the current event or the last event
     that's still active.
 
-    Theses events should happen at the same time (offset)
+    These events should happen at the same time (offset)
     but they are not necessarily the only events to happen at that same time.
     E.g. a clef change and the note that follows it on the next line take place at
     the same musical time but live in different EventCollections.
@@ -2162,13 +2234,13 @@ class EventCollection(prebase.ProtoM21Object):
     >>> ec2.spinePathData
     False
 
-    In the future, EventCollection may enforce that all events have the same lineNumber
+    In the future, EventCollection may enforce that all events have the same lineNumber.
 
     * New in v10: lineNumber.
     '''
     def __init__(self, maxSpines: int = 0, lineNumber: int = 0) -> None:
-        self.events: common.defaultlist = common.defaultlist(lambda: None)
-        self.lastEvents: common.defaultlist = common.defaultlist(lambda: None)
+        self.events: list[SpineEvent|None] = [None] * maxSpines
+        self.lastEvents: dict[int, SpineEvent] = {}
         self.maxSpines: int = maxSpines
         self.lineNumber: int = lineNumber
         self.spinePathData: bool = False
@@ -2184,10 +2256,6 @@ class EventCollection(prebase.ProtoM21Object):
         # should only add if current 'event' is '.' or a comment
         self.lastEvents[spineNum] = spineEvent
 
-    def addGlobalEvent(self, globalEvent: HumdrumLine) -> None:
-        for i in range(self.maxSpines):
-            self.events[i] = globalEvent
-
     def getSpineEvent(self, spineNum: int) -> SpineEvent|None:
         return self.events[spineNum]
 
@@ -2195,10 +2263,10 @@ class EventCollection(prebase.ProtoM21Object):
         # returns the lastEvent if set (
         # should only happen if currentEvent is '.')
         # or the current event
-        if self.lastEvents[spineNum] is not None:
-            return self.lastEvents[spineNum]
-        else:
-            return self.events[spineNum]
+        lastEvent = self.lastEvents.get(spineNum)
+        if lastEvent is not None:
+            return lastEvent
+        return self.events[spineNum]
 
     def getAllOccurring(self) -> list[SpineEvent|None]:
         retEvents: list[SpineEvent|None] = []
@@ -2207,130 +2275,373 @@ class EventCollection(prebase.ProtoM21Object):
         return retEvents
 
 
-def hdStringToNote(contents: str) -> note.GeneralNote:
+def extractDuration(eventC: str) -> tuple[str, str]:
     '''
-    returns a :class:`~music21.note.Note` (or Rest or Unpitched, etc.)
-    matching the current SpineEvent.
-    Does not check to see that it is sane or part of a :samp:`**kern` spine, etc.
+    Extract duration characters from a token, returning what is left.
+
+    >>> humdrum.spineParser.extractDuration('2cc.')
+    ('2.', 'cc')
+    >>> humdrum.spineParser.extractDuration('3%2D')
+    ('3%2', 'D')
+    >>> humdrum.spineParser.extractDuration('B#')
+    ('', 'B#')
+
+    For ``**kern``, this routine should be run separately for each component of a chord.
+
+    New in v11.
+    '''
+    d = []
+    remain = []
+    for c in eventC:
+        if c in '0123456789.%':
+            d.append(c)
+        else:
+            remain.append(c)
+    return (''.join(d), ''.join(remain))
+
+
+def hdStringToDuration(contents: str) -> duration.Duration:
+    '''
+    Convert ``contents`` to a :class:`~music21.duration.Duration` object.
+
+    >>> d = humdrum.spineParser.hdStringToDuration('32')
+    >>> d
+    <music21.duration.Duration 0.125>
+    >>> d.type
+    '32nd'
+
+    Other information such as pitch can be passed here (and in practice is passed here)
+    without affecting parsing, such as the ``C#`` here.
+
+    >>> d = humdrum.spineParser.hdStringToDuration('8C#..')
+    >>> d.type
+    'eighth'
+    >>> d.dots
+    2
+
+    Tuplets are represented with the number of them in a whole note, such as 12 for
+    eighth-note triplets:
+
+    >>> d = humdrum.spineParser.hdStringToDuration('12')
+    >>> d.fullName
+    'Eighth Triplet (1/3 QL)'
+    >>> d.type
+    'eighth'
+    >>> d.tuplets
+    (<music21.duration.Tuplet 3/2/eighth>,)
+
+    Grace notes are represented by ``q``.  A grace note without duration is an eighth note:
+
+    >>> d = humdrum.spineParser.hdStringToDuration('gg#q/LL')
+    >>> d
+    <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
+    >>> d.isGrace
+    True
+
+    If a duration, like ``16``, is given, that type is preserved in the
+    unlinked GraceDuration.
+
+    >>> d = humdrum.spineParser.hdStringToDuration('16ccq')
+    >>> d
+    <music21.duration.GraceDuration unlinked type:16th quarterLength:0.0>
+
+    A single ``q`` is a slashed grace note (acciaccatura):
+
+    >>> d.slash
+    True
+
+    Two ``q``\\s signify a grace note without a slash (or accented grace note):
+
+    >>> d = humdrum.spineParser.hdStringToDuration('16ccqq')
+    >>> d.type
+    '16th'
+    >>> d.slash
+    False
+
+    .. note::
+
+        A capital ``Q`` was the original Humdrum way of signifying these notes
+        (gruppettos).  Some post-2020 encodings use ``Q`` to mean a cue-sized
+        note.  Given no way of distinguishing these interpretations, music21
+        will remain with the original version; so ``Q`` and ``qq`` are synonyms.
 
     New rhythmic extensions formerly defined in
     `wiki.humdrum.org/index.php/Rational_rhythms`
     and now at https://extras.humdrum.org/man/rscale/
     are fully implemented:
 
-    >>> n = humdrum.spineParser.hdStringToNote('CC3%2')
-    >>> n.duration.quarterLength
+    >>> d = humdrum.spineParser.hdStringToDuration('CC3%2')
+    >>> d.quarterLength
     Fraction(8, 3)
-    >>> n.duration.fullName
+    >>> d.fullName
     'Whole Triplet (2 2/3 QL)'
 
-    >>> n = humdrum.spineParser.hdStringToNote('e-00.')
-    >>> n.pitch
-    <music21.pitch.Pitch E-4>
-    >>> n.duration.quarterLength
+    >>> d = humdrum.spineParser.hdStringToDuration('e-00.')
+    >>> d.quarterLength
     24.0
-    >>> n.duration.fullName
+    >>> d.fullName
     'Perfect Longa'
 
-    >>> n = humdrum.spineParser.hdStringToNote('F#000')
-    >>> n.duration.quarterLength
+    >>> d = humdrum.spineParser.hdStringToDuration('F#000')
+    >>> d.quarterLength
     32.0
-    >>> n.duration.fullName
+    >>> d.fullName
     'Imperfect Maxima'
 
     Note that the following example is interpreted as one note in the time of a
-    double-dotted quarter not a double-dotted quarter-note triplet.
+    double-dotted quarter (not a double-dotted quarter-note triplet).
 
-    I believe that the latter definition, though used in
-    https://kern.humdrum.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
-    and the Josquin Research Project [JRP] is incorrect, seeing as it
-    contradicts the specification in
-    https://web.archive.org/web/20100203144730/http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets
+    >>> stored_JRP_Flavor = humdrum.spineParser.flavors['JRP']  #_DOCS_HIDE
+    >>> humdrum.spineParser.flavors['JRP'] = False  #_DOCS_HIDE
 
-    >>> storedFlavors = humdrum.spineParser.flavors['JRP']  #_DOCS_HIDE
-
-    This is the default:
-
-    >>> humdrum.spineParser.flavors['JRP'] = False
-
-    >>> n = humdrum.spineParser.hdStringToNote('6..fff')
-    >>> n.duration.quarterLength
+    >>> d = humdrum.spineParser.hdStringToDuration('6..fff')
+    >>> d.quarterLength
     Fraction(7, 6)
-
-    >>> n.duration.dots
+    >>> d.dots
     0
-
-    >>> n.duration.tuplets[0].durationNormal.dots
+    >>> d.tuplets[0].durationNormal.dots
     2
+    >>> d.tuplets[0].totalTupletLength()
+    3.5
 
-    If you want the JRP definition, set humdrum.spineParser.flavors['JRP'] = True
-    before calling converter.parse() or anything like that:
+    The latter definition (a double-dotted quarter-note triplet), though used in
+    https://kern.humdrum.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
+    and the Josquin Research Project (JRP), is incorrect, seeing as it
+    contradicts the specification in
+    https://www.humdrum.org/Humdrum/representations/kern.html#N-Tuplets
+    (_"92.." is the correct ``**kern`` encoding for a note whose duration is
+    23 notes in the time of a doubly-dotted quarter._)
+
+    We will call the second interpretation the "JRP Flavor". The default JRP Flavor is False::
+
+    >>> humdrum.spineParser.flavors['JRP']
+    False
+
+    If you want the JRP definition, where dots apply to the note, not tuplet,
+    set humdrum.spineParser.flavors['JRP'] = True before calling converter.parse()
+    or any other parsing routine like hdStringToDuration:
 
     >>> humdrum.spineParser.flavors['JRP'] = True
-    >>> n = humdrum.spineParser.hdStringToNote('6..fff')
-    >>> n.duration.quarterLength
+    >>> d = humdrum.spineParser.hdStringToDuration('6..fff')
+
+    Note that the quarter length of the individual note is the same:
+
+    >>> d.quarterLength
     Fraction(7, 6)
-    >>> n.duration.dots
+
+    But the representation of how many dots are on the note as opposed to
+    the total tuplet duration is quite different.
+
+    >>> d.dots
     2
-    >>> n.duration.tuplets[0].durationNormal.dots
+    >>> d.tuplets[0].durationNormal.dots
     0
+    >>> d.tuplets[0].totalTupletLength()
+    2.0
 
-    >>> n = humdrum.spineParser.hdStringToNote('gg#q/LL')
-    >>> n.duration
-    <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
-    >>> n.duration.isGrace
-    True
+    >>> humdrum.spineParser.flavors['JRP'] = stored_JRP_Flavor  #_DOCS_HIDE
 
-    >>> humdrum.spineParser.flavors['JRP'] = storedFlavors  #_DOCS_HIDE
+    If no duration number can be found and this is not a grace note (which gets
+    a default eighth-note duration), then a HumdrumException is raised.
 
+    >>> humdrum.spineParser.hdStringToDuration('nada')
+    Traceback (most recent call last):
+    music21.humdrum.spineParser.HumdrumException: Could not find a duration in 'nada'
+
+    * Changed in v11: Duration extraction moved to hdStringToDuration.
+        Grace notes keep their written duration, and ``qq`` is
+        parsed as an unslashed grace note.
     '''
 
+    # 3.2.7 Duration and
+    # 3.2.8 N-Tuplets
+
+    # Rational durations are rare, and require a '%'; skip the regex without one.
+    foundRational = re.search(r'(\d+)%(\d+)', contents) if '%' in contents else None
+    foundNumber = re.search(r'(\d+)', contents)
+
+    numDots = contents.count('.')
+    hasGrace = 'q' in contents or 'Q' in contents
+
+    d: duration.Duration
+    if foundRational:
+        durationFirst = int(foundRational.group(1))
+        durationSecond = int(foundRational.group(2))
+        d = duration.Duration(
+            quarterLength=opFrac(4 * durationSecond / durationFirst),
+        )
+        # append dots after the quarterLength has been computed.
+        d.dots = numDots
+
+    elif foundNumber:
+        humdrumDurationNumber = int(foundNumber.group(1))
+        d_type: str
+        if humdrumDurationNumber == 0:
+            durationString = foundNumber.group(1)
+            if durationString == '000':
+                # for larger values, see https://extras.humdrum.org/man/rscale/
+                d_type = 'maxima'
+            elif durationString == '00':
+                # for larger values, see https://extras.humdrum.org/man/rscale/
+                d_type = 'longa'
+            else:
+                d_type = 'breve'
+            d = duration.Duration(type=d_type, dots=numDots)
+        elif humdrumDurationNumber in duration.typeFromNumDict:
+            d_type = duration.typeFromNumDict[humdrumDurationNumber]
+            d = duration.Duration(type=d_type, dots=numDots)
+        else:
+            exponents = math.floor(math.log2(humdrumDurationNumber))
+            baseValue = t.cast(int, 2 ** exponents)
+            d_type = duration.typeFromNumDict[baseValue]
+            newTup = duration.Tuplet()
+            newTup.durationActual = duration.durationTupleFromTypeDots(d_type, 0)
+            newTup.durationNormal = newTup.durationActual
+
+            gcd = math.gcd(humdrumDurationNumber, baseValue)
+            newTup.numberNotesActual = humdrumDurationNumber // gcd
+            newTup.numberNotesNormal = baseValue // gcd
+
+            # The Josquin Research Project uses a definition of
+            # Humdrum tuplets that breaks normal usage.
+            JRP = flavors['JRP']
+            if not JRP and numDots:
+                # normal Humdrum way of interpreting dots -- they apply to the tuplet
+                newTup.durationNormal = duration.durationTupleFromTypeDots(d_type, numDots)
+            d = duration.Duration(type=d_type)
+            d.appendTuplet(newTup)
+            if JRP and numDots:
+                d.dots = numDots
+            # call Duration.TupletFixer after to correct this.
+    elif hasGrace:
+        d = duration.Duration(type='eighth')
+    else:
+        raise HumdrumException(f'Could not find a duration in {contents!r}')
+
+    # 3.2.9 Grace Notes and Groupettos
+    # A single `q` is a slashed grace note; `qq` or `Q` is an unslashed grace note.
+    # A grace note keeps its written duration; with none written it defaults to an eighth.
+    if hasGrace:
+        d = d.getGraceDuration(appoggiatura=False)
+        if foundNumber is None:
+            d.type = 'eighth'
+        # != 1: number of q's == 0 (because it's a capital Q) or 2+ (== qq)
+        if contents.count('q') != 1:
+            t.cast(GraceDuration, d).slash = False
+    elif 'P' in contents:
+        d = d.getGraceDuration(appoggiatura=True)
+    elif 'p' in contents:
+        pass  # end appoggiatura duration -- not recorded in music21...
+
+    return d
+
+
+def hdStringToNote(
+    contents: str,
+    *,
+    overrideDuration: duration.Duration|None = None,
+) -> note.GeneralNote:
+    '''
+    Returns a :class:`~music21.note.Note` (or Rest or Unpitched, etc.)
+    matching the current SpineEvent.
+
+    Does not check to see that it is sane or part of a :samp:`**kern` spine, etc.
+
+    If `contents` has no written duration, the note should have had `overrideDuration`
+    given, as happens with chord members.
+
+    >>> n = humdrum.spineParser.hdStringToNote('4CC.')
+    >>> n.fullName
+    'C in octave 2 Dotted Quarter Note'
+
+    >>> n = humdrum.spineParser.hdStringToNote('12dd##')
+    >>> n.fullName
+    'D-double-sharp in octave 5 Eighth Triplet (1/3 QL) Note'
+
+    If `overrideDuration` is passed in as a Duration object, that is used no matter what::
+
+    >>> n = humdrum.spineParser.hdStringToNote('12dd##',
+    ...         overrideDuration=duration.Duration('whole'))
+    >>> n.duration
+    <music21.duration.Duration 4.0>
+    >>> n.duration.type
+    'whole'
+
+    The `overrideDuration` is needed if a note is not a grace note. For instance, for
+    chord members after the first one.
+
+    >>> n = humdrum.spineParser.hdStringToNote('BBB--',
+    ...         overrideDuration=duration.Duration('eighth'))
+    >>> n.fullName
+    'B-double-flat in octave 1 Eighth Note'
+
+    Otherwise, it uses a quarter note and gives a warning.  This may become an error in
+    future versions::
+
+    >>> import warnings
+    >>> with warnings.catch_warnings(record=True) as w:
+    ...      warnings.simplefilter('always')  # _DOCS_HIDE
+    ...      n = humdrum.spineParser.hdStringToNote('B-')
+    ...      n.fullName
+    'B-flat in octave 3 Quarter Note'
+    >>> w[0].message
+    UserWarning("Could not find a duration in 'B-', using quarter note.")
+
+    * Changed in v11: give a warning if no duration can be found and a quarter default was used.
+    '''
     # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern
+
+    # Get duration early
+    try:
+        d = overrideDuration or hdStringToDuration(contents)
+    except HumdrumException:
+        d = duration.Duration(1.0)
+        warnings.warn(f'Could not find a duration in {contents!r}, using quarter note.',
+                      stacklevel=2)
 
     # 3.2.1 Pitches and 3.3 Rests
 
-    matchedNote = re.search('([a-gA-G]+)', contents)
-    # Detect rests first, because rests can contain manual positioning information,
-    # which is also detected by the `matchedNote` variable above.
+    # Detect rests first, because rests can contain manual positioning information
+    # (a pitch letter) that the note search would otherwise pick up; only notes
+    # need that search at all.
     thisObject: note.GeneralNote
     if 'r' in contents:
-        thisObject = note.Rest()
+        thisObject = note.Rest(duration=d)
 
-    elif matchedNote:
+    elif matchedNote := re.search('([a-gA-G]+)', contents):
         kernNoteName = matchedNote.group(1)
         step = kernNoteName[0].lower()
         if step == kernNoteName[0]:  # middle C or higher
             octave = 3 + len(kernNoteName)
         else:  # below middle C
             octave = 4 - len(kernNoteName)
-        builtNote = note.Note(octave=octave)
+        builtNote = note.Note(octave=octave, duration=d)
         builtNote.step = step  # type: ignore[assignment]
         thisObject = builtNote
 
     else:
         raise HumdrumException(f'Could not parse {contents} for note information')
 
-    matchedSharp = re.search(r'(#+)', contents)
-    matchedFlat = re.search(r'(-+)', contents)
-
+    # The count of '#' (or '-') gives the number of sharps (or flats) directly,
+    # which is also the Accidental's alteration -- no regex needed.
     if isinstance(thisObject, note.Note):
-        if matchedSharp:
-            thisObject.pitch.accidental = matchedSharp.group(0)
-        elif matchedFlat:
-            thisObject.pitch.accidental = matchedFlat.group(0)
+        if sharps := contents.count('#'):
+            thisObject.pitch.accidental = pitch.Accidental(sharps)
+        elif flats := contents.count('-'):
+            thisObject.pitch.accidental = pitch.Accidental(-flats)
         elif 'n' in contents:
-            thisObject.pitch.accidental = 'n'
+            thisObject.pitch.accidental = pitch.Accidental('n')
 
     # 3.2.2 -- Slurs, Ties, Phrases
     # TODO: add music21 phrase information
-    for i in range(contents.count('{')):
-        pass  # phraseMark start
-    for i in range(contents.count('}')):
-        pass  # phraseMark end
-    for i in range(contents.count('(')):
-        pass  # slur start
-    for i in range(contents.count(')')):
-        pass  # slur end
+    # for i in range(contents.count('{')):
+    #     pass  # phraseMark start
+    # for i in range(contents.count('}')):
+    #     pass  # phraseMark end
+    # for i in range(contents.count('(')):
+    #     pass  # slur start
+    # for i in range(contents.count(')')):
+    #     pass  # slur end
     if '[' in contents:
         thisObject.tie = tie.Tie('start')
     elif ']' in contents:
@@ -2362,10 +2673,10 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
         t1.connectedToPrevious = True  # true by default, but explicitly
         thisObject.expressions.append(t1)
 
-    if ':' in contents:
-        # TODO: deal with arpeggiation -- should have been in a
-        #  chord structure
-        pass
+    # if ':' in contents:
+    #     # TODO: deal with arpeggiation -- should have been in a
+    #     #  chord structure
+    #     pass
 
     if 'O' in contents:
         thisObject.expressions.append(expressions.Ornament())
@@ -2400,88 +2711,15 @@ def hdStringToNote(contents: str) -> note.GeneralNote:
         elif '\\' in contents:
             thisObject.stemDirection = 'down'
 
-    # 3.2.7 Duration +
-    # 3.2.8 N-Tuplets
-
-    # TODO: SPEEDUP -- only search for rational after foundNumber.
-    foundRational = re.search(r'(\d+)%(\d+)', contents)
-    foundNumber = re.search(r'(\d+)', contents)
-    if foundRational:
-        durationFirst = int(foundRational.group(1))
-        durationSecond = int(foundRational.group(2))
-        thisObject.duration.quarterLength = opFrac(4 * durationSecond / durationFirst)
-        if '.' in contents:
-            thisObject.duration.dots = contents.count('.')
-
-    elif foundNumber:
-        durationType = int(foundNumber.group(1))
-        if durationType == 0:
-            durationString = foundNumber.group(1)
-            if durationString == '000':
-                # for larger values, see https://extras.humdrum.org/man/rscale/
-                thisObject.duration.type = 'maxima'
-            elif durationString == '00':
-                # for larger values, see https://extras.humdrum.org/man/rscale/
-                thisObject.duration.type = 'longa'
-            else:
-                thisObject.duration.type = 'breve'
-            if '.' in contents:
-                thisObject.duration.dots = contents.count('.')
-        elif durationType in duration.typeFromNumDict:
-            thisObject.duration.type = duration.typeFromNumDict[durationType]
-            if '.' in contents:
-                thisObject.duration.dots = contents.count('.')
-        else:
-            dT = int(durationType) + 0.0
-            (unused_remainder, exponents) = math.modf(math.log2(dT))
-            baseValue = 2 ** exponents
-            thisObject.duration.type = duration.typeFromNumDict[int(baseValue)]
-            newTup = duration.Tuplet()
-            newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
-            newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
-
-            gcd = math.gcd(int(dT), int(baseValue))
-            newTup.numberNotesActual = int(dT / gcd)
-            newTup.numberNotesNormal = int(float(baseValue) / gcd)
-
-            # The Josquin Research Project uses an incorrect definition of
-            # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = 'JRP'
-            # code that uses this other method.
-            JRP = flavors['JRP']
-            if not JRP and '.' in contents:
-                newTup.durationNormal = duration.durationTupleFromTypeDots(
-                    newTup.durationNormal.type, contents.count('.'))
-
-            thisObject.duration.appendTuplet(newTup)
-            if JRP and '.' in contents:
-                thisObject.duration.dots = contents.count('.')
-            # call Duration.TupletFixer after to correct this.
-
-    # 3.2.9 Grace Notes and Groupettos
-    if 'q' in contents:
-        thisObject = thisObject.getGrace()
-        thisObject.duration.type = 'eighth'
-    elif 'Q' in contents:
-        thisObject = thisObject.getGrace()
-        dur = thisObject.duration
-        assert isinstance(dur, GraceDuration)
-        dur.slash = False
-        dur.type = 'eighth'
-    elif 'P' in contents:
-        thisObject = thisObject.getGrace(appoggiatura=True)
-    elif 'p' in contents:
-        pass  # end appoggiatura duration -- not needed in music21...
-
     # 3.2.10 Beaming
-    # TODO: Support really complex beams
     if isinstance(thisObject, note.NotRest):
-        for i in range(contents.count('L')):
+        for _ in range(contents.count('L')):
             thisObject.beams.append('start')
-        for i in range(contents.count('J')):
+        for _ in range(contents.count('J')):
             thisObject.beams.append('stop')
-        for i in range(contents.count('k')):
-            thisObject.beams.append('partial', 'right')
-        for i in range(contents.count('K')):
+        for _ in range(contents.count('k')):
+            thisObject.beams.append('partial', 'left')
+        for _ in range(contents.count('K')):
             thisObject.beams.append('partial', 'right')
 
     return thisObject
@@ -2491,7 +2729,7 @@ def hdStringToMeasure(
     previousMeasure: stream.Measure|None = None,
 ) -> stream.Measure:
     '''
-    kern uses an equals sign followed by processing instructions to
+    Kern uses an equals sign followed by processing instructions to
     create new measures.
 
     * Changed in v10: repeat dots are encoded as :class:`~music21.bar.Repeat`
@@ -2563,7 +2801,7 @@ def hdStringToMeasure(
 
 def kernTandemToObject(tandem: str) -> base.Music21Object|None:
     '''
-    Kern uses symbols such as :samp:`*M5/4` and :samp:`*clefG2`, etc., to control processing
+    Kern uses symbols such as :samp:`*M5/4` and :samp:`*clefG2`, etc., to control processing.
 
     This method converts them to music21 objects.
 
@@ -2712,7 +2950,7 @@ class SpineComment(base.Music21Object):
 
 class GlobalComment(base.Music21Object):
     '''
-    A Music21Object that represents a comment for the whole score
+    A Music21Object that represents a comment for the whole score.
 
     >>> sc = humdrum.spineParser.GlobalComment('!! this is a global comment')
     >>> sc
@@ -2730,11 +2968,19 @@ class GlobalComment(base.Music21Object):
         return repr(self.comment)
 
 
-class GlobalReference(base.Music21Object):
+class GlobalReference(prebase.ProtoM21Object):
     # noinspection SpellCheckingInspection
     '''
-    A Music21Object that represents a reference in the score, called a "reference record"
-    in Humdrum.  See Humdrum User's Guide Chapter 2.
+    An item of metadata or "library-type information" called a "Reference Record"
+    in Humdrum.  The music21 term `GlobalReference` uses Global in the sense that
+    it applies to all spines, but also to the score as a whole.
+
+    All GlobalReferences are stored in SpineParser's .globalReferences array
+    during parsing and then stored in the Score's metadata at the end of parsing.
+    The position of a GlobalReference in the Humdrum file does not affect
+    where it is placed in the score's metadata (though later ones will overwrite
+    earlier ones). Humdrum tradition is to place most important reference records
+    at the top of the file and less important ones at the end.
 
     >>> sc = humdrum.spineParser.GlobalReference('!!!REF:this is a global reference')
     >>> sc
@@ -2771,14 +3017,15 @@ class GlobalReference(base.Music21Object):
     'FRE'
     >>> sc.isPrimary
     False
+
+    Changed in v11: GlobalReferences are no longer Music21Object subclasses, since they
+        should not be placed in locations in a Stream.
     '''
     def __init__(
         self,
         codeOrAll: str = '',
         valueOrNone: str|None = None,
-        **keywords,
     ) -> None:
-        super().__init__(**keywords)
         codeOrAll = re.sub(r'^!!!+', '', codeOrAll)
         codeOrAll = codeOrAll.strip()
         if valueOrNone is None and ':' in codeOrAll:
@@ -2906,9 +3153,9 @@ class GlobalReference(base.Music21Object):
 
     def updateMetadata(self, md: metadata.Metadata) -> None:
         '''
-        update a metadata object according to information in this GlobalReference
+        Update a metadata object according to information in this GlobalReference.
 
-        See humdrum guide Appendix I for information
+        See Humdrum guide Appendix I for information.
         '''
         c = self.code
         v = self.value
@@ -2917,7 +3164,7 @@ class GlobalReference(base.Music21Object):
         if uniqueName:
             md.add(uniqueName, v)
         elif c in self.humdrumKeyToUniqueName:
-            # it's a humdrum key, but unsupported
+            # it's a Humdrum key, but unsupported
             md.addCustom('humdrum:' + c, v)
         else:
             # it's a free-form key
@@ -2925,6 +3172,9 @@ class GlobalReference(base.Music21Object):
 
     def _reprInternal(self) -> str:
         return f'{self.code} {self.value!r}'
+
+
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):

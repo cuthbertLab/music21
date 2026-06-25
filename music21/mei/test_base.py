@@ -1899,7 +1899,7 @@ class Test(unittest.TestCase):
         actual = base.clefFromElement(elem)
 
         self.assertEqual(expected, actual)
-        # this test fails on Python 3.5.
+        # this test failed starting on Python 3.5 so commented out; have not checked since.
         # mockClefFromString.assert_called_once_with_('theClefShape2', 1)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
         self.assertEqual(0, mockTabClef.call_count)

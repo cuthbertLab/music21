@@ -44,7 +44,7 @@ _MOD = 'environment'
 
 def etIndent(elem, level=0, spaces=2):
     '''
-    indent an elementTree element for printing
+    Indent an elementTree element for printing.
     '''
     i = '\n' + level * spaces * ' '
     if len(elem):
@@ -77,7 +77,7 @@ class UserSettingsException(EnvironmentException):
 class LocalCorpusSettings(list):
     '''
     A lightweight object for storing the 'LocalCorpusSettings' tag in the
-    .music21rc
+    .music21rc.
 
     It is a subclass of list and has two additional attributes, name (which
     should be None for the unnamed localCorpus) and cacheFilePath
@@ -293,7 +293,7 @@ class _EnvironmentCore:
     # PRIVATE METHODS #
     def _fromSettings(self, settingsTree, ref=None):
         '''
-        Takes in a ElementTree and possibly an already populated reference dictionary
+        Takes in an ElementTree and possibly an already populated reference dictionary
         (or creates a new one) and populates it.
         '''
         if ref is None:
@@ -449,7 +449,7 @@ class _EnvironmentCore:
     def toSettingsXML(self, ref=None):
         '''
         Convert a ref dictionary to an xml.etree.ElementTree.Element object
-        with root "<settings>" and return that object
+        with root "<settings>" and return that object.
         '''
         if ref is None:
             ref = self._ref
@@ -504,7 +504,7 @@ class _EnvironmentCore:
     def getDefaultRootTempDir(self):
         # noinspection SpellCheckingInspection
         '''
-        returns whatever tempfile.gettempdir() returns plus 'music21'.
+        Returns whatever tempfile.gettempdir() returns plus 'music21'.
 
         Creates the subdirectory if it doesn't exist:
 
@@ -564,7 +564,7 @@ class _EnvironmentCore:
 
     def getKeysToPaths(self):
         '''
-        Find all keys that refer to paths
+        Find all keys that refer to paths.
 
         >>> e = environment.Environment()
         >>> for i in e.getKeysToPaths():
@@ -598,11 +598,11 @@ class _EnvironmentCore:
 
     def getRootTempDir(self):
         '''
-        gets either the directory in key 'directoryScratch' or self.getDefaultRootTempDir
+        Gets either the directory in key 'directoryScratch' or self.getDefaultRootTempDir.
 
         Returns an exception if directoryScratch is defined but does not exist.
 
-        Returns a pathlib.Path
+        Returns a pathlib.Path.
         '''
         if self._ref['directoryScratch'] is None:
             return self.getDefaultRootTempDir()
@@ -705,7 +705,7 @@ class _EnvironmentCore:
         >>> e.formatToKey('braille')
         'braillePath'
 
-        returns None if there is no key for this format (whether the format exists or not)
+        Returns None if there is no key for this format (whether the format exists or not).
 
         >>> e.formatToKey('ipython') is None  # actual format
         True
@@ -798,8 +798,8 @@ _environStorage = {'instance': _EnvironmentCore(), 'forcePlatform': None}
 
 def envSingleton():
     '''
-    returns the _environStorage['instance'], _EnvironmentCore singleton
-    object
+    Returns the _environStorage['instance'], _EnvironmentCore singleton
+    object.
     '''
     return _environStorage['instance']
 
@@ -818,7 +818,7 @@ class Environment:
     Generally, each module creates a single, module-level instance of
     Environment, passing the module's name during creation. (This is an
     efficient operation since the Environment module caches most information
-    from module to module)
+    from module to module).
 
     For a more user-friendly interface for creating and editing settings, see
     the :class:`~music21.environment.UserSettings` object.
@@ -922,7 +922,7 @@ class Environment:
         If not able to create a 'music21' directory, the standard default is
         returned.
 
-        Returns a pathlib.Path
+        Returns a pathlib.Path.
         '''
         dstDir = envSingleton().getDefaultRootTempDir()
         self.printDebug([_MOD, 'using temporary directory:', str(dstDir)])
@@ -1365,14 +1365,14 @@ class UserSettings:
 
     def items(self):
         '''
-        dict-like interface to allow iterating over items of the UserSettings.
+        Dict-like interface to allow iterating over items of the UserSettings.
         '''
         for k in self.keys():
             yield (k, self[k])
 
     def values(self):
         '''
-        dict-like interface to allow iterating over values of the UserSettings.
+        Dict-like interface to allow iterating over values of the UserSettings.
         '''
         for _, v in self.items():
             yield v

@@ -154,7 +154,7 @@ class Articulation(base.Music21Object):
     @property
     def name(self) -> str:
         '''
-        returns the name of the articulation, which is generally the
+        Returns the name of the articulation, which is generally the
         class name without the leading letter lowercase.
 
         Subclasses can override this as necessary.
@@ -230,7 +230,7 @@ class Accent(DynamicArticulation):
 class StrongAccent(Accent):
     '''
     Like an accent but even stronger.  Has an extra
-    attribute of pointDirection
+    attribute of pointDirection.
 
     >>> a = articulations.StrongAccent()
     >>> a.pointDirection
@@ -268,7 +268,7 @@ class Staccatissimo(Staccato):
 
 class Spiccato(Staccato, Accent):
     '''
-    A staccato note + accent in one
+    A staccato note + accent in one.
 
     >>> spiccato = articulations.Spiccato()
     >>> staccato = articulations.Staccato()
@@ -309,14 +309,14 @@ class IndeterminateSlide(PitchArticulation):
     of an indeterminate pitch amount (scoops, plops, etc.)
 
     All these have style information of .style.lineShape
-    .style.lineType, .style.dashLength, and .style.spaceLength
+    .style.lineType, .style.dashLength, and .style.spaceLength.
     '''
     _styleClass = style.LineStyle
 
 
 class Scoop(IndeterminateSlide):
     '''
-    An indeterminateSlide coming before the main note and going up
+    An indeterminateSlide coming before the main note and going up.
 
     >>> a = articulations.Scoop()
     '''
@@ -419,7 +419,7 @@ class Fingering(TechnicalIndication):
     a note (in a guitar/fret context, this covers the fret finger,
     see FrettedPluck for that).
 
-    Converts the MusicXML -- <fingering> object
+    Converts the MusicXML -- <fingering> object.
 
     >>> f = articulations.Fingering(5)
     >>> f
@@ -522,7 +522,7 @@ class StringFingering(StringIndication, Fingering):
 
 class Pizzicato(Bowing):
     '''
-    in MusicXML, Pizzicato is an element of every note.
+    In MusicXML, Pizzicato is an element of every note.
     Here we represent pizzicatos along with all bowing marks.
 
     For pluck, see FrettedPluck.
@@ -534,7 +534,7 @@ class SnapPizzicato(Pizzicato):
 
 class NailPizzicato(Pizzicato):
     '''
-    Does not exist in MusicXML
+    Does not exist in MusicXML.
     '''
     pass
 
@@ -561,7 +561,7 @@ class FretIndication(TechnicalIndication):
 
 class FrettedPluck(FretIndication, Fingering):
     '''
-    specifies plucking fingering for fretted instruments
+    Specifies plucking fingering for fretted instruments.
 
     pluck in musicxml
     '''
@@ -581,7 +581,7 @@ class PullOff(spanner.Spanner, TechnicalIndication):
 
 class FretBend(FretIndication):
     '''
-    Bend indication for fretted instruments
+    Bend indication for fretted instruments.
 
     Bend in musicxml
 

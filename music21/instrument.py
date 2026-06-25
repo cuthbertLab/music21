@@ -48,8 +48,8 @@ def unbundleInstruments(streamIn: stream.Stream,
                         inPlace=False) -> stream.Stream|None:
     # noinspection PyShadowingNames
     '''
-    takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
-    and moves their `.storedInstrument` attributes to a new Stream (unless inPlace=True)
+    Takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
+    and moves their `.storedInstrument` attributes to a new Stream (unless inPlace=True).
 
     >>> up1 = note.Unpitched()
     >>> up1.storedInstrument = instrument.BassDrum()
@@ -200,7 +200,7 @@ class Instrument(base.Music21Object):
             new.instrumentIdRandomize()
         return new
 
-    def bestName(self):
+    def bestName(self) -> str|None:
         '''
         Find a viable name, looking first at instrument, then part, then
         abbreviations.
@@ -218,7 +218,7 @@ class Instrument(base.Music21Object):
 
     def partIdRandomize(self):
         '''
-        Force a unique id by using an MD5
+        Force a unique id by using an MD5.
         '''
         idNew = f'P{common.getMd5()}'
         # environLocal.printDebug(['incrementing instrument from',
@@ -228,7 +228,7 @@ class Instrument(base.Music21Object):
 
     def instrumentIdRandomize(self):
         '''
-        Force a unique id by using an MD5
+        Force a unique id by using an MD5.
         '''
         idNew = f'I{common.getMd5()}'
         # environLocal.printDebug(['incrementing instrument from',
@@ -241,7 +241,7 @@ class Instrument(base.Music21Object):
         Assign an unused midi channel given a list of
         used channels.  Music21 uses 0-indexed MIDI channels.
 
-        assigns the number to self.midiChannel and returns
+        Assigns the number to self.midiChannel and returns
         it as an int.
 
         Note that the Percussion MIDI channel (9 in music21, 10 in 1-16 numbering) is special,
@@ -254,7 +254,7 @@ class Instrument(base.Music21Object):
         >>> i.midiChannel
         12
 
-        Note that used is unchanged after calling this and would need to be updated manually
+        Note that used is unchanged after calling this and would need to be updated manually.
 
         >>> used
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
@@ -283,7 +283,7 @@ class Instrument(base.Music21Object):
         Traceback (most recent call last):
         music21.exceptions21.InstrumentException: we are out of midi channels! help!
 
-        Get around this by assinging higher channels:
+        Get around this by assigning higher channels:
 
         >>> i.autoAssignMidiChannel(used2, maxMidi=32)
         16
@@ -315,7 +315,7 @@ class Instrument(base.Music21Object):
                     self.midiChannel = ch
                     return self.midiChannel
             return 0
-            # raise InstrumentException('we are out of midi channels and this ' +
+            # raise InstrumentException('we are out of midi channels and this '
             #            'was not already detected PROGRAM BUG!')
 
 
@@ -1802,7 +1802,7 @@ ensembleNamesBySize = ['no performers', 'solo', 'duet', 'trio', 'quartet',
 
 def ensembleNameBySize(number):
     '''
-    return the name of a generic ensemble with "number" players:
+    Return the name of a generic ensemble with "number" players:
 
     >>> instrument.ensembleNameBySize(4)
     'quartet'
@@ -2302,7 +2302,7 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
 
 def _combinations(instrumentString):
     '''
-    find all combinations of instrumentString.  Remove all punctuation.
+    Find all combinations of instrumentString.  Remove all punctuation.
     '''
     sampleList = instrumentString.split()
     allComb = []

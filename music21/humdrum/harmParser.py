@@ -8,7 +8,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Harmonic annotations from humdrum to `music21`.
+Harmonic annotations from Humdrum to `music21`.
 
 The `**harm` representation is described here: https://www.humdrum.org/rep/harm/
 '''
@@ -18,7 +18,7 @@ import re
 import typing as t
 import unittest
 
-def convertHarmToRoman(harmStr):
+def convertHarmToRoman(harmStr: str) -> str|None:
     # noinspection PyShadowingNames
     '''
     Converts a `**harm` string into a string that
@@ -27,24 +27,25 @@ def convertHarmToRoman(harmStr):
     This is necessary because the two notations are not
     identical. For example, a "V7b" in `**harm` turns into "V65".
 
-    Instantiate a HarmParser to process `**harm` strings
+    Instantiate a HarmParser to process `**harm` strings.
 
     >>> convertHarmToRoman = humdrum.harmParser.convertHarmToRoman
 
-    Convert a few `**harm` strings to music21.roman.RomanNumeral figures
+    Convert a few `**harm` strings to music21.roman.RomanNumeral figures.
 
     >>> diatonicTriads = ['I', 'Vc', 'Ib', 'iib', 'V', 'viiob', 'vib']
     >>> [convertHarmToRoman(x) for x in diatonicTriads]
     ['I', 'V64', 'I6', 'ii6', 'V', 'viio6', 'vi6']
 
-    A few seventh-chord inversions
+    A few seventh-chord inversions:
+
     >>> diatonicSevenths = ['V7', 'viio7c', 'V7d', 'viio7b', 'V7c']
     >>> [convertHarmToRoman(x) for x in diatonicSevenths]
     ['V7', 'viio43', 'V2', 'viio65', 'V43']
 
-    Inversion-wise, augmented sixth chords are a bit tricky
-    German and French are treated as seventh-chords (4 notes)
-    Italians are treated as triads
+    Inversion-wise, augmented sixth chords are a bit tricky.
+    German and French are treated as seventh-chords (4 notes).
+    Italian sixths are treated as triads.
 
     >>> italianSixths = ['Lt', 'Ltb', 'Ltc']
     >>> [convertHarmToRoman(x) for x in italianSixths]
@@ -86,7 +87,7 @@ def convertHarmToRoman(harmStr):
     isSeventh = False
     if harm['intervals'] and '7' in harm['intervals']:
         isSeventh = True
-    # Numeric inversions (although it is more the 'figured bass')
+    # Numeric inversions (although it is more like the 'figured bass')
     if harm['inversion']:
         inversionNumber = ['a', 'b', 'c', 'd'].index(harm['inversion'])
     else:
@@ -117,7 +118,7 @@ def convertHarmToRoman(harmStr):
 
 class HarmDefs:
     '''
-    Regular expression definitions for the HarmParser class
+    Regular expression definitions for the HarmParser class.
     '''
 
     # Detect lowered or raised root (-|lowered, #|raised)
@@ -197,16 +198,16 @@ class HarmDefs:
 
 class HarmParser:
     '''
-    Parses an expression in `**harm` syntax
+    Parses an expression in `**harm` syntax.
     '''
 
     defs = HarmDefs()
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.harmRegExp = re.compile(HarmParser.defs.harmExpression, re.VERBOSE)
         self.impliedRegExp = re.compile(HarmParser.defs.implied, re.VERBOSE)
 
-    def parse(self, harmExpression) -> dict[str, t.Any]:
+    def parse(self, harmExpression: str) -> dict[str, t.Any]:
         # Check for implied harmony
         m: dict[str, t.Any]
         impliedMatch = self.impliedRegExp.match(harmExpression)

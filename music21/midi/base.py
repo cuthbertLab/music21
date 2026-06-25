@@ -44,7 +44,10 @@ import unicodedata
 from typing import overload
 import typing as t
 
-from music21.common.enums import ContainsEnum
+if t.TYPE_CHECKING:
+    import pathlib
+
+from music21.common.enums import HexEnum
 from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
@@ -358,7 +361,7 @@ def putNumbersAsList(numList: Iterable[int]) -> bytes:
     return bytes(post)
 
 
-class ChannelVoiceMessages(ContainsEnum):
+class ChannelVoiceMessages(HexEnum):
     '''
     ChannelVoiceMessages are the main MIDI messages for channel 1-16, such as
     NOTE_ON, NOTE_OFF, etc.
@@ -372,7 +375,7 @@ class ChannelVoiceMessages(ContainsEnum):
     PITCH_BEND = 0xE0
 
 
-class ChannelModeMessages(ContainsEnum):
+class ChannelModeMessages(HexEnum):
     ALL_SOUND_OFF = 0x78
     RESET_ALL_CONTROLLERS = 0x79
     LOCAL_CONTROL = 0x7A
@@ -383,7 +386,7 @@ class ChannelModeMessages(ContainsEnum):
     POLY_MODE_ON = 0x7F
 
 
-class MetaEvents(ContainsEnum):
+class MetaEvents(HexEnum):
     SEQUENCE_NUMBER = 0x00
     TEXT_EVENT = 0x01
     COPYRIGHT_NOTICE = 0x02
@@ -410,7 +413,7 @@ class MetaEvents(ContainsEnum):
     UNKNOWN = 0xFF  # Container for any unknown code
 
 
-class SysExEvents(ContainsEnum):
+class SysExEvents(HexEnum):
     F0_SYSEX_EVENT = 0xF0
     F7_SYSEX_EVENT = 0xF7
 
@@ -491,7 +494,7 @@ class MidiEvent(prebase.ProtoM21Object):
                  track: MidiTrack|None = None,
                  type: MidiEventTypes = MetaEvents.UNKNOWN,
                  time: int = 0,
-                 channel: int = 1):
+                 channel: int = 1) -> None:
         self.track: MidiTrack|None = track  # a MidiTrack object
         self.type: MidiEventTypes = type
         self.time: int = time
@@ -548,7 +551,7 @@ class MidiEvent(prebase.ProtoM21Object):
             trackIndex = self.track.index
 
         printType: str
-        if isinstance(self.type, ContainsEnum):
+        if isinstance(self.type, HexEnum):
             printType = self.type.name
         elif self.type is None:
             printType = 'None'
@@ -585,7 +588,7 @@ class MidiEvent(prebase.ProtoM21Object):
             return None
 
     @pitch.setter
-    def pitch(self, value: int|None):
+    def pitch(self, value: int|None) -> None:
         self.parameter1 = value
 
     @property
@@ -595,7 +598,7 @@ class MidiEvent(prebase.ProtoM21Object):
         return self.parameter2
 
     @velocity.setter
-    def velocity(self, value: int|None):
+    def velocity(self, value: int|None) -> None:
         self.parameter2 = value
 
     # store generic data in parameter 1
@@ -614,7 +617,7 @@ class MidiEvent(prebase.ProtoM21Object):
         return self.parameter1
 
     @data.setter
-    def data(self, value: int|str|bytes|bool|None):
+    def data(self, value: int|str|bytes|bool|None) -> None:
         if value is not None and not isinstance(value, bytes):
             if isinstance(value, str):
                 value = value.encode('utf-8')
@@ -635,7 +638,7 @@ class MidiEvent(prebase.ProtoM21Object):
         '''
         return self.type in ChannelVoiceMessages or self.type in ChannelModeMessages
 
-    def setPitchBend(self, cents: int|float, bendRange=2) -> None:
+    def setPitchBend(self, cents: int|float, bendRange: int = 2) -> None:
         '''
         Treat this event as a pitch bend value, and set the .parameter1 and
          .parameter2 fields appropriately given a specified bend value in cents.
@@ -854,7 +857,7 @@ class MidiEvent(prebase.ProtoM21Object):
             return midiBytes[2:]
         elif self.type == ChannelVoiceMessages.CONTROLLER_CHANGE:
             specificDataSet = False
-            if ChannelModeMessages.hasValue(byte1):
+            if byte1 in ChannelModeMessages:
                 self.type = ChannelModeMessages(byte1)
                 if self.type == ChannelModeMessages.LOCAL_CONTROL:
                     specificDataSet = True
@@ -942,11 +945,11 @@ class MidiEvent(prebase.ProtoM21Object):
         #    'MidiEvent.read(): trying to parse a MIDI event, looking at first two chars:',
         #    'hex(byte0)', hex(byte0), 'hex(byte[1])', hex(byte[1]),])
 
-        if ChannelVoiceMessages.hasValue(msgType):
+        if msgType in ChannelVoiceMessages:
             # NOTE_ON and NOTE_OFF and PROGRAM_CHANGE, PITCH_BEND, etc.
             return self.parseChannelVoiceMessage(midiBytes)
 
-        elif SysExEvents.hasValue(byte0):
+        elif byte0 in SysExEvents:
             self.type = SysExEvents(byte0)
             length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[1:])
             self.data = midiBytesAfterLength[:length]
@@ -954,7 +957,7 @@ class MidiEvent(prebase.ProtoM21Object):
 
         # SEQUENCE_TRACK_NAME and other MetaEvents are here
         elif byte0 == METAEVENT_MARKER:  # 0xFF
-            if MetaEvents.hasValue(byte1):
+            if byte1 in MetaEvents:
                 self.type = MetaEvents(byte1)
             else:
                 # environLocal.printDebug([f' unknown meta event: FF {byte1:02X}'])
@@ -1009,7 +1012,7 @@ class MidiEvent(prebase.ProtoM21Object):
         '''
         if t.TYPE_CHECKING:
             # no DeltaTime here.
-            assert isinstance(self.type, ContainsEnum)
+            assert isinstance(self.type, HexEnum)
 
         if self.type in ChannelVoiceMessages:
             # environLocal.printDebug(['writing channelVoiceMessages', self.type])
@@ -1244,7 +1247,7 @@ class DeltaTime(MidiEvent):
         track: MidiTrack|None = None,
         time: int = 0,
         channel: int = 1,
-    ):
+    ) -> None:
         super().__init__(track, time=time, channel=channel)
         self.type = 'DeltaTime'
 
@@ -1388,7 +1391,7 @@ class MidiTrack(prebase.ProtoM21Object):
     '''
     headerId = b'MTrk'
 
-    def __init__(self, index: int = 0):
+    def __init__(self, index: int = 0) -> None:
         self.index = index
         self.events: list[MidiEvent] = []  # or DeltaTime subclass
         self.data = b''
@@ -1550,7 +1553,7 @@ class MidiTrack(prebase.ProtoM21Object):
         bytes_out = b''.join(midiBytes)
         return self.headerId + putNumber(len(bytes_out), 4) + bytes_out
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         r = f'{self.index} -- {len(self.events)} events'
         return r
 
@@ -1713,7 +1716,7 @@ class MidiFile(prebase.ProtoM21Object):
         self.ticksPerQuarterNote: int = defaults.ticksPerQuarter
         self.ticksPerSecond: int|None = None
 
-    def open(self, filename, attrib='rb') -> None:
+    def open(self, filename: str|pathlib.Path, attrib: str = 'rb') -> None:
         '''
         Open a MIDI file path for reading or writing.
 
