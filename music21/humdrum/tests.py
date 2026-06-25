@@ -96,7 +96,7 @@ class Test(unittest.TestCase):
 
     def testGraceNoteKeepsWrittenDuration(self):
         '''
-        A single `q` is a slashed grace note that keeps its written duration
+        A single `q` is a slashed grace note that keeps its written duration.
         '''
         n = SpineEvent('16ccq').toNote()
         self.assertTrue(n.duration.isGrace)
@@ -242,7 +242,7 @@ class Test(unittest.TestCase):
 
     def x_testFakePiece(self):
         '''
-        test loading a fake piece with spine paths, lyrics, dynamics, etc.
+        Test loading a fake piece with spine paths, lyrics, dynamics, etc.
         '''
         hdc = HumdrumDataCollection(testFiles.fakeTest)
         hdc.parse()
