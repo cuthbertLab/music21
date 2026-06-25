@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pathlib
 import typing as t
 
 from music21 import environment
@@ -32,10 +33,12 @@ class OutputFormat:
         '''
         return []  # define in subclass
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None) -> str:
+    def getString(self, includeClassLabel: bool = True, includeId: bool = True,
+                  lineBreak: str = '\n') -> str:
         return ''  # define in subclass
 
-    def write(self, fp=None, includeClassLabel=True, includeId=True):
+    def write(self, fp: str|pathlib.Path|None = None,
+              includeClassLabel: bool = True, includeId: bool = True):
         '''
         Write the file. If no file path is given, a temporary file will be written.
         '''
@@ -62,7 +65,7 @@ class OutputTabOrange(OutputFormat):
         super().__init__(dataSet=dataSet)
         self.ext = '.tab'
 
-    def getHeaderLines(self, includeClassLabel=True, includeId=True) -> list:
+    def getHeaderLines(self, includeClassLabel: bool = True, includeId: bool = True) -> list:
         # noinspection PyShadowingNames
         '''
         Get the header as a list of lines.
@@ -115,14 +118,13 @@ class OutputTabOrange(OutputFormat):
         post.append(row)
         return post
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None) -> str:
+    def getString(self, includeClassLabel: bool = True, includeId: bool = True,
+                  lineBreak: str = '\n') -> str:
         '''
         Get the complete DataSet as a string with the appropriate headers.
         '''
         if self._dataSet is None:  # pragma: no cover
             raise OutputFormatException('cannot get a string without a DataSet')
-        if lineBreak is None:
-            lineBreak = '\n'
         msg = []
         header = self.getHeaderLines(includeClassLabel=includeClassLabel,
                                      includeId=includeId)
@@ -145,7 +147,7 @@ class OutputCSV(OutputFormat):
         super().__init__(dataSet=dataSet)
         self.ext = '.csv'
 
-    def getHeaderLines(self, includeClassLabel=True, includeId=True) -> list:
+    def getHeaderLines(self, includeClassLabel: bool = True, includeId: bool = True) -> list:
         '''
         Get the header as a list of lines.
 
@@ -163,11 +165,10 @@ class OutputCSV(OutputFormat):
             includeClassLabel=includeClassLabel, includeId=includeId))
         return post
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None) -> str:
+    def getString(self, includeClassLabel: bool = True, includeId: bool = True,
+                  lineBreak: str = '\n') -> str:
         if self._dataSet is None:  # pragma: no cover
             raise OutputFormatException('cannot get a string without a DataSet')
-        if lineBreak is None:
-            lineBreak = '\n'
         msg = []
         header = self.getHeaderLines(includeClassLabel=includeClassLabel,
                                      includeId=includeId)
@@ -198,7 +199,7 @@ class OutputARFF(OutputFormat):
         super().__init__(dataSet=dataSet)
         self.ext = '.arff'
 
-    def getHeaderLines(self, includeClassLabel=True, includeId=True) -> list:
+    def getHeaderLines(self, includeClassLabel: bool = True, includeId: bool = True) -> list:
         '''
         Get the header as a list of lines.
 
@@ -245,11 +246,10 @@ class OutputARFF(OutputFormat):
         post.append('@DATA')
         return post
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None) -> str:
+    def getString(self, includeClassLabel: bool = True, includeId: bool = True,
+                  lineBreak: str = '\n') -> str:
         if self._dataSet is None:  # pragma: no cover
             raise OutputFormatException('cannot get a string without a DataSet')
-        if lineBreak is None:
-            lineBreak = '\n'
 
         msg = []
 

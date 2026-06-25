@@ -11,7 +11,7 @@
 from __future__ import annotations
 
 from collections import Counter
-from collections.abc import KeysView
+from collections.abc import Collection, Iterable, KeysView
 import os
 import pathlib
 import pickle
@@ -27,6 +27,7 @@ from music21 import corpus
 from music21 import environment
 from music21 import exceptions21
 from music21 import note
+from music21 import pitch
 from music21 import stream
 from music21 import text
 
@@ -34,6 +35,7 @@ from music21.metadata.bundles import MetadataEntry
 
 if t.TYPE_CHECKING:
     from music21.features import outputFormats
+    from music21.stream.base import SecondsMapEntry
 
 environLocal = environment.Environment('features.base')
 # ------------------------------------------------------------------------------
@@ -308,7 +310,7 @@ class StreamForms:
     it simple to add additional feature extractors at low additional
     time cost.
     '''
-    def __init__(self, streamObj: stream.Stream, prepareStream=True):
+    def __init__(self, streamObj: stream.Stream, prepareStream: bool = True) -> None:
         self.stream = streamObj
         if self.stream is not None:
             if prepareStream:
@@ -404,10 +406,10 @@ class StreamForms:
         from music21 import instrument
         return instrument.partitionByInstrument(prepared)
 
-    def formSetClassHistogram(self, prepared: stream.Stream) -> Counter:
+    def formSetClassHistogram(self, prepared: stream.Stream) -> Counter[str]:
         return Counter([c.forteClassTnI for c in prepared])
 
-    def formPitchClassSetHistogram(self, prepared: stream.Stream) -> Counter:
+    def formPitchClassSetHistogram(self, prepared: stream.Stream) -> Counter[str]:
         return Counter([c.orderedPitchClassesString for c in prepared])
 
     def formTypesHistogram(self, prepared: stream.Stream) -> dict[str, int]:
@@ -451,13 +453,13 @@ class StreamForms:
             # in the part?
             return prepared
 
-    def formQuarterLengthHistogram(self, prepared: stream.Stream) -> Counter:
+    def formQuarterLengthHistogram(self, prepared: stream.Stream) -> Counter[float]:
         return Counter([float(n.quarterLength) for n in prepared])
 
-    def formMidiPitchHistogram(self, pitches) -> Counter:
+    def formMidiPitchHistogram(self, pitches: Iterable[pitch.Pitch]) -> Counter[int]:
         return Counter([p.midi for p in pitches])
 
-    def formPitchClassHistogram(self, pitches) -> list[int]:
+    def formPitchClassHistogram(self, pitches: Iterable[pitch.Pitch]) -> list[int]:
         cc = Counter([p.pitchClass for p in pitches])
         histo = [0] * 12
         for k in cc:
@@ -503,8 +505,8 @@ class StreamForms:
         # environLocal.printDebug(['contourList', cList])
         return cList
 
-    def formSecondsMap(self, prepared: stream.Stream) -> list[dict]:
-        post: list[dict] = []
+    def formSecondsMap(self, prepared: stream.Stream) -> list[SecondsMapEntry]:
+        post: list[SecondsMapEntry] = []
         secondsMap = prepared.secondsMap
         # filter only notes; all elements would otherwise be gathered
         for bundle in secondsMap:
@@ -512,7 +514,7 @@ class StreamForms:
                 post.append(bundle)
         return post
 
-    def formBeatHistogram(self, secondsMap) -> list[int]:
+    def formBeatHistogram(self, secondsMap: Iterable[SecondsMapEntry]) -> list[int]:
         secondsList = [d['durationSeconds'] for d in secondsMap]
         bpmList = [round(60.0 / d) for d in secondsList]
         histogram = [0] * 200
@@ -765,7 +767,8 @@ class DataSet:
     Set ds.quiet = False to print them regardless of debug mode.
     '''
 
-    def __init__(self, classLabel: str|None = None, featureExtractors=()) -> None:
+    def __init__(self, classLabel: str|None = None,
+                 featureExtractors: Collection[type[FeatureExtractor]] = ()) -> None:
         # assume a two dimensional array
         self.dataInstances: list[DataInstance] = []
 
@@ -787,21 +790,24 @@ class DataSet:
     def getClassLabel(self) -> str|None:
         return self._classLabel
 
-    def addFeatureExtractors(self, values) -> None:
+    def addFeatureExtractors(
+        self,
+        values: type[FeatureExtractor]|Collection[type[FeatureExtractor]]
+    ) -> None:
         '''
         Add one or more FeatureExtractor objects, either as a list or as an individual object.
         '''
         # features are instantiated here
         # however, they do not have a data assignment
-        if not common.isIterable(values):
+        if isinstance(values, type):  # a single FeatureExtractor subclass
             values = [values]
         # need to create instances
         for sub in values:
             self._featureExtractors.append(sub)
             self._instantiatedFeatureExtractors.append(sub())
 
-    def getAttributeLabels(self, includeClassLabel=True,
-                           includeId=True) -> list[str]:
+    def getAttributeLabels(self, includeClassLabel: bool = True,
+                           includeId: bool = True) -> list[str]:
         '''
         Return a list of all attribute labels. Optionally add a class
         label field and/or an id field.
@@ -828,7 +834,8 @@ class DataSet:
             post.append(self._classLabel.replace(' ', '_'))
         return post
 
-    def getDiscreteLabels(self, includeClassLabel=True, includeId=True) -> list[bool|None]:
+    def getDiscreteLabels(self, includeClassLabel: bool = True,
+                          includeId: bool = True) -> list[bool|None]:
         '''
         Return column labels for discrete status.
 
@@ -850,7 +857,7 @@ class DataSet:
             post.append(True)
         return post
 
-    def getClassPositionLabels(self, includeId=True) -> list[bool|None]:
+    def getClassPositionLabels(self, includeId: bool = True) -> list[bool|None]:
         '''
         Return column labels for the presence of a class definition.
 
@@ -1017,8 +1024,8 @@ class DataSet:
             # rows will align with data the order of DataInstances
             self.features.append(row)
 
-    def getFeaturesAsList(self, includeClassLabel=True, includeId=True,
-                          concatenateLists=True) -> list:
+    def getFeaturesAsList(self, includeClassLabel: bool = True, includeId: bool = True,
+                          concatenateLists: bool = True) -> list:
         '''
         Get processed data as a list of lists, merging any sub-lists
         in multidimensional features.
@@ -1068,7 +1075,7 @@ class DataSet:
             return None
         return outputFormat
 
-    def _getOutputFormatFromFilePath(self, fp: str) -> outputFormats.OutputFormat|None:
+    def _getOutputFormatFromFilePath(self, fp: str|pathlib.Path) -> outputFormats.OutputFormat|None:
         '''
         Get an output format from a file path if possible, otherwise return None.
 
@@ -1081,13 +1088,13 @@ class DataSet:
         True
         '''
         # get format from fp if possible
+        fp = str(fp)
         of = None
         if '.' in fp:
-            if self._getOutputFormat(fp.split('.')[-1]) is not None:
-                of = self._getOutputFormat(fp.split('.')[-1])
+            of = self._getOutputFormat(fp.rsplit('.', maxsplit=1)[-1])
         return of
 
-    def getString(self, outputFmt='tab') -> str:
+    def getString(self, outputFmt: str = 'tab') -> str:
         '''
         Get a string representation of the data set in a specific format.
         '''
@@ -1098,7 +1105,8 @@ class DataSet:
         return outputFormat.getString()
 
     # pylint: disable=redefined-builtin
-    def write(self, fp=None, format=None, includeClassLabel=True):
+    def write(self, fp: str|pathlib.Path|None = None, format: str|None = None,
+              includeClassLabel: bool = True):
         '''
         Set the output format object.
         '''
