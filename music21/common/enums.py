@@ -20,13 +20,17 @@ class StrEnum(pyStrEnum):
 
     >>> from music21.common.enums import StrEnum
     >>> from music21.style import Enclosure
-    >>> issubclass(StrEnum, Enclosure)
+    >>> issubclass(Enclosure, StrEnum)
     True
     >>> Enclosure.SQUARE
     <Enclosure.SQUARE>
+    >>> str(Enclosure.SQUARE)
+    'square'
+    >>> 'square' in Enclosure
+    True
     '''
     def __repr__(self) -> str:
-        return f'<{self.__class__.__name__}>'
+        return f'<{self.__class__.__name__}.{self.name}>'
 
 
 class HexEnum(IntEnum):
