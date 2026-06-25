@@ -9,8 +9,24 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from enum import Enum, IntEnum, StrEnum
+from enum import Enum, IntEnum, StrEnum as pyStrEnum
 import re
+
+
+class StrEnum(pyStrEnum):
+    '''
+    A StrEnum that de-emphasizes the string representation.  For backwards
+    compatibility.
+
+    >>> from music21.common.enums import StrEnum
+    >>> from music21.style import Enclosure
+    >>> issubclass(StrEnum, Enclosure)
+    True
+    >>> Enclosure.SQUARE
+    <Enclosure.SQUARE>
+    '''
+    def __repr__(self) -> str:
+        return f'<{self.__class__.__name__}>'
 
 
 class HexEnum(IntEnum):
