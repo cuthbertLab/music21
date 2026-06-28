@@ -31,7 +31,7 @@ of deprecations (current version `11.0.0b6`).
 
 ---
 
-## North star: `theoryAnalyzer`'s ease, minus its baggage
+## Measure of success: theoryAnalyzer's ease is recreated, minus its baggage
 
 A second goal of this work is to make the kinds of results the old
 `theoryAnalysis.theoryAnalyzer` (now in `cuthbertLab/music21-tools`) used to make easy —
@@ -76,12 +76,9 @@ v.getAllVoiceLeadingQuartets(): …`). The job is to make that sweep ergonomic a
   `identifyTonicAndDominant`, `opens/closesIncorrectly`, the SATB framing. Keep the neutral
   primitives; leave the stylistic bundles out.
 
-Open question N1 (this doc's label, not an API name): do we ship a tiny generic helper that
-sweeps a predicate across the score and returns findings, or just *teach the loop* in the
-User's Guide? If we did build one it would need a name — **no such method exists today**; a
-purely hypothetical spelling would be something like
-`score.findVoiceLeading(lambda vlq: vlq.parallelFifth())`. Lean: teach the loop first (it's
-already short and clear), add a helper only if the pattern proves common.
+Decided: **we do not add a generic predicate-sweep helper.** The docs teach the loop
+(`for v in score.verticalities(): for vlq in v.getAllVoiceLeadingQuartets(): …`) — it's
+already short and clear, and a wrapper would just be new surface to maintain and document.
 
 ---
 
@@ -132,7 +129,7 @@ Decisions baked in:
 - **Placement** — `base.py`, not StreamCore, because this is everyday/taught-early API
   (unlike `asTimespans`/`asTree`, which stay in core).
 
-### A1 — the empty final-barline moment — DECIDED: keep it
+### The empty final-barline moment — DECIDED: keep it
 
 With `classList=None`, the last "moment" is the final barline: an **empty** Verticality
 (`pitchSet == set()`, `toChord()` returns an empty `Chord`, and `toChord().isConsonant()`
@@ -234,7 +231,7 @@ the tuples we should provide a genuine passing/neighbor-tone migration path, not
 
 ## Part G — harden zero-pitch (empty) `Chord` behavior
 
-Because A1 keeps the empty final-barline moment, and because emphasizing verticalities will
+Because we keep the empty final-barline moment, and because emphasizing verticalities will
 surface empty chords far more often than today, we should make sure `chord.Chord([])` behaves
 sanely and is covered by tests. Current state (probed):
 
@@ -326,14 +323,14 @@ discoverability, into a standalone `music21/verticality.py` — never back into
 
 ## Decisions
 
-- **A1 — DECIDED: keep** the empty final-barline verticality (Michael). Follow-up captured
-  in Part G (harden zero-pitch `Chord`).
+Decided:
+
+- **Keep** the empty final-barline verticality (Michael). Follow-up captured in Part G
+  (harden zero-pitch `Chord`).
+- **No generic predicate-sweep helper** (Michael). The docs teach the loop instead.
 
 Still needing Michael:
 
 1. Confirm **`verticalities()`** as the Stream method name (vs `iterateVerticalities()`).
 2. Confirm deprecate/remove versions (**v11 → v13** proposed).
 3. Part G: should `root()` on an empty chord return `None` (like `bass()`) or keep raising?
-4. N1 (North star): ship a generic `predicate → findings` sweep helper (would need a new
-   name — none exists today), or just teach the loop in the User's Guide? (Lean: teach the
-   loop first.)
