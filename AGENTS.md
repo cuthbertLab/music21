@@ -69,3 +69,16 @@
 # Worktrees
 
 - When creating a new worktree, create a new virtual environment with `uv sync`.
+
+# Documentation notebooks (image-free)
+
+- In `documentation/source/testsAndInProgress/`, notebooks named `*-noimage.ipynb` must NOT
+  carry rendered `.show()` image output in git — a clean filter strips the base64 `image/*`
+  payloads on `git add` (text/stream outputs are kept) so PR diffs stay small.
+- The filter command is not shared via the repo (git forbids it), so in each worktree/clone
+  register it once before staging such a notebook:
+  `git config filter.stripnbimage.clean "uv run python documentation/source/testsAndInProgress/stripNotebookImages.py"`
+- The `.gitattributes` in that directory wires `*-noimage.ipynb` to the `stripnbimage`
+  filter; the strip script is `stripNotebookImages.py` there. The transform is idempotent.
+- When adding a new iterate-heavy doc notebook that you'll regenerate images for, give it the
+  `-noimage.ipynb` suffix. See CONTRIBUTING.md for the human-facing version.

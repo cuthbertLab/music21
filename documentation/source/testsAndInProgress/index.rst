@@ -13,7 +13,7 @@ Documentation and tests in progress
     usersGuide_56_searching2
     usersGuide_57_speed
 
-    findingParallels
+    findingParallels-noimage
 
     devTest_unconvertedExamples
     devTest_timespans

@@ -54,7 +54,7 @@ sentence. And **almost all those predicates already live on `VoiceLeadingQuartet
 | scale degrees, tonic/dominant, "common-practice errors" | out of scope — key/roman-numeral territory, and the most Bach-assuming pieces |
 
 So for voice-leading errors the capability *already exists*; the score-wide sweep is the
-~5-line loop in the `findingParallels` notebook (`for v in score.verticalities(): for vlq in
+~5-line loop in the `findingParallels-noimage` notebook (`for v in score.verticalities(): for vlq in
 v.getAllVoiceLeadingQuartets(): …`). The job is to make that sweep ergonomic and teachable —
 **not** to resurrect the wrapper.
 
@@ -308,7 +308,7 @@ discoverability, into a standalone `music21/verticality.py` — never back into
 - [ ] `Stream.verticalities()` (returning a re-iterable, `__reversed__`-able view) and
       `Stream.getVerticalityAt()` in `base.py`, with doctests. *(New in v11.)*
 - [ ] Add zero-pitch `Chord` tests; decide `root()`-on-empty behavior (Part G).
-- [ ] Rewrite the `findingParallels` notebook loop to `for v in score.verticalities():`.
+- [ ] Rewrite the `findingParallels-noimage` notebook loop to `for v in score.verticalities():`.
 
 **Phase 2 — the `includeRests` flip**
 - [ ] Change the default in `getAllVoiceLeadingQuartets` + `getPairedMotion`; update the 2
