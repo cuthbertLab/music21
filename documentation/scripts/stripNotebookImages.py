@@ -11,8 +11,8 @@ It is wired up as the ``stripnbimage`` clean filter for
 ``documentation/source/testsAndInProgress/*-noimage.ipynb`` via the
 ``.gitattributes`` in that directory. The filter command itself is *not* shared
 through the repo (git never lets ``.gitattributes`` define commands, for
-security), so each clone/worktree must register it once -- see ``CONTRIBUTING.md``
-(humans) and ``AGENTS.md`` (agents):
+security), so each clone/worktree must register it once -- see
+``developerReference/documenting.rst`` and ``AGENTS.md``:
 
     git config filter.stripnbimage.clean \
         "python documentation/scripts/stripNotebookImages.py"

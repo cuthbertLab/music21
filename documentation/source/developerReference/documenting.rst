@@ -62,6 +62,8 @@ And then run it by changing directory to the one you want to edit and run::
 When editing examples with code be sure, at least the first time, to run each code excerpt individually
 and pay attention to changes in output and unexpected errors.
 
+End a notebook's name in ``-noimage.ipynb`` and its image data will be stripped out before committing.
+
 
 
 Documenting modules and classes

@@ -17,27 +17,6 @@ In 2026 we welcome AI-Assisted contributions, but users must take responsibility
 they must match the code-style of the rest of the music21 project. "Slop that works somehow" will
 not be accepted.
 
-## Image-free documentation notebooks ##
-
-In-progress documentation notebooks under `documentation/source/testsAndInProgress/`
-whose names end in `-noimage.ipynb` (e.g. `findingParallels-noimage.ipynb`) keep their
-rendered `.show()` image output **out of git** so pull-request diffs stay small while a
-notebook is being iterated on. A git *clean* filter strips the base64 image payloads when
-the file is staged; your local working copy keeps its images, and text outputs are
-preserved in git.
-
-Git does not (for security) let a repository ship the filter command itself, so each clone
-must register it **once**:
-
-```bash
-git config filter.stripnbimage.clean \
-  "python documentation/scripts/stripNotebookImages.py"
-```
-
-Use any Python that has `nbformat` installed — your music21 dev environment, or
-`uv run python …` instead of `python …`. Without this step the `-noimage` notebooks are
-simply committed unchanged (images and all), so please run it before contributing to them.
-
 ## Resources ##
 
 [Module Documentation and User's Guide](https://www.music21.org/music21docs/)
