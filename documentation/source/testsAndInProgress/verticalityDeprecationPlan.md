@@ -28,6 +28,10 @@ of deprecations (current version `11.0.0b6`).
 4. **Don't mutate the score through a Verticality.** Changing the durations of underlying
    elements is an advanced timespans-era operation, documented later — not a Verticality
    method.
+5. **Everything ships fully typed.** Every new method, the `VerticalityView`, and every
+   `tree.Verticality` addition carries complete type annotations (PEP 695 syntax per repo
+   style) and must pass `uv run mypy music21`. This is non-negotiable, and it is also why the
+   `tree` package needs a typing pass *first* — see the prerequisite below.
 
 ---
 
@@ -91,21 +95,52 @@ essentially no migration surface to clean up first.
 
 ---
 
+## Prerequisite (Phase 0): type and clean up the `tree` package — do this FIRST
+
+Before *any* of the work below, the `tree` package gets its own self-contained subproject:
+add full type annotations, fix docstring grammar/wording, and tidy the code. Rationale:
+
+- Everything we add (`VerticalityView`, `Stream.verticalities()`, the `tree.Verticality`
+  additions) must be fully typed (principle 5), and it is far easier to type new code against
+  a `tree` whose own signatures are already typed than to fight an untyped substrate.
+- The eventual relocation of `Verticality` out of `tree` (next section) is only sane once the
+  module it leaves behind — and the `spans`/`trees`/`timespanTree` it still depends on — are
+  clean and typed.
+
+This is a normal, low-drama PR (or a few), separate from the verticality consolidation, and a
+natural on-ramp. **No Verticality moves until it lands.**
+
 ## Part A — new top-level Stream API
 
 Add to `stream.Stream`, in `stream/base.py` (the documented, taught-early API), each
 delegating into the already-cached `StreamCore.asTimespans()`:
 
 ```python
-def verticalities(self, *, classList=None):
+def verticalities(self, *, classList=None) -> VerticalityView:
     '''A re-iterable, reversible view of this stream's Verticalities,
     one per vertical moment.'''
-    tree = self.asTimespans(flatten=True, classList=classList)
-    return _VerticalitiesView(tree)   # __iter__ -> forward, __reversed__ -> reverse
+    return VerticalityView(self, classList=classList)
 
-def getVerticalityAt(self, offset, *, classList=None):
+def getVerticalityAt(self, offset: OffsetQLIn, *, classList=None) -> Verticality:
     '''Return the Verticality sounding at the given offset.'''
     return self.asTimespans(flatten=True, classList=classList).getVerticalityAt(offset)
+```
+
+`VerticalityView` (decided name) takes the **Stream itself**, not a tree — that hides the
+tree entirely and makes the view naturally re-iterable, because each pass re-grabs the
+*cached* timespan tree:
+
+```python
+class VerticalityView:
+    def __init__(self, srcStream: stream.Stream, *, classList=None) -> None:
+        self._stream = srcStream
+        self._classList = classList
+    def _tree(self) -> TimespanTree:
+        return self._stream.asTimespans(flatten=True, classList=self._classList)  # cached
+    def __iter__(self) -> Iterator[Verticality]:
+        return self._tree().iterateVerticalities()
+    def __reversed__(self) -> Iterator[Verticality]:
+        return self._tree().iterateVerticalities(reverse=True)
 ```
 
 Decisions baked in:
@@ -114,14 +149,15 @@ Decisions baked in:
   Friendlier and matches the "easy concept" goal. (The tree keeps its existing
   `iterateVerticalities()` name; `Stream.verticalities()` is the public friendly door. We
   can add `Stream.iterateVerticalities` as a hidden alias only if real demand appears.)
+- **The view takes a Stream, always `flatten=True`, with `classList`** (your call). `Part`
+  is a Stream, so `part.verticalities()` gives a single part's slices for free. Anyone with a
+  raw `TimespanTree` already has the tree's own `iterateVerticalities()`.
 - **No `reverse=` kwarg — use `reversed()`.** Python's `reversed()` builtin dispatches to
-  `__reversed__` (note the *d* — there is no `__reverse__` dunder). A bare generator can't
-  be reversed (`TypeError: 'generator' object is not reversible`), so `verticalities()`
-  returns a tiny lazy view object implementing `__iter__` (forward) and `__reversed__`
-  (delegating to the tree's `iterateVerticalities(reverse=True)`). Then both
-  `for v in score.verticalities()` and `for v in reversed(score.verticalities())` read
-  idiomatically, and the view is re-iterable (a plain generator is single-shot). The tree
-  keeps its `reverse=` kwarg internally.
+  `__reversed__` (note the *d* — there is no `__reverse__` dunder). `VerticalityView`
+  implements `__iter__` (forward) and `__reversed__` (delegating to the tree's
+  `iterateVerticalities(reverse=True)`), so both `for v in score.verticalities()` and
+  `for v in reversed(score.verticalities())` read idiomatically, and the view is re-iterable
+  (a plain generator is single-shot). The tree keeps its `reverse=` kwarg internally.
 - **`classList=None` default** — include keys/clefs/barlines, per principle 1. Anyone who
   wants strictly pitched slices passes `classList=(note.NotRest,)`.
 - **Caching** — `asTimespans` caches on the stream, so repeat calls are free; the yielded
@@ -298,11 +334,48 @@ discoverability, into a standalone `music21/verticality.py` — never back into
 
 ---
 
+## Part I — relocate Verticality to a top-level `music21.verticality` module (after Phase 0)
+
+Move `Verticality` (and `VerticalityView`, `VerticalitySequence`) out of `tree/` into a
+top-level `music21/verticality.py`, so most users meet "a vertical slice of music" without
+ever entering tree-land. **Gated on Phase 0** (the `tree` typing pass) and on the additive
+work above.
+
+Why it's more feasible than it first looks — the actual coupling is mild (verified):
+
+- `tree/spans.py` mentions `Verticality` **only in docstrings**; it imports nothing from
+  `tree` at all (just `copy`, `typing`, `common.types`, `environment`, `exceptions21`). So
+  `spans` is a leaf, and `verticality → tree.spans` (the one real module-level dependency) is
+  a safe one-way edge.
+- The only genuine circular reference is `tree/trees.py` ↔ verticality (`getVerticalityAt`
+  returns a `Verticality`), and **that cycle already exists today, in one place** — relocating
+  doesn't add a new one.
+
+So the move is a file relocation plus updating ~4 internal references, **not** an import
+untangling. Mechanics:
+
+- Keep `tree/verticality.py` as a thin back-compat shim (`from music21.verticality import *`)
+  so existing `tree.verticality.Verticality` keeps resolving for one or two release lines.
+- Lazy-import where load order bites (the file already lazy-imports `timespanTree`, `stream`,
+  `voiceLeading`, `tree.analysis`).
+- Add `music21/verticality.py` to the module list / docs reference pages.
+
+Honest caveat (unchanged): this hides the tree from the user's *vocabulary*, not from the
+code — a `Verticality` still structurally holds `tree.spans` timespans. That's fine; the win
+is conceptual discoverability and pairing with `voiceLeading`, plus sidestepping the
+`voiceLeading.py` name clash.
+
+---
+
 ## Execution checklist (suggested order)
 
-**Phase 1 — additive, no behavior loss**
+**Phase 0 — PREREQUISITE: type & clean up `tree`** (gates everything below)
+- [ ] Full type annotations + grammar/docstring fixes across the `tree` package; green under
+      `uv run mypy music21`. Separate PR(s).
+
+**Phase 1 — additive, no behavior loss** (all fully typed)
 - [ ] `tree.Verticality.__iter__` (+ `__len__` / `__contains__`) and `isConsonant()`, with doctests.
-- [ ] `Stream.verticalities()` (returning a re-iterable, `__reversed__`-able view) and
+- [ ] `VerticalityView` (takes a Stream) + `Stream.verticalities()` and
       `Stream.getVerticalityAt()` in `base.py`, with doctests. *(New in v11.)*
 - [ ] Add zero-pitch `Chord` tests; decide `root()`-on-empty behavior (Part G).
 - [ ] Rewrite the `findingParallels-noimage` notebook loop to `for v in score.verticalities():`.
@@ -315,7 +388,11 @@ discoverability, into a standalone `music21/verticality.py` — never back into
 - [ ] Add `@common.deprecated(...)`; redirect docstring; confirm no remaining internal uses
       (currently none outside `voiceLeading.py`).
 
-**Phase 4 — later**
+**Phase 4 — relocate Verticality to `music21.verticality`** (Part I; needs Phase 0)
+- [ ] Move the class + `VerticalityView` + `VerticalitySequence`; leave a `tree/verticality.py`
+      back-compat shim; update internal references and docs.
+
+**Phase 5 — later**
 - [ ] Plan + execute the `VerticalityNTuplet` / `VerticalityTriplet` deprecation (Part E).
 - [ ] Remove deprecated members once the warning window elapses.
 
@@ -328,9 +405,13 @@ Decided:
 - **Keep** the empty final-barline verticality (Michael). Follow-up captured in Part G
   (harden zero-pitch `Chord`).
 - **No generic predicate-sweep helper** (Michael). The docs teach the loop instead.
+- **`VerticalityView`** is the view class name; it takes a Stream, always `flatten=True`,
+  with `classList`.
+- **Everything ships fully typed** (principle 5).
+- **Phase 0 prerequisite**: type + clean up the `tree` package before any of this; the
+  Verticality relocation (Part I) comes after.
 
 Still needing Michael:
 
-1. Confirm **`verticalities()`** as the Stream method name (vs `iterateVerticalities()`).
-2. Confirm deprecate/remove versions (**v11 → v13** proposed).
-3. Part G: should `root()` on an empty chord return `None` (like `bass()`) or keep raising?
+1. Confirm deprecate/remove versions (**v11 → v13** proposed).
+2. Part G: should `root()` on an empty chord return `None` (like `bass()`) or keep raising?
