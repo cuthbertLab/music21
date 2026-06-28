@@ -15,7 +15,7 @@ security), so each clone/worktree must register it once -- see ``CONTRIBUTING.md
 (humans) and ``AGENTS.md`` (agents):
 
     git config filter.stripnbimage.clean \
-        "python documentation/source/testsAndInProgress/stripNotebookImages.py"
+        "python documentation/scripts/stripNotebookImages.py"
 
 The transform is idempotent, so running it on an already-stripped notebook is a
 no-op (no spurious diffs).

@@ -31,7 +31,7 @@ must register it **once**:
 
 ```bash
 git config filter.stripnbimage.clean \
-  "python documentation/source/testsAndInProgress/stripNotebookImages.py"
+  "python documentation/scripts/stripNotebookImages.py"
 ```
 
 Use any Python that has `nbformat` installed — your music21 dev environment, or
