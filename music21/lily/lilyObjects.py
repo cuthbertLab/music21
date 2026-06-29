@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Name:         lily/objects.py
-# Purpose:      python objects representing lilypond
+# Purpose:      Python objects representing Lilypond
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Jeremy Teitelbaum (Lilypond 2.24 adaptations)
