@@ -26,6 +26,7 @@ from music21.exceptions21 import TreeException
 from music21 import common
 
 if t.TYPE_CHECKING:
+    from typing import Self
     from music21.sorting import SortTuple
 
 # A node's position is either an offset-like number or a SortTuple.
@@ -384,7 +385,7 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
         self.height = max(leftHeight, rightHeight) + 1
         self.balance = rightHeight - leftHeight
 
-    def rotateLeftLeft(self) -> AVLNode[PayloadType]:
+    def rotateLeftLeft(self) -> Self:
         r'''
         Rotates a node left twice.
 
@@ -398,7 +399,7 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         Requires `leftChild` to be an AVLNode or will raise an AttributeError.
         '''
-        nextNode = cast('AVLNode[PayloadType]', self.leftChild)
+        nextNode = cast('Self', self.leftChild)
         self.leftChild = nextNode.rightChild
         self.update()
         nextNode.rightChild = self
@@ -406,7 +407,7 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         return nextNode
 
-    def rotateLeftRight(self) -> AVLNode[PayloadType]:
+    def rotateLeftRight(self) -> Self:
         r'''
         Rotates a node left, then right.
 
@@ -418,12 +419,12 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         Requires `leftChild` to be an AVLNode or will raise an AttributeError.
         '''
-        self.leftChild = cast('AVLNode[PayloadType]', self.leftChild).rotateRightRight()
+        self.leftChild = cast('Self', self.leftChild).rotateRightRight()
         self.update()
         nextNode = self.rotateLeftLeft()
         return nextNode
 
-    def rotateRightLeft(self) -> AVLNode[PayloadType]:
+    def rotateRightLeft(self) -> Self:
         r'''
         Rotates a node right, then left.
 
@@ -435,12 +436,12 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         Requires `rightChild` to be an AVLNode or will raise an AttributeError.
         '''
-        self.rightChild = cast('AVLNode[PayloadType]', self.rightChild).rotateLeftLeft()
+        self.rightChild = cast('Self', self.rightChild).rotateLeftLeft()
         self.update()
         nextNode = self.rotateRightRight()
         return nextNode
 
-    def rotateRightRight(self) -> AVLNode[PayloadType]:
+    def rotateRightRight(self) -> Self:
         r'''
         Rotates a node right twice.
 
@@ -454,14 +455,14 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         Requires `rightChild` to be an AVLNode or will raise an AttributeError.
         '''
-        nextNode = cast('AVLNode[PayloadType]', self.rightChild)
+        nextNode = cast('Self', self.rightChild)
         self.rightChild = nextNode.leftChild
         self.update()
         nextNode.leftChild = self
         nextNode.update()
         return nextNode
 
-    def rebalance(self) -> AVLNode[PayloadType]:
+    def rebalance(self) -> Self:
         r'''
         Rebalances the subtree rooted on this node.
 
@@ -469,12 +470,12 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
         '''
         node = self
         if self.balance > 1:
-            if cast('AVLNode[PayloadType]', self.rightChild).balance >= 0:
+            if cast('Self', self.rightChild).balance >= 0:
                 node = self.rotateRightRight()
             else:
                 node = self.rotateRightLeft()
         elif self.balance < -1:
-            if cast('AVLNode[PayloadType]', self.leftChild).balance <= 0:
+            if cast('Self', self.leftChild).balance <= 0:
                 node = self.rotateLeftLeft()
             else:
                 node = self.rotateLeftRight()
