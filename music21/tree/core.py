@@ -272,7 +272,7 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         return f'<{cn}: Start:{ps} Height:{ht} L:{lch} R:{rch}>'
 
-    def moveAttributes(self, other: AVLNode[PayloadType]) -> None:
+    def moveAttributes(self, other: Self) -> None:
         '''
         move attributes from this node to another in case "removal" actually
         means substituting one node for another in the tree.
@@ -397,7 +397,7 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         Returns the prior leftChild node as the new central node.
 
-        Requires `leftChild` to be an AVLNode or will raise an AttributeError.
+        Requires `leftChild` or raises AttributeError.
         '''
         nextNode = cast('Self', self.leftChild)
         self.leftChild = nextNode.rightChild
@@ -417,7 +417,7 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         Returns the former rightChild of the former leftChild node as the new central node.
 
-        Requires `leftChild` to be an AVLNode or will raise an AttributeError.
+        Requires `leftChild` or raises AttributeError.
         '''
         self.leftChild = cast('Self', self.leftChild).rotateRightRight()
         self.update()
@@ -434,7 +434,7 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         Returns the former leftChild of the former rightChild node as the new central node.
 
-        Requires `rightChild` to be an AVLNode or will raise an AttributeError.
+        Requires `rightChild` or raises AttributeError.
         '''
         self.rightChild = cast('Self', self.rightChild).rotateLeftLeft()
         self.update()
@@ -453,7 +453,7 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         Returns the prior rightChild node as the new central node.
 
-        Requires `rightChild` to be an AVLNode or will raise an AttributeError.
+        Requires `rightChild` or raises AttributeError.
         '''
         nextNode = cast('Self', self.rightChild)
         self.rightChild = nextNode.leftChild
