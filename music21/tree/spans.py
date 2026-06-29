@@ -238,7 +238,7 @@ class ElementTimespan(Timespan):
     that is anchored to a single element but extends over rests or other
     notes following a note)
 
-    PitchedTimespans give information about an element (such as a Note).  It knows
+    A PitchedTimespan has information about an element (such as a Note).  It knows
     its absolute position with respect to the element passed into TimespanTree.
     It contains information about what measure it's in, what part it's in, etc.
 
@@ -302,7 +302,7 @@ class ElementTimespan(Timespan):
     # CLASS VARIABLES #
     _DOC_ATTR: dict[str, str] = {
         'parentage': r'''
-            The Stream hierarchy above the element in a ElementTimespan.
+            The Stream hierarchy above the element in an ElementTimespan.
 
             >>> score = corpus.parse('bwv66.6')
             >>> scoreTree = score.asTimespans()
@@ -448,7 +448,7 @@ class ElementTimespan(Timespan):
 
     def getParentageByClass(self, classList):
         '''
-        returns that is the first parentage that has this classList.
+        returns the first parentage that has this classList.
         default stream.Part
 
         >>> score = corpus.parse('bwv66.6')

@@ -84,7 +84,7 @@ class AVLNode(common.SlottedObjectMixin):
         1
 
 
-        The leftChild of the rootNote is perfectly balanced, while the rightChild is off by
+        The leftChild of the rootNode is perfectly balanced, while the rightChild is off by
         one (acceptable).
 
         >>> scoreTree.rootNode.leftChild.balance
@@ -135,7 +135,7 @@ class AVLNode(common.SlottedObjectMixin):
         >>> scoreTree.rootNode.rightChild.rightChild.rightChild.height
         0
 
-        Once you hit a height of zero, then the next child on either size should be None
+        Once you hit a height of zero, then the next child on either side should be None
 
         >>> print(scoreTree.rootNode.rightChild.rightChild.rightChild.rightChild)
         None
@@ -173,7 +173,7 @@ class AVLNode(common.SlottedObjectMixin):
         'leftChild': r'''
         The left child of this node.
 
-        After setting the left child you need to do a node update. with node.update()
+        After setting the left child you need to do a node update with node.update()
 
         >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
@@ -196,7 +196,7 @@ class AVLNode(common.SlottedObjectMixin):
         'rightChild': r'''
         The right child of this node.
 
-        After setting the right child you need to do a node update. with node.update()
+        After setting the right child you need to do a node update with node.update()
 
         >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
@@ -393,7 +393,7 @@ class AVLNode(common.SlottedObjectMixin):
         r'''
         Rotates a node left, then right.
 
-        Makes this note the rightChild of the former rightChild of the former leftChild node
+        Makes this node the rightChild of the former rightChild of the former leftChild node
 
         Used during tree rebalancing.
 
@@ -408,7 +408,7 @@ class AVLNode(common.SlottedObjectMixin):
         r'''
         Rotates a node right, then left.
 
-        Makes this note the leftChild of the former leftChild of the former rightChild node
+        Makes this node the leftChild of the former leftChild of the former rightChild node
 
         Used during tree rebalancing.
 
