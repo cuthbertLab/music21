@@ -302,7 +302,7 @@ class ElementTimespan(Timespan):
     # CLASS VARIABLES #
     _DOC_ATTR: dict[str, str] = {
         'parentage': r'''
-            The Stream hierarchy above the element in a ElementTimespan.
+            The Stream hierarchy above the element in an ElementTimespan.
 
             >>> score = corpus.parse('bwv66.6')
             >>> scoreTree = score.asTimespans()
@@ -448,7 +448,7 @@ class ElementTimespan(Timespan):
 
     def getParentageByClass(self, classList):
         '''
-        returns that is the first parentage that has this classList.
+        returns the first parentage that has this classList.
         default stream.Part
 
         >>> score = corpus.parse('bwv66.6')

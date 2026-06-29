@@ -119,7 +119,7 @@ class ElementTree(core.AVLTree):
         Is true when the ElementTree contains the object within it
 
         If element.sortTuple(self.source) returns the right information, it's a fast
-        O(log n) search. If not his is an O(n log n) operation in python not C, so slow.
+        O(log n) search. If not, this is an O(n log n) operation in python not C, so slow.
 
         >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
@@ -1088,7 +1088,7 @@ class OffsetTree(ElementTree):
     def elementEndTime(el, node):
         '''
         Use so that both OffsetTrees, which have elements which do not have a .endTime, and
-        TimespanTrees, which have element that have an .endTime but not a duration, can
+        TimespanTrees, which have elements that have an .endTime but not a duration, can
         use most of the same code.
         '''
         return node.position + el.duration.quarterLength
@@ -1278,7 +1278,7 @@ class OffsetTree(ElementTree):
         '''
         initialPosition = self.lowestPosition()
         initialEndTime = self.endTime
-        if hasattr(elements, 'offset'):  # a music21 object or an PitchedTimespan
+        if hasattr(elements, 'offset'):  # a music21 object or a PitchedTimespan
             elements = [elements]
         if offsets is not None and not common.isListLike(offsets):
             offsets = [offsets]
