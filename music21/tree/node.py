@@ -30,7 +30,7 @@ class ElementNode(core.AVLNode):
     endTime and index within a stream, as well as the endTimes and indices of the
     elements to the left and right of it.
 
-    Here's an element node that is at first is no different from an AVL node, except in
+    Here's an element node that at first is no different from an AVL node, except in
     representation:
 
     >>> n = note.Note('C4')
@@ -104,7 +104,7 @@ class ElementNode(core.AVLNode):
     3
 
     If they've never been set then they return -1, but the .updateIndices() call above
-    set these number for the children also. So they return the node's own index and one above:
+    set these numbers for the children also. So they return the node's own index and one above:
 
     >>> n2ElNode.subtreeElementsStartIndex
     2
@@ -127,7 +127,7 @@ class ElementNode(core.AVLNode):
     can know from this information whether there's going to be an element whose start or
     end time will possibly match the offset span without needing to descend into the tree.
 
-    The last element in a Stream often doesn't has the highest endTime (think of different
+    The last element in a Stream often doesn't have the highest endTime (think of different
     voices, flat streams, etc.) so searches for offsets are often O(n) when
     they could be O(log n) if the information were cached into a tree as this does.
     '''
@@ -317,9 +317,9 @@ class OffsetNode(ElementNode):
     >>> scoreTree = tree.fromStream.asTimespans(sf, flatten=False, classList=None)
     >>> rn = scoreTree.rootNode
 
-    The RootNode here represents the starting position of the Note F at 3.0; It is the center
+    The RootNode here represents the starting position of the Note F at 3.0; it is the center
     of the elements in the flat Stream.  Its index is 5 (that is, it's the sixth note in the
-    element list) and its offset is 3.0
+    element list) and its offset is 3.0.
 
     >>> rn
     <OffsetNode 3.0 Indices:0,11,12,20 Length:1>
@@ -328,14 +328,14 @@ class OffsetNode(ElementNode):
     >>> sf[11].offset
     3.0
 
-    Thus, the indices of 0:5:6:12 indicate that the left-side of the node handles indices
-    from >= 0 to < 5; and the right-side of the node handles indices >= 6 and < 12, and this node
-    handles indices >= 5 and < 6.
+    Thus, the indices of 0,11,12,20 indicate that the left-side of the node handles indices
+    from >= 0 to < 11; and the right-side of the node handles indices >= 12 and < 20, and this node
+    handles indices >= 11 and < 12.
 
-    The `Length: {1}` indicates that there is exactly one element at this location, that is,
+    The `Length: 1` indicates that there is exactly one element at this location, that is,
     the F.
 
-    The "payload" of the node, is just that element wrapped in a list wrapped in an
+    The "payload" of the node is just that element wrapped in a list wrapped in an
     ElementTimespan or PitchedTimespan:
 
     >>> rn.payload
@@ -375,7 +375,7 @@ class OffsetNode(ElementNode):
     >>> leftLeft.rightChild is None
     True
 
-    What makes an OffsetNode more interesting than other AWL Nodes is that it is aware of
+    What makes an OffsetNode more interesting than other AVL Nodes is that it is aware of
     the fact that it might have objects that end at different times, such as the zero-length
     metadata and the 2.0 length half note
 

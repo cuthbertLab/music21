@@ -119,7 +119,7 @@ class ElementTree(core.AVLTree):
         Is true when the ElementTree contains the object within it
 
         If element.sortTuple(self.source) returns the right information, it's a fast
-        O(log n) search. If not his is an O(n log n) operation in python not C, so slow.
+        O(log n) search. If not, this is an O(n log n) operation in Python not C, so slow.
 
         >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
@@ -488,7 +488,7 @@ class ElementTree(core.AVLTree):
         and the second is the complete payload for that node, and
         that the positions are strictly increasing in order.
 
-        This is about an order of magnitude faster (3ms vs 21ms for 1000 items; 31 vs. 30ms for
+        This is about an order of magnitude faster (3ms vs 21ms for 1000 items; 31 vs. 300ms for
         10,000 items) than running createNodeAtPosition() for each element in a list if it is
         already sorted.  Thus, it should be used when converting a
         Stream where .isSorted is True into a tree.
@@ -1088,7 +1088,7 @@ class OffsetTree(ElementTree):
     def elementEndTime(el, node):
         '''
         Use so that both OffsetTrees, which have elements which do not have a .endTime, and
-        TimespanTrees, which have element that have an .endTime but not a duration, can
+        TimespanTrees, which have elements that have an .endTime but not a duration, can
         use most of the same code.
         '''
         return node.position + el.duration.quarterLength
@@ -1278,7 +1278,7 @@ class OffsetTree(ElementTree):
         '''
         initialPosition = self.lowestPosition()
         initialEndTime = self.endTime
-        if hasattr(elements, 'offset'):  # a music21 object or an PitchedTimespan
+        if hasattr(elements, 'offset'):  # a music21 object or a PitchedTimespan
             elements = [elements]
         if offsets is not None and not common.isListLike(offsets):
             offsets = [offsets]
