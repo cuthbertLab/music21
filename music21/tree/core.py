@@ -272,7 +272,7 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
 
         return f'<{cn}: Start:{ps} Height:{ht} L:{lch} R:{rch}>'
 
-    def moveAttributes(self, other: Self) -> None:
+    def moveAttributes(self, other: AVLNode[PayloadType]) -> None:
         '''
         move attributes from this node to another in case "removal" actually
         means substituting one node for another in the tree.
