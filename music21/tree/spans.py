@@ -238,7 +238,7 @@ class ElementTimespan(Timespan):
     that is anchored to a single element but extends over rests or other
     notes following a note)
 
-    PitchedTimespans give information about an element (such as a Note).  It knows
+    A PitchedTimespan has information about an element (such as a Note).  It knows
     its absolute position with respect to the element passed into TimespanTree.
     It contains information about what measure it's in, what part it's in, etc.
 

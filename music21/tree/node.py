@@ -328,11 +328,11 @@ class OffsetNode(ElementNode):
     >>> sf[11].offset
     3.0
 
-    Thus, the indices of 0:5:6:12 indicate that the left-side of the node handles indices
-    from >= 0 to < 5; and the right-side of the node handles indices >= 6 and < 12, and this node
-    handles indices >= 5 and < 6.
+    Thus, the indices of 0,11,12,20 indicate that the left-side of the node handles indices
+    from >= 0 to < 11; and the right-side of the node handles indices >= 12 and < 20, and this node
+    handles indices >= 11 and < 12.
 
-    The `Length: {1}` indicates that there is exactly one element at this location, that is,
+    The `Length: 1` indicates that there is exactly one element at this location, that is,
     the F.
 
     The "payload" of the node is just that element wrapped in a list wrapped in an

@@ -276,7 +276,7 @@ class TimespanTree(trees.OffsetTree):
         if classList is None:
             classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
-            message = f'PitchedTimespan {pitchedTimespan!r}, must be an PitchedTimespan'
+            message = f'PitchedTimespan {pitchedTimespan!r}, must be a PitchedTimespan'
             raise TimespanTreeException(message)
         verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
@@ -294,7 +294,7 @@ class TimespanTree(trees.OffsetTree):
         classList=None
     ) -> spans.PitchedTimespan | None:
         r'''
-        Finds next element timespan in the same Part/Measure, etc. (specify in classList) as
+        Finds previous element timespan in the same Part/Measure, etc. (specify in classList) as
         the `pitchedTimespan`.
 
         >>> score = corpus.parse('bwv66.6')
@@ -324,7 +324,7 @@ class TimespanTree(trees.OffsetTree):
         if classList is None:
             classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
-            message = f'PitchedTimespan {pitchedTimespan!r}, must be an PitchedTimespan'
+            message = f'PitchedTimespan {pitchedTimespan!r}, must be a PitchedTimespan'
             raise TimespanTreeException(message)
         verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
