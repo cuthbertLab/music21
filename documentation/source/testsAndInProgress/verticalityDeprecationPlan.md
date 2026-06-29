@@ -148,9 +148,19 @@ Snapshot semantics (decided): capture once in `__init__`, public `.tree`/`.strea
 asked for, and re-building the (expensive) tree on a second pass just because the stream
 changed would be surprising. Caveat to document, not fix: this freezes *structure* (which
 notes sound where) but the timespans still hold the **live Note objects**, so editing a
-note's pitch is still visible. Naming nit: Python's own views (`dict.keys()`, `memoryview`)
-are *live*, so "View" slightly oversells the snapshot — acceptable if the docstring says
-"snapshot at construction"; revisit `Verticalities`/`VerticalitySnapshot` if it grates.
+note's pitch is still visible.
+
+Name — DECIDED: **`VerticalityView`** (not `Verticalities`). In music21 a `…Iterator`
+(`StreamIterator`, `OffsetIterator`, `RecursiveIterator`, `corpus.chorales.Iterator`) is a
+stateful object that does its *own* `__next__` over an internal cursor and is usually indexable
+(`Sequence`, `__getitem__`/`__len__`, `reset()`). `VerticalityView` has none of that — no
+`__next__`, no cursor, no indexing; it just hands back fresh generators off `self.tree`. So
+`VerticalityIterator` would over-promise that contract, which is why `View` is the truthful
+name. (Python's own views — `dict.keys()`, `memoryview` — are *live* rather than snapshots, so
+the docstring should say "snapshot at construction." `VerticalityIterator` would only be honest
+if we built the full `StreamIterator`-style object — `__next__` + `__getitem__` + `reset` — which
+is more surface than a snapshot needs; the tree already gives random access by offset via
+`getVerticalityAt`.)
 
 Decisions baked in:
 
