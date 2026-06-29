@@ -41,7 +41,7 @@ class ElementTreeException(exceptions21.TreeException):
 # -----------------------------------------------------------------------------
 
 
-class ElementTree(core.AVLTree):
+class ElementTree[PayloadType](core.AVLTree[PayloadType]):
     r'''
     A data structure for efficiently storing a score: flat or recursed or normal.
 
@@ -96,7 +96,7 @@ class ElementTree(core.AVLTree):
     rootNode: nodeModule.ElementNode|None
 
     # CLASS VARIABLES #
-    nodeClass = nodeModule.ElementNode
+    nodeClass: type[core.AVLNode[PayloadType]] = nodeModule.ElementNode
 
     __slots__ = (
         '_source',
@@ -885,7 +885,7 @@ class ElementTree(core.AVLTree):
 
 
 # ---------------------------------------------------------------
-class OffsetTree(ElementTree):
+class OffsetTree(ElementTree[list[object]]):
     '''
     A tree representation where positions are offsets in the score
     and each node has a payload which is a list of elements at
@@ -968,7 +968,7 @@ class OffsetTree(ElementTree):
             elif node.rightChild and node.payloadElementsStopIndex <= index:
                 return recurseByIndex(node.rightChild, index)
 
-        def recurseBySlice(node: nodeModule.OffsetNode, start, stop):
+        def recurseBySlice(node, start, stop):
             '''
             Return a slice of the payload elements (plural) where start <= index < stop.
             '''

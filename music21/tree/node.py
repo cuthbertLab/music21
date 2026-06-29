@@ -24,7 +24,7 @@ from music21.sorting import SortTuple
 # -----------------------------------------------------------------------------
 
 
-class ElementNode(core.AVLNode):
+class ElementNode[PayloadType](core.AVLNode[PayloadType]):
     r'''
     A node containing a single element, which is aware of the element's
     endTime and index within a stream, as well as the endTimes and indices of the
@@ -283,7 +283,7 @@ class ElementNode(core.AVLNode):
 
 
 # -----------------------------------------------------------------------------
-class OffsetNode(ElementNode):
+class OffsetNode(ElementNode[list[object]]):
     r'''
     A node representing zero, one, or many elements at an offset.  It has all the
     power of an ElementNode but substantially more.

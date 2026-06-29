@@ -16,14 +16,25 @@ absolutely balanced by having O(log n) search times.
 '''
 from __future__ import annotations
 
+from collections.abc import Iterator
+import typing as t
+from typing import cast
+
+from music21.common.types import OffsetQLIn
 from music21 import prebase
 from music21.exceptions21 import TreeException
 from music21 import common
 
+if t.TYPE_CHECKING:
+    from music21.sorting import SortTuple
+
+# A node's position is either an offset-like number or a SortTuple.
+type AVLPosition = OffsetQLIn | SortTuple
+
 # -----------------------------------------------------------------------------
 
 
-class AVLNode(common.SlottedObjectMixin):
+class AVLNode[PayloadType](common.SlottedObjectMixin):
     r'''
     An AVL Tree Node, not specialized in any way, just contains positions.
 
@@ -229,19 +240,19 @@ class AVLNode(common.SlottedObjectMixin):
 
     # INITIALIZER #
 
-    def __init__(self, position, payload=None):
-        self.position = position
-        self.payload = payload
+    def __init__(self, position: AVLPosition, payload: PayloadType | None = None) -> None:
+        self.position: AVLPosition = position
+        self.payload: PayloadType | None = payload
 
-        self.balance = 0
-        self.height = 0
+        self.balance: int = 0
+        self.height: int = 0
 
-        self.leftChild = None
-        self.rightChild = None
+        self.leftChild: AVLNode[PayloadType] | None = None
+        self.rightChild: AVLNode[PayloadType] | None = None
 
     # SPECIAL METHODS #
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         lch = None
         if self.leftChild:
             lch = self.leftChild.height
@@ -256,7 +267,7 @@ class AVLNode(common.SlottedObjectMixin):
 
         return f'<{cn}: Start:{ps} Height:{ht} L:{lch} R:{rch}>'
 
-    def moveAttributes(self, other):
+    def moveAttributes(self, other: AVLNode[PayloadType]) -> None:
         '''
         move attributes from this node to another in case "removal" actually
         means substituting one node for another in the tree.
@@ -269,7 +280,7 @@ class AVLNode(common.SlottedObjectMixin):
         other.position = self.position
         other.payload = self.payload
 
-    def debug(self):
+    def debug(self) -> str:
         '''
         Get a debug of the Node:
 
@@ -289,7 +300,7 @@ class AVLNode(common.SlottedObjectMixin):
         '''
         return '\n'.join(self._getDebugPieces())
 
-    def _getDebugPieces(self):
+    def _getDebugPieces(self) -> list[str]:
         r'''
         Return a list of the debugging information of the tree (used for debug):
 
@@ -321,7 +332,7 @@ class AVLNode(common.SlottedObjectMixin):
             result.extend('\t' + x for x in subResult[1:])
         return result
 
-    def update(self):
+    def update(self) -> None:
         '''
         Updates the height and balance attributes of the nodes.
 
@@ -369,7 +380,7 @@ class AVLNode(common.SlottedObjectMixin):
         self.height = max(leftHeight, rightHeight) + 1
         self.balance = rightHeight - leftHeight
 
-    def rotateLeftLeft(self):
+    def rotateLeftLeft(self) -> AVLNode[PayloadType]:
         r'''
         Rotates a node left twice.
 
@@ -381,7 +392,7 @@ class AVLNode(common.SlottedObjectMixin):
 
         Returns the prior leftChild node as the new central node.
         '''
-        nextNode = self.leftChild
+        nextNode = cast('AVLNode[PayloadType]', self.leftChild)
         self.leftChild = nextNode.rightChild
         self.update()
         nextNode.rightChild = self
@@ -389,7 +400,7 @@ class AVLNode(common.SlottedObjectMixin):
 
         return nextNode
 
-    def rotateLeftRight(self):
+    def rotateLeftRight(self) -> AVLNode[PayloadType]:
         r'''
         Rotates a node left, then right.
 
@@ -399,12 +410,12 @@ class AVLNode(common.SlottedObjectMixin):
 
         Returns the former rightChild of the former leftChild node as the new central node.
         '''
-        self.leftChild = self.leftChild.rotateRightRight()
+        self.leftChild = cast('AVLNode[PayloadType]', self.leftChild).rotateRightRight()
         self.update()
         nextNode = self.rotateLeftLeft()
         return nextNode
 
-    def rotateRightLeft(self):
+    def rotateRightLeft(self) -> AVLNode[PayloadType]:
         r'''
         Rotates a node right, then left.
 
@@ -414,12 +425,12 @@ class AVLNode(common.SlottedObjectMixin):
 
         Returns the former leftChild of the former rightChild node as the new central node.
         '''
-        self.rightChild = self.rightChild.rotateLeftLeft()
+        self.rightChild = cast('AVLNode[PayloadType]', self.rightChild).rotateLeftLeft()
         self.update()
         nextNode = self.rotateRightRight()
         return nextNode
 
-    def rotateRightRight(self):
+    def rotateRightRight(self) -> AVLNode[PayloadType]:
         r'''
         Rotates a node right twice.
 
@@ -431,14 +442,14 @@ class AVLNode(common.SlottedObjectMixin):
 
         Returns the prior rightChild node as the new central node.
         '''
-        nextNode = self.rightChild
+        nextNode = cast('AVLNode[PayloadType]', self.rightChild)
         self.rightChild = nextNode.leftChild
         self.update()
         nextNode.leftChild = self
         nextNode.update()
         return nextNode
 
-    def rebalance(self):
+    def rebalance(self) -> AVLNode[PayloadType]:
         r'''
         Rebalances the subtree rooted on this node.
 
@@ -446,12 +457,12 @@ class AVLNode(common.SlottedObjectMixin):
         '''
         node = self
         if self.balance > 1:
-            if self.rightChild.balance >= 0:
+            if cast('AVLNode[PayloadType]', self.rightChild).balance >= 0:
                 node = self.rotateRightRight()
             else:
                 node = self.rotateRightLeft()
         elif self.balance < -1:
-            if self.leftChild.balance <= 0:
+            if cast('AVLNode[PayloadType]', self.leftChild).balance <= 0:
                 node = self.rotateLeftLeft()
             else:
                 node = self.rotateLeftRight()
@@ -466,7 +477,7 @@ class AVLNode(common.SlottedObjectMixin):
 
 # ---------------------------------------------------------------------------
 
-class AVLTree(prebase.ProtoM21Object):
+class AVLTree[PayloadType](prebase.ProtoM21Object):
     r'''
     Data structure for working with tree.node.AVLNode objects.
 
@@ -476,12 +487,12 @@ class AVLTree(prebase.ProtoM21Object):
         '__weakref__',
         'rootNode',
     )
-    nodeClass = AVLNode
+    nodeClass: type[AVLNode[PayloadType]] = AVLNode
 
-    def __init__(self):
-        self.rootNode = None
+    def __init__(self) -> None:
+        self.rootNode: AVLNode[PayloadType] | None = None
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[AVLNode[PayloadType]]:
         r'''
         Iterates through all the nodes in the position tree in left to right order.
 
@@ -506,7 +517,7 @@ class AVLTree(prebase.ProtoM21Object):
         numerous possible configurations that meet the AVLTree constraints, some
         of height 2 and some of height 3
         '''
-        def recurse(node):
+        def recurse(node: AVLNode[PayloadType] | None) -> Iterator[AVLNode[PayloadType]]:
             if node is not None:
                 if node.leftChild is not None:
                     yield from recurse(node.leftChild)
@@ -515,7 +526,10 @@ class AVLTree(prebase.ProtoM21Object):
                     yield from recurse(node.rightChild)
         return recurse(self.rootNode)
 
-    def populateFromSortedList(self, listOfTuples):
+    def populateFromSortedList(
+        self,
+        listOfTuples: list[tuple[AVLPosition, PayloadType]]
+    ) -> None:
         # noinspection PyShadowingNames
         '''
         Populate this tree from a sorted list of two-tuples of (position, payload).
@@ -560,7 +574,9 @@ class AVLTree(prebase.ProtoM21Object):
         <AVLNode: Start:1 Height:1 L:0 R:0> '1'
         <AVLNode: Start:0 Height:0 L:None R:None> '0'
         '''
-        def recurse(subListOfTuples) -> AVLNode|None:
+        def recurse(
+            subListOfTuples: list[tuple[AVLPosition, PayloadType]]
+        ) -> AVLNode[PayloadType] | None:
             '''
             Divide and conquer.
             '''
@@ -577,7 +593,7 @@ class AVLTree(prebase.ProtoM21Object):
         NodeClass = self.nodeClass
         self.rootNode = recurse(listOfTuples)
 
-    def createNodeAtPosition(self, position):
+    def createNodeAtPosition(self, position: AVLPosition) -> None:
         '''
         creates a new node at position and sets the rootNode
         appropriately
@@ -606,7 +622,10 @@ class AVLTree(prebase.ProtoM21Object):
         >>> avl.rootNode.rightChild.rightChild
         <AVLNode: Start:30 Height:0 L:None R:None>
         '''
-        def recurse(node, innerPosition):
+        def recurse(
+            node: AVLNode[PayloadType] | None,
+            innerPosition: AVLPosition,
+        ) -> AVLNode[PayloadType] | None:
             '''
             this recursively finds the right place for the new node
             and either creates a new node (if it is in the right place)
@@ -629,7 +648,7 @@ class AVLTree(prebase.ProtoM21Object):
 
         self.rootNode = recurse(self.rootNode, position)
 
-    def debug(self):
+    def debug(self) -> str:
         r'''
         Gets string representation of the node tree.
 
@@ -655,14 +674,17 @@ class AVLTree(prebase.ProtoM21Object):
             return self.rootNode.debug()
         return ''
 
-    def getNodeByPosition(self, position):
+    def getNodeByPosition(self, position: AVLPosition) -> AVLNode[PayloadType] | None:
         r'''
         Searches for a node whose position is `position` in the subtree
         rooted on `node`.
 
         Returns a Node object or None
         '''
-        def recurse(innerPosition, node):
+        def recurse(
+            innerPosition: AVLPosition,
+            node: AVLNode[PayloadType] | None,
+        ) -> AVLNode[PayloadType] | None:
             if node is not None:
                 if node.position == innerPosition:
                     return node
@@ -674,7 +696,7 @@ class AVLTree(prebase.ProtoM21Object):
 
         return recurse(position, self.rootNode)
 
-    def getNodeAfter(self, position):
+    def getNodeAfter(self, position: AVLPosition) -> AVLNode[PayloadType] | None:
         r'''
         Gets the first node after `position`.
 
@@ -717,7 +739,10 @@ class AVLTree(prebase.ProtoM21Object):
         <ElementNode: Start:6.5 <0.20...> Indices:(l:55 *56* r:57)
             Payload:<music21.note.Note D>>
         '''
-        def recurse(node, innerPosition):
+        def recurse(
+            node: AVLNode[PayloadType] | None,
+            innerPosition: AVLPosition,
+        ) -> AVLNode[PayloadType] | None:
             if node is None:
                 return None
             inner_result = None
@@ -732,7 +757,7 @@ class AVLTree(prebase.ProtoM21Object):
             return None
         return result
 
-    def getPositionAfter(self, position):
+    def getPositionAfter(self, position: AVLPosition) -> AVLPosition | None:
         r'''
         Gets start position after `position`.
 
@@ -769,7 +794,7 @@ class AVLTree(prebase.ProtoM21Object):
         else:
             return None
 
-    def getNodeBefore(self, position):
+    def getNodeBefore(self, position: AVLPosition) -> AVLNode[PayloadType] | None:
         '''
         Finds the node immediately before position.
 
@@ -784,7 +809,10 @@ class AVLTree(prebase.ProtoM21Object):
         >>> scoreTree.getNodeBefore(0) is None
         True
         '''
-        def recurse(node, innerPosition):
+        def recurse(
+            node: AVLNode[PayloadType] | None,
+            innerPosition: AVLPosition,
+        ) -> AVLNode[PayloadType] | None:
             if node is None:
                 return None
             innerResult = None
@@ -799,7 +827,7 @@ class AVLTree(prebase.ProtoM21Object):
             return None
         return result
 
-    def getPositionBefore(self, position):
+    def getPositionBefore(self, position: AVLPosition) -> AVLPosition | None:
         r'''
         Gets the start position immediately preceding `position` in this
         position-tree.
@@ -819,7 +847,7 @@ class AVLTree(prebase.ProtoM21Object):
             return None
         return node.position
 
-    def removeNode(self, position):
+    def removeNode(self, position: AVLPosition) -> None:
         r'''
         Removes a node at `position` and rebalances the tree
 
@@ -863,7 +891,10 @@ class AVLTree(prebase.ProtoM21Object):
         <AVLNode: Start:5 Height:0 L:None R:None> None
         <AVLNode: Start:20 Height:1 L:0 R:None> twenty
         '''
-        def recurseRemove(node, innerPosition):
+        def recurseRemove(
+            node: AVLNode[PayloadType] | None,
+            innerPosition: AVLPosition,
+        ) -> AVLNode[PayloadType] | None:
             if node is not None:
                 if node.position == innerPosition:
                     # got the right node!
