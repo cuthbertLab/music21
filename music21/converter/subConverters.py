@@ -129,7 +129,7 @@ class SubConverter:
         equipped to show in this format.
 
         Default True. Might be False if, say
-        a Lilypond converter is used and Lilypond
+        a LilyPond converter is used and LilyPond
         is not installed.
         '''
         return True
@@ -399,9 +399,9 @@ class ConverterIPython(SubConverter):
 
 class ConverterLilypond(SubConverter):
     '''
-    Convert to Lilypond and from there usually to png, pdf, or svg.
+    Convert to LilyPond and from there usually to png, pdf, or svg.
 
-    Note: that the proper format for displaying Lilypond in Jupyter
+    Note: that the proper format for displaying LilyPond in Jupyter
     notebook in v9 is ipython.lily.png and not lily.ipython.png
     '''
     registerFormats = ('lilypond', 'lily')

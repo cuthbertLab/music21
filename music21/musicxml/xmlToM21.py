@@ -842,7 +842,7 @@ class MusicXMLImporter(XMLParserBase):
             partId = p.get('id')
             if partId is None:  # pragma: no cover
                 partId = list(self.mxScorePartDict.keys())[0]
-                # Lilypond Test Suite allows for parsing w/o a part ID for one part
+                # LilyPond Test Suite allows for parsing w/o a part ID for one part
             try:
                 mxScorePart = self.mxScorePartDict[partId]
             except KeyError:  # pragma: no cover

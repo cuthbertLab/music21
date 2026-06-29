@@ -345,7 +345,7 @@ class StreamCore(Music21Object):
         This is not the same as getElementById, which refers to the id
         attribute which may be manually set and not unique.
 
-        However, some implementations of python will reuse object locations, sometimes
+        However, some implementations of Python will reuse object locations, sometimes
         quickly, so don't keep these around.
 
         Used by spanner and variant.

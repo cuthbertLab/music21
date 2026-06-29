@@ -1163,7 +1163,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     def set(self, name: str|int|float, *, allowNonStandardValue: bool = False) -> None:
         '''
-        Change the type of the Accidental.  Strings, numbers, and Lilypond (German-like)
+        Change the type of the Accidental.  Strings, numbers, and LilyPond (German-like)
         abbreviations are all accepted.  All other values will change
         after setting.
 
