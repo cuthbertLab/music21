@@ -67,7 +67,7 @@ class Style(ProtoM21Object):
         'hideObjectOnPrint': '''
             If set to `True`, the Music21Object will not print upon output
             (only used in MusicXML output at this point and
-            in Lilypond output for notes, chords, and rests).
+            in LilyPond output for notes, chords, and rests).
             ''',
         'units': '''
             What distances are measured in.  The default "tenths" is a concept
