@@ -1,0 +1,20 @@
+# .worktreeignore
+#
+# Paths that are git-ignored (see .gitignore) but are expensive to regenerate
+# and worth carrying into / sharing across a fresh worktree, so a new worktree
+# is usable immediately instead of after a full rebuild.
+
+# Python virtual environment (expensive `uv sync`)
+.venv
+
+# Build / packaging artifacts
+dist
+build
+
+# Built documentation (expensive Sphinx build)
+documentation/build
+
+# Tool caches that speed up repeated runs
+.mypy_cache
+.pytest_cache
+.coverage
