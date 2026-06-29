@@ -127,21 +127,30 @@ def getVerticalityAt(self, offset: OffsetQLIn, *, classList=None) -> Verticality
 ```
 
 `VerticalityView` (decided name) takes the **Stream itself**, not a tree — that hides the
-tree entirely and makes the view naturally re-iterable, because each pass re-grabs the
-*cached* timespan tree:
+tree from the caller. It builds the timespan tree **once, in `__init__`**, and stores it as a
+plain public attribute, so the view is a stable snapshot: re-iterating gives the same result
+even if the stream is edited afterward.
 
 ```python
 class VerticalityView:
     def __init__(self, srcStream: stream.Stream, *, classList=None) -> None:
-        self._stream = srcStream
-        self._classList = classList
-    def _tree(self) -> TimespanTree:
-        return self._stream.asTimespans(flatten=True, classList=self._classList)  # cached
+        self.stream = srcStream
+        self.classList = classList
+        self.tree: TimespanTree = srcStream.asTimespans(flatten=True, classList=classList)
     def __iter__(self) -> Iterator[Verticality]:
-        return self._tree().iterateVerticalities()
+        return self.tree.iterateVerticalities()
     def __reversed__(self) -> Iterator[Verticality]:
-        return self._tree().iterateVerticalities(reverse=True)
+        return self.tree.iterateVerticalities(reverse=True)
 ```
+
+Snapshot semantics (decided): capture once in `__init__`, public `.tree`/`.stream`/
+`.classList`. A held `v = score.verticalities()` should iterate the structure as it was when
+asked for, and re-building the (expensive) tree on a second pass just because the stream
+changed would be surprising. Caveat to document, not fix: this freezes *structure* (which
+notes sound where) but the timespans still hold the **live Note objects**, so editing a
+note's pitch is still visible. Naming nit: Python's own views (`dict.keys()`, `memoryview`)
+are *live*, so "View" slightly oversells the snapshot — acceptable if the docstring says
+"snapshot at construction"; revisit `Verticalities`/`VerticalitySnapshot` if it grates.
 
 Decisions baked in:
 
@@ -160,8 +169,9 @@ Decisions baked in:
   (a plain generator is single-shot). The tree keeps its `reverse=` kwarg internally.
 - **`classList=None` default** — include keys/clefs/barlines, per principle 1. Anyone who
   wants strictly pitched slices passes `classList=(note.NotRest,)`.
-- **Caching** — `asTimespans` caches on the stream, so repeat calls are free; the yielded
-  Verticalities keep their tree backref, so `getAllVoiceLeadingQuartets()` etc. still work.
+- **Cost** — the view builds the tree once at construction and holds it, so re-iteration is
+  free; `asTimespans` also caches on the stream. The yielded Verticalities keep their tree
+  backref, so `getAllVoiceLeadingQuartets()` etc. still work.
 - **Placement** — `base.py`, not StreamCore, because this is everyday/taught-early API
   (unlike `asTimespans`/`asTree`, which stay in core).
 
@@ -367,6 +377,17 @@ is conceptual discoverability and pairing with `voiceLeading`, plus sidestepping
 
 ---
 
+## Part J — Verticality / finding-parallels User's Guide chapter (late)
+
+Promote the in-progress `findingParallels-noimage` notebook into a real User's Guide chapter
+that teaches Verticalities and the voice-leading loop in the house tone, and **integrate the
+`theoryExercises/Rouen` example** (dense with parallels — fun to hunt) alongside the subtle
+single Bach case. This is deliberately **late** — it should sit on top of the finished
+`Stream.verticalities()` API and the relocated `music21.verticality`, not race ahead of them.
+Until then the notebook stays as an in-progress tutorial.
+
+---
+
 ## Execution checklist (suggested order)
 
 **Phase 0 — PREREQUISITE: type & clean up `tree`** (gates everything below)
@@ -392,7 +413,11 @@ is conceptual discoverability and pairing with `voiceLeading`, plus sidestepping
 - [ ] Move the class + `VerticalityView` + `VerticalitySequence`; leave a `tree/verticality.py`
       back-compat shim; update internal references and docs.
 
-**Phase 5 — later**
+**Phase 5 — late**
+- [ ] Promote `findingParallels-noimage` into a User's Guide chapter + integrate
+      `theoryExercises/Rouen` (Part J) — on top of the finished API, not before.
+
+**Phase 6 — later**
 - [ ] Plan + execute the `VerticalityNTuplet` / `VerticalityTriplet` deprecation (Part E).
 - [ ] Remove deprecated members once the warning window elapses.
 
