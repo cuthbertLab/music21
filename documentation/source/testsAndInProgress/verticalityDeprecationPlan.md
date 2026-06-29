@@ -371,3 +371,29 @@ runs in Phases 2–4 below, **prerequisites first**.
 - **4C — Tuples → `VerticalitySequence`** (Design E): port `hasPassingTone` / `hasNeighborTone`
   (shedding `partNum`/coloring), then deprecate the tuple classes pointing there; remove after
   the window.
+
+---
+
+## Deferred tree-internals follow-ups (after the `tree` package is typed — not now)
+
+Found while typing `tree/` (Phase 2A); they simplify + speed things up but are **not easy**, so
+per "do it now only if easy + simplifies + faster" they wait until the existing code is typed.
+
+- **Make AVL `payload` required `PayloadType` (no `None` default), threaded through
+  construction.** `createNodeAtPosition(position, payload)` would let nodes be born with their
+  payload and let `ElementTree._insertCore` drop its redundant `getNodeByPosition` re-traversal
+  (a real speedup). The hard part is `OffsetTree`: several elements can share one offset (chords),
+  so it appends into a *list* on a possibly-existing node — so `createNodeAtPosition` would need
+  to **return the created-or-found node** and the base position-only tree / `OffsetNode(40, None)`
+  still want a `None`/empty state. Worth doing; needs its own focused PR.
+- **A mutual base class for `ElementNode` / `OffsetNode`.** When typing `node.py`, the two will
+  likely want a shared typed base so the `OffsetNode` list-payload vs `ElementNode` single-payload
+  split is expressed cleanly — and probably a `createNodeAtPositionIfNotExists` (or similar) to
+  capture the find-or-create that the payload refactor above needs.
+- **Give `AVLTree` a second type parameter for its node type** so `rootNode` and `nodeClass` are
+  tied: `class AVLTree[PayloadType, NodeType: AVLNode]` with `nodeClass: type[NodeType]` and
+  `rootNode: NodeType | None`. Verified to work (cast-free node-specific access on `rootNode`;
+  wrong `nodeClass` flagged). Caveats: the bound must be the un-subscripted `AVLNode` (mypy won't
+  let a bound reference the earlier `PayloadType`), and `OffsetTree` *rebinds* the node class
+  (`ElementNode` → `OffsetNode`), so threading `NodeType` through that hierarchy is the fiddly
+  part — do it during the `trees.py` typing pass, where it removes casts.
