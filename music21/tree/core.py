@@ -34,6 +34,10 @@ type AVLPosition = OffsetQLIn | SortTuple
 # -----------------------------------------------------------------------------
 
 
+# TODO: when Python 3.13 is the minimum, give PayloadType a default with PEP 695
+#     bracket-default syntax: ``class AVLNode[PayloadType = object]`` (and likewise
+#     AVLTree / ElementNode / ElementTree). On 3.12 that syntax is unavailable, so the
+#     payload type is left unparameterized (mypy treats a bare ``AVLNode`` as ``object``-ish).
 class AVLNode[PayloadType](common.SlottedObjectMixin):
     r'''
     An AVL Tree Node, not specialized in any way, just contains positions.
