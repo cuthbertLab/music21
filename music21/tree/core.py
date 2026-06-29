@@ -395,6 +395,8 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
         Used during tree rebalancing.
 
         Returns the prior leftChild node as the new central node.
+
+        Requires `leftChild` to be an AVLNode or will raise an AttributeError.
         '''
         nextNode = cast('AVLNode[PayloadType]', self.leftChild)
         self.leftChild = nextNode.rightChild
@@ -413,6 +415,8 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
         Used during tree rebalancing.
 
         Returns the former rightChild of the former leftChild node as the new central node.
+
+        Requires `leftChild` to be an AVLNode or will raise an AttributeError.
         '''
         self.leftChild = cast('AVLNode[PayloadType]', self.leftChild).rotateRightRight()
         self.update()
@@ -428,6 +432,8 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
         Used during tree rebalancing.
 
         Returns the former leftChild of the former rightChild node as the new central node.
+
+        Requires `rightChild` to be an AVLNode or will raise an AttributeError.
         '''
         self.rightChild = cast('AVLNode[PayloadType]', self.rightChild).rotateLeftLeft()
         self.update()
@@ -445,6 +451,8 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
         Used during tree rebalancing.
 
         Returns the prior rightChild node as the new central node.
+
+        Requires `rightChild` to be an AVLNode or will raise an AttributeError.
         '''
         nextNode = cast('AVLNode[PayloadType]', self.rightChild)
         self.rightChild = nextNode.leftChild
