@@ -248,7 +248,7 @@ Verticality. Document "changing the durations of the elements at a vertical mome
   findings), no coloring, keep `unaccentedOnly`. Then `@common.deprecated` the tuple classes
   pointing here.
 
-The survey (Execution Pre-3) found a real external user of exactly this layer via the removed
+The survey (Phase 2B) found a real external user of exactly this layer via the removed
 `theoryAnalyzer`, so this must be a genuine migration path, not a delete. Planning it now keeps
 the `VerticalitySequence` API consistent with the `Verticality` / `VerticalityView` decisions.
 
@@ -262,7 +262,7 @@ Two situations, two policies:
   **v13**. Tighten its docstring to point at the concrete replacements.
 - **The `tree.verticality.*` path** — advanced, barely documented, perpetual-beta. Relocating
   to `music21.verticality` gets **no deprecation window** by default: move it, update the ~4
-  internal references. *Only if* the usage survey (Pre-3) finds external `tree.verticality.*`
+  internal references. *Only if* the usage survey (2B) finds external `tree.verticality.*`
   importers do we add a short-lived shim.
 
 **At most two `Verticality` names at once (not three):** because the `tree` path carries no
@@ -306,7 +306,7 @@ tree-land. The coupling is mild (verified):
 
 So it's a file relocation plus ~4 internal-reference updates, not an import untangle:
 
-- **Default: no shim — we don't expect to need one.** Only if Pre-3 turns up external
+- **Default: no shim — we don't expect to need one.** Only if 2B turns up external
   `tree.verticality.*` importers do we leave a thin `tree/verticality.py`
   (`from music21.verticality import *`) for a release line.
 - Lazy-import where load order bites (the file already lazy-imports `timespanTree`, `stream`,
@@ -328,43 +328,46 @@ API and the relocated `music21.verticality`, not racing ahead.
 
 ## Execution plan (one PR at a time, via supervised subagents)
 
-### Prerequisites — land first, each its own small PR off `master`
+Everything above (Decisions through Design notes) is **Phase 1 — Planning**. The implementation
+runs in Phases 2–4 below, **prerequisites first**.
 
-- **Pre-1 — Notebook image-stripping infra.** Extract the `stripNotebookImages.py` clean filter,
-  the `testsAndInProgress/.gitattributes`, the `documenting.rst` sentence, and the AGENTS.md note
-  into their own PR off `master`. Standalone, generally useful, needed before the notebook work.
-- **Pre-2 — Type & clean up the `tree` package.** Several small PRs: start with a
+### Phase 2 — Prerequisites (land first; each its own small PR off `master`)
+
+- **2A — Type & clean up the `tree` package.** Several small PRs: start with a
   grammar/punctuation-only pass over `music21/tree/` (zero logic), then type module by module
   (`spans` leaf first). Green under `ruff` / `mypy` / `pylint`; doctests unchanged.
-- **Pre-3 — GitHub usage survey.** Decide whether the relocation needs a shim and confirm the
+- **2B — GitHub usage survey.** Decide whether the relocation needs a shim and confirm the
   `voiceLeading.Verticality` removal is safe. Findings so far: zero external callers of the
   duration methods; one external user of the tuples but only via the removed `theoryAnalyzer`.
   Still to run (the decisive one): external importers of `tree.verticality` /
   `from music21.tree.verticality import` / `.iterateVerticalities` / `.getVerticalityAt`. Empty
   → relocate with no shim. (Caveats: `gh search code` has no regex and under-counts private
   repos / notebooks; "zero" is strong evidence, not proof.)
+- **2C — Notebook image-stripping infra.** Extract the `stripNotebookImages.py` clean filter,
+  the `testsAndInProgress/.gitattributes`, the `documenting.rst` sentence, and the AGENTS.md note
+  into their own PR off `master`. Standalone, generally useful, needed before the notebook work.
 
-### Core implementation — one PR at a time
+### Phase 3 — Core implementation (one PR at a time)
 
-- **1 — Additive API** (Design A, B, G): `VerticalityView` + `Stream.verticalities()` /
+- **3A — Additive API** (Design A, B, G): `VerticalityView` + `Stream.verticalities()` /
   `getVerticalityAt()` / `verticalitiesNwise(n=3)`; `tree.Verticality.__iter__` (+ `__len__` /
   `__contains__`) + `isConsonant()`; zero-pitch `Chord` tests + the brief doc notes; decide
   `root()`-on-empty. Fully typed, with doctests. *(New in v11.)* Then rewrite the
   `findingParallels-noimage` loop to `for v in score.verticalities():`.
-- **2 — `includeRests` flip** (Design C): change the default; update the 2 doctests + 2 notebooks.
-- **3 — Deprecate `voiceLeading.Verticality`** (Design D, F): `@common.deprecated`, redirect
+- **3B — `includeRests` flip** (Design C): change the default; update the 2 doctests + 2 notebooks.
+- **3C — Deprecate `voiceLeading.Verticality`** (Design D, F): `@common.deprecated`, redirect
   docstring, cut/replace members per the fate table.
-- **4 — Relocate Verticality to `music21.verticality`** (Design H; needs Pre-2 & Pre-3): move the
+- **3D — Relocate Verticality to `music21.verticality`** (Design H; needs 2A & 2B): move the
   class + `VerticalityView` + `VerticalitySequence`, update references and docs; shim only if
-  Pre-3 found importers.
+  2B found importers.
 
-### Late
+### Phase 4 — Late
 
-- **5 — Finish Rouen corpus integration:** regenerate `music21/corpus/_metadataCache/core.p.gz`
+- **4A — Finish Rouen corpus integration:** regenerate `music21/corpus/_metadataCache/core.p.gz`
   so `theoryExercises/Rouen` is indexed (and `corpus.search('Rouen')` works); fix any
   corpus-count assertion (the floors in `corpus/testCorpus.py`, the range doctest at
   `corpora.py:615` — verify, likely already in range); commit the regenerated `core.p.gz`.
-- **6 — User's Guide chapter** (Design I): promote `findingParallels-noimage` + integrate Rouen.
-- **7 — Tuples → `VerticalitySequence`** (Design E): port `hasPassingTone` / `hasNeighborTone`
+- **4B — User's Guide chapter** (Design I): promote `findingParallels-noimage` + integrate Rouen.
+- **4C — Tuples → `VerticalitySequence`** (Design E): port `hasPassingTone` / `hasNeighborTone`
   (shedding `partNum`/coloring), then deprecate the tuple classes pointing there; remove after
   the window.
