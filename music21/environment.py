@@ -528,7 +528,7 @@ class _EnvironmentCore:
         the directory from tempfile.gettempdir(). The location of this directory
         depends on OS.
 
-        Note the temporary directory may be different in each python session.
+        Note the temporary directory may be different in each Python session.
         '''
         if self._checkAccessibility(self.defaultRootTempDir):
             return self.defaultRootTempDir
