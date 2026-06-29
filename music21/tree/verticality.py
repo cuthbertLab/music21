@@ -360,7 +360,7 @@ class Verticality(prebase.ProtoM21Object):
         if tree is None:
             return None
         offset = tree.getPositionAfter(self.offset)
-        return offset
+        return t.cast('float | None', offset)
 
     @property
     def nextVerticality(self):
