@@ -1,15 +1,22 @@
-# Strategy plan: consolidate on `tree.verticality.Verticality`
+# Strategy plan: consolidate on one Verticality concept (v11)
 
-**Goal.** Make `tree.verticality.Verticality` the one Verticality concept in music21,
-easy enough to teach early, and deprecate the older
-`voiceLeading.Verticality` (and, in a later phase, the
+**Goal.** Make a single Verticality *the* concept in music21 — `tree.verticality.Verticality`
+today, relocated to a top-level `music21.verticality.Verticality` — easy enough to teach
+early, and deprecate the older `voiceLeading.Verticality` (and, later, the
 `voiceLeading.VerticalityNTuplet` / `VerticalityTriplet` "tuple" classes).
 
-**Status of this document.** Planning only — no code has been changed yet except where
-noted as already-done elsewhere. Target release line: **v11** for new API and the start
-of deprecations (current version `11.0.0b6`).
+**Status of this document.** Planning only — no code has been changed yet except where noted
+as already-done elsewhere. Target release line: **v11** for new API and the start of
+deprecations (current version `11.0.0b6`).
+
+**How the phases run.** **Phase 1** is the planning/design (everything in this section).
+**Phase 2** is the prerequisites that must land first — type the `tree` package (2A) and
+investigate real-world usage (2B). **Phases 3+** are the implementation, in the execution
+checklist near the end.
 
 ---
+
+# Phase 1 — Planning
 
 ## Guiding principles
 
@@ -31,7 +38,7 @@ of deprecations (current version `11.0.0b6`).
 5. **Everything ships fully typed.** Every new method, the `VerticalityView`, and every
    `tree.Verticality` addition carries complete type annotations (PEP 695 syntax per repo
    style) and must pass `uv run mypy music21`. This is non-negotiable, and it is also why the
-   `tree` package needs a typing pass *first* — see the prerequisite below.
+   `tree` package needs a typing pass *first* — see Phase 2A.
 
 ---
 
@@ -94,21 +101,6 @@ music21. `getChord()` appears in **no** documentation notebook. So the deprecati
 essentially no migration surface to clean up first.
 
 ---
-
-## Prerequisite (Phase 0): type and clean up the `tree` package — do this FIRST
-
-Before *any* of the work below, the `tree` package gets its own self-contained subproject:
-add full type annotations, fix docstring grammar/wording, and tidy the code. Rationale:
-
-- Everything we add (`VerticalityView`, `Stream.verticalities()`, the `tree.Verticality`
-  additions) must be fully typed (principle 5), and it is far easier to type new code against
-  a `tree` whose own signatures are already typed than to fight an untyped substrate.
-- The eventual relocation of `Verticality` out of `tree` (next section) is only sane once the
-  module it leaves behind — and the `spans`/`trees`/`timespanTree` it still depends on — are
-  clean and typed.
-
-This is a normal, low-drama PR (or a few), separate from the verticality consolidation, and a
-natural on-ramp. **No Verticality moves until it lands.**
 
 ## Part A — new top-level Stream API
 
@@ -271,17 +263,61 @@ modern non-destructive equivalent is `verticality.makeElement(quarterLength)`.
 
 ---
 
-## Part E — `VerticalityNTuplet` / `VerticalityTriplet` (the "tuples") — Phase 2
+## Part E — `VerticalitySequence` replaces the `Tuplet` classes (plan now, build late)
 
-Out of scope for the first pass; recorded so we don't forget. Structural replacement already
-exists: `TimespanTree.iterateVerticalitiesNwise()` + `VerticalitySequence`. The two analysis
-predicates `hasPassingTone()` / `hasNeighborTone()` have **no** equivalent yet and would need
-porting (likely onto `VerticalitySequence` or a small free function) before these can be
-deprecated. Separate plan.
+`VerticalityNTuplet` / `VerticalityTriplet` are a sliding window of N consecutive
+verticalities plus two analysis predicates (`hasPassingTone` / `hasNeighborTone`). We plan
+their replacement **now**, alongside the main work, even though the build is a late phase.
 
-The GitHub survey (Part H) found a real external user of exactly this layer
-(`hasPassingTone` / `hasNeighborTone` via the old `theoryAnalyzer`), so when we do tackle
-the tuples we should provide a genuine passing/neighbor-tone migration path, not just delete.
+**Structural half — already done.** `TimespanTree.iterateVerticalitiesNwise(n)` yields
+`VerticalitySequence` objects (a thin wrapper over N verticalities, with `__len__` /
+`__getitem__` / `unwrap`). That *is* the modern `VerticalityNTuplet`. So we also add
+`Stream.verticalitiesNwise(n=3)` (sugar over the cached tree, mirroring `Stream.verticalities()`)
+so users never touch the tree.
+
+**Analytical half — the real port.** Move passing/neighbor-tone detection onto
+`VerticalitySequence` (a 3-element sequence) as `hasPassingTone()` / `hasNeighborTone()`,
+**shedding the same baggage as Part D**:
+
+- no `partNumToIdentify` — work per *part identity*, or return, for each voice that has one, a
+  finding object carrying the offending note + its part;
+- no in-place coloring;
+- keep `unaccentedOnly` as a real, useful option.
+
+`VerticalitySequence` (or a small free function `verticality.nonChordTones(seq)`) becomes the
+one home. Then `VerticalityNTuplet` / `VerticalityTriplet` get `@common.deprecated` pointing
+there.
+
+**Why now:** Phase 2B found a real external user of exactly this layer (`hasPassingTone` /
+`hasNeighborTone` via the old `theoryAnalyzer`), so the replacement must be a genuine
+migration path, not a delete. Planning it here keeps the `VerticalitySequence` API decisions
+consistent with the `Verticality` / `VerticalityView` ones (return findings, identify parts by
+element, fully typed). Build lands in the late phase (after relocation), but the design is
+settled alongside everything else.
+
+---
+
+## Part F — deprecation mechanics
+
+Two different situations, two different policies:
+
+- **`voiceLeading.Verticality`** (and its tuples) — a long-documented public class with real
+  history. Use `@common.deprecated('v11', 'v13', '…use music21.verticality.Verticality…')` on
+  its `__init__` (and the dropped methods someone might still call on an old instance), so
+  construction emits a `Music21DeprecationWarning`. Removal no earlier than **v13** (one
+  release line of warning). Tighten its docstring to point at the concrete replacements.
+- **The `tree.verticality.*` path** — advanced and barely documented; the `tree` package has
+  always been perpetual-beta. So relocating `Verticality` to `music21.verticality` gets **no
+  deprecation window** by default: we just move it and update the ~4 internal references. The
+  *only* thing that changes this is **Phase 2B** reporting external code that imports
+  `tree.verticality.*` directly — then, and only then, we leave a short-lived back-compat shim.
+
+### At most two `Verticality` names at once (not three)
+Because the `tree` path carries no deprecation window, there's never a third live name. While
+`voiceLeading.Verticality` is deprecated (v11→v13), the canonical class moves straight to
+`music21.verticality.Verticality`. That is also why the canonical class **cannot** live in
+`voiceLeading.py`: the deprecated `voiceLeading.Verticality` keeps that name and module during
+its window, and two classes named `Verticality` can't share one file.
 
 ---
 
@@ -305,61 +341,12 @@ on empty returning `False` from B2 is part of this same surface.)
 
 ---
 
-## Part H — real-world usage evidence (GitHub code search)
-
-music21 is a dependency (often transitively) of thousands of repos, so removals must be
-evidence-driven. Findings (`gh search code`, then filtering out vendored music21 source —
-i.e. any `…/music21/voiceLeading.py`, doc-build, or fork path):
-
-- **Duration-mutation methods** (`changeDurationOfAllObjects`, `makeAllSmallestDuration`,
-  `makeAllLargestDuration`): **zero external callers.** Every hit is a vendored copy of
-  music21's own source. A call-pattern search (`.changeDurationOfAllObjects`) plus path
-  filtering returns 0 external. → effectively dead public API; safe to drop on the normal
-  deprecation schedule with low risk.
-- **`voiceLeading.Verticality` + the tuples + `hasPassingTone`/`hasNeighborTone`:** one real
-  external user found — `avnerdorman/BachChorales63chords` (a notebook leaning on
-  `voiceLeading.Verticality`, `VoiceLeadingQuartet`, `VerticalityNTuplet`/`Triplet`,
-  `hasPassingTone`/`hasNeighborTone`) — **but entirely via the old `theoryAnalyzer`, which is
-  already removed from current music21.** That user is therefore already pinned to an old
-  version and does not constrain us; it does confirm a genuine audience for passing/neighbor
-  analysis (see Part E).
-
-Caveats: `gh search code` uses GitHub's legacy API — **no regex** (a `/…/` query returns
-nothing), and it indexes only public default branches, so it under-counts (private repos,
-Colab/Kaggle notebooks, course materials are invisible). "Zero external" is strong evidence,
-not proof. It does index vendored `site-packages`, which is what makes the 0-external-callers
-result credible.
-
----
-
-## Part F — deprecation mechanics
-
-- Use `@common.deprecated('v11', 'v13', '…use tree.verticality.Verticality…')` on
-  `voiceLeading.Verticality.__init__` (and the dropped methods that someone might still call
-  on an old instance), so construction emits a `Music21DeprecationWarning`.
-- The class docstring already says "DEPRECATED in favor of tree.verticality.Verticality";
-  tighten it to point at the concrete replacements above and remove the "not every feature
-  replicated" hedge once B1/B2 land.
-- Removal no earlier than **v13** (one release line of warning), per usual music21 policy.
-  The Part H evidence supports the standard window — the duration methods could even go
-  sooner, but there's no reason to rush them ahead of the rest of `vl.Verticality`.
-
-### Why the new Verticality will never live in `voiceLeading.py`
-Because the deprecated `voiceLeading.Verticality` has to keep its name and module for one or
-two release lines while we steer people to `tree.verticality.Verticality`, the new class
-**cannot** also live in `voiceLeading.py` — two classes named `Verticality` in one module is
-a non-starter. So the canonical class stays in `tree/` (or, if we ever relocate it for
-discoverability, into a standalone `music21/verticality.py` — never back into
-`voiceLeading.py`).
-
----
-
-## Part I — relocate Verticality to a top-level `music21.verticality` module (after Phase 0)
+## Part H — relocate Verticality to a top-level `music21.verticality` module
 
 Move `Verticality` (and `VerticalityView`, `VerticalitySequence`) out of `tree/` into a
 top-level `music21/verticality.py`, so most users meet "a vertical slice of music" without
-ever entering tree-land. **Gated on Phase 0** (the `tree` typing pass) and on the additive
-work above.
+ever entering tree-land. **Gated on Phase 2** (the `tree` typing pass 2A and the usage survey
+2B) and on the additive work above.
 
 Why it's more feasible than it first looks — the actual coupling is mild (verified):
 
@@ -374,8 +361,10 @@ Why it's more feasible than it first looks — the actual coupling is mild (veri
 So the move is a file relocation plus updating ~4 internal references, **not** an import
 untangling. Mechanics:
 
-- Keep `tree/verticality.py` as a thin back-compat shim (`from music21.verticality import *`)
-  so existing `tree.verticality.Verticality` keeps resolving for one or two release lines.
+- **Default: no shim — we don't expect to need one.** The `tree.verticality.*` path is
+  advanced/undocumented, so the plan is to just move the module and update internal references.
+  *Only if* Phase 2B turns up external code importing `tree.verticality.*` directly do we add a
+  thin, short-lived `tree/verticality.py` shim (`from music21.verticality import *`).
 - Lazy-import where load order bites (the file already lazy-imports `timespanTree`, `stream`,
   `voiceLeading`, `tree.analysis`).
 - Add `music21/verticality.py` to the module list / docs reference pages.
@@ -387,7 +376,7 @@ is conceptual discoverability and pairing with `voiceLeading`, plus sidestepping
 
 ---
 
-## Part J — Verticality / finding-parallels User's Guide chapter (late)
+## Part I — Verticality / finding-parallels User's Guide chapter (late)
 
 Promote the in-progress `findingParallels-noimage` notebook into a real User's Guide chapter
 that teaches Verticalities and the voice-leading loop in the house tone, and **integrate the
@@ -398,37 +387,92 @@ Until then the notebook stays as an in-progress tutorial.
 
 ---
 
+# Phase 2 — Prerequisites (land before any implementation)
+
+## 2A — type and clean up the `tree` package
+
+Before *any* implementation, the `tree` package gets its own self-contained subproject: add
+full type annotations, fix docstring grammar/wording, and tidy the code. Rationale:
+
+- Everything we add (`VerticalityView`, `Stream.verticalities()`, the `tree.Verticality`
+  additions) must be fully typed (principle 5), and it is far easier to type new code against
+  a `tree` whose own signatures are already typed than to fight an untyped substrate.
+- The eventual relocation of `Verticality` out of `tree` (Part H) is only sane once the module
+  it leaves behind — and the `spans`/`trees`/`timespanTree` it still depends on — are clean
+  and typed.
+
+A normal, low-drama PR (or a few), separate from the verticality consolidation, and a natural
+on-ramp. **No Verticality moves until it lands.**
+
+## 2B — investigate real-world usage on GitHub
+
+music21 is a dependency (often transitively) of thousands of repos, so removals and moves must
+be evidence-driven. This survey **decides whether the `tree.verticality.*` relocation needs any
+back-compat shim** (Parts F/H) and confirms the `voiceLeading.Verticality` removal is safe.
+
+Findings so far (`gh search code`, then filtering out vendored music21 source — i.e. any
+`…/music21/voiceLeading.py`, doc-build, or fork path):
+
+- **Duration-mutation methods** (`changeDurationOfAllObjects`, `makeAllSmallestDuration`,
+  `makeAllLargestDuration`): **zero external callers.** Every hit is a vendored copy of
+  music21's own source. A call-pattern search (`.changeDurationOfAllObjects`) plus path
+  filtering returns 0 external. → effectively dead public API; safe to drop.
+- **`voiceLeading.Verticality` + the tuples + `hasPassingTone`/`hasNeighborTone`:** one real
+  external user found — `avnerdorman/BachChorales63chords` (a notebook leaning on
+  `voiceLeading.Verticality`, `VoiceLeadingQuartet`, `VerticalityNTuplet`/`Triplet`,
+  `hasPassingTone`/`hasNeighborTone`) — **but entirely via the old `theoryAnalyzer`, which is
+  already removed from current music21.** That user is therefore already pinned to an old
+  version and does not constrain us; it does confirm a genuine audience for passing/neighbor
+  analysis (see Part E).
+- **Still to run (the decisive search):** external importers of `tree.verticality` —
+  `from music21.tree.verticality import`, `tree.verticality.Verticality`,
+  `.iterateVerticalities`, `.getVerticalityAt`. If that comes back empty, Part H relocates with
+  **no shim**; if not, we add a short-lived shim for those names.
+
+Caveats: `gh search code` uses GitHub's legacy API — **no regex** (a `/…/` query returns
+nothing), and it indexes only public default branches, so it under-counts (private repos,
+Colab/Kaggle notebooks, course materials are invisible). "Zero external" is strong evidence,
+not proof. It does index vendored `site-packages`, which is what makes the 0-external-callers
+result credible.
+
+---
+
 ## Execution checklist (suggested order)
 
-**Phase 0 — PREREQUISITE: type & clean up `tree`** (gates everything below)
-- [ ] Full type annotations + grammar/docstring fixes across the `tree` package; green under
-      `uv run mypy music21`. Separate PR(s).
-
-**Phase 1 — additive, no behavior loss** (all fully typed)
+**Phase 3 — additive, no behavior loss** (all fully typed; needs Phase 2A)
 - [ ] `tree.Verticality.__iter__` (+ `__len__` / `__contains__`) and `isConsonant()`, with doctests.
 - [ ] `VerticalityView` (takes a Stream) + `Stream.verticalities()` and
       `Stream.getVerticalityAt()` in `base.py`, with doctests. *(New in v11.)*
+- [ ] `Stream.verticalitiesNwise(n=3)` sugar over the cached tree (mirrors `verticalities()`).
 - [ ] Add zero-pitch `Chord` tests; decide `root()`-on-empty behavior (Part G).
 - [ ] Rewrite the `findingParallels-noimage` notebook loop to `for v in score.verticalities():`.
 
-**Phase 2 — the `includeRests` flip**
+**Phase 4 — the `includeRests` flip**
 - [ ] Change the default in `getAllVoiceLeadingQuartets` + `getPairedMotion`; update the 2
       doctests and 2 notebooks listed in Part C.
 
-**Phase 3 — deprecate `voiceLeading.Verticality`**
+**Phase 5 — deprecate `voiceLeading.Verticality`**
 - [ ] Add `@common.deprecated(...)`; redirect docstring; confirm no remaining internal uses
       (currently none outside `voiceLeading.py`).
 
-**Phase 4 — relocate Verticality to `music21.verticality`** (Part I; needs Phase 0)
-- [ ] Move the class + `VerticalityView` + `VerticalitySequence`; leave a `tree/verticality.py`
-      back-compat shim; update internal references and docs.
+**Phase 6 — relocate Verticality to `music21.verticality`** (Part H; needs Phase 2)
+- [ ] Move the class + `VerticalityView` + `VerticalitySequence`; update internal references
+      and docs. Add a `tree/verticality.py` shim *only if* 2B found external importers.
 
-**Phase 5 — late**
+**Phase 7 — finish integrating the `Rouen` corpus example** (independent; can land early)
+- [ ] Regenerate `music21/corpus/_metadataCache/core.p.gz` so `theoryExercises/Rouen` is
+      indexed (and `corpus.search('Rouen')` works); bump any corpus-count assertion that needs
+      it (the floors in `corpus/testCorpus.py`, the range doctest at `corpora.py:615` — verify,
+      likely already in range); commit the regenerated `core.p.gz`.
+
+**Phase 8 — late: User's Guide chapter**
 - [ ] Promote `findingParallels-noimage` into a User's Guide chapter + integrate
-      `theoryExercises/Rouen` (Part J) — on top of the finished API, not before.
+      `theoryExercises/Rouen` (Part I) — on top of the finished API, not before.
 
-**Phase 6 — later**
-- [ ] Plan + execute the `VerticalityNTuplet` / `VerticalityTriplet` deprecation (Part E).
+**Phase 9 — late: the tuples → `VerticalitySequence`**
+- [ ] Port `hasPassingTone` / `hasNeighborTone` onto `VerticalitySequence` (Part E), shedding
+      `partNum`/coloring; then `@common.deprecated` the `VerticalityNTuplet` / `VerticalityTriplet`
+      classes pointing there.
 - [ ] Remove deprecated members once the warning window elapses.
 
 ---
@@ -441,12 +485,19 @@ Decided:
   (harden zero-pitch `Chord`).
 - **No generic predicate-sweep helper** (Michael). The docs teach the loop instead.
 - **`VerticalityView`** is the view class name; it takes a Stream, always `flatten=True`,
-  with `classList`.
+  with `classList`; snapshot at construction.
 - **Everything ships fully typed** (principle 5).
-- **Phase 0 prerequisite**: type + clean up the `tree` package before any of this; the
-  Verticality relocation (Part I) comes after.
+- **Phase 2 prerequisites first**: 2A type + clean up the `tree` package, 2B survey GitHub
+  usage. The Verticality relocation (Part H) comes after.
+- **No deprecation window for the `tree.verticality.*` path** (advanced/undocumented) — just
+  move it, no shim expected — *unless* Phase 2B finds external code importing it directly.
+  `voiceLeading.Verticality` still gets the normal v11→v13 window.
+- **`VerticalitySequence` is the planned replacement for the tuples** (Part E) — designed now
+  (shed `partNum`/coloring; add `Stream.verticalitiesNwise`), built in the late phase.
+- **Rouen corpus integration is its own task** (Phase 7): regenerate + commit `core.p.gz`,
+  fix any corpus-count assertion.
 
 Still needing Michael:
 
-1. Confirm deprecate/remove versions (**v11 → v13** proposed).
+1. Confirm `voiceLeading.Verticality` deprecate/remove versions (**v11 → v13** proposed).
 2. Part G: should `root()` on an empty chord return `None` (like `bass()`) or keep raising?
