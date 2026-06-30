@@ -97,18 +97,19 @@ class RelativeCounter(collections.Counter):
         return new
 
 
-class defaultlist(list):
+class defaultlist(list):  # pragma: no cover
     '''
-    Call a function for every time something is missing:
+    A list that calls a function every time something is missing, rather than
+    giving IndexErrors.
 
-    >>> a = common.defaultlist(lambda:True)
-    >>> a[5]
-    True
+    ```
+    a = common.defaultlist(lambda:True)
+    a[5] is True
+    ```
 
-    * Deprecated in v11: use a plain list or a dict instead.  This was a
-      transitional helper from when music21 was ported from Perl, where you
-      could read or assign past the end of a list and get default values.
-      Work within normal Python types instead.
+    * Deprecated in v11: use a plain list instead while checking to see if the
+      value exists.  This was a transitional helper for the early days of music21
+      when Myke was still thinking in Perl. (was called PerlArray early on)
     '''
     @deprecated('v11', 'v12', 'use a plain list or a dict instead')
     def __init__(self, fx: Callable[[], t.Any]) -> None:
