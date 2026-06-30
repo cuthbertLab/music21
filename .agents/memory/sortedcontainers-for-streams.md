@@ -42,3 +42,18 @@ StreamCore implementations behind one shared abstract interface — the default
 its workload (tiny measures vs. huge flat scores) instead of forcing one container
 to win both cases — which is exactly the trade-off that sank the all-or-nothing
 attempts above.
+
+**Related dead end — `bisect_getElements` (deleted):** a 2022 branch that kept the
+plain `list` but replaced the linear scan in `getElementAtOrBefore` /
+`getElementBeforeOffset` with a binary search (`bisect_right`/`bisect_left` keyed
+on `elementOffset`). Because storage stays a list, it avoids the small-stream
+*insertion* overhead that sank sortedcontainers — but it applied bisect
+*unconditionally*, with no length gate, so tiny streams just ate the property-build
++ per-probe lambda cost for no gain. To be worth anything it would need to check
+length first and only bisect the `classList=None` path (the `classList` path still
+does an O(n) filter before bisecting, so it can't speed up anyway). And since a
+binary search over a list won't actually beat the linear scan until well over
+~1000 elements — a size real music21 streams almost never reach — **we should not
+pursue bisect-on-list at all.** If we ever want fast offset lookup on big streams,
+get it from the swappable-`.core` plan above (a sortedcontainer or binary-search
+tree backend), not by bolting `bisect` onto the list.
