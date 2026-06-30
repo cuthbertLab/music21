@@ -136,7 +136,7 @@ def isIterable(usrData: t.Any) -> t.TypeGuard[Iterable]:
     >>> common.isIterable(stream.Stream())
     True
 
-    Ranges are not iterators by python 3, but return True
+    Ranges are not iterators by Python 3, but return True
 
     >>> common.isIterable(range(20))
     True

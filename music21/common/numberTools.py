@@ -447,7 +447,7 @@ def roundToHalfInteger(num: float|int) -> float|int:
     >>> common.roundToHalfInteger(0.75)
     1
 
-    unlike python round function, does the same for 1.25 and 1.75
+    unlike Python round function, does the same for 1.25 and 1.75
 
     >>> common.roundToHalfInteger(1.25)
     1.5

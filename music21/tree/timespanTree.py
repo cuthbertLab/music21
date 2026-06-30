@@ -50,7 +50,7 @@ class TimespanTree(trees.OffsetTree):
     like all :class:`~music21.tree.trees.OffsetTree` objects, for searching large scores
     quickly by time.
 
-    While you can construct an TimespanTree by hand, inserting timespans one at
+    While you can construct a TimespanTree by hand, inserting timespans one at
     a time, the common use-case is to construct the TimespanTree from an entire
     score at once:
 
@@ -148,8 +148,8 @@ class TimespanTree(trees.OffsetTree):
         TimespanTree is an extended AVL tree because each node in the
         tree keeps track of not just the start offsets of PitchedTimespans
         stored at that node, but also the earliest and latest stop offset of
-        all PitchedTimespans stores at both that node and all nodes which are
-        children of that node. This lets us quickly located PitchedTimespans
+        all PitchedTimespans stored at both that node and all nodes which are
+        children of that node. This lets us quickly locate PitchedTimespans
         which overlap offsets or which are contained within ranges of offsets.
         This also means that the contents of a TimespanTree are always
         sorted.
@@ -176,7 +176,7 @@ class TimespanTree(trees.OffsetTree):
     def elementEndTime(el, unused_node):
         '''
         Use so that both OffsetTrees, which have elements which do not have a .endTime, and
-        TimespanTrees, which have element that have an .endTime but not a duration, can
+        TimespanTrees, which have elements that have an .endTime but not a duration, can
         use most of the same code.
         '''
         return el.endTime
@@ -276,7 +276,7 @@ class TimespanTree(trees.OffsetTree):
         if classList is None:
             classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
-            message = f'PitchedTimespan {pitchedTimespan!r}, must be an PitchedTimespan'
+            message = f'PitchedTimespan {pitchedTimespan!r}, must be a PitchedTimespan'
             raise TimespanTreeException(message)
         verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
@@ -294,7 +294,7 @@ class TimespanTree(trees.OffsetTree):
         classList=None
     ) -> spans.PitchedTimespan | None:
         r'''
-        Finds next element timespan in the same Part/Measure, etc. (specify in classList) as
+        Finds previous element timespan in the same Part/Measure, etc. (specify in classList) as
         the `pitchedTimespan`.
 
         >>> score = corpus.parse('bwv66.6')
@@ -324,7 +324,7 @@ class TimespanTree(trees.OffsetTree):
         if classList is None:
             classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
-            message = f'PitchedTimespan {pitchedTimespan!r}, must be an PitchedTimespan'
+            message = f'PitchedTimespan {pitchedTimespan!r}, must be a PitchedTimespan'
             raise TimespanTreeException(message)
         verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
@@ -792,7 +792,7 @@ class TimespanTree(trees.OffsetTree):
     @property
     def element(self):
         '''
-        defined so a TimespanTree can be used like an PitchedTimespan
+        defined so a TimespanTree can be used like a PitchedTimespan
 
         TODO: Look at subclassing or at least deriving from a common base.
         '''

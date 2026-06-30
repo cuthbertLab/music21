@@ -1163,7 +1163,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     def set(self, name: str|int|float, *, allowNonStandardValue: bool = False) -> None:
         '''
-        Change the type of the Accidental.  Strings, numbers, and Lilypond (German-like)
+        Change the type of the Accidental.  Strings, numbers, and LilyPond (German-like)
         abbreviations are all accepted.  All other values will change
         after setting.
 
@@ -2303,10 +2303,9 @@ class Pitch(prebase.ProtoM21Object):
         >>> p2.isTwelveTone()
         False
         '''
-        if self.accidental is not None:
-            if not self.accidental.isTwelveTone():
-                return False
-        if self._microtone is not None and self.microtone.cents != 0:
+        if self._accidental is not None and not self._accidental.isTwelveTone():
+            return False
+        if self._microtone is not None and self._microtone.cents != 0:
             return False
         return True
 

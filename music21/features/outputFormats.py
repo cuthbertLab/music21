@@ -1,7 +1,14 @@
 from __future__ import annotations
 
+import pathlib
+import typing as t
+import unittest
+
 from music21 import environment
 from music21 import exceptions21
+
+if t.TYPE_CHECKING:
+    from music21.features.base import DataSet
 
 environLocal = environment.Environment('features.outputFormats')
 
@@ -15,24 +22,26 @@ class OutputFormat:
     Provide output for a DataSet, which is passed in as an initial argument.
     '''
 
-    def __init__(self, dataSet=None):
-        # assume a two dimensional array
-        self.ext = None  # store a file extension if necessary
+    def __init__(self, dataSet: DataSet|None = None) -> None:
+        # assume a two-dimensional array
+        self.ext: str = ''  # store a file extension if necessary
         # pass a data set object
         self._dataSet = dataSet
 
-    def getHeaderLines(self):
+    def getHeaderLines(self) -> list:
         '''
         Get the header as a list of lines.
         '''
-        pass  # define in subclass
+        return []  # define in subclass
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
-        pass  # define in subclass
+    def getString(self, includeClassLabel: bool = True, includeId: bool = True,
+                  lineBreak: str = '\n') -> str:
+        return ''  # define in subclass
 
-    def write(self, fp=None, includeClassLabel=True, includeId=True):
+    def write(self, fp: str|pathlib.Path|None = None,
+              includeClassLabel: bool = True, includeId: bool = True) -> str|pathlib.Path:
         '''
-        Write the file. If not file path is given, a temporary file will be written.
+        Write the file. If no file path is given, a temporary file will be written.
         '''
         if fp is None:
             fp = environLocal.getTempFile(suffix=self.ext)
@@ -53,11 +62,12 @@ class OutputTabOrange(OutputFormat):
     https://orange3.readthedocs.io/projects/orange-data-mining-library/en/latest/tutorial/data.html#saving-the-data
     '''
 
-    def __init__(self, dataSet=None):
+    def __init__(self, dataSet: DataSet|None = None) -> None:
         super().__init__(dataSet=dataSet)
         self.ext = '.tab'
 
-    def getHeaderLines(self, includeClassLabel=True, includeId=True):
+    def getHeaderLines(self, includeClassLabel: bool = True,
+                       includeId: bool = True) -> list[list[str]]:
         # noinspection PyShadowingNames
         '''
         Get the header as a list of lines.
@@ -80,6 +90,8 @@ class OutputTabOrange(OutputFormat):
         ['meta', '', 'class']
 
         '''
+        if self._dataSet is None:  # pragma: no cover
+            raise OutputFormatException('cannot get header lines without a DataSet')
         post = []
         post.append(self._dataSet.getAttributeLabels(
             includeClassLabel=includeClassLabel, includeId=includeId))
@@ -108,12 +120,13 @@ class OutputTabOrange(OutputFormat):
         post.append(row)
         return post
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
+    def getString(self, includeClassLabel: bool = True, includeId: bool = True,
+                  lineBreak: str = '\n') -> str:
         '''
         Get the complete DataSet as a string with the appropriate headers.
         '''
-        if lineBreak is None:
-            lineBreak = '\n'
+        if self._dataSet is None:  # pragma: no cover
+            raise OutputFormatException('cannot get a string without a DataSet')
         msg = []
         header = self.getHeaderLines(includeClassLabel=includeClassLabel,
                                      includeId=includeId)
@@ -132,11 +145,12 @@ class OutputCSV(OutputFormat):
     Comma-separated value list.
     '''
 
-    def __init__(self, dataSet=None):
+    def __init__(self, dataSet: DataSet|None = None) -> None:
         super().__init__(dataSet=dataSet)
         self.ext = '.csv'
 
-    def getHeaderLines(self, includeClassLabel=True, includeId=True):
+    def getHeaderLines(self, includeClassLabel: bool = True,
+                       includeId: bool = True) -> list[list[str]]:
         '''
         Get the header as a list of lines.
 
@@ -147,14 +161,17 @@ class OutputCSV(OutputFormat):
         >>> of.getHeaderLines()[0]
         ['Identifier', 'Changes_of_Meter', 'Composer']
         '''
+        if self._dataSet is None:  # pragma: no cover
+            raise OutputFormatException('cannot get header lines without a DataSet')
         post = []
         post.append(self._dataSet.getAttributeLabels(
             includeClassLabel=includeClassLabel, includeId=includeId))
         return post
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
-        if lineBreak is None:
-            lineBreak = '\n'
+    def getString(self, includeClassLabel: bool = True, includeId: bool = True,
+                  lineBreak: str = '\n') -> str:
+        if self._dataSet is None:  # pragma: no cover
+            raise OutputFormatException('cannot get a string without a DataSet')
         msg = []
         header = self.getHeaderLines(includeClassLabel=includeClassLabel,
                                      includeId=includeId)
@@ -181,11 +198,12 @@ class OutputARFF(OutputFormat):
     '.arff'
     '''
 
-    def __init__(self, dataSet=None):
+    def __init__(self, dataSet: DataSet|None = None) -> None:
         super().__init__(dataSet=dataSet)
         self.ext = '.arff'
 
-    def getHeaderLines(self, includeClassLabel=True, includeId=True):
+    def getHeaderLines(self, includeClassLabel: bool = True,
+                       includeId: bool = True) -> list[str]:
         '''
         Get the header as a list of lines.
 
@@ -201,6 +219,8 @@ class OutputARFF(OutputFormat):
         @DATA
 
         '''
+        if self._dataSet is None:  # pragma: no cover
+            raise OutputFormatException('cannot get header lines without a DataSet')
         post = []
 
         # get three parallel lists
@@ -224,15 +244,16 @@ class OutputARFF(OutputFormat):
                     post.append(f'@ATTRIBUTE {attrLabel} NUMERIC')
             else:
                 values = self._dataSet.getUniqueClassValues()
-                joined = ','.join(values)
+                joined = ','.join(str(v) for v in values)
                 post.append('@ATTRIBUTE class {' + joined + '}')
         # include start of data declaration
         post.append('@DATA')
         return post
 
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
-        if lineBreak is None:
-            lineBreak = '\n'
+    def getString(self, includeClassLabel: bool = True, includeId: bool = True,
+                  lineBreak: str = '\n') -> str:
+        if self._dataSet is None:  # pragma: no cover
+            raise OutputFormatException('cannot get a string without a DataSet')
 
         msg = []
 
@@ -250,6 +271,38 @@ class OutputARFF(OutputFormat):
                 sub.append(str(e))
             msg.append(','.join(sub))
         return lineBreak.join(msg)
+
+
+class Test(unittest.TestCase):
+
+    def testARFFNumericClassValues(self):
+        '''
+        Regression test: numeric (non-string) class values must not crash
+        ARFF header generation. Previously the class declaration was built
+        with ','.join(values), which raised a TypeError when the class
+        values were ints or floats rather than strings.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import converter
+        from music21 import features
+
+        ds = features.DataSet(classLabel='Meter')
+        ds.addFeatureExtractors(features.extractorsById(['r31']))
+        s1 = converter.parse('tinynotation: 4/4 c4 d e f')
+        s2 = converter.parse('tinynotation: 3/4 c4 d e')
+        # integer class values, not strings
+        ds.addMultipleData([s1, s2], classValues=[3, 4])
+        ds.process()
+
+        self.assertEqual(ds.getUniqueClassValues(), [3, 4])
+
+        of = features.outputFormats.OutputARFF(dataSet=ds)
+        classLines = [line for line in of.getHeaderLines()
+                      if line.startswith('@ATTRIBUTE class')]
+        self.assertEqual(classLines, ['@ATTRIBUTE class {3,4}'])
+        # building the full string must not raise either
+        self.assertIn('@ATTRIBUTE class {3,4}', of.getString())
 
 
 if __name__ == '__main__':

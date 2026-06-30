@@ -9,6 +9,8 @@
 # ------------------------------------------------------------------------------
 '''
 Original music21 feature extractors.
+
+Type annotations in this module were added with AI assistance (Claude).
 '''
 from __future__ import annotations
 
@@ -88,12 +90,8 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'P22'
-
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Quality'
-        self.description = '''
+    name = 'Quality'
+    description = '''
             Set to 0 if the Key or KeySignature indicates that
             a recording is major, set to 1 if it indicates
             that it is minor.
@@ -101,8 +99,6 @@ class QualityFeature(featuresModule.FeatureExtractor):
             modes in the keys, analyze the piece to
             discover what mode it is most likely in.
             '''
-        self.isSequential = True
-        self.dimensions = 1
 
     def process(self) -> None:
         '''
@@ -112,15 +108,14 @@ class QualityFeature(featuresModule.FeatureExtractor):
             raise ValueError('Cannot process without a data instance or feature.')
 
         allKeys = self.data['flat.getElementsByClass(Key)']
-        keyFeature: int|None = None
         if len(allKeys) == 1:
             k0 = allKeys[0]
             if k0.mode == 'major':
-                keyFeature = 0
+                self.feature.vector[0] = 0
+                return
             elif k0.mode == 'minor':
-                keyFeature = 1
-            self.feature.vector[0] = keyFeature
-            return
+                self.feature.vector[0] = 1
+                return
 
         useKey = None
         if len(allKeys) == 1:
@@ -172,20 +167,17 @@ class TonalCertainty(featuresModule.FeatureExtractor):
     [0.0]
     '''
     id = 'K1'  # TODO: need id
+    name = 'Tonal Certainty'
+    description = ('A floating point magnitude value that suggest tonal '
+                   'certainty based on automatic key analysis.')
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Tonal Certainty'
-        self.description = ('A floating point magnitude value that suggest tonal '
-                            'certainty based on automatic key analysis.')
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         self.feature.vector[0] = self.data['flat.analyzedKey.tonalCertainty']
 
 
@@ -205,15 +197,10 @@ class FirstBeatAttackPrevalence(featuresModule.FeatureExtractor):
     TODO: Implement!
     '''
     id = 'MP1'
-
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'First Beat Attack Prevalence'
-        self.description = ('Fraction of first beats of a measure that have notes '
-                            'that start on this beat.')
-        self.dimensions = 1
-        self.discrete = False
+    name = 'First Beat Attack Prevalence'
+    description = ('Fraction of first beats of a measure that have notes '
+                   'that start on this beat.')
+    discrete = False
 
 
 # ------------------------------------------------------------------------------
@@ -228,19 +215,15 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
     [3]
     '''
     id = 'QL1'
+    name = 'Unique Note Quarter Lengths'
+    description = 'The number of unique note quarter lengths.'
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Unique Note Quarter Lengths'
-        self.description = 'The number of unique note quarter lengths.'
-        self.dimensions = 1
-        self.discrete = True
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         count = 0
         histo = self.data['flat.notes.quarterLengthHistogram']
         for key in histo:
@@ -258,19 +241,16 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
     [1.0]
     '''
     id = 'QL2'
+    name = 'Most Common Note Quarter Length'
+    description = 'The value of the most common quarter length.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Note Quarter Length'
-        self.description = 'The value of the most common quarter length.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['flat.notes.quarterLengthHistogram']
         maximum = 0
         ql = 0
@@ -292,19 +272,16 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     [0.60...]
     '''
     id = 'QL3'
+    name = 'Most Common Note Quarter Length Prevalence'
+    description = 'Fraction of notes that have the most common quarter length.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Note Quarter Length Prevalence'
-        self.description = 'Fraction of notes that have the most common quarter length.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         summation = 0  # count of all
         histo = self.data['flat.notes.quarterLengthHistogram']
         if not histo:
@@ -329,19 +306,16 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
     [1.5]
     '''
     id = 'QL4'
+    name = 'Range of Note Quarter Lengths'
+    description = 'Difference between the longest and shortest quarter lengths.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Range of Note Quarter Lengths'
-        self.description = 'Difference between the longest and shortest quarter lengths.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         histo = self.data['flat.notes.quarterLengthHistogram']
         if not histo:
             raise NativeFeatureException('input lacks notes')
@@ -370,19 +344,16 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
     [27]
     '''
     id = 'CS1'
+    name = 'Unique Pitch Class Set Simultaneities'
+    description = 'Number of unique pitch class simultaneities.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Unique Pitch Class Set Simultaneities'
-        self.description = 'Number of unique pitch class simultaneities.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         count = 0
         histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
         for key in histo:
@@ -402,19 +373,16 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
     [14]
     '''
     id = 'CS2'
+    name = 'Unique Set Class Simultaneities'
+    description = 'Number of unique set class simultaneities.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Unique Set Class Simultaneities'
-        self.description = 'Number of unique set class simultaneities.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         count = 0
         histo = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
         for key in histo:
@@ -435,20 +403,17 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
     [0.134...]
     '''
     id = 'CS3'
+    name = 'Most Common Pitch Class Set Simultaneity Prevalence'
+    description = ('Fraction of all pitch class simultaneities that are '
+                   'the most common simultaneity.')
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Pitch Class Set Simultaneity Prevalence'
-        self.description = ('Fraction of all pitch class simultaneities that are '
-                            'the most common simultaneity.')
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         summation = 0  # count of all
         histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
         maxKey = 0  # max found for any one key
@@ -481,20 +446,17 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.235...]
     '''
     id = 'CS4'
+    name = 'Most Common Set Class Simultaneity Prevalence'
+    description = ('Fraction of all set class simultaneities that '
+                   'are the most common simultaneity.')
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Most Common Set Class Simultaneity Prevalence'
-        self.description = ('Fraction of all set class simultaneities that '
-                            'are the most common simultaneity.')
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         summation = 0  # count of all
         histo = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
         if not histo:
@@ -522,19 +484,16 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.46...]
     '''
     id = 'CS5'
+    name = 'Major Triad Simultaneity Prevalence'
+    description = 'Percentage of all simultaneities that are major triads.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Major Triad Simultaneity Prevalence'
-        self.description = 'Percentage of all simultaneities that are major triads.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
@@ -556,19 +515,16 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.211...]
     '''
     id = 'CS6'
+    name = 'Minor Triad Simultaneity Prevalence'
+    description = 'Percentage of all simultaneities that are minor triads.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Minor Triad Simultaneity Prevalence'
-        self.description = 'Percentage of all simultaneities that are minor triads.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
@@ -590,19 +546,16 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.076...]
     '''
     id = 'CS7'
+    name = 'Dominant Seventh Simultaneity Prevalence'
+    description = 'Percentage of all simultaneities that are dominant seventh.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Dominant Seventh Simultaneity Prevalence'
-        self.description = 'Percentage of all simultaneities that are dominant seventh.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
@@ -624,19 +577,16 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.019...]
     '''
     id = 'CS8'
+    name = 'Diminished Triad Simultaneity Prevalence'
+    description = 'Percentage of all simultaneities that are diminished triads.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Diminished Triad Simultaneity Prevalence'
-        self.description = 'Percentage of all simultaneities that are diminished triads.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
@@ -651,7 +601,7 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''
     Gives the proportion of all simultaneities which form triads (major,
-    minor, diminished, or augmented)
+    minor, diminished, or augmented).
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.TriadSimultaneityPrevalence(s)
@@ -663,19 +613,16 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.02272727...]
     '''
     id = 'CS9'
+    name = 'Triad Simultaneity Prevalence'
+    description = 'Proportion of all simultaneities that form triads.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Triad Simultaneity Prevalence'
-        self.description = 'Proportion of all simultaneities that form triads.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
@@ -697,19 +644,16 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.0]
     '''
     id = 'CS10'
+    name = 'Diminished Seventh Simultaneity Prevalence'
+    description = 'Percentage of all simultaneities that are diminished seventh chords.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Diminished Seventh Simultaneity Prevalence'
-        self.description = 'Percentage of all simultaneities that are diminished seventh chords.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
@@ -741,19 +685,16 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
     [0.02...]
     '''
     id = 'CS11'
+    name = 'Incorrectly Spelled Triad Prevalence'
+    description = 'Percentage of all triads that are spelled incorrectly.'
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Incorrectly Spelled Triad Prevalence'
-        self.description = 'Percentage of all triads that are spelled incorrectly.'
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # use for total number of chords
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         if not histo:
@@ -783,7 +724,7 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
     of all chord motion of music21.harmony.Harmony objects
     that move up by i-half-steps. (a half-step motion down would
     be stored in i = 11).  i = 0 is always 0.0 since consecutive
-    chords on the same pitch are ignored (unless there are 0 or 1 harmonies, in which case it is 1)
+    chords on the same pitch are ignored (unless there are 0 or 1 harmonies, in which case it is 1).
 
     Sample test on Dylan's Blowing In The Wind (not included), showing all
     motion is 3rds, 6ths, or especially 4ths and 5ths.
@@ -803,21 +744,19 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'CS12'
+    name = 'Chord Bass Motion'
+    description = ('12-element vector showing the fraction of chords that move '
+                   'by x semitones (where x=0 is always 0 unless there are 0 '
+                   'or 1 harmonies, in which case it is 1).')
+    dimensions = 12
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Chord Bass Motion'
-        self.description = ('12-element vector showing the fraction of chords that move '
-                            'by x semitones (where x=0 is always 0 unless there are 0 '
-                            'or 1 harmonies, in which case it is 1).')
-        self.dimensions = 12
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # use for total number of chords
         harms = self.data['flat.getElementsByClass(Harmony)']
 
@@ -879,20 +818,17 @@ class LandiniCadence(featuresModule.FeatureExtractor):
     Return a boolean if one or more Parts end with a Landini-like cadential figure.
     '''
     id = 'MC1'
+    name = 'Ends With Landini Melodic Contour'
+    description = ('Boolean that indicates the presence of a Landini-like '
+                   'cadential figure in one or more parts.')
+    discrete = False
 
-    def __init__(self, dataOrStream=None, **keywords):
-        super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Ends With Landini Melodic Contour'
-        self.description = ('Boolean that indicates the presence of a Landini-like '
-                            'cadential figure in one or more parts.')
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         # store plausible ending half step movements
         # these need to be lists for comparison
         match = [[-2, 3], [-1, -2, 3]]
@@ -935,9 +871,8 @@ class LandiniCadence(featuresModule.FeatureExtractor):
 
 class LanguageFeature(featuresModule.FeatureExtractor):
     '''
-    language of text as a number
-    the number is the index of text.LanguageDetector.languageCodes + 1
-    or 0 if there is no language.
+    Language of the text as a number. The number is the index of
+    text.LanguageDetector.languageCodes + 1, or 0 if there is no language.
 
     Detect that the language of a Handel aria is Italian.
 
@@ -948,21 +883,20 @@ class LanguageFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'TX1'
+    name = 'Language Feature'
+    description = ('Language of the lyrics of the piece given as a numeric '
+                   'value from text.LanguageDetector.mostLikelyLanguageNumeric().')
 
-    def __init__(self, dataOrStream=None, **keywords):
+    def __init__(self, dataOrStream=None, **keywords) -> None:
         super().__init__(dataOrStream=dataOrStream, **keywords)
-
-        self.name = 'Language Feature'
-        self.description = ('Language of the lyrics of the piece given as a numeric '
-                            'value from text.LanguageDetector.mostLikelyLanguageNumeric().')
-        self.dimensions = 1
-        self.discrete = True
         self.languageDetector = text.LanguageDetector()
 
-    def process(self):
+    def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
         '''
+        if self.data is None or self.feature is None:  # pragma: no cover
+            raise ValueError('Cannot process without a data instance or feature.')
         storedLyrics = self.data['assembledLyrics']
         self.feature.vector[0] = self.languageDetector.mostLikelyLanguageNumeric(storedLyrics)
 

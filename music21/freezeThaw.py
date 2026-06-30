@@ -36,7 +36,7 @@ Pickle is a Python-specific
 idea for storing objects.  The `pickle` module stores objects as a text file
 that can't be easily read by non-Python applications; it also isn't guaranteed
 to work across Python versions or even computers.  However, it works well, is
-fast, and is a standard part of python.
+fast, and is a standard part of Python.
 
 JSON was originally created to pass
 JavaScript objects from a web server to a web browser, but its utility
@@ -50,7 +50,7 @@ uses explicit lists of attributes that need to be stored and just saves those. T
 homemade set of methods that are specifically tailored for music21; but it misses some things that
 may be important to you.  The second approach uses the freely distributable
 `jsonpickle` module. This approach probably stores more data than
-a person not using music21 or python is likely to want, but can be used to get back an entire
+a person not using music21 or Python is likely to want, but can be used to get back an entire
 music21 Stream with no conversion.
 
 Both JSON and Pickle files can be huge, but `freezeThaw` can compress them with

@@ -9,7 +9,7 @@
 # -------------------------------------------------------------------------------
 '''
 tinyNotation is a simple way of specifying single line melodies
-that uses a notation somewhat similar to Lilypond but with WAY fewer
+that uses a notation somewhat similar to LilyPond but with WAY fewer
 options.  It was originally developed to notate trecento (medieval Italian)
 music, but it is pretty useful for a lot of short examples, so we have
 made it a generally supported music21 format.

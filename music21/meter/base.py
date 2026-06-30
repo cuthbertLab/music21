@@ -272,7 +272,7 @@ class TimeSignature(TimeSignatureBase):
     that they apply to.  Alternatively you can put the time signature at the
     front of a `Part` or at the beginning of a `Score`, and they will work
     within music21, but they won't necessarily display properly in MusicXML,
-    Lilypond, etc.  So best is to create structures where the TimeSignature
+    LilyPond, etc.  So best is to create structures where the TimeSignature
     goes in the first Measure of the score, as below:
 
     >>> s = stream.Score()
