@@ -33,3 +33,12 @@ per-insert constant-factor overhead is a net loss for small containers. The plai
 container) to make streams always-sorted — it's already been tried twice and lost
 on small-stream speed. If revisiting, benchmark the 2–8 element case first, not
 just large streams. Both branches were deleted; the good ideas live here.
+
+**Longer-term idea (Myke):** once `StreamCore` lives on `Stream` as `Stream.core`
+(the deferred composition refactor), make two *swappable* `stream/core.py`
+StreamCore implementations behind one shared abstract interface — the default
+`list`-based `.core` for small streams, and a tree/B-tree or sortedcontainer
+`.core` that a large stream can swap in. Each backing store is then best-suited to
+its workload (tiny measures vs. huge flat scores) instead of forcing one container
+to win both cases — which is exactly the trade-off that sank the all-or-nothing
+attempts above.
