@@ -350,6 +350,51 @@ class Test(unittest.TestCase):
         i = interval.Interval(note.Note('c4'), note.Note('c~4'))
         self.assertEqual(str(i), '<music21.interval.Interval A1 (-50c)>')
 
+    def testTransposeMicrotonePreserved(self):
+        # A microtone (cents offset) must survive transposition unchanged and
+        # must not be turned into a spurious quarter-tone accidental. Formerly
+        # the source microtone leaked into the accidental computation, so e.g.
+        # C4(+30c) transposed by a unison became C~4(-20c), or larger microtones
+        # raised AccidentalException.
+
+        # Transposing by a perfect unison is the identity.
+        p = pitch.Pitch('C4')
+        p.microtone = 30
+        out = p.transpose(interval.Interval('P1'))
+        self.assertEqual(out.nameWithOctave, 'C4')
+        self.assertEqual(out.microtone.cents, 30)
+
+        # A formerly-crashing case: G#5(+50c) transposed by an augmented unison.
+        p = pitch.Pitch('G#5')
+        p.microtone = 50
+        out = p.transpose(interval.Interval('A1'))
+        self.assertEqual(out.nameWithOctave, 'G##5')
+        self.assertEqual(out.microtone.cents, 50)
+
+        # A quarter-tone accidental and a microtone both survive a unison.
+        p = pitch.Pitch('C~4')
+        p.microtone = 30
+        out = p.transpose(interval.Interval('P1'))
+        self.assertEqual(out.name, 'C~')
+        self.assertEqual(out.microtone.cents, 30)
+
+        # Across intervals and microtone magnitudes: the cents are preserved,
+        # the sounding pitch moves by exactly the interval, and no quarter-tone
+        # accidental is introduced on an integer-semitone interval.
+        for iName in ['P1', 'm2', 'M3', 'P5', 'm7', 'P8', 'A4', 'd5']:
+            iv = interval.Interval(iName)
+            for cents in (-49, -25, 26, 49):
+                with self.subTest(interval=iName, cents=cents):
+                    src = pitch.Pitch('C4')
+                    src.microtone = cents
+                    psBefore = src.ps
+                    out = src.transpose(iv)
+                    self.assertAlmostEqual(out.microtone.cents, cents)
+                    self.assertAlmostEqual(out.ps - psBefore,
+                                           iv.chromatic.semitones)
+                    if out.accidental is not None:
+                        self.assertEqual(out.accidental.alter % 1, 0.0)
+
     def testDescendingAugmentedUnison(self):
         ns = note.Note('C4')
         ne = note.Note('C-4')
