@@ -52,7 +52,7 @@ class VerticalityException(exceptions21.TreeException):
 class Verticality(prebase.ProtoM21Object):
     r'''
     A collection of information about elements that are sounding at a given
-    offset or just finished at that offset or are continuing from before, etc..
+    offset or just finished at that offset or are continuing from before, etc.
 
     Create a timespan-stream from a score:
 
@@ -360,7 +360,7 @@ class Verticality(prebase.ProtoM21Object):
         if tree is None:
             return None
         offset = tree.getPositionAfter(self.offset)
-        return offset
+        return t.cast('float | None', offset)
 
     @property
     def nextVerticality(self):

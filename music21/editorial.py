@@ -68,7 +68,7 @@ class Editorial(prebase.ProtoM21Object, dict):
     >>> n = note.Note('F')
     >>> n.editorial.ficta = fictaSharp
     >>> assert(n.editorial.ficta.alter == 1.0) #_DOCS_HIDE
-    >>> #_DOCS_SHOW n.show('lily.png')  # only Lilypond currently supports musica ficta
+    >>> #_DOCS_SHOW n.show('lily.png')  # only LilyPond currently supports musica ficta
 
     .. image:: images/noteEditorialFictaSharp.*
         :width: 103

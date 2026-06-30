@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Name:         lily/translate.py
-# Purpose:      music21 classes for translating to Lilypond
+# Purpose:      music21 classes for translating to LilyPond
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
@@ -8,9 +8,9 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-music21 translates to Lilypond format and if Lilypond is installed on the
+music21 translates to LilyPond format and if LilyPond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
-of musical files using Lilypond.
+of musical files using LilyPond.
 '''
 from __future__ import annotations
 
@@ -210,7 +210,7 @@ class LilypondConverter:
                 versionPieces = versionString.split('.')
         except OSError as exc:  # pragma: no cover
             raise LilyTranslateException(
-                'Cannot find a copy of Lilypond installed on your system. '
+                'Cannot find a copy of LilyPond installed on your system. '
                 + 'Please be sure it is installed. And that your '
                 + "environment.UserSettings()['lilypondPath'] is set to find it.") from exc
 
@@ -247,7 +247,7 @@ class LilypondConverter:
         except IndexError:  # pragma: no cover
             self.context = self.topLevelObject
 
-    # ----------- Set a complete Lilypond Tree from a music21 object ----------#
+    # ----------- Set a complete LilyPond Tree from a music21 object ----------#
 
     def textFromMusic21Object(self, m21ObjectIn):
         r'''
@@ -279,7 +279,7 @@ class LilypondConverter:
 
     def loadFromMusic21Object(self, m21ObjectIn):
         r'''
-        Create a Lilypond object hierarchy in self.topLevelObject from an
+        Create a LilyPond object hierarchy in self.topLevelObject from an
         arbitrary music21 object.
 
         TODO: make lilypond automatically run makeNotation.makeTupletBrackets(s)
@@ -2410,7 +2410,7 @@ class LilypondConverter:
                        backend=None, fileName=None, skipWriting=False):
         r'''
         creates a .ly file from self.topLevelObject via .writeLyFile
-        then runs the file through Lilypond.
+        then runs the file through LilyPond.
 
         Returns the full path of the file produced by lilypond including the format extension.
 
