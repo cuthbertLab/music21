@@ -3,6 +3,9 @@
 
 - At the start of every session, run `git fetch` (and pull/rebase as appropriate) from
   origin so work always begins from the latest commits on the current branch / master.
+- Project-shared agent memories live in `.agents/memory/` (indexed by
+  `.agents/memory/MEMORY.md`). `.claude/memory` is a symlink to it so Claude
+  Code reads the same set. Add new memories there, one fact per file.
 
 # Code style
 
