@@ -2303,10 +2303,9 @@ class Pitch(prebase.ProtoM21Object):
         >>> p2.isTwelveTone()
         False
         '''
-        if self.accidental is not None:
-            if not self.accidental.isTwelveTone():
-                return False
-        if self._microtone is not None and self.microtone.cents != 0:
+        if self._accidental is not None and not self._accidental.isTwelveTone():
+            return False
+        if self._microtone is not None and self._microtone.cents != 0:
             return False
         return True
 
