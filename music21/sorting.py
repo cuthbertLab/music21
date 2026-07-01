@@ -208,7 +208,7 @@ class SortTuple(t.NamedTuple):
 
         * Changed in v11: a bad field name now raises ValueError
         '''
-        return self._replace(**keywords)
+        return self._replace(**keywords)  # pylint: disable=no-member
 
     def add(self, other):
         '''
@@ -237,7 +237,7 @@ class SortTuple(t.NamedTuple):
         outList = [max(getattr(self, attr), getattr(other, attr))
                    if attr in ('atEnd', 'isNotGrace')
                    else (getattr(self, attr) + getattr(other, attr))
-                   for attr in self._fields]  # _fields are the namedtuple attributes
+                   for attr in self._fields]  # pylint: disable=no-member
 
         return self.__class__(*outList)
 
@@ -267,7 +267,7 @@ class SortTuple(t.NamedTuple):
         outList = [min(getattr(self, attr), getattr(other, attr))
                    if attr in ('atEnd', 'isNotGrace')
                    else (getattr(self, attr) - getattr(other, attr))
-                   for attr in self._fields]  # _fields are the namedtuple attributes
+                   for attr in self._fields]  # pylint: disable=no-member
 
         return self.__class__(*outList)
 
