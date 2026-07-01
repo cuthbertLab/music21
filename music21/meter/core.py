@@ -359,6 +359,50 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
     def __str__(self):
         return str(int(self.numerator)) + '/' + str(int(self.denominator))
 
+    def modify(self, **keywords) -> MeterTerminal:
+        '''
+        Return a (cached) MeterTerminal identical to this one except for the
+        given ``numerator``, ``denominator`` and/or ``weight`` keyword(s); the
+        other values carry over.  The original is unchanged, since a
+        MeterTerminal is immutable.
+
+        This is how to "change" an immutable terminal -- analogous to
+        :func:`copy.replace` (Python 3.13+) or ``namedtuple._replace``.
+
+        >>> a = meter.MeterTerminal('2/4', weight=0.5)
+        >>> b = a.modify(weight=0.25)
+        >>> b
+        <music21.meter.core.MeterTerminal 2/4>
+        >>> b.weight
+        0.25
+
+        The original is unchanged, and the un-named values carry over (here the
+        weight stays 0.5):
+
+        >>> a.weight
+        0.5
+        >>> c = a.modify(numerator=3)
+        >>> c
+        <music21.meter.core.MeterTerminal 3/4>
+        >>> c.weight
+        0.5
+
+        modify goes through the cache, so identical results share one object:
+
+        >>> a.modify(numerator=3) is c
+        True
+
+        AI-assisted (Claude).
+        '''
+        return getMeterTerminal(
+            numerator=keywords.get('numerator', self._numerator),
+            denominator=keywords.get('denominator', self._denominator),
+            weight=keywords.get('weight', self._weight),
+        )
+
+    # copy.replace() support (Python 3.13+)
+    __replace__ = modify
+
     # -------------------------------------------------------------------------
     # properties
 
@@ -371,10 +415,9 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> a.weight
         0.5
 
-        To get a MeterTerminal with a different weight, specify the existing
-        numerator and denominator and the new weight:
+        To get a MeterTerminal with a different weight, use :meth:`modify`:
 
-        >>> meter.core.getMeterTerminal(a.numerator, a.denominator, weight=0.25)
+        >>> a.modify(weight=0.25)
         <music21.meter.core.MeterTerminal 2/4>
 
         * Changed in v11: weight is immutable and must be a float (not int).
@@ -390,10 +433,9 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> a.numerator
         2
 
-        To get a MeterTerminal with a different numerator, specify the new
-        numerator and the existing denominator and weight:
+        To get a MeterTerminal with a different numerator, use :meth:`modify`:
 
-        >>> meter.core.getMeterTerminal(3, a.denominator, weight=a.weight)
+        >>> a.modify(numerator=3)
         <music21.meter.core.MeterTerminal 3/4>
 
         * Changed in v11: numerator is immutable.
@@ -409,10 +451,9 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> a.denominator
         4
 
-        To get a MeterTerminal with a different denominator, specify the
-        existing numerator, the new denominator, and the existing weight:
+        To get a MeterTerminal with a different denominator, use :meth:`modify`:
 
-        >>> meter.core.getMeterTerminal(a.numerator, 8, weight=a.weight)
+        >>> a.modify(denominator=8)
         <music21.meter.core.MeterTerminal 2/8>
 
         * Changed in v11: denominator is immutable.
@@ -529,7 +570,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         numerator, denominator, partitionList, summedNumerator = _loadData(value)
         parenthesis = False
         if partitionRequest is not None:
-            built = _makeSequence(
+            built = makeSequence(
                 numerator, denominator, tuple(partitionList),
                 summedNumerator=summedNumerator
             ).partition(partitionRequest)
@@ -564,6 +605,39 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         A MeterSequence is immutable, so a shallow copy is also just itself.
         '''
         return self
+
+    def modify(self, **keywords) -> MeterSequence:
+        '''
+        Return a (cached) MeterSequence identical to this one except for the
+        given ``partition``, ``parenthesis`` and/or ``summedNumerator``
+        keyword(s); the numerator and denominator follow from the partition.
+        The original is unchanged, since a MeterSequence is immutable.
+
+        Analogous to :func:`copy.replace` (Python 3.13+); for changing the
+        partition structure itself prefer the functional :meth:`partition`,
+        :meth:`subdividePartitionsEqual`, and :meth:`replaceElement`.
+
+        >>> ms = meter.MeterSequence('4/4', 4)
+        >>> ms.parenthesis
+        False
+        >>> ms2 = ms.modify(parenthesis=True)
+        >>> ms2.parenthesis
+        True
+        >>> ms.parenthesis
+        False
+
+        AI-assisted (Claude).
+        '''
+        partition = tuple(keywords.get('partition', self._partition))
+        numerator, denominator = _ratioFromPartition(partition)
+        return makeSequence(
+            numerator, denominator, partition,
+            parenthesis=keywords.get('parenthesis', self.parenthesis),
+            summedNumerator=keywords.get('summedNumerator', self.summedNumerator),
+        )
+
+    # copy.replace() support (Python 3.13+)
+    __replace__ = modify
 
     def __getitem__(self, key: int) -> MeterNode:
         '''
@@ -677,7 +751,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
         AI-assisted (Claude).
         '''
-        return _makeSequence(
+        return makeSequence(
             self._numerator, self._denominator, tuple(partition),
             parenthesis=self.parenthesis, summedNumerator=self.summedNumerator)
 
@@ -1973,7 +2047,7 @@ _meterSequenceCache: dict[
 ] = {}
 
 
-def _makeSequence(
+def makeSequence(
     numerator: int,
     denominator: int,
     partition: tuple,
@@ -2022,7 +2096,7 @@ def getMeterSequence(
     AI-assisted (Claude).
     '''
     built = MeterSequence(value, partitionRequest)
-    return _makeSequence(
+    return makeSequence(
         built._numerator, built._denominator, built._partition,
         parenthesis=built.parenthesis, summedNumerator=built.summedNumerator)
 
@@ -2144,7 +2218,7 @@ def _buildSequence(
     '''
     numerator, denominator, partition, summedNumerator = _loadData(
         value, autoWeight=autoWeight, targetWeight=targetWeight)
-    ms = _makeSequence(numerator, denominator, tuple(partition),
+    ms = makeSequence(numerator, denominator, tuple(partition),
                        summedNumerator=summedNumerator)
     if partitionRequest is not None:
         ms = ms.partition(partitionRequest)
