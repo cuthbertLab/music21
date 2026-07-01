@@ -76,23 +76,21 @@ class TestExternal(unittest.TestCase):
 
 class Test(unittest.TestCase):
     def testMeterSubdivision(self):
-        a = MeterSequence()
-        a.load('4/4', 4)
+        a = MeterSequence('4/4', 4)
         self.assertEqual(str(a), '{1/4+1/4+1/4+1/4}')
 
-        a[0] = a[0].subdivide(2)
+        a = a.replaceElement(0, a[0].subdivide(2))
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+1/4}')
 
-        a[3] = a[3].subdivide(4)
+        a = a.replaceElement(3, a[3].subdivide(4))
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}')
 
     def testMeterSequenceDeepcopy(self):
-        a = MeterSequence()
-        a.load('4/4', 4)
+        a = MeterSequence('4/4', 4)
         b = copy.deepcopy(a)
-        self.assertIsNot(a, b)
-        # TODO: equity of meter sequences not yet defined.
-        # self.assertEqual(a, b)
+        # a MeterSequence is immutable, so deepcopy returns the same object
+        self.assertIs(a, b)
+        self.assertEqual(a, b)
 
     def testTimeSignatureDeepcopy(self):
         c = TimeSignature('4/4')
@@ -188,13 +186,18 @@ class Test(unittest.TestCase):
 
     def testOffsetToDepth(self):
         # get a maximally divided 4/4 to the level of 1/8
+        def recSub(node, remaining):
+            # functionally subdivide node by 2 for `remaining` levels
+            if remaining == 0:
+                return node
+            sub = node.subdivide(2)
+            for idx in range(len(sub)):
+                sub = sub.replaceElement(idx, recSub(sub[idx], remaining - 1))
+            return sub
+
         a = MeterSequence('4/4')
         for h in range(len(a)):
-            a[h] = a[h].subdivide(2)
-            for i in range(len(a[h])):
-                a[h][i] = a[h][i].subdivide(2)
-                for j in range(len(a[h][i])):
-                    a[h][i][j] = a[h][i][j].subdivide(2)
+            a = a.replaceElement(h, recSub(a[h], 3))
 
         # matching with starts result in a Lerdahl-Jackendoff style depth
         match = [4, 1, 2, 1, 3, 1, 2, 1]
@@ -314,36 +317,28 @@ class Test(unittest.TestCase):
                                  beatDur[i])
 
     def testSubdividePartitionsEqual(self):
-        ms = MeterSequence('2/4')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('2/4').subdividePartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/4+1/4}}')
 
-        ms = MeterSequence('3/4')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('3/4').subdividePartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/4+1/4+1/4}}')
 
-        ms = MeterSequence('6/8')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('6/8').subdividePartitionsEqual(None)
         self.assertEqual(str(ms), '{{3/8+3/8}}')
 
-        ms = MeterSequence('6/16')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('6/16').subdividePartitionsEqual(None)
         self.assertEqual(str(ms), '{{3/16+3/16}}')
 
-        ms = MeterSequence('3/8+3/8')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('3/8+3/8').subdividePartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/8+1/8+1/8}+{1/8+1/8+1/8}}')
 
-        ms = MeterSequence('2/8+3/8')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('2/8+3/8').subdividePartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/8+1/8}+{1/8+1/8+1/8}}')
 
-        ms = MeterSequence('5/8')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('5/8').subdividePartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/8+1/8+1/8+1/8+1/8}}')
 
-        ms = MeterSequence('3/8+3/4')
-        ms.subdividePartitionsEqual(None)  # can partition by another
+        ms = MeterSequence('3/8+3/4').subdividePartitionsEqual(None)  # can partition by another
         self.assertEqual(str(ms), '{{1/8+1/8+1/8}+{1/4+1/4+1/4}}')
 
     def testSetDefaultAccentWeights(self):
@@ -441,7 +436,7 @@ class Test(unittest.TestCase):
         from music21 import meter
         # create a meter with 6 beats but beams in 2 groups
         ts = meter.TimeSignature('6/8')
-        ts.beatSequence.partition(6)
+        ts.beatSequence = ts.beatSequence.partition(6)
         self.assertEqual(str(ts.beatSequence), '{1/8+1/8+1/8+1/8+1/8+1/8}')
         self.assertEqual(str(ts.beamSequence), '{3/8+3/8}')
 

@@ -34,7 +34,9 @@ from music21.exceptions21 import MeterException, TimeSignatureException
 from music21 import style
 
 from music21.meter.tools import slashToTuple, proportionToFraction
-from music21.meter.core import MeterSequence, getMeterTerminal
+from music21.meter.core import (
+    MeterSequence, getMeterSequence, getMeterTerminal, _makeSequence,
+)
 
 environLocal = environment.Environment('meter')
 
@@ -600,7 +602,7 @@ class TimeSignature(TimeSignatureBase):
             value = '2/2'
             self.symbol = 'cut'
 
-        self.displaySequence = MeterSequence(value)
+        self.displaySequence = getMeterSequence(value)
 
         # get simple representation; presently, only slashToTuple
         # supports the fast/slow indication
@@ -613,12 +615,12 @@ class TimeSignature(TimeSignatureBase):
         favorCompound = (division != MeterDivision.SLOW)
 
         # used for beaming
-        self.beamSequence = MeterSequence(value, divisions)
+        self.beamSequence = getMeterSequence(value, divisions)
         # used for getting beat divisions
-        self.beatSequence = MeterSequence(value, divisions)
+        self.beatSequence = getMeterSequence(value, divisions)
 
         # accentSequence is used for setting one level of accents
-        self.accentSequence = MeterSequence(value, divisions)
+        self.accentSequence = getMeterSequence(value, divisions)
 
         if divisions is None:  # set default beam partitions
             # beam is not adjust by tempo indication
@@ -879,12 +881,12 @@ class TimeSignature(TimeSignatureBase):
     @beatCount.setter
     def beatCount(self, value: int):
         try:
-            self.beatSequence.partition(value)
+            self.beatSequence = self.beatSequence.partition(value)
         except MeterException:
             raise TimeSignatureException(f'cannot partition beat with provided value: {value}')
         # create subdivisions using default parameters
         if len(self.beatSequence) > 1:  # if partitioned
-            self.beatSequence.subdividePartitionsEqual()
+            self.beatSequence = self.beatSequence.subdividePartitionsEqual()
 
     @property
     def beatCountName(self) -> str:
@@ -976,7 +978,7 @@ class TimeSignature(TimeSignatureBase):
         * Changed in v7: return 1 instead of a TimeSignatureException.
         '''
         # first, find if there is more than one beat and if all beats are uniformly partitioned
-        post = []
+        post: list[int] = []
         if len(self.beatSequence) == 1:
             return 1
 
@@ -1013,11 +1015,11 @@ class TimeSignature(TimeSignatureBase):
         5/8 + 5/8 with no further subdivisions:
 
         >>> ts = meter.TimeSignature('10/8')
-        >>> ts.beatSequence.partition(2)
+        >>> ts.beatSequence = ts.beatSequence.partition(2)
         >>> ts.beatSequence
         <music21.meter.core.MeterSequence {5/8+5/8}>
         >>> for i, mt in enumerate(ts.beatSequence):
-        ...     ts.beatSequence[i] = mt.subdivideByCount(5)
+        ...     ts.beatSequence = ts.beatSequence.replaceElement(i, mt.subdivideByCount(5))
         >>> ts.beatSequence
         <music21.meter.core.MeterSequence {{1/8+1/8+1/8+1/8+1/8}+{1/8+1/8+1/8+1/8+1/8}}>
         >>> ts.beatDivisionCountName
@@ -1144,7 +1146,11 @@ class TimeSignature(TimeSignatureBase):
     @summedNumerator.setter
     def summedNumerator(self, value: bool):
         if self.displaySequence is not None:
-            self.displaySequence.summedNumerator = value
+            # displaySequence is immutable; swap in a copy with the new flag
+            ds = self.displaySequence
+            self.displaySequence = _makeSequence(
+                ds.numerator, ds.denominator, ds._partition,
+                parenthesis=ds.parenthesis, summedNumerator=value)
 
     # --------------------------------------------------------------------------
     # private methods -- most to be put into the various sequences.
@@ -1170,36 +1176,36 @@ class TimeSignature(TimeSignatureBase):
         if len(self.displaySequence) == 1:
             # create toplevel partitions
             if self.numerator == 2:  # duple meters
-                self.beatSequence.partition(2)
+                self.beatSequence = self.beatSequence.partition(2)
             elif self.numerator == 6 and favorCompound:  # duple meters
-                self.beatSequence.partition(2)
+                self.beatSequence = self.beatSequence.partition(2)
             elif self.numerator == 3 and favorCompound:  # 3/8, 3/16, but not 3/4
-                self.beatSequence.partition(1)
+                self.beatSequence = self.beatSequence.partition(1)
             elif self.numerator == 3:  # triple meters
-                self.beatSequence.partition([1, 1, 1])
+                self.beatSequence = self.beatSequence.partition([1, 1, 1])
             elif self.numerator == 9 and favorCompound:  # triple meters
-                self.beatSequence.partition([3, 3, 3])
+                self.beatSequence = self.beatSequence.partition([3, 3, 3])
             elif self.numerator == 4:  # quadruple meters
-                self.beatSequence.partition(4)
+                self.beatSequence = self.beatSequence.partition(4)
             elif self.numerator == 12 and favorCompound:
-                self.beatSequence.partition(4)
+                self.beatSequence = self.beatSequence.partition(4)
             elif self.numerator >= 15 and self.numerator % 3 == 0 and favorCompound:
                 # quintuple meters and above.
                 num_triples = self.numerator // 3
-                self.beatSequence.partition([3] * num_triples)
+                self.beatSequence = self.beatSequence.partition([3] * num_triples)
             # skip 6 numerators; covered above
             else:  # case of odd meters: 11, 13
-                self.beatSequence.partition(self.numerator)
+                self.beatSequence = self.beatSequence.partition(self.numerator)
 
         # if a complex meter has been given
         else:  # partition by display
             # TODO: remove partitionByMeterSequence usage.
-            self.beatSequence.partition(self.displaySequence)
+            self.beatSequence = self.beatSequence.partition(self.displaySequence)
 
         # create subdivisions, and thus define compound/simple distinction
         if len(self.beatSequence) > 1:  # if partitioned
             try:
-                self.beatSequence.subdividePartitionsEqual()
+                self.beatSequence = self.beatSequence.subdividePartitionsEqual()
             except MeterException:
                 if self.denominator >= 128:
                     pass  # do not raise an exception for unable to subdivide smaller than 128
@@ -1222,24 +1228,26 @@ class TimeSignature(TimeSignatureBase):
 
         # more general, based only on numerator
         elif self.numerator in (2, 3, 4):
-            self.beamSequence.partition(self.numerator)
+            self.beamSequence = self.beamSequence.partition(self.numerator)
             # if denominator is 4, subdivide each partition
             if self.denominator == 4:
                 for i in range(len(self.beamSequence)):  # subdivide  each beat in 2
-                    self.beamSequence[i] = self.beamSequence[i].subdivide(2)
+                    self.beamSequence = self.beamSequence.replaceElement(
+                        i, self.beamSequence[i].subdivide(2))
         elif self.numerator == 5:
             default = [2, 3]
-            self.beamSequence.partition(default)
+            self.beamSequence = self.beamSequence.partition(default)
             # if denominator is 4, subdivide each partition
             if self.denominator == 4:
                 for i in range(len(self.beamSequence)):  # subdivide  each beat in 2
-                    self.beamSequence[i] = self.beamSequence[i].subdivide(default[i])
+                    self.beamSequence = self.beamSequence.replaceElement(
+                        i, self.beamSequence[i].subdivide(default[i]))
 
         elif self.numerator == 7:
-            self.beamSequence.partition(3)  # divide into three groups
+            self.beamSequence = self.beamSequence.partition(3)  # divide into three groups
 
         elif self.numerator in [6, 9, 12, 15, 18, 21]:
-            self.beamSequence.partition([3] * int(self.numerator / 3))
+            self.beamSequence = self.beamSequence.partition([3] * int(self.numerator / 3))
         else:
             pass  # doing nothing will beam all together
         # environLocal.printDebug(f'default beam partitions set to: {self.beamSequence}')
@@ -1286,17 +1294,16 @@ class TimeSignature(TimeSignatureBase):
         #    firstPartitionForm, 'self.beatSequence: ', self.beatSequence, tsStr)
         # using cacheKey speeds up TS creation from 2300 microseconds to 500microseconds
         try:
-            self.accentSequence = copy.deepcopy(
-                _meterSequenceAccentArchetypes[cacheKey]
-            )
+            # archetypes are immutable and shared; no copy needed
+            self.accentSequence = _meterSequenceAccentArchetypes[cacheKey]
             # environLocal.printDebug(['using stored accent archetype:'])
         except KeyError:
             # environLocal.printDebug(['creating a new accent archetype'])
             ms = MeterSequence(tsStr)
             # key operation here
             # div count needs to be the number of top-level beat divisions
-            ms.subdivideNestedHierarchy(depth,
-                                        firstPartitionForm=firstPartitionForm)
+            ms = ms.subdivideNestedHierarchy(depth,
+                                             firstPartitionForm=firstPartitionForm)
 
             # provide a partition for each flattened division
             accentCount = len(ms.flatten())
@@ -1317,16 +1324,17 @@ class TimeSignature(TimeSignatureBase):
                 weightValues[x + 1] = weightValueMin * pow(2, x)
 
             # set weights on accent partitions
-            self.accentSequence.partition([1] * accentCount)
+            self.accentSequence = self.accentSequence.partition([1] * accentCount)
             for i in range(accentCount):
                 # get values from weightValues dictionary; terminals are
                 # immutable, so replace each with a re-weighted cached one
                 mt = self.accentSequence[i]
-                self.accentSequence[i] = getMeterTerminal(
-                    mt.numerator, mt.denominator, weight=weightValues[weightInts[i]])
+                self.accentSequence = self.accentSequence.replaceElement(
+                    i, getMeterTerminal(
+                        mt.numerator, mt.denominator, weight=weightValues[weightInts[i]]))
 
             if cacheKey != _meterSequenceAccentArchetypesNoneCache:
-                _meterSequenceAccentArchetypes[cacheKey] = copy.deepcopy(self.accentSequence)
+                _meterSequenceAccentArchetypes[cacheKey] = self.accentSequence
 
     # --------------------------------------------------------------------------
     # access data for other processing
@@ -1350,8 +1358,8 @@ class TimeSignature(TimeSignatureBase):
         unless we see the context of adjoining durations.
 
         >>> a = meter.TimeSignature('2/4', 2)
-        >>> a.beamSequence[0] = a.beamSequence[0].subdivide(2)
-        >>> a.beamSequence[1] = a.beamSequence[1].subdivide(2)
+        >>> a.beamSequence = a.beamSequence.replaceElement(0, a.beamSequence[0].subdivide(2))
+        >>> a.beamSequence = a.beamSequence.replaceElement(1, a.beamSequence[1].subdivide(2))
         >>> a.beamSequence
         <music21.meter.core.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
         >>> b = [note.Note(type='16th') for _ in range(8)]
@@ -1637,7 +1645,7 @@ class TimeSignature(TimeSignatureBase):
         division.
 
         >>> a = meter.TimeSignature('3/4', 3)
-        >>> a.accentSequence.partition([2, 1])
+        >>> a.accentSequence = a.accentSequence.partition([2, 1])
         >>> a.accentSequence
         <music21.meter.core.MeterSequence {2/4+1/4}>
         >>> a.getAccent(0.0)
@@ -1688,8 +1696,8 @@ class TimeSignature(TimeSignatureBase):
         else:
             weightList = weights
 
-        # terminals are immutable; setLevelWeight replaces them in place
-        self.accentSequence.setLevelWeight(weightList, level)
+        # sequences are immutable; setLevelWeight returns a new one
+        self.accentSequence = self.accentSequence.setLevelWeight(weightList, level)
 
     def averageBeatStrength(self, streamIn, notesOnly=True):
         '''
@@ -1840,7 +1848,7 @@ class TimeSignature(TimeSignatureBase):
         1
         >>> a.getBeat(2.5)
         3
-        >>> a.beatSequence.partition(['3/8', '3/8'])
+        >>> a.beatSequence = a.beatSequence.partition(['3/8', '3/8'])
         >>> a.getBeat(2.5)
         2
         '''
@@ -2021,7 +2029,7 @@ class TimeSignature(TimeSignatureBase):
 
         Works for specifically partitioned meters too:
 
-        >>> a.beatSequence.partition(['3/8', '3/8'])
+        >>> a.beatSequence = a.beatSequence.partition(['3/8', '3/8'])
         >>> a.getBeatProgress(2.5)
         (2, 1.0)
         '''
@@ -2105,10 +2113,13 @@ class TimeSignature(TimeSignatureBase):
         1
 
         >>> b = meter.TimeSignature('3/4', 1)
-        >>> b.beatSequence[0] = b.beatSequence[0].subdivide(3)
-        >>> b.beatSequence[0][0] = b.beatSequence[0][0].subdivide(2)
-        >>> b.beatSequence[0][1] = b.beatSequence[0][1].subdivide(2)
-        >>> b.beatSequence[0][2] = b.beatSequence[0][2].subdivide(2)
+        >>> b.beatSequence = b.beatSequence.replaceElement(0, b.beatSequence[0].subdivide(3))
+        >>> b.beatSequence = b.beatSequence.replaceElement(
+        ...     0, b.beatSequence[0].replaceElement(0, b.beatSequence[0][0].subdivide(2)))
+        >>> b.beatSequence = b.beatSequence.replaceElement(
+        ...     0, b.beatSequence[0].replaceElement(1, b.beatSequence[0][1].subdivide(2)))
+        >>> b.beatSequence = b.beatSequence.replaceElement(
+        ...     0, b.beatSequence[0].replaceElement(2, b.beatSequence[0][2].subdivide(2)))
         >>> b.getBeatDepth(0)
         3
         >>> b.getBeatDepth(0.5)

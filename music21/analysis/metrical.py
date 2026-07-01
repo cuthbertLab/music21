@@ -61,7 +61,7 @@ def labelBeatDepth(streamIn):
 
         # need to make a copy otherwise the .beat/.beatStr values will be messed up (1/4 the normal)
         tsTemp = copy.deepcopy(ts)
-        tsTemp.beatSequence.subdivideNestedHierarchy(depth=3)
+        tsTemp.beatSequence = tsTemp.beatSequence.subdivideNestedHierarchy(depth=3)
 
         for n in m.notesAndRests:
             if hasattr(n, 'tie') and n.tie is not None:

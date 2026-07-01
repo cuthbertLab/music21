@@ -2365,15 +2365,15 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
         except IndexError:
             environRules.warn('Problem in converting a time signature in measure '
                               f'{music21Measure.number}, offset may be wrong')
-    bs = copy.deepcopy(ts.beatSequence)
+    bs = ts.beatSequence
 
     numberOfPartitions = 2
     try:
-        bs.partitionByCount(numberOfPartitions, loadDefault=False)
+        bs = bs.partitionByCount(numberOfPartitions, loadDefault=False)
         (startOffsetZero, endOffsetZero) = bs.getLevelSpan()[0]
     except meter.MeterException:
         numberOfPartitions += 1
-        bs.partitionByCount(numberOfPartitions, loadDefault=False)
+        bs = bs.partitionByCount(numberOfPartitions, loadDefault=False)
         startOffsetZero = bs.getLevelSpan()[0][0]
         endOffsetZero = bs.getLevelSpan()[-2][-1]
     endOffsetZero -= offset
