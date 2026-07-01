@@ -21,9 +21,9 @@ import typing as t
 
 from music21 import common
 from music21.common.numberTools import opFrac
-from music21.common.objects import SlottedObjectMixin
+from music21.common.objects import FrozenObject
 from music21.common.types import OffsetQLIn
-from music21.duration import Duration, FrozenDuration
+from music21.duration import FrozenDuration
 from music21 import environment
 from music21.exceptions21 import MeterException
 from music21.meter import tools
@@ -33,7 +33,7 @@ environLocal = environment.Environment('meter.core')
 
 # -----------------------------------------------------------------------------
 
-class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
+class MeterTerminal(prebase.ProtoM21Object, FrozenObject):
     '''
     A MeterTerminal is a nestable primitive of rhythmic division.
 
@@ -46,62 +46,64 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     >>> a = meter.MeterTerminal('5/2')
     >>> a.duration.quarterLength
     10.0
+
+    A MeterTerminal is an immutable value object defined solely by its
+    numerator, denominator, and weight.  Its attributes cannot be changed
+    after creation; instead make a new one (see :func:`getMeterTerminal`):
+
+    >>> a.numerator = 6
+    Traceback (most recent call last):
+    TypeError: This MeterTerminal instance is immutable.
+
+    Because it is immutable, deep-copying a MeterTerminal returns the same
+    shared object, and equality is by value:
+
+    >>> import copy
+    >>> copy.deepcopy(a) is a
+    True
+    >>> meter.MeterTerminal('2/4') == meter.MeterTerminal('2/4')
+    True
+
+    * Changed in v11: MeterTerminal is immutable, deep-copies to itself, and
+      compares by value.
+
+    AI-assisted (Claude).
     '''
     # CLASS VARIABLES #
 
     __slots__ = (
         '_denominator',
-        '_duration',
         '_numerator',
-        '_overriddenDuration',
         '_weight',
     )
 
     # INITIALIZER #
-    def __init__(self, slashNotation: str|None = None, weight: int|float = 1):
+    def __init__(self, slashNotation: str|None = None, weight: int|float = 1, *,
+                 numerator: int = 0, denominator: int = 1):
         # because of how they are copied, MeterTerminals must not have any
         # initialization parameters without defaults
-        self._duration: Duration|None = None
-        self._numerator: int = 0
-        self._denominator: int = 1
-        self._weight: int|float = 1  # do not use setter here -- bad override in MeterSequence
-        self._overriddenDuration: Duration|None = None
-
         if slashNotation is not None:
-            # assign directly to values, not properties, to avoid
-            # calling _ratioChanged more than necessary
-            values = tools.slashToTuple(slashNotation)  # raise MeterException early if problem.
-            self._numerator = values.numerator
-            self._denominator = values.denominator
-
-        self._ratioChanged()  # sets self._duration
-
-        # this will set the underlying weight attribute directly for data checking
-        # explicitly calling base class method to avoid problems
-        # in the derived class MeterSequence
-        self._weight = weight
+            # raise MeterException early if there is a problem.
+            values = tools.slashToTuple(slashNotation)
+            numerator = values.numerator
+            denominator = values.denominator
+        self._numerator: int = numerator
+        self._denominator: int = denominator
+        self._weight: int|float = weight
 
     # SPECIAL METHODS #
 
     def __deepcopy__(self, memo=None):
         '''
-        Helper method to for the deepcopy function in copy.py.
+        Helper method for the deepcopy function in copy.py.
 
         Do not call this directly.
 
-        Defining a custom __deepcopy__ here is a performance boost,
-        particularly in not copying _duration, directly assigning _weight, and
-        other benefits.
+        A MeterTerminal is immutable and shared, so deep-copying it simply
+        returns the same object (a large performance win, since MeterTerminals
+        are copied constantly as part of Streams and TimeSignatures).
         '''
-        # call class to get a new, empty instance
-        new = self.__class__()
-        # for name in dir(self):
-        new._numerator = self._numerator
-        new._denominator = self._denominator
-        new._ratioChanged()  # faster than copying dur
-        # new._duration = copy.deepcopy(self._duration, memo)
-        new._weight = self._weight  # these are numbers
-        return new
+        return self
 
     def _reprInternal(self):
         return str(self)
@@ -268,67 +270,42 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     @property
     def weight(self) -> float|int:
         '''
-        Return or set the weight of a MeterTerminal
+        Return the weight of a MeterTerminal (read-only; a MeterTerminal is
+        immutable).
 
-        >>> a = meter.MeterTerminal('2/4')
-        >>> a.weight = 0.5
+        >>> a = meter.MeterTerminal('2/4', 0.5)
         >>> a.weight
         0.5
         '''
         return self._weight
 
-    @weight.setter
-    def weight(self, value: float|int):
-        self._weight = value
-
     @property
     def numerator(self) -> int:
         '''
-        Return or set the numerator of the MeterTerminal
+        Return the numerator of the MeterTerminal (read-only; a MeterTerminal
+        is immutable).
 
         >>> a = meter.MeterTerminal('2/4')
         >>> a.numerator
         2
         >>> a.duration.quarterLength
         2.0
-        >>> a.numerator = 11
-        >>> a.duration.quarterLength
-        11.0
         '''
         return self._numerator
-
-    @numerator.setter
-    def numerator(self, value: int):
-        self._numerator = value
-        self._ratioChanged()
 
     @property
     def denominator(self) -> int:
         '''
-        Get or set the denominator of the meter terminal
+        Return the denominator of the meter terminal (read-only; a
+        MeterTerminal is immutable).
 
         >>> a = meter.MeterTerminal('2/4')
         >>> a.denominator
         4
         >>> a.duration.quarterLength
         2.0
-        >>> a.denominator = 8
-        >>> a.duration.quarterLength
-        1.0
-
-        >>> a.denominator = 7
-        Traceback (most recent call last):
-        music21.exceptions21.MeterException: bad denominator value: 7
         '''
         return self._denominator
-
-    @denominator.setter
-    def denominator(self, value: int):
-        # use duration.typeFromNumDict?
-        if value not in tools.validDenominatorsSet:
-            raise MeterException(f'bad denominator value: {value}')
-        self._denominator = value
-        self._ratioChanged()
 
     @staticmethod
     @lru_cache(1024)
@@ -349,15 +326,6 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         # NOTE: this is a performance critical method.
         return FrozenDuration(quarterLength=(4.0 * numerator) / denominator)
-
-    def _ratioChanged(self):
-        '''
-        If the ratio has changed, call this to refresh the cached duration.
-        '''
-        self._duration = self._durationFromNumeratorDenominator(
-            self.numerator, self.denominator
-        )
-
 
     @property
     def duration(self):
@@ -389,14 +357,7 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         * Changed in v11: returns a shared, immutable
           :class:`~music21.duration.FrozenDuration` (was a mutable Duration).
         '''
-        if self._overriddenDuration:
-            return self._overriddenDuration
-        else:
-            return self._duration
-
-    @duration.setter
-    def duration(self, value: Duration):
-        self._overriddenDuration = value
+        return self._durationFromNumeratorDenominator(self.numerator, self.denominator)
 
     @property
     def depth(self):
@@ -404,6 +365,41 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         Return how many levels deep this part is -- the depth of a terminal is always 1
         '''
         return 1
+
+
+# -----------------------------------------------------------------------------
+
+_meterTerminalCache: dict[tuple[int, int, type, float|int], MeterTerminal] = {}
+
+
+def getMeterTerminal(numerator: int, denominator: int,
+                     weight: float|int = 1) -> MeterTerminal:
+    '''
+    Return a shared, cached, immutable :class:`MeterTerminal` for these values.
+
+    Because MeterTerminals are immutable, identical `(numerator, denominator,
+    weight)` triples can all share one object.  This is how a "changed" terminal
+    is produced: instead of mutating an existing terminal, request the cached
+    terminal for the new values.
+
+    >>> mt = meter.core.getMeterTerminal(1, 4)
+    >>> mt
+    <music21.meter.core.MeterTerminal 1/4>
+    >>> meter.core.getMeterTerminal(1, 4) is mt
+    True
+    >>> meter.core.getMeterTerminal(1, 4, weight=0.5) is mt
+    False
+
+    AI-assisted (Claude).
+    '''
+    # the weight's type is part of the key: an int 1 and a float 1.0 compare
+    # equal but must stay distinct terminals so the exact weight is preserved.
+    key = (numerator, denominator, type(weight), weight)
+    cached = _meterTerminalCache.get(key)
+    if cached is None:
+        cached = MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
+        _meterTerminalCache[key] = cached
+    return cached
 
 
 # -----------------------------------------------------------------------------
@@ -422,6 +418,21 @@ class MeterSequence(MeterTerminal):
         'parenthesis',
         'summedNumerator',
     )
+
+    # A MeterSequence is mutable, unlike its MeterTerminal base class.  Setting
+    # `frozen = False` tells FrozenObject to allow attribute assignment; bypassing
+    # FrozenObject's __setattr__/__delattr__ entirely also avoids their per-set
+    # overhead on this performance-critical (frequently rebuilt) object.
+    frozen = False
+    __setattr__ = object.__setattr__  # type: ignore[assignment]
+    __delattr__ = object.__delattr__  # type: ignore[assignment]
+
+    # A MeterSequence holds mutable, unhashable slots (a list and a dict), so it
+    # cannot use FrozenObject's value-based comparison/hashing.  Restore identity
+    # semantics.
+    __eq__ = object.__eq__
+    __ne__ = object.__ne__
+    __hash__ = object.__hash__
 
     # INITIALIZER #
 
@@ -477,10 +488,6 @@ class MeterSequence(MeterTerminal):
         new._denominator = self._denominator
         # noinspection PyArgumentList
         new._partition = copy.deepcopy(self._partition, memo)
-        new._ratioChanged()  # faster than copying dur
-        # new._duration = copy.deepcopy(self._duration, memo)
-
-        new._overriddenDuration = self._overriddenDuration
         new.summedNumerator = self.summedNumerator
         new.parenthesis = self.parenthesis
 
@@ -603,15 +610,10 @@ class MeterSequence(MeterTerminal):
 
         if isinstance(value, MeterTerminal):  # may be a MeterSequence
             mt = value
-        else:  # assume it is a string
-            mt = MeterTerminal(value)
+        else:  # assume it is a string; share the cached immutable terminal
+            values = tools.slashToTuple(value)
+            mt = getMeterTerminal(values.numerator, values.denominator)
 
-        # if isinstance(value, str):
-        #     mt = MeterTerminal(value)
-        # elif isinstance(value, MeterTerminal):  # may be a MeterSequence
-        #     mt = value
-        # else:
-        #     raise MeterException(f'cannot add {value} to this sequence')
         self._partition.append(mt)
         # clear cache
         self._levelListCache = {}
@@ -1271,8 +1273,7 @@ class MeterSequence(MeterTerminal):
         if isinstance(value, str):
             ratioList, self.summedNumerator = tools.slashMixedToFraction(value)
             for n, d in ratioList:
-                slashNotation = f'{n}/{d}'
-                self._addTerminal(MeterTerminal(slashNotation))
+                self._addTerminal(getMeterTerminal(n, d))
             self._updateRatio()
             if targetWeight is not None:
                 self.weight = targetWeight
@@ -1281,7 +1282,12 @@ class MeterSequence(MeterTerminal):
             # if we have a single MeterTerminal and autoWeight is active
             # set this terminal to the old weight
             if targetWeight is not None:
-                value.weight = targetWeight
+                if isinstance(value, MeterSequence):
+                    value.weight = targetWeight
+                else:
+                    # a terminal is immutable: swap in a re-weighted cached one
+                    value = getMeterTerminal(value.numerator, value.denominator,
+                                             weight=targetWeight)
             self._addTerminal(value)
             self._updateRatio()
             # do not need to set weight, as based on terminal
@@ -1318,8 +1324,6 @@ class MeterSequence(MeterTerminal):
         # can only set to private attributes
         # self._numerator, self._denominator = None, 1
         self._numerator, self._denominator = tools.fractionSum(fTuple)
-        # must call ratio changed directly as not using properties
-        self._ratioChanged()
 
     # --------------------------------------------------------------------------
     # properties
@@ -1360,18 +1364,15 @@ class MeterSequence(MeterTerminal):
         >>> accentSequence.weight
         0.75
 
-        Changing the weight of the child sequence will affect the parent, since this is
-        not cached, but recomputed on each call.
-
-        >>> downbeat.weight = 0.375
-        >>> accentSequence.weight
-        0.625
-
-        Changing the weight on the parent sequence will reset weights on the children
+        A MeterSequence's weight is not cached; it is recomputed from its parts
+        on each call.  Setting the weight on the parent sequence resets the
+        weights on its children so that they sum to the requested value:
 
         >>> accentSequence.weight = 1.0
-        >>> (downbeat.weight, upbeat.weight)
+        >>> (accentSequence[0].weight, accentSequence[1].weight)
         (0.5, 0.5)
+        >>> accentSequence.weight
+        1.0
 
         Assume this MeterSequence is a whole, not a part of some larger MeterSequence.
         Thus, we cannot use numerator/denominator relationship
@@ -1397,13 +1398,16 @@ class MeterSequence(MeterTerminal):
                 f'or this denominator {self._denominator} {type(self._denominator)}'
             ) from te
 
-        for mt in self._partition:
-            # for mt in self:
-            partRatio = mt._numerator / mt._denominator
-            mt.weight = value * (partRatio / totalRatio)
-            # mt.weight = (partRatio/totalRatio) #* totalRatio
-            # environLocal.printDebug(['setting weight based on part, total, weight',
-            #    partRatio, totalRatio, mt.weight])
+        for i, mt in enumerate(self._partition):
+            partRatio = mt.numerator / mt.denominator
+            newWeight = value * (partRatio / totalRatio)
+            if isinstance(mt, MeterSequence):
+                # a nested MeterSequence is still mutable: recurse
+                mt.weight = newWeight
+            else:
+                # a terminal is immutable: swap in a re-weighted cached one
+                self._partition[i] = getMeterTerminal(
+                    mt.numerator, mt.denominator, weight=newWeight)
 
     def _getFlatList(self):
         '''
@@ -1701,11 +1705,12 @@ class MeterSequence(MeterTerminal):
                         levelCount - 1, flat)
                 else:  # level count is at zero
                     if flat:  # make sequence into a terminal
-                        mt = MeterTerminal(
-                            f'{partition_i.numerator}/{partition_i.denominator}'
+                        # weight matches that of the sequence it flattens
+                        mt = getMeterTerminal(
+                            partition_i.numerator,
+                            partition_i.denominator,
+                            weight=partition_i.weight,
                         )
-                        # set weight to that of the sequence
-                        mt.weight = partition_i.weight
                         mtList.append(mt)
                     else:  # it is not a terminal, it is a meter sequence
                         mtList.append(partition_i)
@@ -1825,11 +1830,39 @@ class MeterSequence(MeterTerminal):
         [2, 1.5, 1.5, 2, 1.5, 1.5]
         >>> b.getLevelWeight(2)
         [2, 1.5, 1.5, 2, 0.75, 0.75, 1.5]
+
+        * Changed in v11: terminals are immutable, so each affected terminal is
+          replaced in place by a cached one carrying the new weight.
         '''
-        levelObjs = self.getLevelList(level)
-        for i in range(len(levelObjs)):
-            mt = levelObjs[i]
-            mt.weight = weightList[i % len(weightList)]
+        self._applyLevelWeights(weightList, level)
+
+    def _applyLevelWeights(self, weightList, level, startIndex=0):
+        '''
+        Recursively re-weight the leaf terminals reached at `level`, mirroring
+        the flattening order of :meth:`getLevelList` (flat=True) so that the same
+        terminals are affected and the same running index into `weightList` is
+        used.  Since terminals are immutable, each is replaced in its parent
+        partition by a cached, re-weighted one.  Returns the next running index.
+
+        AI-assisted (Claude).
+        '''
+        idx = startIndex
+        for i, partition_i in enumerate(self._partition):
+            if not isinstance(partition_i, MeterSequence):
+                newWeight = weightList[idx % len(weightList)]
+                self._partition[i] = getMeterTerminal(
+                    partition_i.numerator, partition_i.denominator, weight=newWeight)
+                idx += 1
+            elif level > 0:
+                idx = partition_i._applyLevelWeights(weightList, level - 1, idx)
+            else:
+                # getLevelList(flat=True) flattens this sequence to a single
+                # synthetic terminal that has no persistent home; only the index
+                # advances (matching the historical behavior).
+                idx += 1
+        # clear cache
+        self._levelListCache = {}
+        return idx
 
     # --------------------------------------------------------------------------
     # given a quarter note position, return the active index

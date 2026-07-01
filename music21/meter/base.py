@@ -34,7 +34,7 @@ from music21.exceptions21 import MeterException, TimeSignatureException
 from music21 import style
 
 from music21.meter.tools import slashToTuple, proportionToFraction
-from music21.meter.core import MeterSequence
+from music21.meter.core import MeterSequence, getMeterTerminal
 
 environLocal = environment.Environment('meter')
 
@@ -1319,8 +1319,11 @@ class TimeSignature(TimeSignatureBase):
             # set weights on accent partitions
             self.accentSequence.partition([1] * accentCount)
             for i in range(accentCount):
-                # get values from weightValues dictionary
-                self.accentSequence[i].weight = weightValues[weightInts[i]]
+                # get values from weightValues dictionary; terminals are
+                # immutable, so replace each with a re-weighted cached one
+                mt = self.accentSequence[i]
+                self.accentSequence[i] = getMeterTerminal(
+                    mt.numerator, mt.denominator, weight=weightValues[weightInts[i]])
 
             if cacheKey != _meterSequenceAccentArchetypesNoneCache:
                 _meterSequenceAccentArchetypes[cacheKey] = copy.deepcopy(self.accentSequence)
@@ -1685,9 +1688,8 @@ class TimeSignature(TimeSignatureBase):
         else:
             weightList = weights
 
-        msLevel = self.accentSequence.getLevel(level)
-        for i in range(len(msLevel)):
-            msLevel[i].weight = weightList[i % len(weightList)]
+        # terminals are immutable; setLevelWeight replaces them in place
+        self.accentSequence.setLevelWeight(weightList, level)
 
     def averageBeatStrength(self, streamIn, notesOnly=True):
         '''
