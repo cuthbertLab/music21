@@ -40,6 +40,13 @@ from music21.meter.core import (
 
 environLocal = environment.Environment('meter')
 
+# Cache of the fully-configured (display, beam, beat, accent) MeterSequences a
+# TimeSignature.load() produces for a given (value, divisions).  The sequences are
+# immutable and shared, and any later change to a TimeSignature is copy-on-write, so
+# repeated TimeSignatures of the same meter can reuse them and skip the (hashing-heavy)
+# rebuild entirely.
+_defaultSequenceCache: dict[tuple[str, t.Any], tuple[MeterSequence, ...]] = {}
+
 if t.TYPE_CHECKING:
     from music21.common.types import OffsetQL, OffsetQLIn
     from music21 import stream
@@ -602,6 +609,18 @@ class TimeSignature(TimeSignatureBase):
             value = '2/2'
             self.symbol = 'cut'
 
+        cacheKey = (value, divisions)
+        cached = None
+        cacheable = True
+        try:
+            cached = _defaultSequenceCache.get(cacheKey)
+        except TypeError:
+            cacheable = False  # unhashable divisions (e.g. a list): skip the cache
+        if cached is not None:
+            (self.displaySequence, self.beamSequence,
+             self.beatSequence, self.accentSequence) = cached
+            return
+
         self.displaySequence = getMeterSequence(value)
 
         # get simple representation; presently, only slashToTuple
@@ -633,6 +652,11 @@ class TimeSignature(TimeSignatureBase):
                 self._setDefaultAccentWeights(3)  # set partitions based on beat
             except MeterException:
                 environLocal.printDebug(['cannot set default accents for:', self])
+
+        if cacheable:
+            _defaultSequenceCache[cacheKey] = (
+                self.displaySequence, self.beamSequence,
+                self.beatSequence, self.accentSequence)
 
     @property
     def ratioString(self):
