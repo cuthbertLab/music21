@@ -812,6 +812,10 @@ class TimeSignature(TimeSignatureBase):
 
         >>> meter.TimeSignature().barDuration
         <music21.duration.Duration 4.0>
+
+        Note: this currently returns an ordinary (mutable) Duration, but it is
+        expected to return an immutable :class:`~music21.duration.FrozenDuration`
+        in v12 -- do not rely on being able to modify it in place.
         '''
         if self._overriddenBarDuration:
             return self._overriddenBarDuration
