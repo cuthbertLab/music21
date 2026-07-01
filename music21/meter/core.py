@@ -16,13 +16,14 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 import copy
+from functools import lru_cache
 import typing as t
 
 from music21 import common
 from music21.common.numberTools import opFrac
 from music21.common.objects import SlottedObjectMixin
 from music21.common.types import OffsetQLIn
-from music21.duration import Duration, DurationException
+from music21.duration import Duration, FrozenDuration
 from music21 import environment
 from music21.exceptions21 import MeterException
 from music21.meter import tools
@@ -329,43 +330,64 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         self._denominator = value
         self._ratioChanged()
 
+    @staticmethod
+    @lru_cache(1024)
+    def _durationFromNumeratorDenominator(
+        numerator: int,
+        denominator: int,
+    ) -> FrozenDuration:
+        '''
+        Return the (immutable) duration equal in length to a numerator/denominator
+        ratio.
+
+        Cached, since a small set of ratios (1/4, 1/8, 3/8, ...) recurs constantly.
+
+        >>> meter.core.MeterTerminal._durationFromNumeratorDenominator(3, 8)
+        <music21.duration.FrozenDuration 1.5>
+
+        AI-assisted (Claude).
+        '''
+        # NOTE: this is a performance critical method.
+        return FrozenDuration(quarterLength=(4.0 * numerator) / denominator)
+
     def _ratioChanged(self):
         '''
-        If ratio has been changed, call this to update duration
+        If the ratio has changed, call this to refresh the cached duration.
         '''
-        # NOTE: this is a performance critical method and should only be
-        # called when necessary
-        self._duration = Duration()
-        try:
-            self._duration.quarterLength = (
-                (4.0 * self.numerator) / self.denominator
-            )
-        except DurationException:
-            environLocal.printDebug(
-                ['DurationException encountered',
-                 'numerator/denominator',
-                 self.numerator,
-                 self.denominator
-                 ]
-            )
+        self._duration = self._durationFromNumeratorDenominator(
+            self.numerator, self.denominator
+        )
 
 
     @property
     def duration(self):
         '''
-        duration gets or sets a duration value that
-        is equal in length of the terminal.
+        Returns a :class:`~music21.duration.FrozenDuration` equal in length to this
+        terminal (or sequence).  It is shared and cached, and therefore immutable:
 
-        >>> a = meter.MeterTerminal()
-        >>> a.numerator = 3
-        >>> a.denominator = 8
-        >>> d = a.duration
-        >>> d.type
+        >>> a = meter.MeterTerminal('3/8')
+        >>> a.duration
+        <music21.duration.FrozenDuration 1.5>
+        >>> a.duration.type
         'quarter'
-        >>> d.dots
+        >>> a.duration.dots
         1
-        >>> d.quarterLength
-        1.5
+
+        Trying to change it raises an exception:
+
+        >>> a.duration.quarterLength = 5.0
+        Traceback (most recent call last):
+        TypeError: This FrozenDuration instance is immutable.
+
+        If you need a changeable duration, unfreeze it first:
+
+        >>> changeable = a.duration.unfreeze()
+        >>> changeable.quarterLength = 5.0
+        >>> changeable
+        <music21.duration.Duration 5.0>
+
+        * Changed in v11: returns a shared, immutable
+          :class:`~music21.duration.FrozenDuration` (was a mutable Duration).
         '''
         if self._overriddenDuration:
             return self._overriddenDuration

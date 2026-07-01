@@ -24,6 +24,8 @@
 
 - pytest works but to run the whole suite run music21/test/multiprocessTest.py (or testSingleCoreAll.py 
   if on a single core machine.)
+- It is very unlikely that there were any preexisting failures. If you changed something and
+  now it appears master has also a preexisting failure, you should clear the music21 temp cache.
 - Run `uv run ruff check music21` before making PRs or pushes to open PRs.
 - Run `uv run mypy music21` before making PRs or pushes to open PRs.
 - Never commit `forceSource=True` to a test or doctest (it re-parses from source every

@@ -39,7 +39,7 @@ from music21.meter.core import MeterSequence
 environLocal = environment.Environment('meter')
 
 if t.TYPE_CHECKING:
-    from music21.common.types import OffsetQL
+    from music21.common.types import OffsetQL, OffsetQLIn
     from music21 import stream
 
 # this is just a placeholder so that .beamSequence, etc. do not need to
@@ -791,7 +791,9 @@ class TimeSignature(TimeSignatureBase):
         if beamSequence is not None:
             # could come from self.beamSequence, self.accentSequence,
             #   self.displaySequence, self.accentSequence
-            return beamSequence.duration
+            # unfreeze() so callers get an ordinary, mutable Duration; the meter's
+            # own duration stays a shared, immutable FrozenDuration internally.
+            return beamSequence.duration.unfreeze()
 
         # should never happen.
         return duration.Duration(0)  # pragma: no cover
@@ -901,7 +903,7 @@ class TimeSignature(TimeSignatureBase):
         return self.beatSequence.partitionStr
 
     @property
-    def beatDuration(self) -> duration.Duration:
+    def beatDuration(self) -> duration.FrozenDuration:
         '''
         Return a :class:`~music21.duration.Duration` object equal to the beat unit
         of this Time Signature, if and only if this TimeSignature has a uniform beat unit.
@@ -911,21 +913,21 @@ class TimeSignature(TimeSignatureBase):
 
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatDuration
-        <music21.duration.Duration 1.0>
+        <music21.duration.FrozenDuration 1.0>
         >>> ts = meter.TimeSignature('6/8')
         >>> ts.beatDuration
-        <music21.duration.Duration 1.5>
+        <music21.duration.FrozenDuration 1.5>
 
         >>> ts = meter.TimeSignature('7/8')
         >>> ts.beatDuration
-        <music21.duration.Duration 0.5>
+        <music21.duration.FrozenDuration 0.5>
 
         >>> ts = meter.TimeSignature('3/8')
         >>> ts.beatDuration
-        <music21.duration.Duration 1.5>
+        <music21.duration.FrozenDuration 1.5>
         >>> ts.beatCount = 3
         >>> ts.beatDuration
-        <music21.duration.Duration 0.5>
+        <music21.duration.FrozenDuration 0.5>
 
         Cannot do this because of asymmetry
 
@@ -935,6 +937,7 @@ class TimeSignature(TimeSignatureBase):
         music21.exceptions21.TimeSignatureException: non-uniform beat unit: [2.0, 0.75]
 
         * Changed in v7: return NaN rather than raising Exception in property.
+        * Changed in v11: returns a :class:`~music21.duration.FrozenDuration`.
         '''
         post = []
         for ms in self.beatSequence:
@@ -1029,7 +1032,7 @@ class TimeSignature(TimeSignatureBase):
             return 'Other'
 
     @property
-    def beatDivisionDurations(self) -> list[duration.Duration]:
+    def beatDivisionDurations(self) -> list[duration.FrozenDuration]:
         '''
         Return the beat division, or the durations that make up one beat,
         as a list of :class:`~music21.duration.Duration` objects, if and only if
@@ -1037,17 +1040,19 @@ class TimeSignature(TimeSignatureBase):
 
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatDivisionDurations
-        [<music21.duration.Duration 0.5>,
-         <music21.duration.Duration 0.5>]
+        [<music21.duration.FrozenDuration 0.5>,
+         <music21.duration.FrozenDuration 0.5>]
 
         >>> ts = meter.TimeSignature('6/8')
         >>> ts.beatDivisionDurations
-        [<music21.duration.Duration 0.5>,
-         <music21.duration.Duration 0.5>,
-         <music21.duration.Duration 0.5>]
+        [<music21.duration.FrozenDuration 0.5>,
+         <music21.duration.FrozenDuration 0.5>,
+         <music21.duration.FrozenDuration 0.5>]
 
         Value returned of non-uniform beat divisions will change at any time
         after v7.1 to avoid raising an exception.
+
+        * Changed in v11: returns :class:`~music21.duration.FrozenDuration` objects.
 
         OMIT_FROM_DOCS
 
@@ -1058,13 +1063,13 @@ class TimeSignature(TimeSignatureBase):
         >>> ts.beatSequence[0]
         <music21.meter.core.MeterTerminal 1/128>
         >>> ts.beatDivisionDurations
-        [<music21.duration.Duration 0.03125>]
+        [<music21.duration.FrozenDuration 0.03125>]
 
         >>> ts = meter.TimeSignature('1/128')
         >>> ts.beatSequence[0]
         <music21.meter.core.MeterTerminal 1/128>
         >>> ts.beatDivisionDurations
-        [<music21.duration.Duration 0.03125>]
+        [<music21.duration.FrozenDuration 0.03125>]
         '''
         post = []
         for mt in self.beatSequence:
@@ -1864,9 +1869,9 @@ class TimeSignature(TimeSignatureBase):
                     return post  # do not add offset for end of bar
                 post.append(o)
 
-    def getBeatDuration(self, qLenPos):
+    def getBeatDuration(self, qLenPos: OffsetQLIn) -> duration.FrozenDuration:
         '''
-        Returns a :class:`~music21.duration.Duration`
+        Returns a :class:`~music21.duration.FrozenDuration`
         object representing the length of the beat
         found at qLenPos.  For most standard
         meters, you can give qLenPos = 0
@@ -1884,15 +1889,15 @@ class TimeSignature(TimeSignatureBase):
 
         >>> ts1 = meter.TimeSignature('3/4')
         >>> ts1.getBeatDuration(0.5)
-        <music21.duration.Duration 1.0>
+        <music21.duration.FrozenDuration 1.0>
         >>> ts1.getBeatDuration(2.5)
-        <music21.duration.Duration 1.0>
+        <music21.duration.FrozenDuration 1.0>
 
         Ex. 2: same for 6/8:
 
         >>> ts2 = meter.TimeSignature('6/8')
         >>> ts2.getBeatDuration(2.5)
-        <music21.duration.Duration 1.5>
+        <music21.duration.FrozenDuration 1.5>
 
         Ex. 3: but for a compound meter of 3/8 + 2/8,
         where you ask for the beat duration
@@ -1900,9 +1905,11 @@ class TimeSignature(TimeSignatureBase):
 
         >>> ts3 = meter.TimeSignature('3/8+2/8')  # will partition as 2 beat
         >>> ts3.getBeatDuration(0.5)
-        <music21.duration.Duration 1.5>
+        <music21.duration.FrozenDuration 1.5>
         >>> ts3.getBeatDuration(1.5)
-        <music21.duration.Duration 1.0>
+        <music21.duration.FrozenDuration 1.0>
+
+        * Changed in v11: returns a :class:`~music21.duration.FrozenDuration`.
         '''
         return self.beatSequence[self.beatSequence.offsetToIndex(qLenPos)].duration
 

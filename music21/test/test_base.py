@@ -20,6 +20,7 @@ from music21 import clef
 from music21.common.enums import ElementSearch, OffsetSpecial
 from music21 import converter
 from music21 import corpus
+from music21 import duration
 from music21 import dynamics
 from music21 import editorial
 from music21 import exceptions21
@@ -78,6 +79,27 @@ class Test(unittest.TestCase):
         n.groups[0] = 'bassoon'
         self.assertFalse('flute' in n.groups)
         self.assertTrue('flute' in b.groups)
+
+    def testAssignFrozenDurationKeepsClientUnset(self):
+        '''
+        A FrozenDuration (e.g. a MeterSequence's duration) may be assigned as an
+        element's .duration; it is held shared -- not thawed -- and its client is
+        left unset, since a frozen duration never changes.  Changing the element's
+        length then does copy-on-write, leaving the shared frozen duration intact.
+        '''
+        frozen = meter.MeterSequence('4/4').duration
+        self.assertIsInstance(frozen, duration.FrozenDuration)
+
+        n = note.Note()
+        n.duration = frozen
+        self.assertIs(n.duration, frozen)
+        self.assertIsNone(frozen.client)
+
+        # copy-on-write: setting the length swaps in a mutable copy
+        n.quarterLength = 3.0
+        self.assertEqual(n.quarterLength, 3.0)
+        self.assertNotIsInstance(n.duration, duration.FrozenDuration)
+        self.assertEqual(frozen.quarterLength, 4.0)  # original untouched
 
     def testOffsets(self):
         a = ElementWrapper(note.Note('A#'))

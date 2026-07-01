@@ -1724,11 +1724,23 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> tupDur1 == tupDur2
         True
 
+        Grace durations are conceptually distinct, so they never equal an ordinary
+        Duration:
+
         >>> graceDur1 = tupDur1.getGraceDuration()
         >>> graceDur1 == tupDur1
         False
+
+        But two grace durations of the same value are equal:
+
         >>> graceDur2 = tupDur2.getGraceDuration()
         >>> graceDur1 == graceDur2
+        True
+
+        A :class:`FrozenDuration` differs from a Duration only in being immutable,
+        so it compares equal to an otherwise-identical Duration:
+
+        >>> duration.Duration(2.0) == duration.FrozenDuration(quarterLength=2.0)
         True
 
         Link status must be the same:
@@ -1736,8 +1748,15 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> tupDur1.linked = False
         >>> tupDur1 == tupDur2
         False
+
+        * Changed in v11: equality is by musical value, not exact class, so a
+          FrozenDuration equals the Duration it represents.
         '''
-        if type(other) is not type(self):
+        if not isinstance(other, Duration):
+            return False
+        # A grace duration is conceptually a different thing from an ordinary
+        # duration, even at the same length; a FrozenDuration is not.
+        if self.isGrace != other.isGrace:
             return False
 
         if self.isComplex != other.isComplex:
@@ -1903,7 +1922,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         newTuplet.frozen = True
         self.tuplets = self._tuplets + (newTuplet,)
 
-    def augmentOrDiminish(self, amountToScale: OffsetQLIn, retainComponents=False) -> t.Self:
+    def augmentOrDiminish(self, amountToScale: OffsetQLIn, retainComponents=False) -> Duration:
         '''
         Given a number greater than zero, creates a new Duration object
         after
@@ -3088,6 +3107,86 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
         '''
         return self
 
+    def unfreeze(self) -> Duration:
+        '''
+        Return an independent, mutable :class:`Duration` with the same value --
+        faithfully preserving components, tuplets, etc.
+
+        >>> fd = duration.FrozenDuration(type='half', dots=1)
+        >>> d = fd.unfreeze()
+        >>> d
+        <music21.duration.Duration 3.0>
+        >>> type(d) is duration.Duration
+        True
+
+        The copy is mutable and fully independent of the original:
+
+        >>> d.dots = 0
+        >>> d.quarterLength
+        2.0
+        >>> fd.dots
+        1
+
+        Tuplets and unlinked status survive the round trip:
+
+        >>> fd2 = duration.FrozenDuration(2/3)
+        >>> d2 = fd2.unfreeze()
+        >>> d2.tuplets
+        (<music21.duration.Tuplet 3/2/quarter>,)
+        >>> d2.tuplets is fd2.tuplets
+        False
+
+        * New in v11.
+
+        AI-assisted (Claude).
+        '''
+        # Copy the frozen state straight onto a bare mutable Duration.  __new__
+        # skips __init__ (which would just set defaults __setstate__ overwrites);
+        # __setstate__ then restores every slot.  Components/quarterLength/link
+        # status are immutable and shared; only tuplets are mutable, so deep-copy
+        # those (when any) -- meter durations have none, so it is skipped entirely.
+        new = Duration.__new__(Duration)
+        new.__setstate__(self.__getstate__())
+        if self._tuplets:
+            new._tuplets = copy.deepcopy(self._tuplets)
+        new.client = None
+        return new
+
+    def augmentOrDiminish(self, amountToScale: OffsetQLIn, retainComponents=False) -> Duration:
+        '''
+        Like :meth:`Duration.augmentOrDiminish`, but always returns a new, mutable
+        Duration.
+
+        >>> fd = duration.FrozenDuration(quarterLength=1.0)
+        >>> d = fd.augmentOrDiminish(0.5)
+        >>> d
+        <music21.duration.Duration 0.5>
+        >>> type(d) is duration.Duration
+        True
+        '''
+        return self.unfreeze().augmentOrDiminish(
+            amountToScale, retainComponents=retainComponents)
+
+    def splitDotGroups(self, *, inPlace=False) -> Duration:
+        '''
+        Like :meth:`Duration.splitDotGroups`, but `inPlace` must be False since a
+        FrozenDuration cannot be mutated.
+
+        >>> fd = duration.FrozenDuration(quarterLength=1.0)
+        >>> fd.splitDotGroups()
+        <music21.duration.Duration 1.0>
+
+        >>> fd.splitDotGroups(inPlace=True)
+        Traceback (most recent call last):
+        TypeError: This FrozenDuration instance is immutable.
+        '''
+        if inPlace:
+            raise TypeError(f'This {type(self).__name__} instance is immutable.')
+        # unfreeze() already made the copy, so split it in place -- no second copy.
+        thawed = self.unfreeze()
+        thawed.splitDotGroups(inPlace=True)
+        return thawed
+
 class GraceDuration(Duration):
     '''
     A Duration that, no matter how it is created, always has a quarter length
@@ -3652,6 +3751,30 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
+
+    def testFrozenDurationEquality(self):
+        # A FrozenDuration equals the Duration it represents, in either order.
+        d = Duration(2.0)
+        fd = FrozenDuration(quarterLength=2.0)
+        self.assertEqual(d, fd)
+        self.assertEqual(fd, d)
+        self.assertFalse(d != fd)
+        self.assertFalse(fd != d)
+
+        # Equal even from different construction paths (differing internal flags
+        # that a slot-by-slot comparison would trip on).
+        self.assertEqual(Duration(type='half'), fd)
+        self.assertEqual(fd, Duration(type='half'))
+
+        # Same value frozen-vs-frozen is equal; a different value is not.
+        self.assertEqual(FrozenDuration(quarterLength=2.0), fd)
+        self.assertNotEqual(fd, Duration(1.0))
+        self.assertNotEqual(Duration(1.0), fd)
+
+        # A grace duration is conceptually distinct, in either order.
+        grace = d.getGraceDuration()
+        self.assertNotEqual(grace, d)
+        self.assertNotEqual(d, grace)
 
     def testTuple(self):
         # create a tuplet with 5 dotted eighths in the place of 3 double-dotted
