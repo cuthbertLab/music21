@@ -1,10 +1,10 @@
 # -----------------------------------------------------------------------------
 # Name:         sorting.py
-# Purpose:      Music21 class for sorting
+# Purpose:      Music21 class for sorting Music21Objects
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014-2015 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2014-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -40,10 +40,6 @@ class SortingException(exceptions21.Music21Exception):
 class SortTuple(t.NamedTuple):
     '''
     Derived class of namedTuple which allows for comparisons with pure ints/fractions.
-
-    * Changed in v11: defined directly as a typed NamedTuple (no separate base class);
-      ``priority`` is now typed ``int | float`` to reflect the ``±inf`` sentinels.
-      (AI-assisted.)
 
     >>> n = note.Note()
     >>> s = stream.Stream()
@@ -97,6 +93,7 @@ class SortTuple(t.NamedTuple):
     >>> st.shortRepr()
     '1.0 <0.20.323>'
 
+    * Changed in v11: priority and classSortOrder can be floats.
     '''
     atEnd: int
     offset: OffsetQL
@@ -187,10 +184,8 @@ class SortTuple(t.NamedTuple):
     def modify(self, **keywords) -> SortTuple:
         '''
         Return a new SortTuple identical to the previous, except with
-        the given keyword modified.  Works only with keywords.
-
-        Identical to ``_replace()`` and ``copy.replace()`` on Py 3.13+;
-        called out to document it.
+        the given keyword modified.  Works only with keywords. (Identical to
+        ``_replace()`` and ``copy.replace()`` on Py 3.13+)
 
         >>> st = sorting.SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20,
         ...           isNotGrace=1, insertIndex=32)
@@ -204,15 +199,14 @@ class SortTuple(t.NamedTuple):
         >>> st3.shortRepr()
         'End <0.20.[Grace].32>'
 
-        The original tuple is never modified (hence tuple):
+        The original tuple is never modified (hence why it's a tuple):
 
         >>> st.offset
         1.0
 
-        Changing offset, but nothing else, helps in creating .flatten() positions.
+        `Stream.flatten()` uses `.modify` to change offsets while keeping other values identical.
 
-        * Changed in v11: delegates to the namedtuple ``_replace``; a bad field
-          name now raises ValueError instead of being silently ignored.
+        * Changed in v11: a bad field name now raises ValueError
         '''
         return self._replace(**keywords)
 
@@ -239,28 +233,31 @@ class SortTuple(t.NamedTuple):
             raise SortingException('Cannot add attributes from a different class')
 
         outList = [max(getattr(self, attr), getattr(other, attr))
-                    if attr in ('atEnd', 'isNotGrace')
-                    else (getattr(self, attr) + getattr(other, attr))
-                    for attr in self._fields]  # _fields are the namedtuple attributes
+                   if attr in ('atEnd', 'isNotGrace')
+                   else (getattr(self, attr) + getattr(other, attr))
+                   for attr in self._fields]  # _fields are the namedtuple attributes
 
         return self.__class__(*outList)
 
     def sub(self, other):
         '''
-        Subtract all attributes from to another.  atEnd and isNotGrace take the min value of either.
+        Subtract all attributes from another SortTuple.
+        `atEnd` and `isNotGrace` take the min value of either.
 
         >>> n = note.Note()
         >>> n.offset = 10
         >>> s = stream.Stream()
         >>> s.offset = 10
-        >>> n.sortTuple()
+        >>> nt = n.sortTuple()
+        >>> nt
         SortTuple(atEnd=0, offset=10.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=0)
-        >>> s.sortTuple()
+        >>> st = s.sortTuple()
+        >>> st
         SortTuple(atEnd=0, offset=10.0, priority=0, classSortOrder=-20, isNotGrace=1, insertIndex=0)
-        >>> s.sortTuple().sub(n.sortTuple())
+        >>> st.sub(nt)
         SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=-40, isNotGrace=1, insertIndex=0)
 
-        Note that atEnd and isNotGrace are lower bounded at 0.
+        Note that `atEnd` and `isNotGrace` are lower bounded at 0.
         '''
         if not isinstance(other, self.__class__):
             raise SortingException('Cannot add attributes from a different class')
