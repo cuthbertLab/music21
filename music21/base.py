@@ -857,15 +857,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     @quarterLength.setter
     def quarterLength(self, value: OffsetQLIn):
-        try:
-            self.duration.quarterLength = value
-        except TypeError:
-            # self.duration is an immutable FrozenDuration (held shared): replace
-            # it with a mutable copy before changing its length (copy-on-write).
-            if not isinstance(self.duration, FrozenDuration):
-                raise
-            self.duration = self.duration.unfreeze()
-            self.duration.quarterLength = value
+        self.duration.quarterLength = value
 
     @property
     def derivation(self) -> Derivation:
