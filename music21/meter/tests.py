@@ -105,12 +105,18 @@ class Test(unittest.TestCase):
         self.assertNotEqual(e, f)
 
     def testMeterTerminalCache(self):
-        # identical (numerator, denominator, weight) -> one shared object
+        # this is an internal test, so it inspects the private cache directly
+        from music21.meter.core import _meterTerminalCache
+        # getMeterTerminal populates the cache under its (numerator, denominator,
+        # weight) key, and a repeat request is the very object stored there
         a = getMeterTerminal(1, 4)
+        self.assertIs(_meterTerminalCache[(1, 4, 1.0)], a)
         self.assertIs(a, getMeterTerminal(1, 4))
         self.assertIs(a, getMeterTerminal(numerator=1, denominator=4, weight=1.0))
-        # a different weight is a different terminal
-        self.assertIsNot(a, getMeterTerminal(1, 4, weight=0.5))
+        # a different weight is a different terminal, stored under its own key
+        b = getMeterTerminal(1, 4, weight=0.5)
+        self.assertIsNot(a, b)
+        self.assertIs(_meterTerminalCache[(1, 4, 0.5)], b)
         # value equality regardless of how they were built
         self.assertEqual(MeterTerminal('1/4'), getMeterTerminal(1, 4))
 
@@ -130,10 +136,22 @@ class Test(unittest.TestCase):
         self.assertIs(a.__replace__(numerator=3), c)
 
     def testMeterSequenceCache(self):
-        # identical value -> one shared MeterSequence
-        self.assertIs(getMeterSequence('4/4', 4), getMeterSequence('4/4', 4))
-        # every default 4/4 TimeSignature shares its owned sequences
+        # this is an internal test, so it inspects the private caches directly
+        from music21.meter.core import _meterSequenceCache
+        from music21.meter.base import _defaultSequenceCache
+        # getMeterSequence stores the built sequence in the sequence cache, and a
+        # repeat request is the very object stored there
+        ms = getMeterSequence('4/4', 4)
+        self.assertIs(getMeterSequence('4/4', 4), ms)
+        self.assertTrue(any(cached is ms for cached in _meterSequenceCache.values()))
+        # TimeSignature.load stores its configured (display, beam, beat, accent)
+        # sequences under (value, divisions); a repeat 4/4 reuses exactly those
         a = TimeSignature('4/4')
+        display, beam, beat, accent = _defaultSequenceCache[('4/4', None)]
+        self.assertIs(a.displaySequence, display)
+        self.assertIs(a.beamSequence, beam)
+        self.assertIs(a.beatSequence, beat)
+        self.assertIs(a.accentSequence, accent)
         b = TimeSignature('4/4')
         for seqName in ('beamSequence', 'beatSequence',
                         'accentSequence', 'displaySequence'):
