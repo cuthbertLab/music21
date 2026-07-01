@@ -37,18 +37,13 @@ class SortingException(exceptions21.Music21Exception):
     pass
 
 
-_SortTupleBase = t.NamedTuple('SortTuple', [   # type: ignore[name-match]
-    ('atEnd', int),
-    ('offset', OffsetQL),
-    ('priority', int),
-    ('classSortOrder', int),
-    ('isNotGrace', int),
-    ('insertIndex', int),
-])
-
-class SortTuple(_SortTupleBase):
+class SortTuple(t.NamedTuple):
     '''
     Derived class of namedTuple which allows for comparisons with pure ints/fractions.
+
+    * Changed in v11: defined directly as a typed NamedTuple (no separate base class);
+      ``priority`` is now typed ``int | float`` to reflect the ``±inf`` sentinels.
+      (AI-assisted.)
 
     >>> n = note.Note()
     >>> s = stream.Stream()
@@ -103,13 +98,18 @@ class SortTuple(_SortTupleBase):
     '1.0 <0.20.323>'
 
     '''
-    def __new__(cls, *tupEls, **keywords):
-        # noinspection PyTypeChecker
-        return super(SortTuple, cls).__new__(cls, *tupEls, **keywords)
+    atEnd: int
+    offset: OffsetQL
+    priority: int | float
+    classSortOrder: int | float
+    isNotGrace: int
+    insertIndex: int
 
     def __eq__(self, other):
         if isinstance(other, tuple):
-            return super().__eq__(other)
+            # NB: tuple.__eq__ not super() -- bare super() in a class-syntax NamedTuple
+            # body triggers a __classcell__ RuntimeError at class creation.
+            return tuple.__eq__(self, other)
         try:
             if self.atEnd == 1 and other != INFINITY:
                 return False
@@ -122,7 +122,7 @@ class SortTuple(_SortTupleBase):
 
     def __lt__(self, other):
         if isinstance(other, tuple):
-            return super().__lt__(other)
+            return tuple.__lt__(self, other)
         try:
             if self.atEnd == 1:
                 return False
@@ -133,7 +133,7 @@ class SortTuple(_SortTupleBase):
 
     def __gt__(self, other):
         if isinstance(other, tuple):
-            return super().__gt__(other)
+            return tuple.__gt__(self, other)
         try:
             if self.atEnd == 1 and other != INFINITY:
                 return True
@@ -184,10 +184,13 @@ class SortTuple(_SortTupleBase):
         reprParts.append('>')
         return ''.join(reprParts)
 
-    def modify(self, **keywords):
+    def modify(self, **keywords) -> SortTuple:
         '''
         Return a new SortTuple identical to the previous, except with
         the given keyword modified.  Works only with keywords.
+
+        Identical to ``_replace()`` and ``copy.replace()`` on Py 3.13+;
+        called out to document it.
 
         >>> st = sorting.SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20,
         ...           isNotGrace=1, insertIndex=32)
@@ -207,10 +210,11 @@ class SortTuple(_SortTupleBase):
         1.0
 
         Changing offset, but nothing else, helps in creating .flatten() positions.
+
+        * Changed in v11: delegates to the namedtuple ``_replace``; a bad field
+          name now raises ValueError instead of being silently ignored.
         '''
-        # _fields are the namedtuple attributes
-        outList = [keywords.get(attr, getattr(self, attr)) for attr in self._fields]
-        return self.__class__(*outList)
+        return self._replace(**keywords)
 
     def add(self, other):
         '''

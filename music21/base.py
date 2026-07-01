@@ -1895,7 +1895,7 @@ class Music21Object(prebase.ProtoM21Object):
         (<music21.stream.Score bach>, '9.5 <0.20...>', <RecursionType.ELEMENTS_ONLY>)
 
         Streams have themselves as the first element in their context sites, at position
-        zero and classSortOrder negative infinity.
+        zero and priority negative infinity.
 
         This example shows the context sites for Measure 3 of the
         Alto part. We will get the measure object using direct access to
