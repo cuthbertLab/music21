@@ -2128,12 +2128,16 @@ class TimeSignature(TimeSignatureBase):
 
         >>> b = meter.TimeSignature('3/4', 1)
         >>> b.beatSequence = b.beatSequence.setIndex(0, b.beatSequence[0].subdivide(3))
-        >>> b.beatSequence = b.beatSequence.setIndex(
-        ...     0, b.beatSequence[0].setIndex(0, b.beatSequence[0][0].subdivide(2)))
-        >>> b.beatSequence = b.beatSequence.setIndex(
-        ...     0, b.beatSequence[0].setIndex(1, b.beatSequence[0][1].subdivide(2)))
-        >>> b.beatSequence = b.beatSequence.setIndex(
-        ...     0, b.beatSequence[0].setIndex(2, b.beatSequence[0][2].subdivide(2)))
+
+        Subdivide every component of ``beatSequence[0]`` by 2.  Since the sequences
+        are immutable, build up the new inner sequence in a variable and then set it
+        back into ``beatSequence`` once:
+
+        >>> inner = b.beatSequence[0]
+        >>> for i in range(len(inner)):
+        ...     inner = inner.setIndex(i, inner[i].subdivide(2))
+        >>> b.beatSequence = b.beatSequence.setIndex(0, inner)
+
         >>> b.getBeatDepth(0)
         3
         >>> b.getBeatDepth(0.5)
