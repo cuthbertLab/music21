@@ -40,12 +40,16 @@ from music21.meter.core import (
 
 environLocal = environment.Environment('meter')
 
-# Cache of the fully-configured (display, beam, beat, accent) MeterSequences a
-# TimeSignature.load() produces for a given (value, divisions).  The sequences are
+# Cache of the fully-configured MeterSequences a TimeSignature.load() produces for a
+# given (value, divisions).  Each value is a 4-tuple in the fixed order
+# (displaySequence, beamSequence, beatSequence, accentSequence).  The sequences are
 # immutable and shared, and any later change to a TimeSignature is copy-on-write, so
 # repeated TimeSignatures of the same meter can reuse them and skip the (hashing-heavy)
 # rebuild entirely.
-_defaultSequenceCache: dict[tuple[str, t.Any], tuple[MeterSequence, ...]] = {}
+_defaultSequenceCache: dict[
+    tuple[str, t.Any],
+    tuple[MeterSequence, MeterSequence, MeterSequence, MeterSequence],
+] = {}
 
 if t.TYPE_CHECKING:
     from music21.common.types import OffsetQL, OffsetQLIn
