@@ -60,11 +60,6 @@ _SENTINEL_METER_SEQUENCE = MeterSequence()
 # also [pow(2,x) for x in range(8)]
 MIN_DENOMINATOR_TYPE = '128th'
 
-# store a module-level dictionary of partitioned meter sequences used
-# for setting default accent weights; store as needed
-_meterSequenceAccentArchetypes: dict[tuple[str, t.Any, int], MeterSequence] = {}
-_meterSequenceAccentArchetypesNoneCache = ('', -1, -1)  # a cache key representing None
-
 def bestTimeSignature(meas: stream.Stream) -> 'music21.meter.TimeSignature':
     # noinspection PyShadowingNames
     '''
@@ -1316,56 +1311,40 @@ class TimeSignature(TimeSignatureBase):
                 firstPartitionForm = len(self.beatSequence)
             else:
                 firstPartitionForm = None
-            cacheKey = (tsStr, firstPartitionForm, depth)
         else:  # derive from meter sequence
             firstPartitionForm = self.beatSequence
-            cacheKey = _meterSequenceAccentArchetypesNoneCache  # cannot cache based on beat form
 
-        # environLocal.printDebug('_setDefaultAccentWeights(): firstPartitionForm set to',
-        #    firstPartitionForm, 'self.beatSequence: ', self.beatSequence, tsStr)
-        # using cacheKey speeds up TS creation from 2300 microseconds to 500microseconds
-        try:
-            # archetypes are immutable and shared; no copy needed
-            self.accentSequence = _meterSequenceAccentArchetypes[cacheKey]
-            # environLocal.printDebug(['using stored accent archetype:'])
-        except KeyError:
-            # environLocal.printDebug(['creating a new accent archetype'])
-            ms = MeterSequence(tsStr)
-            # key operation here
-            # div count needs to be the number of top-level beat divisions
-            ms = ms.subdivideNestedHierarchy(depth,
-                                             firstPartitionForm=firstPartitionForm)
+        ms = MeterSequence(tsStr)
+        # key operation here
+        # div count needs to be the number of top-level beat divisions
+        ms = ms.subdivideNestedHierarchy(depth, firstPartitionForm=firstPartitionForm)
 
-            # provide a partition for each flattened division
-            accentCount = len(ms.flatten())
-            # environLocal.printDebug(['got accentCount', accentCount, 'ms: ', ms])
-            divStep = self.barDuration.quarterLength / accentCount
-            weightInts = [0] * accentCount  # weights as integer/depth counts
-            for i in range(accentCount):
-                ql = opFrac(i * divStep)
-                weightInts[i] = ms.offsetToDepth(ql, align='quantize', index=i)
+        # provide a partition for each flattened division
+        accentCount = len(ms.flatten())
+        divStep = self.barDuration.quarterLength / accentCount
+        weightInts = [0] * accentCount  # weights as integer/depth counts
+        for i in range(accentCount):
+            ql = opFrac(i * divStep)
+            weightInts[i] = ms.offsetToDepth(ql, align='quantize', index=i)
 
-            maxInt = max(weightInts)
-            weightValues = {}  # reference dictionary
-            # minimum value, something like 1/16, to be multiplied by powers of 2
-            weightValueMin = 1 / pow(2, maxInt - 1)
-            for x in range(maxInt):
-                # multiply base value (0.125) by 1, 2, 4
-                # there is never a 0 integer weight, so add 1 to dictionary
-                weightValues[x + 1] = weightValueMin * pow(2, x)
+        maxInt = max(weightInts)
+        weightValues = {}  # reference dictionary
+        # minimum value, something like 1/16, to be multiplied by powers of 2
+        weightValueMin = 1 / pow(2, maxInt - 1)
+        for x in range(maxInt):
+            # multiply base value (0.125) by 1, 2, 4
+            # there is never a 0 integer weight, so add 1 to dictionary
+            weightValues[x + 1] = weightValueMin * pow(2, x)
 
-            # set weights on accent partitions
-            self.accentSequence = self.accentSequence.partition([1] * accentCount)
-            for i in range(accentCount):
-                # get values from weightValues dictionary; terminals are
-                # immutable, so replace each with a re-weighted cached one
-                mt = self.accentSequence[i]
-                self.accentSequence = self.accentSequence.setIndex(
-                    i, getMeterTerminal(
-                        mt.numerator, mt.denominator, weight=weightValues[weightInts[i]]))
-
-            if cacheKey != _meterSequenceAccentArchetypesNoneCache:
-                _meterSequenceAccentArchetypes[cacheKey] = self.accentSequence
+        # set weights on accent partitions
+        self.accentSequence = self.accentSequence.partition([1] * accentCount)
+        for i in range(accentCount):
+            # get values from weightValues dictionary; terminals are
+            # immutable, so replace each with a re-weighted cached one
+            mt = self.accentSequence[i]
+            self.accentSequence = self.accentSequence.setIndex(
+                i, getMeterTerminal(
+                    mt.numerator, mt.denominator, weight=weightValues[weightInts[i]]))
 
     # --------------------------------------------------------------------------
     # access data for other processing
