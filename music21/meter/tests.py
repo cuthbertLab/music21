@@ -19,7 +19,9 @@ from music21 import duration
 from music21 import note
 from music21 import stream
 from music21.meter.base import TimeSignature
-from music21.meter.core import MeterSequence, MeterTerminal
+from music21.meter.core import (
+    MeterSequence, MeterTerminal, getMeterSequence, getMeterTerminal,
+)
 
 class TestExternal(unittest.TestCase):
     show = True
@@ -79,10 +81,10 @@ class Test(unittest.TestCase):
         a = MeterSequence('4/4', 4)
         self.assertEqual(str(a), '{1/4+1/4+1/4+1/4}')
 
-        a = a.replaceElement(0, a[0].subdivide(2))
+        a = a.setIndex(0, a[0].subdivide(2))
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+1/4}')
 
-        a = a.replaceElement(3, a[3].subdivide(4))
+        a = a.setIndex(3, a[3].subdivide(4))
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}')
 
     def testMeterSequenceDeepcopy(self):
@@ -101,6 +103,53 @@ class Test(unittest.TestCase):
         e = TimeSignature('slow 6/8')
         f = TimeSignature('fast 6/8')
         self.assertNotEqual(e, f)
+
+    def testMeterTerminalCache(self):
+        # identical (numerator, denominator, weight) -> one shared object
+        a = getMeterTerminal(1, 4)
+        self.assertIs(a, getMeterTerminal(1, 4))
+        self.assertIs(a, getMeterTerminal(numerator=1, denominator=4, weight=1.0))
+        # a different weight is a different terminal
+        self.assertIsNot(a, getMeterTerminal(1, 4, weight=0.5))
+        # value equality regardless of how they were built
+        self.assertEqual(MeterTerminal('1/4'), getMeterTerminal(1, 4))
+
+    def testMeterTerminalModify(self):
+        a = getMeterTerminal(2, 4, weight=0.5)
+        # modify changes only the named slot(s); the rest carry over
+        b = a.modify(weight=0.25)
+        self.assertEqual((b.numerator, b.denominator, b.weight), (2, 4, 0.25))
+        c = a.modify(numerator=3)
+        self.assertEqual((c.numerator, c.denominator, c.weight), (3, 4, 0.5))
+        # the original is unchanged (immutable) and setting a slot raises
+        self.assertEqual(a.weight, 0.5)
+        with self.assertRaises(TypeError):
+            a.weight = 0.25
+        # modify is wired through the cache, and __replace__ is an alias
+        self.assertIs(a.modify(weight=0.25), b)
+        self.assertIs(a.__replace__(numerator=3), c)
+
+    def testMeterSequenceCache(self):
+        # identical value -> one shared MeterSequence
+        self.assertIs(getMeterSequence('4/4', 4), getMeterSequence('4/4', 4))
+        # every default 4/4 TimeSignature shares its owned sequences
+        a = TimeSignature('4/4')
+        b = TimeSignature('4/4')
+        for seqName in ('beamSequence', 'beatSequence',
+                        'accentSequence', 'displaySequence'):
+            self.assertIs(getattr(a, seqName), getattr(b, seqName), seqName)
+
+    def testMeterSequenceModify(self):
+        a = MeterSequence('4/4', 4)
+        self.assertFalse(a.parenthesis)
+        b = a.modify(parenthesis=True)
+        self.assertTrue(b.parenthesis)
+        self.assertFalse(a.parenthesis)  # original unchanged
+        # a mutating attempt on the immutable sequence raises
+        with self.assertRaises(TypeError):
+            a.parenthesis = True
+        # modify is cache-wired: same result from two independent sequences
+        self.assertIs(b, MeterSequence('4/4', 4).modify(parenthesis=True))
 
     def testGetBeams(self):
         ts = TimeSignature('6/8')
@@ -192,12 +241,12 @@ class Test(unittest.TestCase):
                 return node
             sub = node.subdivide(2)
             for idx in range(len(sub)):
-                sub = sub.replaceElement(idx, recSub(sub[idx], remaining - 1))
+                sub = sub.setIndex(idx, recSub(sub[idx], remaining - 1))
             return sub
 
         a = MeterSequence('4/4')
         for h in range(len(a)):
-            a = a.replaceElement(h, recSub(a[h], 3))
+            a = a.setIndex(h, recSub(a[h], 3))
 
         # matching with starts result in a Lerdahl-Jackendoff style depth
         match = [4, 1, 2, 1, 3, 1, 2, 1]

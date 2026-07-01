@@ -3856,6 +3856,17 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isolatedNote.beatDuration
         <music21.duration.FrozenDuration 0.0>
 
+        If you want to modify the frozen beatDuration, call unfreeze on it and
+        assign it to a new variable:
+
+        >>> bd = n0.beatDuration
+        >>> bd
+        <music21.duration.FrozenDuration 1.5>
+        >>> bdThaw = bd.unfreeze()
+        >>> bdThaw.type = 'eighth'
+        >>> bdThaw
+        <music21.duration.Duration 0.75>
+
         * Changed in v6.3: returns a duration.Duration object of length 0 if
           there is no TimeSignature in sites.  Previously raised an exception.
         * Changed in v11: returns a :class:`~music21.duration.FrozenDuration`.

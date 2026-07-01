@@ -268,9 +268,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
     def __eq__(self, other: object) -> bool:
         if type(self) is not type(other):
-            # Defer to the other operand rather than declaring inequality, so a
-            # subclass with a value-based __eq__ (e.g. duration.FrozenDuration vs
-            # a plain Duration) can still compare equal in either order.
+            # Defer to the other operand rather than declaring inequality
             return NotImplemented
         for thisSlot in self._getSlotsRecursive():
             if thisSlot == 'id':

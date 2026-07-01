@@ -1019,7 +1019,7 @@ class TimeSignature(TimeSignatureBase):
         >>> ts.beatSequence
         <music21.meter.core.MeterSequence {5/8+5/8}>
         >>> for i, mt in enumerate(ts.beatSequence):
-        ...     ts.beatSequence = ts.beatSequence.replaceElement(i, mt.subdivideByCount(5))
+        ...     ts.beatSequence = ts.beatSequence.setIndex(i, mt.subdivideByCount(5))
         >>> ts.beatSequence
         <music21.meter.core.MeterSequence {{1/8+1/8+1/8+1/8+1/8}+{1/8+1/8+1/8+1/8+1/8}}>
         >>> ts.beatDivisionCountName
@@ -1232,7 +1232,7 @@ class TimeSignature(TimeSignatureBase):
             # if denominator is 4, subdivide each partition
             if self.denominator == 4:
                 for i in range(len(self.beamSequence)):  # subdivide  each beat in 2
-                    self.beamSequence = self.beamSequence.replaceElement(
+                    self.beamSequence = self.beamSequence.setIndex(
                         i, self.beamSequence[i].subdivide(2))
         elif self.numerator == 5:
             default = [2, 3]
@@ -1240,7 +1240,7 @@ class TimeSignature(TimeSignatureBase):
             # if denominator is 4, subdivide each partition
             if self.denominator == 4:
                 for i in range(len(self.beamSequence)):  # subdivide  each beat in 2
-                    self.beamSequence = self.beamSequence.replaceElement(
+                    self.beamSequence = self.beamSequence.setIndex(
                         i, self.beamSequence[i].subdivide(default[i]))
 
         elif self.numerator == 7:
@@ -1329,7 +1329,7 @@ class TimeSignature(TimeSignatureBase):
                 # get values from weightValues dictionary; terminals are
                 # immutable, so replace each with a re-weighted cached one
                 mt = self.accentSequence[i]
-                self.accentSequence = self.accentSequence.replaceElement(
+                self.accentSequence = self.accentSequence.setIndex(
                     i, getMeterTerminal(
                         mt.numerator, mt.denominator, weight=weightValues[weightInts[i]]))
 
@@ -1358,8 +1358,8 @@ class TimeSignature(TimeSignatureBase):
         unless we see the context of adjoining durations.
 
         >>> a = meter.TimeSignature('2/4', 2)
-        >>> a.beamSequence = a.beamSequence.replaceElement(0, a.beamSequence[0].subdivide(2))
-        >>> a.beamSequence = a.beamSequence.replaceElement(1, a.beamSequence[1].subdivide(2))
+        >>> a.beamSequence = a.beamSequence.setIndex(0, a.beamSequence[0].subdivide(2))
+        >>> a.beamSequence = a.beamSequence.setIndex(1, a.beamSequence[1].subdivide(2))
         >>> a.beamSequence
         <music21.meter.core.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
         >>> b = [note.Note(type='16th') for _ in range(8)]
@@ -2113,13 +2113,13 @@ class TimeSignature(TimeSignatureBase):
         1
 
         >>> b = meter.TimeSignature('3/4', 1)
-        >>> b.beatSequence = b.beatSequence.replaceElement(0, b.beatSequence[0].subdivide(3))
-        >>> b.beatSequence = b.beatSequence.replaceElement(
-        ...     0, b.beatSequence[0].replaceElement(0, b.beatSequence[0][0].subdivide(2)))
-        >>> b.beatSequence = b.beatSequence.replaceElement(
-        ...     0, b.beatSequence[0].replaceElement(1, b.beatSequence[0][1].subdivide(2)))
-        >>> b.beatSequence = b.beatSequence.replaceElement(
-        ...     0, b.beatSequence[0].replaceElement(2, b.beatSequence[0][2].subdivide(2)))
+        >>> b.beatSequence = b.beatSequence.setIndex(0, b.beatSequence[0].subdivide(3))
+        >>> b.beatSequence = b.beatSequence.setIndex(
+        ...     0, b.beatSequence[0].setIndex(0, b.beatSequence[0][0].subdivide(2)))
+        >>> b.beatSequence = b.beatSequence.setIndex(
+        ...     0, b.beatSequence[0].setIndex(1, b.beatSequence[0][1].subdivide(2)))
+        >>> b.beatSequence = b.beatSequence.setIndex(
+        ...     0, b.beatSequence[0].setIndex(2, b.beatSequence[0][2].subdivide(2)))
         >>> b.getBeatDepth(0)
         3
         >>> b.getBeatDepth(0.5)

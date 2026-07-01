@@ -300,7 +300,8 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
     True
 
     * Changed in v11: MeterTerminal is immutable, deep-copies to itself, and
-      compares by value.
+      compares by value.  Removed the numerator/denominator/weight/duration
+      setters (set values when creating the terminal, or use `modify()`).
 
     AI-assisted (Claude).
     '''
@@ -516,7 +517,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
     Like :class:`~music21.meter.core.MeterTerminal`, a MeterSequence is an
     immutable value object.  Its structure cannot be changed after creation;
     the "mutating" methods (:meth:`partition`, :meth:`subdividePartitionsEqual`,
-    :meth:`setLevelWeight`, :meth:`replaceElement`, ...) instead RETURN a new
+    :meth:`setLevelWeight`, :meth:`setIndex`, ...) instead RETURN a new
     MeterSequence and leave ``self`` unchanged:
 
     >>> ms2 = ms.partition(2)
@@ -536,6 +537,9 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
     * Changed in v11: MeterSequence is immutable, hashable, deep-copies to
       itself, and its formerly in-place operations return a new sequence.
+      Removed `load()` (set values when creating the sequence), the `weight`
+      setter (use `withWeight()`), and item assignment `ms[i] = x` (use
+      `setIndex()`).
 
     AI-assisted (Claude).
     '''
@@ -615,7 +619,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
         Analogous to :func:`copy.replace` (Python 3.13+); for changing the
         partition structure itself prefer the functional :meth:`partition`,
-        :meth:`subdividePartitionsEqual`, and :meth:`replaceElement`.
+        :meth:`subdividePartitionsEqual`, and :meth:`setIndex`.
 
         >>> ms = meter.MeterSequence('4/4', 4)
         >>> ms.parenthesis
@@ -675,7 +679,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         '''
         return len(self._partition)
 
-    def replaceElement(self, index: int, value: MeterNode) -> MeterSequence:
+    def setIndex(self, index: int, value: MeterNode) -> MeterSequence:
         '''
         Return a new MeterSequence with the element at `index` replaced by
         `value` (which must occupy the same ratio of time as the element it
@@ -687,15 +691,15 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
         >>> a[0]
         <music21.meter.core.MeterTerminal 1/4>
-        >>> a = a.replaceElement(0, a[0].subdivide(2))
+        >>> a = a.setIndex(0, a[0].subdivide(2))
         >>> a
         <music21.meter.core.MeterSequence {{1/8+1/8}+1/4+1/4+1/4}>
-        >>> a = a.replaceElement(0, a[0].replaceElement(0, a[0][0].subdivide(2)))
+        >>> a = a.setIndex(0, a[0].setIndex(0, a[0][0].subdivide(2)))
         >>> a
         <music21.meter.core.MeterSequence {{{1/16+1/16}+1/8}+1/4+1/4+1/4}>
         >>> a[3]
         <music21.meter.core.MeterTerminal 1/4>
-        >>> a.replaceElement(3, a[0][0])
+        >>> a.setIndex(3, a[0][0])
         Traceback (most recent call last):
         music21.exceptions21.MeterException: cannot insert {1/16+1/16} into space of 1/4
 
@@ -1094,10 +1098,10 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
         To subdivide a nested component, replace it functionally:
 
-        >>> ms = ms.replaceElement(0, ms[0].subdividePartitionsEqual(2))
+        >>> ms = ms.setIndex(0, ms[0].subdividePartitionsEqual(2))
         >>> ms
         <music21.meter.core.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{1/8+1/8}}>
-        >>> ms = ms.replaceElement(1, ms[1].subdividePartitionsEqual(2))
+        >>> ms = ms.setIndex(1, ms[1].subdividePartitionsEqual(2))
         >>> ms
         <music21.meter.core.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
 
@@ -1379,7 +1383,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> len(b)
         3
 
-        >>> a = a.replaceElement(1, a[1].subdivide(4))
+        >>> a = a.setIndex(1, a[1].subdivide(4))
         >>> len(a)
         3
         >>> a
@@ -1396,7 +1400,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
          <music21.meter.core.MeterTerminal 1/16>,
          <music21.meter.core.MeterTerminal 1/4>]
 
-        >>> a = a.replaceElement(1, a[1].replaceElement(2, a[1][2].subdivide(4)))
+        >>> a = a.setIndex(1, a[1].setIndex(2, a[1][2].subdivide(4)))
         >>> a
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
         >>> b = a._getFlatList()
@@ -1430,7 +1434,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         Now take a MeterSequence and subdivide the second beat into 4 parts:
 
         >>> ms = meter.MeterSequence('3/4', 3)
-        >>> ms = ms.replaceElement(1, ms[1].subdivide(4))
+        >>> ms = ms.setIndex(1, ms[1].subdivide(4))
         >>> ms
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> b = ms.flatten()
@@ -1439,7 +1443,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> b
         <music21.meter.core.MeterSequence {1/4+1/16+1/16+1/16+1/16+1/4}>
 
-        >>> ms = ms.replaceElement(1, ms[1].replaceElement(2, ms[1][2].subdivide(4)))
+        >>> ms = ms.setIndex(1, ms[1].setIndex(2, ms[1][2].subdivide(4)))
         >>> ms
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
         >>> b = ms.flatten()
@@ -1492,8 +1496,8 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> ms = ms.partition(4)
         >>> ms.isUniformPartition()
         True
-        >>> ms = ms.replaceElement(0, ms[0].subdivideByCount(2))
-        >>> ms = ms.replaceElement(1, ms[1].subdivideByCount(4))
+        >>> ms = ms.setIndex(0, ms[0].subdivideByCount(2))
+        >>> ms = ms.setIndex(1, ms[1].subdivideByCount(4))
         >>> ms.isUniformPartition()
         True
         >>> ms.isUniformPartition(depth=1)
@@ -1538,9 +1542,9 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         1 quarter, 2 eighth, 1 quarter, ((2-sixteenths) + 1 eighth).
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b = b.replaceElement(1, b[1].subdivide(2))
-        >>> b = b.replaceElement(3, b[3].subdivide(2))
-        >>> b = b.replaceElement(3, b[3].replaceElement(0, b[3][0].subdivide(2)))
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
 
@@ -1643,9 +1647,9 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         level. A sort of flatness with variable depth.
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b = b.replaceElement(1, b[1].subdivide(2))
-        >>> b = b.replaceElement(3, b[3].subdivide(2))
-        >>> b = b.replaceElement(3, b[3].replaceElement(0, b[3][0].subdivide(2)))
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevel(0)
@@ -1662,9 +1666,9 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         For a given level, return the time span of each terminal or sequence
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b = b.replaceElement(1, b[1].subdivide(2))
-        >>> b = b.replaceElement(3, b[3].subdivide(2))
-        >>> b = b.replaceElement(3, b[3].replaceElement(0, b[3][0].subdivide(2)))
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelSpan(0)
@@ -1698,12 +1702,12 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> b.getLevelWeight(0)
         [0.25, 0.25, 0.25, 0.25]
 
-        >>> b = b.replaceElement(1, b[1].subdivide(2))
-        >>> b = b.replaceElement(3, b[3].subdivide(2))
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
         >>> b.getLevelWeight(0)
         [0.25, 0.25, 0.25, 0.25]
 
-        >>> b = b.replaceElement(3, b[3].replaceElement(0, b[3][0].subdivide(2)))
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelWeight(0)
@@ -1733,12 +1737,12 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> b.getLevelWeight(0)
         [2.0, 3.0, 2.0, 3.0]
 
-        >>> b = b.replaceElement(1, b[1].subdivide(2))
-        >>> b = b.replaceElement(3, b[3].subdivide(2))
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
         >>> b.getLevelWeight(0)
         [2.0, 3.0, 2.0, 3.0]
 
-        >>> b = b.replaceElement(3, b[3].replaceElement(0, b[3][0].subdivide(2)))
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelWeight(0)
@@ -1853,7 +1857,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         The len of the returned list also provides the depth at the specified qLen.
 
         >>> a = meter.MeterSequence('3/4', 3)
-        >>> a = a.replaceElement(1, a[1].subdivide(4))
+        >>> a = a.setIndex(1, a[1].subdivide(4))
         >>> a
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> len(a)
@@ -1986,9 +1990,9 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         start, quantize, or end.
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b = b.replaceElement(1, b[1].subdivide(2))
-        >>> b = b.replaceElement(3, b[3].subdivide(2))
-        >>> b = b.replaceElement(3, b[3].replaceElement(0, b[3][0].subdivide(2)))
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.offsetToDepth(0)
@@ -2246,10 +2250,10 @@ def _replaceAtPath(root: MeterSequence, path: tuple[int, ...], newNode) -> Meter
     '''
     idx = path[0]
     if len(path) == 1:
-        return root.replaceElement(idx, newNode)
+        return root.setIndex(idx, newNode)
     child = t.cast('MeterSequence', root[idx])
     newChild = _replaceAtPath(child, path[1:], newNode)
-    return root.replaceElement(idx, newChild)
+    return root.setIndex(idx, newChild)
 
 
 def _subdivideNestedByPaths(
