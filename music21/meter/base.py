@@ -609,13 +609,16 @@ class TimeSignature(TimeSignatureBase):
             value = '2/2'
             self.symbol = 'cut'
 
-        cacheKey = (value, divisions)
+        # divisions may be list-like -- e.g. ['2/8', '3/8'] (Ariza & Cuthbert 2010) --
+        # so normalize a list to a tuple to make it a usable cache key.
+        keyDivisions = tuple(divisions) if isinstance(divisions, list) else divisions
+        cacheKey = (value, keyDivisions)
         cached = None
         cacheable = True
         try:
             cached = _defaultSequenceCache.get(cacheKey)
         except TypeError:
-            cacheable = False  # unhashable divisions (e.g. a list): skip the cache
+            cacheable = False  # still unhashable (rare): skip the cache
         if cached is not None:
             (self.displaySequence, self.beamSequence,
              self.beatSequence, self.accentSequence) = cached
