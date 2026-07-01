@@ -219,14 +219,16 @@ class SortTuple(t.NamedTuple):
         >>> n.offset = 10
         >>> s = stream.Stream()
         >>> s.offset = 10
-        >>> n.sortTuple()
+        >>> nt = n.sortTuple()
+        >>> nt
         SortTuple(atEnd=0, offset=10.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=0)
-        >>> s.sortTuple()
+        >>> st = s.sortTuple()
+        >>> st
         SortTuple(atEnd=0, offset=10.0, priority=0, classSortOrder=-20, isNotGrace=1, insertIndex=0)
-        >>> s.sortTuple().add(n.sortTuple())
+        >>> st.add(nt)
         SortTuple(atEnd=0, offset=20.0, priority=0, classSortOrder=0, isNotGrace=1, insertIndex=0)
 
-        Note that atEnd and isNotGrace are equal to other's value. are upper bounded at 1 and
+        Note that `atEnd` and `isNotGrace` are upper bounded at 1 and
         take the maxValue of either.
         '''
         if not isinstance(other, self.__class__):
