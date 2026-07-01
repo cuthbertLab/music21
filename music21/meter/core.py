@@ -78,10 +78,11 @@ class MeterTerminal(prebase.ProtoM21Object, FrozenObject):
     )
 
     # INITIALIZER #
-    def __init__(self, slashNotation: str|None = None, weight: int|float = 1, *,
+    def __init__(self, slashNotation: str|None = None, weight: float = 1.0, *,
                  numerator: int = 0, denominator: int = 1):
-        # because of how they are copied, MeterTerminals must not have any
-        # initialization parameters without defaults
+        # MeterSequence (a subclass) builds an empty instance via
+        # super().__init__() -- in its __init__ and __deepcopy__ -- so every
+        # parameter here must keep a default.
         if slashNotation is not None:
             # raise MeterException early if there is a problem.
             values = tools.slashToTuple(slashNotation)
@@ -89,7 +90,7 @@ class MeterTerminal(prebase.ProtoM21Object, FrozenObject):
             denominator = values.denominator
         self._numerator: int = numerator
         self._denominator: int = denominator
-        self._weight: int|float = weight
+        self._weight: float = weight
 
     # SPECIAL METHODS #
 
@@ -102,6 +103,12 @@ class MeterTerminal(prebase.ProtoM21Object, FrozenObject):
         A MeterTerminal is immutable and shared, so deep-copying it simply
         returns the same object (a large performance win, since MeterTerminals
         are copied constantly as part of Streams and TimeSignatures).
+        '''
+        return self
+
+    def __copy__(self):
+        '''
+        A MeterTerminal is immutable, so a shallow copy is also just itself.
         '''
         return self
 
@@ -268,42 +275,56 @@ class MeterTerminal(prebase.ProtoM21Object, FrozenObject):
     # properties
 
     @property
-    def weight(self) -> float|int:
+    def weight(self) -> float:
         '''
-        Return the weight of a MeterTerminal (read-only; a MeterTerminal is
-        immutable).
+        Return the weight of a MeterTerminal.
 
         >>> a = meter.MeterTerminal('2/4', 0.5)
         >>> a.weight
         0.5
+
+        To get one with a different weight, make a new terminal:
+
+        >>> meter.core.getMeterTerminal(a.numerator, a.denominator, weight=0.25)
+        <music21.meter.core.MeterTerminal 2/4>
+
+        * Changed in v11: weight is immutable and must be a float (not int).
         '''
         return self._weight
 
     @property
     def numerator(self) -> int:
         '''
-        Return the numerator of the MeterTerminal (read-only; a MeterTerminal
-        is immutable).
+        Return the numerator of the MeterTerminal.
 
         >>> a = meter.MeterTerminal('2/4')
         >>> a.numerator
         2
-        >>> a.duration.quarterLength
-        2.0
+
+        To get one with a different numerator, make a new terminal:
+
+        >>> meter.core.getMeterTerminal(3, a.denominator)
+        <music21.meter.core.MeterTerminal 3/4>
+
+        * Changed in v11: numerator is immutable.
         '''
         return self._numerator
 
     @property
     def denominator(self) -> int:
         '''
-        Return the denominator of the meter terminal (read-only; a
-        MeterTerminal is immutable).
+        Return the denominator of the MeterTerminal.
 
         >>> a = meter.MeterTerminal('2/4')
         >>> a.denominator
         4
-        >>> a.duration.quarterLength
-        2.0
+
+        To get one with a different denominator, make a new terminal:
+
+        >>> meter.core.getMeterTerminal(a.numerator, 8)
+        <music21.meter.core.MeterTerminal 2/8>
+
+        * Changed in v11: denominator is immutable.
         '''
         return self._denominator
 
@@ -369,11 +390,11 @@ class MeterTerminal(prebase.ProtoM21Object, FrozenObject):
 
 # -----------------------------------------------------------------------------
 
-_meterTerminalCache: dict[tuple[int, int, type, float|int], MeterTerminal] = {}
+_meterTerminalCache: dict[tuple[int, int, float], MeterTerminal] = {}
 
 
 def getMeterTerminal(numerator: int, denominator: int,
-                     weight: float|int = 1) -> MeterTerminal:
+                     weight: float = 1.0) -> MeterTerminal:
     '''
     Return a shared, cached, immutable :class:`MeterTerminal` for these values.
 
@@ -392,9 +413,7 @@ def getMeterTerminal(numerator: int, denominator: int,
 
     AI-assisted (Claude).
     '''
-    # the weight's type is part of the key: an int 1 and a float 1.0 compare
-    # equal but must stay distinct terminals so the exact weight is preserved.
-    key = (numerator, denominator, type(weight), weight)
+    key = (numerator, denominator, weight)
     cached = _meterTerminalCache.get(key)
     if cached is None:
         cached = MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
@@ -492,6 +511,13 @@ class MeterSequence(MeterTerminal):
         new.parenthesis = self.parenthesis
 
         return new
+
+    def __copy__(self):
+        '''
+        A MeterSequence is mutable (unlike its MeterTerminal base), so a copy
+        must be an independent object, not the shared self.
+        '''
+        return self.__deepcopy__()
 
     def __getitem__(self, key: int) -> MeterTerminal:
         '''
@@ -1227,7 +1253,7 @@ class MeterSequence(MeterTerminal):
                                 | MeterSequence
                                 | None) = None,
              autoWeight: bool = False,
-             targetWeight: int|float|None = None):
+             targetWeight: float|None = None):
         '''
         This method is called when a MeterSequence is created, or if a MeterSequence is re-set.
 
@@ -1330,7 +1356,7 @@ class MeterSequence(MeterTerminal):
     # do not permit setting of numerator/denominator
 
     @property
-    def weight(self) -> int | float:
+    def weight(self) -> float:
         '''
         Get the weight for the MeterSequence, or set the weight and thereby change the weights
         for each object in this MeterSequence.
@@ -1384,7 +1410,7 @@ class MeterSequence(MeterTerminal):
         return summation
 
     @weight.setter
-    def weight(self, value: int | float) -> None:
+    def weight(self, value: float) -> None:
         # environLocal.printDebug(['calling setWeight with value', value])
         if not common.isNum(value):
             raise MeterException('weight values must be numbers')
@@ -1807,29 +1833,29 @@ class MeterSequence(MeterTerminal):
         single level of the MeterSequence.
 
         >>> a = meter.MeterSequence('4/4', 4)
-        >>> a.setLevelWeight([1, 2, 3, 4])
+        >>> a.setLevelWeight([1.0, 2.0, 3.0, 4.0])
         >>> a.getLevelWeight()
-        [1, 2, 3, 4]
+        [1.0, 2.0, 3.0, 4.0]
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b.setLevelWeight([2, 3])
+        >>> b.setLevelWeight([2.0, 3.0])
         >>> b.getLevelWeight(0)
-        [2, 3, 2, 3]
+        [2.0, 3.0, 2.0, 3.0]
 
         >>> b[1] = b[1].subdivide(2)
         >>> b[3] = b[3].subdivide(2)
         >>> b.getLevelWeight(0)
-        [2, 3.0, 2, 3.0]
+        [2.0, 3.0, 2.0, 3.0]
 
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelWeight(0)
-        [2, 3.0, 2, 3.0]
+        [2.0, 3.0, 2.0, 3.0]
         >>> b.getLevelWeight(1)
-        [2, 1.5, 1.5, 2, 1.5, 1.5]
+        [2.0, 1.5, 1.5, 2.0, 1.5, 1.5]
         >>> b.getLevelWeight(2)
-        [2, 1.5, 1.5, 2, 0.75, 0.75, 1.5]
+        [2.0, 1.5, 1.5, 2.0, 0.75, 0.75, 1.5]
 
         * Changed in v11: terminals are immutable, so each affected terminal is
           replaced in place by a cached one carrying the new weight.

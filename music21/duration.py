@@ -3107,6 +3107,12 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
         '''
         return self
 
+    def __copy__(self):
+        '''
+        Immutable objects return themselves
+        '''
+        return self
+
     def unfreeze(self) -> Duration:
         '''
         Return an independent, mutable :class:`Duration` with the same value --
