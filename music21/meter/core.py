@@ -325,6 +325,10 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
             values = tools.slashToTuple(slashNotation)
             numerator = values.numerator
             denominator = values.denominator
+        # Set the slots on the known-safe init path with object.__setattr__ to
+        # bypass FrozenObject's expensive per-set inspection (which walks the
+        # stack to find where in a sequence we are); afterwards the object is
+        # fully immutable.
         object.__setattr__(self, '_numerator', numerator)
         object.__setattr__(self, '_denominator', denominator)
         object.__setattr__(self, '_weight', weight)
@@ -367,7 +371,8 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> a.weight
         0.5
 
-        To get one with a different weight, make a new terminal:
+        To get a MeterTerminal with a different weight, specify the existing
+        numerator and denominator and the new weight:
 
         >>> meter.core.getMeterTerminal(a.numerator, a.denominator, weight=0.25)
         <music21.meter.core.MeterTerminal 2/4>
@@ -385,9 +390,10 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> a.numerator
         2
 
-        To get one with a different numerator, make a new terminal:
+        To get a MeterTerminal with a different numerator, specify the new
+        numerator and the existing denominator and weight:
 
-        >>> meter.core.getMeterTerminal(3, a.denominator)
+        >>> meter.core.getMeterTerminal(3, a.denominator, weight=a.weight)
         <music21.meter.core.MeterTerminal 3/4>
 
         * Changed in v11: numerator is immutable.
@@ -403,9 +409,10 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> a.denominator
         4
 
-        To get one with a different denominator, make a new terminal:
+        To get a MeterTerminal with a different denominator, specify the
+        existing numerator, the new denominator, and the existing weight:
 
-        >>> meter.core.getMeterTerminal(a.numerator, 8)
+        >>> meter.core.getMeterTerminal(a.numerator, 8, weight=a.weight)
         <music21.meter.core.MeterTerminal 2/8>
 
         * Changed in v11: denominator is immutable.
@@ -458,7 +465,7 @@ def getMeterTerminal(numerator: int, denominator: int,
 
 class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
     '''
-    A MeterSequence is an immutable, hashable list of MeterTerminals, or
+    A MeterSequence is an immutable, hashable sequence of MeterTerminals, or
     other MeterSequences.
 
     >>> ms = meter.MeterSequence('4/4', 4)
@@ -617,6 +624,8 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> a.replaceElement(3, a[0][0])
         Traceback (most recent call last):
         music21.exceptions21.MeterException: cannot insert {1/16+1/16} into space of 1/4
+
+        * New in v11: functional replacement for ``ms[index] = value`` assignment.
 
         AI-assisted (Claude).
         '''
@@ -1255,10 +1264,21 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
             summation += obj.weight  # may be a MeterTerminal or MeterSequence
         return summation
 
-    def _withWeight(self, targetWeight: float) -> MeterSequence:
+    def withWeight(self, targetWeight: float) -> MeterSequence:
         '''
         Return a new MeterSequence whose children are re-weighted so that they
         sum (proportionally) to ``targetWeight``.
+
+        This is the immutable replacement for the pre-v11 ``ms.weight = x``
+        setter: rather than re-weighting the children in place, request a new
+        sequence.
+
+        >>> ms = meter.MeterSequence('4/4', 4)
+        >>> ms2 = ms.withWeight(1.0)
+        >>> [mt.weight for mt in ms2]
+        [0.25, 0.25, 0.25, 0.25]
+
+        * New in v11: replaces the ``weight`` setter.
 
         AI-assisted (Claude).
         '''
@@ -2047,7 +2067,7 @@ def _applyWeight(partition, numerator: int, denominator: int, targetWeight: floa
         partRatio = mt.numerator / mt.denominator
         newWeight = targetWeight * (partRatio / totalRatio)
         if isinstance(mt, MeterSequence):
-            out.append(mt._withWeight(newWeight))
+            out.append(mt.withWeight(newWeight))
         else:
             out.append(getMeterTerminal(mt.numerator, mt.denominator, weight=newWeight))
     return out
@@ -2089,7 +2109,7 @@ def _loadData(
     elif isinstance(value, MeterCore):  # a MeterTerminal or MeterSequence
         if targetWeight is not None:
             if isinstance(value, MeterSequence):
-                value = value._withWeight(targetWeight)
+                value = value.withWeight(targetWeight)
             else:
                 # a terminal is immutable: swap in a re-weighted cached one
                 value = getMeterTerminal(value.numerator, value.denominator,
