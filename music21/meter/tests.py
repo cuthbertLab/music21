@@ -134,6 +134,9 @@ class Test(unittest.TestCase):
         # modify is wired through the cache, and __replace__ is an alias
         self.assertIs(a.modify(weight=0.25), b)
         self.assertIs(a.__replace__(numerator=3), c)
+        # an unhandled keyword raises rather than being silently ignored
+        with self.assertRaises(ValueError):
+            a.modify(parenthesis=True)
 
     def testMeterSequenceCache(self):
         # this is an internal test, so it inspects the private caches directly
@@ -168,6 +171,11 @@ class Test(unittest.TestCase):
             a.parenthesis = True
         # modify is cache-wired: same result from two independent sequences
         self.assertIs(b, MeterSequence('4/4', 4).modify(parenthesis=True))
+        # numerator/denominator/weight are not modifiable here (they follow from
+        # the partition); an unhandled keyword raises
+        for kw in ({'numerator': 3}, {'denominator': 8}, {'weight': 1.5}):
+            with self.assertRaises(ValueError):
+                a.modify(**kw)
 
     def testGetBeams(self):
         ts = TimeSignature('6/8')

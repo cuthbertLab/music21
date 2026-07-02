@@ -393,8 +393,19 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> a.modify(numerator=3) is c
         True
 
+        Any keyword other than numerator/denominator/weight raises a ValueError:
+
+        >>> a.modify(parenthesis=True)
+        Traceback (most recent call last):
+        ValueError: MeterTerminal.modify() does not accept ['parenthesis']...
+
         AI-assisted (Claude).
         '''
+        extra = set(keywords) - {'numerator', 'denominator', 'weight'}
+        if extra:
+            raise ValueError(
+                f'MeterTerminal.modify() does not accept {sorted(extra)}; allowed '
+                'keywords are numerator, denominator, weight.')
         return getMeterTerminal(
             numerator=keywords.get('numerator', self._numerator),
             denominator=keywords.get('denominator', self._denominator),
@@ -613,15 +624,16 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
     def modify(self, **keywords) -> MeterSequence:
         '''
         Return a (cached) MeterSequence identical to this one except for the
-        given ``numerator``, ``denominator``,
-        ``partition``, ``parenthesis`` and/or ``summedNumerator``
-        keyword(s).
+        given ``partition``, ``parenthesis`` and/or ``summedNumerator`` keyword(s).
 
         The original is unchanged, since a MeterSequence is immutable.
 
-        Analogous to :func:`copy.replace` (Python 3.13+); for changing the
-        partition structure itself prefer the functional :meth:`partition`,
-        :meth:`subdividePartitionsEqual`, and :meth:`setIndex`.
+        Analogous to :func:`copy.replace` (Python 3.13+).  Unlike
+        :meth:`MeterTerminal.modify`, the numerator, denominator, and weight cannot
+        be changed here -- they follow from the partition -- so change the structure
+        with :meth:`partition`, :meth:`subdividePartitionsEqual`, :meth:`setIndex`,
+        etc.  Any keyword other than partition/parenthesis/summedNumerator raises a
+        ValueError.
 
         >>> ms = meter.MeterSequence('4/4', 4)
         >>> ms
@@ -638,36 +650,26 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> ms.parenthesis
         False
 
-        Changing the numerator or denominator rebuilds the sequence with that many
-        equal parts:
+        Trying to change the numerator, denominator, or weight raises a ValueError:
 
-        >>> ms3 = ms.modify(numerator=3)
-        >>> ms3
-        <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
-
-        Any other keyword, including weight, is ignored.
-
-        >>> ms.weight
-        1.0
-        >>> ms.modify(weight=1.5).weight
-        1.0
-
-        For other changes to the MeterSequence, see methods
-        :meth:`subdivide`, :meth:`partition`, etc.
+        >>> ms.modify(numerator=3)
+        Traceback (most recent call last):
+        ValueError: MeterSequence.modify() does not accept ['numerator']...
+        >>> ms.modify(weight=1.5)
+        Traceback (most recent call last):
+        ValueError: MeterSequence.modify() does not accept ['weight']...
 
         AI-assisted (Claude).
         '''
-        if 'partition' in keywords:
-            partition = tuple(keywords['partition'])
-            numerator, denominator = _ratioFromPartition(partition)
-        elif 'numerator' in keywords or 'denominator' in keywords:
-            numerator = keywords.get('numerator', self._numerator)
-            denominator = keywords.get('denominator', self._denominator)
-            # rebuild the new ratio as `numerator` equal parts (each 1/denominator)
-            partition = getMeterSequence(f'{numerator}/{denominator}', numerator)._partition
-        else:
-            partition = self._partition
-            numerator, denominator = self._numerator, self._denominator
+        extra = set(keywords) - {'partition', 'parenthesis', 'summedNumerator'}
+        if extra:
+            raise ValueError(
+                f'MeterSequence.modify() does not accept {sorted(extra)}; allowed '
+                'keywords are partition, parenthesis, summedNumerator.  numerator, '
+                'denominator, and weight follow from the partition -- change them via '
+                'partition(), subdividePartitionsEqual(), setIndex(), etc.')
+        partition = tuple(keywords.get('partition', self._partition))
+        numerator, denominator = _ratioFromPartition(partition)
         return makeSequence(
             numerator, denominator, partition,
             parenthesis=keywords.get('parenthesis', self.parenthesis),
