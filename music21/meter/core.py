@@ -613,8 +613,10 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
     def modify(self, **keywords) -> MeterSequence:
         '''
         Return a (cached) MeterSequence identical to this one except for the
-        given ``partition``, ``parenthesis`` and/or ``summedNumerator``
-        keyword(s); the numerator and denominator follow from the partition.
+        given ``numerator``, ``denominator``,
+        ``partition``, ``parenthesis`` and/or ``summedNumerator``
+        keyword(s).
+
         The original is unchanged, since a MeterSequence is immutable.
 
         Analogous to :func:`copy.replace` (Python 3.13+); for changing the
@@ -622,6 +624,12 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         :meth:`subdividePartitionsEqual`, and :meth:`setIndex`.
 
         >>> ms = meter.MeterSequence('4/4', 4)
+        >>> ms
+        <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
+
+        Modify so that there's a parenthesis around the whole sequence. The original
+        is unchanged.
+
         >>> ms.parenthesis
         False
         >>> ms2 = ms.modify(parenthesis=True)
@@ -630,10 +638,36 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> ms.parenthesis
         False
 
+        Changing the numerator or denominator rebuilds the sequence with that many
+        equal parts:
+
+        >>> ms3 = ms.modify(numerator=3)
+        >>> ms3
+        <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
+
+        Any other keyword, including weight, is ignored.
+
+        >>> ms.weight
+        1.0
+        >>> ms.modify(weight=1.5).weight
+        1.0
+
+        For other changes to the MeterSequence, see methods
+        :meth:`subdivide`, :meth:`partition`, etc.
+
         AI-assisted (Claude).
         '''
-        partition = tuple(keywords.get('partition', self._partition))
-        numerator, denominator = _ratioFromPartition(partition)
+        if 'partition' in keywords:
+            partition = tuple(keywords['partition'])
+            numerator, denominator = _ratioFromPartition(partition)
+        elif 'numerator' in keywords or 'denominator' in keywords:
+            numerator = keywords.get('numerator', self._numerator)
+            denominator = keywords.get('denominator', self._denominator)
+            # rebuild the new ratio as `numerator` equal parts (each 1/denominator)
+            partition = getMeterSequence(f'{numerator}/{denominator}', numerator)._partition
+        else:
+            partition = self._partition
+            numerator, denominator = self._numerator, self._denominator
         return makeSequence(
             numerator, denominator, partition,
             parenthesis=keywords.get('parenthesis', self.parenthesis),
