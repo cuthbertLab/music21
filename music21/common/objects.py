@@ -268,7 +268,8 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
     def __eq__(self, other: object) -> bool:
         if type(self) is not type(other):
-            return False
+            # Defer to the other operand rather than declaring inequality
+            return NotImplemented
         for thisSlot in self._getSlotsRecursive():
             if thisSlot == 'id':
                 continue

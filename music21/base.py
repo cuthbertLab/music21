@@ -26,7 +26,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'11.0.0b6'
+'11.0.0b9'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -54,7 +54,7 @@ from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL, OffsetQLIn
 from music21 import defaults
 from music21.derivation import Derivation
-from music21.duration import Duration, DurationException
+from music21.duration import Duration, DurationException, FrozenDuration
 from music21.editorial import Editorial  # import class directly to not conflict with property.
 from music21 import environment
 from music21 import exceptions21
@@ -2795,13 +2795,25 @@ class Music21Object(prebase.ProtoM21Object):
     def duration(self, durationObj: Duration):
         durationObjAlreadyExists = False
         if self._duration is not None:
-            self._duration.client = None
+            try:
+                self._duration.client = None
+            except TypeError:
+                # a FrozenDuration is immutable and has no client to clear
+                if not isinstance(self._duration, FrozenDuration):
+                    raise
             durationObjAlreadyExists = True
 
         try:
             ql = durationObj.quarterLength
             self._duration = durationObj
-            durationObj.client = self
+            try:
+                durationObj.client = self
+            except TypeError:
+                # durationObj is an immutable FrozenDuration (e.g. one from a
+                # TimeSignature): it never changes, so it needs no client
+                # back-reference and can be held shared as-is.
+                if not isinstance(durationObj, FrozenDuration):
+                    raise
             if durationObjAlreadyExists:
                 self.informSites({'changedElement': 'duration', 'quarterLength': ql})
 
@@ -3797,9 +3809,9 @@ class Music21Object(prebase.ProtoM21Object):
             return 'nan'
 
     @property
-    def beatDuration(self) -> Duration:
+    def beatDuration(self) -> FrozenDuration:
         '''
-        Return a :class:`~music21.duration.Duration` of the beat
+        Return a :class:`~music21.duration.FrozenDuration` of the beat
         active for this object as found in the most recently
         positioned Measure.
 
@@ -3815,7 +3827,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> m.repeatAppend(n, 6)
         >>> n0 = m.notes.first()
         >>> n0.beatDuration
-        <music21.duration.Duration 1.0>
+        <music21.duration.FrozenDuration 1.0>
 
         Notice that the beat duration is the same for all these notes
         and has nothing to do with the duration of the element itself
@@ -3842,16 +3854,28 @@ class Music21Object(prebase.ProtoM21Object):
 
         >>> isolatedNote = note.Note('E4')
         >>> isolatedNote.beatDuration
-        <music21.duration.Duration 0.0>
+        <music21.duration.FrozenDuration 0.0>
+
+        If you want to modify the frozen beatDuration, call unfreeze on it and
+        assign it to a new variable:
+
+        >>> bd = n0.beatDuration
+        >>> bd
+        <music21.duration.FrozenDuration 1.5>
+        >>> bdThaw = bd.unfreeze()
+        >>> bdThaw.type = 'eighth'
+        >>> bdThaw
+        <music21.duration.Duration 0.75>
 
         * Changed in v6.3: returns a duration.Duration object of length 0 if
           there is no TimeSignature in sites.  Previously raised an exception.
+        * Changed in v11: returns a :class:`~music21.duration.FrozenDuration`.
         '''
         try:
             ts = self._getTimeSignatureForBeat()
             return ts.getBeatDuration(ts.getMeasureOffsetOrMeterModulusOffset(self))
         except Music21ObjectException:
-            return Duration(0)
+            return FrozenDuration(quarterLength=0.0)
 
     @property
     def beatStrength(self) -> float:

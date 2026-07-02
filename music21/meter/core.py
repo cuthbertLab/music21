@@ -15,14 +15,14 @@ This module defines two component objects for defining nested metrical structure
 from __future__ import annotations
 
 from collections.abc import Sequence
-import copy
+from functools import lru_cache
 import typing as t
 
 from music21 import common
 from music21.common.numberTools import opFrac
-from music21.common.objects import SlottedObjectMixin
+from music21.common.objects import FrozenObject
 from music21.common.types import OffsetQLIn
-from music21.duration import Duration, DurationException
+from music21.duration import FrozenDuration
 from music21 import environment
 from music21.exceptions21 import MeterException
 from music21.meter import tools
@@ -30,85 +30,98 @@ from music21 import prebase
 
 environLocal = environment.Environment('meter.core')
 
+# a MeterTerminal or a MeterSequence, the two kinds of things that can appear
+# inside a MeterSequence's partition.  (PEP 695 type aliases are evaluated
+# lazily, so the forward references resolve fine.)
+type MeterNode = MeterTerminal | MeterSequence
+
+
 # -----------------------------------------------------------------------------
-
-class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
+class MeterCore:
     '''
-    A MeterTerminal is a nestable primitive of rhythmic division.
+    A mixin holding the read-only behavior shared by both
+    :class:`~music21.meter.core.MeterTerminal` and
+    :class:`~music21.meter.core.MeterSequence`.
 
-    >>> a = meter.MeterTerminal('2/4')
-    >>> a.duration.quarterLength
-    2.0
-    >>> a = meter.MeterTerminal('3/8')
-    >>> a.duration.quarterLength
-    1.5
-    >>> a = meter.MeterTerminal('5/2')
-    >>> a.duration.quarterLength
-    10.0
+    Each subclass supplies ``numerator``, ``denominator``, and ``weight``
+    properties; MeterCore provides the derived, immutable behaviors: the
+    duration, ratio comparison, and the various ``subdivide`` methods (which
+    build and return a new :class:`~music21.meter.core.MeterSequence`).
+
+    AI-assisted (Claude).
     '''
-    # CLASS VARIABLES #
+    __slots__ = ()
 
-    __slots__ = (
-        '_denominator',
-        '_duration',
-        '_numerator',
-        '_overriddenDuration',
-        '_weight',
-    )
+    # these are supplied by the concrete classes as read-only properties;
+    # declared here (as stubs) for the type checker and to document the contract.
+    @property
+    def numerator(self) -> int:
+        raise NotImplementedError  # pragma: no cover
 
-    # INITIALIZER #
-    def __init__(self, slashNotation: str|None = None, weight: int|float = 1):
-        # because of how they are copied, MeterTerminals must not have any
-        # initialization parameters without defaults
-        self._duration: Duration|None = None
-        self._numerator: int = 0
-        self._denominator: int = 1
-        self._weight: int|float = 1  # do not use setter here -- bad override in MeterSequence
-        self._overriddenDuration: Duration|None = None
+    @property
+    def denominator(self) -> int:
+        raise NotImplementedError  # pragma: no cover
 
-        if slashNotation is not None:
-            # assign directly to values, not properties, to avoid
-            # calling _ratioChanged more than necessary
-            values = tools.slashToTuple(slashNotation)  # raise MeterException early if problem.
-            self._numerator = values.numerator
-            self._denominator = values.denominator
+    @property
+    def weight(self) -> float:
+        raise NotImplementedError  # pragma: no cover
 
-        self._ratioChanged()  # sets self._duration
-
-        # this will set the underlying weight attribute directly for data checking
-        # explicitly calling base class method to avoid problems
-        # in the derived class MeterSequence
-        self._weight = weight
-
-    # SPECIAL METHODS #
-
-    def __deepcopy__(self, memo=None):
+    @staticmethod
+    @lru_cache(1024)
+    def _durationFromNumeratorDenominator(
+        numerator: int,
+        denominator: int,
+    ) -> FrozenDuration:
         '''
-        Helper method to for the deepcopy function in copy.py.
+        Return the (immutable) duration equal in length to a numerator/denominator
+        ratio.
 
-        Do not call this directly.
+        Cached, since a small set of ratios (1/4, 1/8, 3/8, ...) recurs constantly.
 
-        Defining a custom __deepcopy__ here is a performance boost,
-        particularly in not copying _duration, directly assigning _weight, and
-        other benefits.
+        >>> meter.core.MeterTerminal._durationFromNumeratorDenominator(3, 8)
+        <music21.duration.FrozenDuration 1.5>
+
+        AI-assisted (Claude).
         '''
-        # call class to get a new, empty instance
-        new = self.__class__()
-        # for name in dir(self):
-        new._numerator = self._numerator
-        new._denominator = self._denominator
-        new._ratioChanged()  # faster than copying dur
-        # new._duration = copy.deepcopy(self._duration, memo)
-        new._weight = self._weight  # these are numbers
-        return new
+        # NOTE: this is a performance critical method.
+        return FrozenDuration(quarterLength=(4.0 * numerator) / denominator)
+
+    @property
+    def duration(self) -> FrozenDuration:
+        '''
+        Returns a :class:`~music21.duration.FrozenDuration` equal in length to this
+        terminal (or sequence).  It is shared and cached, and therefore immutable:
+
+        >>> a = meter.MeterTerminal('3/8')
+        >>> a.duration
+        <music21.duration.FrozenDuration 1.5>
+        >>> a.duration.type
+        'quarter'
+        >>> a.duration.dots
+        1
+
+        Trying to change it raises an exception:
+
+        >>> a.duration.quarterLength = 5.0
+        Traceback (most recent call last):
+        TypeError: This FrozenDuration instance is immutable.
+
+        If you need a changeable duration, unfreeze it first:
+
+        >>> changeable = a.duration.unfreeze()
+        >>> changeable.quarterLength = 5.0
+        >>> changeable
+        <music21.duration.Duration 5.0>
+
+        * Changed in v11: returns a shared, immutable
+          :class:`~music21.duration.FrozenDuration` (was a mutable Duration).
+        '''
+        return self._durationFromNumeratorDenominator(self.numerator, self.denominator)
 
     def _reprInternal(self):
         return str(self)
 
-    def __str__(self):
-        return str(int(self.numerator)) + '/' + str(int(self.denominator))
-
-    def ratioEqual(self, other):
+    def ratioEqual(self, other) -> bool:
         '''
         Compare the numerator and denominator of another object.
         Note that these have to be exact matches; 3/4 is not the same as 6/8
@@ -134,7 +147,7 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
 
     # -------------------------------------------------------------------------
 
-    def subdivideByCount(self, countRequest=None):
+    def subdivideByCount(self, countRequest=None) -> MeterSequence:
         '''
         returns a MeterSequence made up of taking this MeterTerminal and
         subdividing it into the given number of parts.  Each of those parts
@@ -163,18 +176,14 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         <music21.meter.core.MeterTerminal 3/8>
 
         But what if you want to divide into 3/8+2/8 or something else?
-        for that, see the :meth:`~music21.meter.MeterSequence.load` method
+        for that, see the :meth:`~music21.meter.MeterSequence.partition` method
         of :class:`~music21.meter.MeterSequence`.
         '''
-        # elevate to meter sequence
-        ms = MeterSequence()
         # cannot set the weight of this MeterSequence w/o having offsets
-        # pass this MeterTerminal as an argument
-        # when subdividing, use autoWeight
-        ms.load(self, countRequest, autoWeight=True, targetWeight=self.weight)
-        return ms
+        # pass this object as an argument; when subdividing, use autoWeight
+        return _buildSequence(self, countRequest, autoWeight=True, targetWeight=self.weight)
 
-    def subdivideByList(self, numeratorList):
+    def subdivideByList(self, numeratorList) -> MeterSequence:
         '''
         Return a MeterSequence dividing this
         MeterTerminal according to the numeratorList
@@ -209,40 +218,14 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         See :meth:`~music21.meter.MeterSequence.partitionByList` method
         of :class:`~music21.meter.MeterSequence` for more details.
         '''
-        # elevate to meter sequence
-        ms = MeterSequence()
-        ms.load(self)  # do not need to autoWeight here
-        ms.partitionByList(numeratorList)  # this will split weight
-        return ms
-
-    def subdivideByOther(self, other: 'music21.meter.MeterSequence'):
-        '''
-        Return a MeterSequence based on another MeterSequence
-
-        >>> a = meter.MeterSequence('1/4+1/4+1/4')
-        >>> a
-        <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
-        >>> b = meter.MeterSequence('3/8+3/8')
-        >>> a.subdivideByOther(b)
-        <music21.meter.core.MeterSequence {{3/8+3/8}}>
-
-        >>> terminal = meter.MeterTerminal('1/4')
-        >>> divider = meter.MeterSequence('1/8+1/8')
-        >>> terminal.subdivideByOther(divider)
-        <music21.meter.core.MeterSequence {{1/8+1/8}}>
-        '''
-        # elevate to meter sequence
-        ms = MeterSequence()
-        if other.duration.quarterLength != self.duration.quarterLength:
-            raise MeterException(f'cannot subdivide by other: {other}')
-        ms.load(other)  # do not need to autoWeight here
-        # ms.partitionByOtherMeterSequence(other)  # this will split weight
-        return ms
+        # elevate to meter sequence, then partition
+        ms = _buildSequence(self)  # do not need to autoWeight here
+        return ms.partitionByList(numeratorList)  # this will split weight
 
     def subdivide(
         self,
-        value: Sequence[int | str] | MeterSequence | int
-    ):
+        value: Sequence[int | str] | int
+    ) -> MeterSequence:
         '''
         Subdivision takes a MeterTerminal and, making it into a collection of MeterTerminals,
         Returns a MeterSequence.
@@ -254,127 +237,217 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         if common.isListLike(value):
             return self.subdivideByList(value)
-        elif isinstance(value, MeterSequence):
-            return self.subdivideByOther(value)
         elif common.isNum(value):
             return self.subdivideByCount(value)
         else:
             raise MeterException(f'cannot process partition argument {value}')
 
+
+# -----------------------------------------------------------------------------
+
+class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
+    '''
+    A MeterTerminal is a nestable primitive of rhythmic division.
+
+    >>> a = meter.MeterTerminal('2/4')
+    >>> a.duration.quarterLength
+    2.0
+    >>> a = meter.MeterTerminal('3/8')
+    >>> a.duration.quarterLength
+    1.5
+    >>> a = meter.MeterTerminal('5/2')
+    >>> a.duration.quarterLength
+    10.0
+
+    A MeterTerminal is an immutable value object defined solely by its
+    numerator, denominator, and weight.  Its attributes cannot be changed
+    after creation; instead make a new one (see :func:`getMeterTerminal`):
+
+    >>> a.numerator = 6
+    Traceback (most recent call last):
+    TypeError: This MeterTerminal instance is immutable.
+
+    Because it is immutable, deep-copying a MeterTerminal returns the same
+    shared object, and equality is by value:
+
+    >>> import copy
+    >>> copy.deepcopy(a) is a
+    True
+    >>> meter.MeterTerminal('2/4') == meter.MeterTerminal('2/4')
+    True
+
+    * Changed in v11: MeterTerminal is immutable, deep-copies to itself, and
+      compares by value.  Removed the numerator/denominator/weight/duration
+      setters (set values when creating the terminal, or use `modify()`).
+
+    AI-assisted (Claude).
+    '''
+    # CLASS VARIABLES #
+
+    __slots__ = (
+        '_denominator',
+        '_numerator',
+        '_weight',
+    )
+
+    # slot type declarations (for the type checker); set via object.__setattr__
+    _numerator: int
+    _denominator: int
+    _weight: float
+
+    # INITIALIZER #
+    def __init__(self, slashNotation: str|None = None, weight: float = 1.0, *,
+                 numerator: int = 0, denominator: int = 1):
+        if slashNotation is not None:
+            # raise MeterException early if there is a problem.
+            values = tools.slashToTuple(slashNotation)
+            numerator = values.numerator
+            denominator = values.denominator
+        # Set the slots on the known-safe init path with object.__setattr__ to
+        # bypass FrozenObject's expensive per-set inspection (which walks the
+        # stack to find where in a sequence we are); afterwards the object is
+        # fully immutable.
+        object.__setattr__(self, '_numerator', numerator)
+        object.__setattr__(self, '_denominator', denominator)
+        object.__setattr__(self, '_weight', weight)
+
+    # SPECIAL METHODS #
+
+    def __deepcopy__(self, memo=None):
+        '''
+        Helper method for the deepcopy function in copy.py.
+
+        Do not call this directly.
+
+        A MeterTerminal is immutable and shared, so deep-copying it simply
+        returns the same object (a large performance win, since MeterTerminals
+        are copied constantly as part of Streams and TimeSignatures).
+        '''
+        return self
+
+    def __copy__(self):
+        '''
+        A MeterTerminal is immutable, so a shallow copy is also just itself.
+        '''
+        return self
+
+    def _reprInternal(self):
+        return str(self)
+
+    def __str__(self):
+        return str(int(self.numerator)) + '/' + str(int(self.denominator))
+
+    def modify(self, **keywords) -> MeterTerminal:
+        '''
+        Return a (cached) MeterTerminal identical to this one except for the
+        given ``numerator``, ``denominator`` and/or ``weight`` keyword(s); the
+        other values carry over.  The original is unchanged, since a
+        MeterTerminal is immutable.
+
+        This is how to "change" an immutable terminal -- analogous to
+        :func:`copy.replace` (Python 3.13+) or ``namedtuple._replace``.
+
+        >>> a = meter.MeterTerminal('2/4', weight=0.5)
+        >>> b = a.modify(weight=0.25)
+        >>> b
+        <music21.meter.core.MeterTerminal 2/4>
+        >>> b.weight
+        0.25
+
+        The original is unchanged, and the un-named values carry over (here the
+        weight stays 0.5):
+
+        >>> a.weight
+        0.5
+        >>> c = a.modify(numerator=3)
+        >>> c
+        <music21.meter.core.MeterTerminal 3/4>
+        >>> c.weight
+        0.5
+
+        modify goes through the cache, so identical results share one object:
+
+        >>> a.modify(numerator=3) is c
+        True
+
+        Any keyword other than numerator/denominator/weight raises a ValueError:
+
+        >>> a.modify(parenthesis=True)
+        Traceback (most recent call last):
+        ValueError: MeterTerminal.modify() does not accept ['parenthesis']...
+
+        AI-assisted (Claude).
+        '''
+        extra = set(keywords) - {'numerator', 'denominator', 'weight'}
+        if extra:
+            raise ValueError(
+                f'MeterTerminal.modify() does not accept {sorted(extra)}; allowed '
+                'keywords are numerator, denominator, weight.')
+        return getMeterTerminal(
+            numerator=keywords.get('numerator', self._numerator),
+            denominator=keywords.get('denominator', self._denominator),
+            weight=keywords.get('weight', self._weight),
+        )
+
+    # copy.replace() support (Python 3.13+)
+    __replace__ = modify
+
     # -------------------------------------------------------------------------
     # properties
 
     @property
-    def weight(self) -> float|int:
+    def weight(self) -> float:
         '''
-        Return or set the weight of a MeterTerminal
+        Return the weight of a MeterTerminal.
 
-        >>> a = meter.MeterTerminal('2/4')
-        >>> a.weight = 0.5
+        >>> a = meter.MeterTerminal('2/4', 0.5)
         >>> a.weight
         0.5
+
+        To get a MeterTerminal with a different weight, use :meth:`modify`:
+
+        >>> a.modify(weight=0.25)
+        <music21.meter.core.MeterTerminal 2/4>
+
+        * Changed in v11: weight is immutable and must be a float (not int).
         '''
         return self._weight
-
-    @weight.setter
-    def weight(self, value: float|int):
-        self._weight = value
 
     @property
     def numerator(self) -> int:
         '''
-        Return or set the numerator of the MeterTerminal
+        Return the numerator of the MeterTerminal.
 
         >>> a = meter.MeterTerminal('2/4')
         >>> a.numerator
         2
-        >>> a.duration.quarterLength
-        2.0
-        >>> a.numerator = 11
-        >>> a.duration.quarterLength
-        11.0
+
+        To get a MeterTerminal with a different numerator, use :meth:`modify`:
+
+        >>> a.modify(numerator=3)
+        <music21.meter.core.MeterTerminal 3/4>
+
+        * Changed in v11: numerator is immutable.
         '''
         return self._numerator
-
-    @numerator.setter
-    def numerator(self, value: int):
-        self._numerator = value
-        self._ratioChanged()
 
     @property
     def denominator(self) -> int:
         '''
-        Get or set the denominator of the meter terminal
+        Return the denominator of the MeterTerminal.
 
         >>> a = meter.MeterTerminal('2/4')
         >>> a.denominator
         4
-        >>> a.duration.quarterLength
-        2.0
-        >>> a.denominator = 8
-        >>> a.duration.quarterLength
-        1.0
 
-        >>> a.denominator = 7
-        Traceback (most recent call last):
-        music21.exceptions21.MeterException: bad denominator value: 7
+        To get a MeterTerminal with a different denominator, use :meth:`modify`:
+
+        >>> a.modify(denominator=8)
+        <music21.meter.core.MeterTerminal 2/8>
+
+        * Changed in v11: denominator is immutable.
         '''
         return self._denominator
-
-    @denominator.setter
-    def denominator(self, value: int):
-        # use duration.typeFromNumDict?
-        if value not in tools.validDenominatorsSet:
-            raise MeterException(f'bad denominator value: {value}')
-        self._denominator = value
-        self._ratioChanged()
-
-    def _ratioChanged(self):
-        '''
-        If ratio has been changed, call this to update duration
-        '''
-        # NOTE: this is a performance critical method and should only be
-        # called when necessary
-        self._duration = Duration()
-        try:
-            self._duration.quarterLength = (
-                (4.0 * self.numerator) / self.denominator
-            )
-        except DurationException:
-            environLocal.printDebug(
-                ['DurationException encountered',
-                 'numerator/denominator',
-                 self.numerator,
-                 self.denominator
-                 ]
-            )
-
-
-    @property
-    def duration(self):
-        '''
-        duration gets or sets a duration value that
-        is equal in length of the terminal.
-
-        >>> a = meter.MeterTerminal()
-        >>> a.numerator = 3
-        >>> a.denominator = 8
-        >>> d = a.duration
-        >>> d.type
-        'quarter'
-        >>> d.dots
-        1
-        >>> d.quarterLength
-        1.5
-        '''
-        if self._overriddenDuration:
-            return self._overriddenDuration
-        else:
-            return self._duration
-
-    @duration.setter
-    def duration(self, value: Duration):
-        self._overriddenDuration = value
 
     @property
     def depth(self):
@@ -386,20 +459,96 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
 
 # -----------------------------------------------------------------------------
 
+_meterTerminalCache: dict[tuple[int, int, float], MeterTerminal] = {}
 
-class MeterSequence(MeterTerminal):
+
+def getMeterTerminal(numerator: int, denominator: int,
+                     weight: float = 1.0) -> MeterTerminal:
     '''
-    A meter sequence is a list of MeterTerminals, or other MeterSequences
+    Return a shared, cached, immutable :class:`MeterTerminal` for these values.
+
+    Because MeterTerminals are immutable, identical `(numerator, denominator,
+    weight)` triples can all share one object.  This is how a "changed" terminal
+    is produced: instead of mutating an existing terminal, request the cached
+    terminal for the new values.
+
+    >>> mt = meter.core.getMeterTerminal(1, 4)
+    >>> mt
+    <music21.meter.core.MeterTerminal 1/4>
+    >>> meter.core.getMeterTerminal(1, 4) is mt
+    True
+    >>> meter.core.getMeterTerminal(1, 4, weight=0.5) is mt
+    False
+
+    AI-assisted (Claude).
+    '''
+    key = (numerator, denominator, weight)
+    cached = _meterTerminalCache.get(key)
+    if cached is None:
+        cached = MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
+        _meterTerminalCache[key] = cached
+    return cached
+
+
+# -----------------------------------------------------------------------------
+
+
+class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
+    '''
+    A MeterSequence is an immutable, hashable sequence of MeterTerminals, or
+    other MeterSequences.
+
+    >>> ms = meter.MeterSequence('4/4', 4)
+    >>> ms
+    <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
+
+    Like :class:`~music21.meter.core.MeterTerminal`, a MeterSequence is an
+    immutable value object.  Its structure cannot be changed after creation;
+    the "mutating" methods (:meth:`partition`, :meth:`subdividePartitionsEqual`,
+    :meth:`setLevelWeight`, :meth:`setIndex`, ...) instead RETURN a new
+    MeterSequence and leave ``self`` unchanged:
+
+    >>> ms2 = ms.partition(2)
+    >>> ms2
+    <music21.meter.core.MeterSequence {1/2+1/2}>
+    >>> ms
+    <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
+
+    Because it is immutable, deep-copying a MeterSequence returns the same
+    shared object, and equality is by value:
+
+    >>> import copy
+    >>> copy.deepcopy(ms) is ms
+    True
+    >>> meter.MeterSequence('4/4', 4) == meter.MeterSequence('4/4', 4)
+    True
+
+    * Changed in v11: MeterSequence is immutable, hashable, deep-copies to
+      itself, and its formerly in-place operations return a new sequence.
+      Removed `load()` (set values when creating the sequence),
+      `subdivideByOther()` (it only wrapped its argument in a new sequence),
+      the `weight` setter (use `withWeight()`), and item assignment
+      `ms[i] = x` (use `setIndex()`).
+
+    AI-assisted (Claude).
     '''
 
     # CLASS VARIABLES #
 
     __slots__ = (
-        '_levelListCache',
+        '_denominator',
+        '_numerator',
         '_partition',
         'parenthesis',
         'summedNumerator',
     )
+
+    # slot type declarations (for the type checker); set via object.__setattr__
+    _numerator: int
+    _denominator: int
+    _partition: tuple[MeterNode, ...]
+    parenthesis: bool
+    summedNumerator: bool
 
     # INITIALIZER #
 
@@ -408,63 +557,105 @@ class MeterSequence(MeterTerminal):
         value: str | MeterTerminal | Sequence[MeterTerminal] | Sequence[str] | None = None,
         partitionRequest: t.Any|None = None,
     ):
-        super().__init__()
+        # Build the data on the known-safe init path using object.__setattr__ to
+        # bypass FrozenObject's expensive per-set inspection; after __init__ the
+        # object is fully immutable.
+        numerator, denominator, partitionList, summedNumerator = _loadData(value)
+        parenthesis = False
+        if partitionRequest is not None:
+            built = makeSequence(
+                numerator, denominator, tuple(partitionList),
+                summedNumerator=summedNumerator
+            ).partition(partitionRequest)
+            numerator = built._numerator
+            denominator = built._denominator
+            partitionList = list(built._partition)
+            summedNumerator = built.summedNumerator
+            parenthesis = built.parenthesis
 
-        self._numerator: int = 1  # rationalized
-        self._denominator: int = 0  # lowest common multiple
-        self._partition: list[MeterTerminal|MeterSequence] = []
-        self._levelListCache: dict[tuple[int, bool], list[MeterTerminal]] = {}
-
-        # this attribute is only used in MeterTerminals, and note
-        # in MeterSequences; a MeterSequence's weight is based solely
-        # on the sum of its component parts.
-        # del self._weight -- no -- screws up pickling -- cannot del a slotted object
-
-        # Bool stores whether this meter was provided as a summed numerator
-        self.summedNumerator: bool = False
-
-        # An optional parameter used only in meter display sequences.
-        # Needed in cases where a meter component is parenthetical
-        self.parenthesis: bool = False
-
-        if value is not None:
-            self.load(value, partitionRequest)
+        object.__setattr__(self, '_numerator', numerator)
+        object.__setattr__(self, '_denominator', denominator)
+        object.__setattr__(self, '_partition', tuple(partitionList))
+        object.__setattr__(self, 'summedNumerator', summedNumerator)
+        object.__setattr__(self, 'parenthesis', parenthesis)
 
     # SPECIAL METHODS #
 
     def __deepcopy__(self, memo=None):
         '''
-        Helper method to copy.py's deepcopy function. Call it from there.
-
-        Defining a custom __deepcopy__ here is a performance boost,
-        particularly in not copying _duration and other benefits.
-
-        Notably, self._levelListCache is not copied,
-        which may not be needed in the copy and may be large.
+        A MeterSequence is immutable and shared, so deep-copying it simply
+        returns the same object.
 
         >>> from copy import deepcopy
         >>> ms1 = meter.MeterSequence('4/4+3/8')
-        >>> ms2 = deepcopy(ms1)
-        >>> ms2
-        <music21.meter.core.MeterSequence {4/4+3/8}>
+        >>> deepcopy(ms1) is ms1
+        True
         '''
-        # call class to get a new, empty instance
-        new = self.__class__()
-        # for name in dir(self):
-        new._numerator = self._numerator
-        new._denominator = self._denominator
-        # noinspection PyArgumentList
-        new._partition = copy.deepcopy(self._partition, memo)
-        new._ratioChanged()  # faster than copying dur
-        # new._duration = copy.deepcopy(self._duration, memo)
+        return self
 
-        new._overriddenDuration = self._overriddenDuration
-        new.summedNumerator = self.summedNumerator
-        new.parenthesis = self.parenthesis
+    def __copy__(self):
+        '''
+        A MeterSequence is immutable, so a shallow copy is also just itself.
+        '''
+        return self
 
-        return new
+    def modify(self, **keywords) -> MeterSequence:
+        '''
+        Return a (cached) MeterSequence identical to this one except for the
+        given ``partition``, ``parenthesis`` and/or ``summedNumerator`` keyword(s).
 
-    def __getitem__(self, key: int) -> MeterTerminal:
+        The original is unchanged, since a MeterSequence is immutable.
+
+        Analogous to :func:`copy.replace` (Python 3.13+).  Unlike
+        :meth:`MeterTerminal.modify`, the numerator, denominator, and weight cannot
+        be changed here -- they follow from the partition -- so change the structure
+        with :meth:`partition`, :meth:`subdividePartitionsEqual`, :meth:`setIndex`,
+        etc.  Any keyword other than partition/parenthesis/summedNumerator raises a
+        ValueError.
+
+        >>> ms = meter.MeterSequence('4/4', 4)
+        >>> ms
+        <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
+
+        Modify so that there's a parenthesis around the whole sequence. The original
+        is unchanged.
+
+        >>> ms.parenthesis
+        False
+        >>> ms2 = ms.modify(parenthesis=True)
+        >>> ms2.parenthesis
+        True
+        >>> ms.parenthesis
+        False
+
+        Trying to change the numerator, denominator, or weight raises a ValueError:
+
+        >>> ms.modify(numerator=3)
+        Traceback (most recent call last):
+        ValueError: MeterSequence.modify() does not accept ['numerator']...
+        >>> ms.modify(weight=1.5)
+        Traceback (most recent call last):
+        ValueError: MeterSequence.modify() does not accept ['weight']...
+
+        AI-assisted (Claude).
+        '''
+        extra = set(keywords) - {'partition', 'parenthesis', 'summedNumerator'}
+        if extra:
+            raise ValueError(
+                f'MeterSequence.modify() does not accept {sorted(extra)}; allowed '
+                'keywords are partition, parenthesis, summedNumerator.')
+        partition = tuple(keywords.get('partition', self._partition))
+        numerator, denominator = _ratioFromPartition(partition)
+        return makeSequence(
+            numerator, denominator, partition,
+            parenthesis=keywords.get('parenthesis', self.parenthesis),
+            summedNumerator=keywords.get('summedNumerator', self.summedNumerator),
+        )
+
+    # copy.replace() support (Python 3.13+)
+    __replace__ = modify
+
+    def __getitem__(self, key: int) -> MeterNode:
         '''
         Get an MeterTerminal (or MeterSequence) from _partition
 
@@ -500,42 +691,49 @@ class MeterSequence(MeterTerminal):
         '''
         return len(self._partition)
 
-    def __setitem__(self, key: int, value: MeterTerminal):
+    def setIndex(self, index: int, value: MeterNode) -> MeterSequence:
         '''
-        Insert items at index positions.
+        Return a new MeterSequence with the element at `index` replaced by
+        `value` (which must occupy the same ratio of time as the element it
+        replaces).  This is the immutable replacement for the old
+        ``ms[index] = value`` item assignment.
 
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a
         <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
         >>> a[0]
         <music21.meter.core.MeterTerminal 1/4>
-        >>> a[0] = a[0].subdivide(2)
+        >>> a = a.setIndex(0, a[0].subdivide(2))
         >>> a
         <music21.meter.core.MeterSequence {{1/8+1/8}+1/4+1/4+1/4}>
-        >>> a[0][0] = a[0][0].subdivide(2)
+        >>> a = a.setIndex(0, a[0].setIndex(0, a[0][0].subdivide(2)))
         >>> a
         <music21.meter.core.MeterSequence {{{1/16+1/16}+1/8}+1/4+1/4+1/4}>
         >>> a[3]
         <music21.meter.core.MeterTerminal 1/4>
-        >>> a[3] = a[0][0]
+        >>> a.setIndex(3, a[0][0])
         Traceback (most recent call last):
-        ...
         music21.exceptions21.MeterException: cannot insert {1/16+1/16} into space of 1/4
+
+        * New in v11: functional replacement for ``ms[index] = value`` assignment.
+
+        AI-assisted (Claude).
         '''
         # comparison of numerator and denominator
-        if not isinstance(value, MeterTerminal):
+        if not isinstance(value, MeterCore):
             raise MeterException('values in MeterSequences must be MeterTerminals or '
                                  f'MeterSequences, not {value}')
-        if value.ratioEqual(self[key]):
-            self._partition[key] = value
-        else:
-            raise MeterException(f'cannot insert {value} into space of {self[key]}')
-
-        # clear cache
-        self._levelListCache = {}
+        if not value.ratioEqual(self[index]):
+            raise MeterException(f'cannot insert {value} into space of {self[index]}')
+        newPartition = list(self._partition)
+        newPartition[index] = value
+        return self._rebuild(newPartition)
 
     def __str__(self):
         return '{' + self.partitionDisplay + '}'
+
+    def _reprInternal(self):
+        return str(self)
 
     @property
     def partitionDisplay(self):
@@ -562,37 +760,16 @@ class MeterSequence(MeterTerminal):
 
     # -------------------------------------------------------------------------
 
-    def _clearPartition(self) -> None:
+    def _rebuild(self, partition: list) -> MeterSequence:
         '''
-        This will not sync with .numerator and .denominator if called alone
+        Return a cached MeterSequence with the same numerator, denominator,
+        parenthesis, and summedNumerator as ``self`` but a new partition.
+
+        AI-assisted (Claude).
         '''
-        self._partition = []
-        # clear cache
-        self._levelListCache = {}
-
-    def _addTerminal(self, value: MeterTerminal|str) -> None:
-        '''
-        Add an object to the partition list. This does not update numerator and denominator.
-
-        ???: (targetWeight is the expected total Weight for this MeterSequence. This
-        would be self.weight, but often partitions are cleared before _addTerminal is called.)
-        '''
-        # NOTE: this is a performance critical method
-
-        if isinstance(value, MeterTerminal):  # may be a MeterSequence
-            mt = value
-        else:  # assume it is a string
-            mt = MeterTerminal(value)
-
-        # if isinstance(value, str):
-        #     mt = MeterTerminal(value)
-        # elif isinstance(value, MeterTerminal):  # may be a MeterSequence
-        #     mt = value
-        # else:
-        #     raise MeterException(f'cannot add {value} to this sequence')
-        self._partition.append(mt)
-        # clear cache
-        self._levelListCache = {}
+        return makeSequence(
+            self._numerator, self._denominator, tuple(partition),
+            parenthesis=self.parenthesis, summedNumerator=self.summedNumerator)
 
     def getPartitionOptions(self) -> tools.MeterOptions:
         '''
@@ -632,24 +809,23 @@ class MeterSequence(MeterTerminal):
 
     # -------------------------------------------------------------------------
 
-    def partitionByCount(self, countRequest: int, loadDefault: bool = True) -> None:
+    def partitionByCount(self, countRequest: int, loadDefault: bool = True) -> MeterSequence:
         '''
-        Divide the current MeterSequence into the requested number of parts.
+        Return a new MeterSequence dividing this one into the requested number
+        of parts.
 
         If it is not possible to divide it into the requested number, and
-        loadDefault is `True`, then give the default partition:
-
-        This will destroy any established structure in the stored partition.
+        loadDefault is `True`, then give the default partition.
 
         >>> a = meter.MeterSequence('4/4')
         >>> a
         <music21.meter.core.MeterSequence {4/4}>
-        >>> a.partitionByCount(2)
+        >>> a = a.partitionByCount(2)
         >>> a
         <music21.meter.core.MeterSequence {1/2+1/2}>
         >>> str(a)
         '{1/2+1/2}'
-        >>> a.partitionByCount(4)
+        >>> a = a.partitionByCount(4)
         >>> a
         <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
         >>> str(a)
@@ -659,13 +835,13 @@ class MeterSequence(MeterTerminal):
         meter is irregular:
 
         >>> b = meter.MeterSequence('5/8')
-        >>> b.partitionByCount(2)
+        >>> b = b.partitionByCount(2)
         >>> b
          <music21.meter.core.MeterSequence {2/8+3/8}>
 
         This relies on a pre-defined exemption for partitioning 5 by 3:
 
-        >>> b.partitionByCount(3)
+        >>> b = b.partitionByCount(3)
         >>> str(b)
         '{2/8+2/8+1/8}'
 
@@ -673,7 +849,7 @@ class MeterSequence(MeterTerminal):
         there is no known way to do this:
 
         >>> a = meter.MeterSequence('5/8')
-        >>> a.partitionByCount(11)
+        >>> a = a.partitionByCount(11)
         >>> str(a)
         '{2/8+3/8}'
 
@@ -683,6 +859,7 @@ class MeterSequence(MeterTerminal):
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by 11 (5/8)
 
+        * Changed in v11: returns a new MeterSequence rather than mutating in place.
         '''
         opts = self.getPartitionOptions()
         optMatch = None
@@ -703,40 +880,38 @@ class MeterSequence(MeterTerminal):
                 )
 
         targetWeight = self.weight
-        # environLocal.printDebug(['partitionByCount, targetWeight', targetWeight])
-        self._clearPartition()  # weight will now be zero
-        for mStr in optMatch:
-            self._addTerminal(mStr)
-        self.weight = targetWeight
+        partition = [_coerceTerminal(mStr) for mStr in optMatch]
+        partition = _applyWeight(partition, self.numerator, self.denominator, targetWeight)
+        return self._rebuild(partition)
 
-        # clear cache
-        self._levelListCache = {}
-
-    def partitionByList(self, numeratorList: Sequence[int] | Sequence[str]) -> None:
+    def partitionByList(
+        self,
+        numeratorList: Sequence[int] | Sequence[str]
+    ) -> MeterSequence:
         '''
-        Given a numerator list, partition MeterSequence into a new list
-        of MeterTerminals
+        Given a numerator list, return a new MeterSequence partitioned into a
+        list of MeterTerminals.
 
         >>> a = meter.MeterSequence('4/4')
-        >>> a.partitionByList([1, 1, 1, 1])
+        >>> a = a.partitionByList([1, 1, 1, 1])
         >>> str(a)
         '{1/4+1/4+1/4+1/4}'
 
         This divides it into two equal parts:
 
-        >>> a.partitionByList([1, 1])
+        >>> a = a.partitionByList([1, 1])
         >>> str(a)
         '{1/2+1/2}'
 
         And now into one big part:
 
-        >>> a.partitionByList([1])
+        >>> a = a.partitionByList([1])
         >>> str(a)
         '{1/1}'
 
         Here we divide 4/4 very unconventionally:
 
-        >>> a.partitionByList(['3/4', '1/8', '1/8'])
+        >>> a = a.partitionByList(['3/4', '1/8', '1/8'])
         >>> a
         <music21.meter.core.MeterSequence {3/4+1/8+1/8}>
 
@@ -745,25 +920,26 @@ class MeterSequence(MeterTerminal):
         >>> a.partitionByList(['3/4', '1/8', '5/8'])
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by ['3/4', '1/8', '5/8']
+
+        * Changed in v11: returns a new MeterSequence rather than mutating in place.
         '''
-        optMatch: MeterSequence | None | tuple[str, ...] = None
+        optMatch: Sequence[MeterNode] | tuple[str, ...] | None = None
 
         # assume a list of terminal definitions
         if isinstance(numeratorList[0], str):
-            # TODO: working with private methods of a created MeterSequence
-            test = MeterSequence()
-            for mtStr in numeratorList:
-                test._addTerminal(t.cast(str, mtStr))
-            test._updateRatio()
+            testPartition = [_coerceTerminal(t.cast(str, mtStr)) for mtStr in numeratorList]
+            testNum, testDen = _ratioFromPartition(testPartition)
+            testDur = MeterCore._durationFromNumeratorDenominator(
+                testNum, testDen).quarterLength
             # if durations are equal, this can be used as a partition
-            if self.duration.quarterLength == test.duration.quarterLength:
-                optMatch = test
+            if self.duration.quarterLength == testDur:
+                optMatch = testPartition
             else:
                 raise MeterException(f'Cannot set partition by {numeratorList}')
 
-        elif sum(t.cast(list[int], numeratorList)) in [self.numerator * x for x in range(1, 9)]:
+        elif sum(t.cast('list[int]', numeratorList)) in [self.numerator * x for x in range(1, 9)]:
             for i in range(1, 9):
-                if sum(t.cast(list[int], numeratorList)) == self.numerator * i:
+                if sum(t.cast('list[int]', numeratorList)) == self.numerator * i:
                     optMatchInner: list[str] = []
                     for n in numeratorList:
                         optMatchInner.append(f'{n}/{self.denominator * i}')
@@ -785,19 +961,15 @@ class MeterSequence(MeterTerminal):
                 f'Cannot set partition by {numeratorList} ({self.numerator}/{self.denominator})'
             )
 
-        # Since we have a numerator/denominator match, set this MeterSequence
+        # Since we have a numerator/denominator match, build the new sequence
         targetWeight = self.weight
-        self._clearPartition()  # clears self.weight
-        for mStr in optMatch:
-            self._addTerminal(mStr)
-        self.weight = targetWeight
+        partition = [_coerceTerminal(mStr) for mStr in optMatch]
+        partition = _applyWeight(partition, self.numerator, self.denominator, targetWeight)
+        return self._rebuild(partition)
 
-        # clear cache
-        self._levelListCache = {}
-
-    def partitionByOtherMeterSequence(self, other: MeterSequence) -> None:
+    def partitionByOtherMeterSequence(self, other: MeterSequence) -> MeterSequence:
         '''
-        Set partition to that found in another
+        Return a new MeterSequence with the partition found in another
         MeterSequence.
 
         >>> a = meter.MeterSequence('4/4', 4)
@@ -805,33 +977,31 @@ class MeterSequence(MeterTerminal):
         '{1/4+1/4+1/4+1/4}'
 
         >>> b = meter.MeterSequence('4/4', 2)
-        >>> a.partitionByOtherMeterSequence(b)
+        >>> a = a.partitionByOtherMeterSequence(b)
         >>> len(a)
         2
         >>> str(a)
         '{1/2+1/2}'
+
+        * Changed in v11: returns a new MeterSequence rather than mutating in place.
         '''
         if (self.numerator == other.numerator
                 and self.denominator == other.denominator):
             targetWeight = self.weight
-            self._clearPartition()
-            for mt in other:
-                self._addTerminal(copy.deepcopy(mt))
-            self.weight = targetWeight
+            # other's members are immutable, so they can be shared directly
+            partition = list(other._partition)
+            partition = _applyWeight(partition, self.numerator, self.denominator, targetWeight)
+            return self._rebuild(partition)
         else:
             raise MeterException('Cannot set partition for unequal MeterSequences')
-
-        # clear cache
-        self._levelListCache = {}
 
     def partition(
         self,
         value: int | Sequence[str] | Sequence[MeterTerminal] | Sequence[int] | MeterSequence,
         loadDefault=False
-    ) -> None:
+    ) -> MeterSequence:
         '''
-        Partitioning creates and sets a number of MeterTerminals
-        that make up this MeterSequence.
+        Return a new MeterSequence partitioned according to `value`.
 
         A simple way to partition based on argument time. Single integers
         are treated as beat counts; lists are treated as numerator lists;
@@ -848,13 +1018,13 @@ class MeterSequence(MeterTerminal):
         1
         >>> str(b)
         '{13/8}'
-        >>> b.partition(13)
+        >>> b = b.partition(13)
         >>> len(b)
         13
         >>> str(b)
         '{1/8+1/8+1/8+...+1/8}'
 
-        >>> a.partition(b)
+        >>> a = a.partition(b)
         >>> len(a)
         13
         >>> str(a)
@@ -868,7 +1038,7 @@ class MeterSequence(MeterTerminal):
         music21.exceptions21.MeterException: Cannot set partition by 2 (3/128)
 
         >>> c = meter.MeterSequence('3/128')
-        >>> c.partition(2, loadDefault=True)
+        >>> c = c.partition(2, loadDefault=True)
         >>> len(c)
         3
         >>> str(c)
@@ -876,20 +1046,21 @@ class MeterSequence(MeterTerminal):
 
         * Changed in v9.3: if given a list it must either be all numbers, all strings,
           or all MeterTerminals, not a mix (which was undocumented and buggy)
+        * Changed in v11: returns a new MeterSequence rather than mutating in place.
         '''
         if common.isListLike(value):
-            self.partitionByList(value)
+            return self.partitionByList(value)
         elif isinstance(value, MeterSequence):
-            self.partitionByOtherMeterSequence(value)
+            return self.partitionByOtherMeterSequence(value)
         elif isinstance(value, int):
-            self.partitionByCount(value, loadDefault=loadDefault)
+            return self.partitionByCount(value, loadDefault=loadDefault)
         else:
             raise MeterException(f'cannot process partition argument {value}')
 
-    def subdividePartitionsEqual(self, divisions: int|None = None) -> None:
+    def subdividePartitionsEqual(self, divisions: int|None = None) -> MeterSequence:
         '''
-        Subdivide all partitions by equally-spaced divisions,
-        given a divisions value. Manipulates this MeterSequence in place.
+        Return a new MeterSequence with all partitions subdivided by
+        equally-spaced divisions, given a divisions value.
 
         Divisions value may optionally be a MeterSequence,
         from which a top-level partitioning structure is derived.
@@ -910,7 +1081,7 @@ class MeterSequence(MeterTerminal):
         Divide the Sequence into two parts, so now there are two
         MeterTerminals of 1/4 each:
 
-        >>> ms.partition(2)
+        >>> ms = ms.partition(2)
         >>> ms
         <music21.meter.core.MeterSequence {1/4+1/4}>
         >>> len(ms)
@@ -923,7 +1094,7 @@ class MeterSequence(MeterTerminal):
         But what happens if we want to divide each of those into 1/8+1/8 are replace
         them by MeterSequences?  subdividePartitionsEqual is what is needed.
 
-        >>> ms.subdividePartitionsEqual(2)
+        >>> ms = ms.subdividePartitionsEqual(2)
         >>> ms
         <music21.meter.core.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
 
@@ -937,20 +1108,19 @@ class MeterSequence(MeterTerminal):
         >>> ms[1]
         <music21.meter.core.MeterSequence {1/8+1/8}>
 
-        There is not a way (the authors know of) to get to the next level.
-        You would just need to do them individually.
+        To subdivide a nested component, replace it functionally:
 
-        >>> ms[0].subdividePartitionsEqual(2)
+        >>> ms = ms.setIndex(0, ms[0].subdividePartitionsEqual(2))
         >>> ms
         <music21.meter.core.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{1/8+1/8}}>
-        >>> ms[1].subdividePartitionsEqual(2)
+        >>> ms = ms.setIndex(1, ms[1].subdividePartitionsEqual(2))
         >>> ms
         <music21.meter.core.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
 
         If None is given as a parameter, then it will try to find something logical.
 
         >>> ms = meter.MeterSequence('2/4+3/4')
-        >>> ms.subdividePartitionsEqual(None)
+        >>> ms = ms.subdividePartitionsEqual(None)
         >>> ms
         <music21.meter.core.MeterSequence {{1/4+1/4}+{1/4+1/4+1/4}}>
 
@@ -963,11 +1133,13 @@ class MeterSequence(MeterTerminal):
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by 5 (3/8)
 
+        * Changed in v11: returns a new MeterSequence rather than mutating in place.
         '''
-        divisionsLocal: int = 1
+        newPartition: list[MeterNode] = []
         for i in range(len(self)):
+            el = self[i]
             if divisions is None:  # get dynamically
-                partitionNumerator: int = self[i].numerator
+                partitionNumerator: int = el.numerator
                 if partitionNumerator in (1, 2, 4, 8, 16, 32, 64):
                     divisionsLocal = 2
                 elif partitionNumerator == 3:
@@ -979,108 +1151,49 @@ class MeterSequence(MeterTerminal):
                     divisionsLocal = partitionNumerator
             else:
                 divisionsLocal = divisions
-            # environLocal.printDebug(['got divisions:', divisionsLocal,
-            #   'for numerator', self[i].numerator, 'denominator', self[i].denominator])
-            self[i] = self[i].subdivide(divisionsLocal)
+            newPartition.append(el.subdivide(divisionsLocal))
 
-        # clear cache
-        self._levelListCache = {}
-
-    def _subdivideNested(self, processObjList, divisions):
-        # noinspection PyShadowingNames
-        '''
-        Recursive nested call routine. Returns a list of the MeterSequences at the newly created
-        level.
-
-        >>> ms = meter.MeterSequence('2/4')
-        >>> ms.partition(2)
-        >>> ms
-        <music21.meter.core.MeterSequence {1/4+1/4}>
-        >>> ms[0]
-        <music21.meter.core.MeterTerminal 1/4>
-
-        >>> post = ms._subdivideNested([ms], 2)
-        >>> ms
-        <music21.meter.core.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
-        >>> ms[0]
-        <music21.meter.core.MeterSequence {1/8+1/8}>
-        >>> post
-        [<music21.meter.core.MeterSequence {1/8+1/8}>, <music21.meter.core.MeterSequence {1/8+1/8}>]
-        >>> ms[0] is post[0]
-        True
-
-        >>> post2 = ms._subdivideNested(post, 2)  # pass post here
-        >>> ms
-        <music21.meter.core.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
-        >>> post2
-        [<music21.meter.core.MeterSequence {1/16+1/16}>,
-         <music21.meter.core.MeterSequence {1/16+1/16}>,
-         <music21.meter.core.MeterSequence {1/16+1/16}>,
-         <music21.meter.core.MeterSequence {1/16+1/16}>]
-
-        Notice that since we gave a list of lists, post2 is now one level down
-
-        >>> post2[0] is ms[0]
-        False
-        >>> post2[0] is ms[0][0]
-        True
-
-        '''
-        for obj in processObjList:
-            obj.subdividePartitionsEqual(divisions)
-        # gather references for recursive processing
-        post = []
-        for obj in processObjList:
-            for sub in obj:
-                post.append(sub)
-        # clear cache
-        self._levelListCache = {}
-        return post
+        return self._rebuild(newPartition)
 
     def subdivideNestedHierarchy(self, depth, firstPartitionForm=None,
-                                 normalizeDenominators=True):
+                                 normalizeDenominators=True) -> MeterSequence:
         '''
-        Create nested structure down to a specified depth;
-        the first division is set to one; the second division
-        may be by 2 or 3; remaining divisions are always by 2.
-
-        This a destructive procedure that will remove
-        any existing partition structures.
+        Return a new MeterSequence with a nested structure down to a specified
+        depth; the first division is set to one; the second division may be by
+        2 or 3; remaining divisions are always by 2.
 
         `normalizeDenominators`, if True, will reduce all denominators to the same minimum level.
 
         >>> ms = meter.MeterSequence('4/4')
         >>> ms.subdivideNestedHierarchy(1)
-        >>> ms
         <music21.meter.core.MeterSequence {{1/2+1/2}}>
         >>> ms.subdivideNestedHierarchy(2)
-        >>> ms
         <music21.meter.core.MeterSequence {{{1/4+1/4}+{1/4+1/4}}}>
         >>> ms.subdivideNestedHierarchy(3)
-        >>> ms
         <music21.meter.core.MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
 
         I think you get the picture!
 
-        The effects above are not cumulative.  Users can skip directly to
-        whatever level of hierarchy they want.
+        The effects above are not cumulative -- each call starts from ``ms`` --
+        so users can skip directly to whatever level of hierarchy they want.
 
         >>> ms2 = meter.MeterSequence('4/4')
         >>> ms2.subdivideNestedHierarchy(3)
-        >>> ms2
         <music21.meter.core.MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
+
+        * Changed in v11: returns a new MeterSequence rather than mutating in place.
+
+        AI-assisted (Claude).
         '''
         # as a hierarchical representation, zeroth subdivision must be 1
-        self.partition(1)
+        ms = self.partition(1)
         depthCount = 0
 
         # initial divisions are often based on numerator or are provided
         # by looking at the number of top-level beat partitions
         # thus, 6/8 will have 2, 18/4 should have 5
         if isinstance(firstPartitionForm, MeterSequence):
-            # change self in place, as we cannot re-assign to self:
-            #     self = self.subdivideByOther(firstPartitionForm.getLevel(0))
-            self.load(firstPartitionForm.getLevel(0))
+            ms = _buildSequence(firstPartitionForm.getLevel(0))
             depthCount += 1
         else:  # can be just a number
             if firstPartitionForm is None:
@@ -1090,57 +1203,47 @@ class MeterSequence(MeterTerminal):
                 divFirst = 2
             elif firstPartitionForm in [3]:
                 divFirst = 3
-    #             elif firstPartitionForm in [6, 9, 12, 15, 18]:
-    #                 divFirst = firstPartitionForm / 3
             # otherwise, set the first div to the number of beats; in 18/4
             # this should be 6
             else:  # set to numerator
                 divFirst = firstPartitionForm
 
             # use partitions equal, divide by number
-            self.subdividePartitionsEqual(divFirst)
-            # self[h] = self[h].subdivide(divFirst)
+            ms = ms.subdividePartitionsEqual(divFirst)
             depthCount += 1
 
-#         environLocal.printDebug(['subdivideNestedHierarchy(): firstPartitionForm:',
-#   firstPartitionForm, ': self: ', self])
-
-        # all other partitions are recursive; start first with list
-        post = [self[0]]
+        # all other partitions are recursive; start first with list of paths
+        post: list[tuple[int, ...]] = [(0,)]
         while depthCount < depth:
             # setting divisions to None will get either 2/3 for all components
-            post = self._subdivideNested(post, divisions=None)
+            ms, post = _subdivideNestedByPaths(ms, post, None)
             depthCount += 1
             # need to detect cases of unequal denominators
             if not normalizeDenominators:
                 continue
             while True:
                 d = []
-                for ref in post:
-                    if ref.denominator not in d:
-                        d.append(ref.denominator)
+                for p in post:
+                    den = _getAtPath(ms, p).denominator
+                    if den not in d:
+                        d.append(den)
                 # if we have more than one denominator; we need to normalize
-                # environLocal.printDebug(['subdivideNestedHierarchy():', 'd',  d,
-                #   'post', post, 'depthCount', depthCount])
                 if len(d) > 1:
-                    postNew = []
-                    for i in range(len(post)):
+                    postNew: list[tuple[int, ...]] = []
+                    minD = min(d)
+                    for p in post:
                         # if this is a lower denominator (1/4 not 1/8),
                         # process again
-                        if post[i].denominator == min(d):
-                            postNew += self._subdivideNested([post[i]],
-                                                             divisions=None)
+                        if _getAtPath(ms, p).denominator == minD:
+                            ms, childPaths = _subdivideNestedByPaths(ms, [p], None)
+                            postNew += childPaths
                         else:  # keep original if no problem
-                            postNew.append(post[i])
+                            postNew.append(p)
                     post = postNew  # reassigning to original
                 else:
                     break
 
-        # clear cache; done in self._subdivideNested and possibly not
-        # needed here
-        self._levelListCache = {}
-
-        # environLocal.printDebug(['subdivideNestedHierarchy(): post nested processing:',  self])
+        return ms
 
     # --------------------------------------------------------------------------
     @property
@@ -1192,142 +1295,47 @@ class MeterSequence(MeterTerminal):
             return str(count) + '-uple'
 
     # --------------------------------------------------------------------------
-    # loading is always destructive
-
-    def load(self,
-             value: str | MeterTerminal | Sequence[MeterTerminal] | Sequence[str],
-             partitionRequest: (int
-                                | Sequence[str]
-                                | Sequence[MeterTerminal]
-                                | Sequence[int]
-                                | MeterSequence
-                                | None) = None,
-             autoWeight: bool = False,
-             targetWeight: int|float|None = None):
-        '''
-        This method is called when a MeterSequence is created, or if a MeterSequence is re-set.
-
-        User can enter a list of values or an abbreviated slash notation.
-
-        autoWeight, if True, will attempt to set weights.
-        targetWeight, if given, will be used instead of self.weight
-
-        loading is a destructive operation.
-
-        >>> a = meter.MeterSequence()
-        >>> a.load('4/4', 4)
-        >>> a
-        <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
-        >>> str(a)
-        '{1/4+1/4+1/4+1/4}'
-
-        >>> a.load('4/4', 2)  # request 2 beats
-        >>> a
-        <music21.meter.core.MeterSequence {1/2+1/2}>
-        >>> str(a)
-        '{1/2+1/2}'
-
-        >>> a.load('5/8', 2)  # request 2 beats
-        >>> str(a)
-        '{2/8+3/8}'
-
-        >>> a.load('5/8+4/4')
-        >>> str(a)
-        '{5/8+4/4}'
-        '''
-        # NOTE: this is a performance critical method
-        if autoWeight:
-            if targetWeight is None:
-                # get from current MeterSequence
-                targetWeight = self.weight  # store old
-        else:  # None will not set any value
-            targetWeight = None
-
-        # environLocal.printDebug(['calling load in MeterSequence, got targetWeight', targetWeight])
-        self._clearPartition()
-
-        if isinstance(value, str):
-            ratioList, self.summedNumerator = tools.slashMixedToFraction(value)
-            for n, d in ratioList:
-                slashNotation = f'{n}/{d}'
-                self._addTerminal(MeterTerminal(slashNotation))
-            self._updateRatio()
-            if targetWeight is not None:
-                self.weight = targetWeight
-
-        elif isinstance(value, MeterTerminal):
-            # if we have a single MeterTerminal and autoWeight is active
-            # set this terminal to the old weight
-            if targetWeight is not None:
-                value.weight = targetWeight
-            self._addTerminal(value)
-            self._updateRatio()
-            # do not need to set weight, as based on terminal
-            # environLocal.printDebug([
-            #    'created MeterSequence from MeterTerminal; old weight, new weight',
-            #    value.weight, self.weight])
-
-        elif common.isIterable(value):  # a list of Terminals or Sequence es
-            for obj in value:
-                # environLocal.printDebug(f'creating MeterSequence with {obj}')
-                self._addTerminal(obj)
-            self._updateRatio()
-            if targetWeight is not None:
-                self.weight = targetWeight
-        else:
-            raise MeterException(f'cannot create a MeterSequence with a {value!r}')
-
-        if partitionRequest is not None:
-            self.partition(partitionRequest)
-
-        # clear cache
-        self._levelListCache = {}
-
-    def _updateRatio(self):
-        '''
-        Look at _partition to determine the total
-        numerator and denominator values for this sequence
-
-        This should only be called internally, as MeterSequences
-        are supposed to be immutable (mostly)
-        '''
-        fTuple = tuple((mt.numerator, mt.denominator) for mt in self._partition)
-        # clear first to avoid partial updating
-        # can only set to private attributes
-        # self._numerator, self._denominator = None, 1
-        self._numerator, self._denominator = tools.fractionSum(fTuple)
-        # must call ratio changed directly as not using properties
-        self._ratioChanged()
-
-    # --------------------------------------------------------------------------
     # properties
     # do not permit setting of numerator/denominator
 
     @property
-    def weight(self) -> int | float:
+    def numerator(self) -> int:
         '''
-        Get the weight for the MeterSequence, or set the weight and thereby change the weights
-        for each object in this MeterSequence.
+        Return the numerator of the MeterSequence (the rationalized total).
+
+        >>> meter.MeterSequence('3/4+3/8').numerator
+        9
+        '''
+        return self._numerator
+
+    @property
+    def denominator(self) -> int:
+        '''
+        Return the denominator of the MeterSequence (the lowest common multiple).
+
+        >>> meter.MeterSequence('3/4+3/8').denominator
+        8
+        '''
+        return self._denominator
+
+    @property
+    def weight(self) -> float:
+        '''
+        Return the weight for the MeterSequence: the sum of the weights of each
+        object in this MeterSequence.
 
         By default, all the partitions of a MeterSequence's weights sum to 1.0
 
         >>> a = meter.MeterSequence('3/4')
         >>> a.weight
         1.0
-        >>> a.partition(3)
+        >>> a = a.partition(3)
         >>> a
         <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
         >>> a.weight
         1.0
         >>> a[0].weight
         0.3333...
-
-        But this MeterSequence might be embedded in another one, so perhaps
-        its weight should be 0.5?
-
-        >>> a.weight = 0.5
-        >>> a[0].weight
-        0.16666...
 
         When creating a new MeterSequence from MeterTerminals, the sequence has
         the weight of the sum of those creating it.
@@ -1338,50 +1346,35 @@ class MeterSequence(MeterTerminal):
         >>> accentSequence.weight
         0.75
 
-        Changing the weight of the child sequence will affect the parent, since this is
-        not cached, but recomputed on each call.
-
-        >>> downbeat.weight = 0.375
-        >>> accentSequence.weight
-        0.625
-
-        Changing the weight on the parent sequence will reset weights on the children
-
-        >>> accentSequence.weight = 1.0
-        >>> (downbeat.weight, upbeat.weight)
-        (0.5, 0.5)
-
-        Assume this MeterSequence is a whole, not a part of some larger MeterSequence.
-        Thus, we cannot use numerator/denominator relationship
-        as a scalar.
+        A MeterSequence's weight is not stored; it is recomputed from its parts
+        on each call.
         '''
         summation = 0.0
         for obj in self._partition:
             summation += obj.weight  # may be a MeterTerminal or MeterSequence
         return summation
 
-    @weight.setter
-    def weight(self, value: int | float) -> None:
-        # environLocal.printDebug(['calling setWeight with value', value])
-        if not common.isNum(value):
-            raise MeterException('weight values must be numbers')
+    def withWeight(self, targetWeight: float) -> MeterSequence:
+        '''
+        Return a new MeterSequence whose children are re-weighted so that they
+        sum (proportionally) to ``targetWeight``.
 
-        try:
-            totalRatio = self._numerator / self._denominator
-        except TypeError as te:
-            raise MeterException(
-                'Something wrong with the type of '
-                f'this numerator {self._numerator} {type(self._numerator)} '
-                f'or this denominator {self._denominator} {type(self._denominator)}'
-            ) from te
+        This is the immutable replacement for the pre-v11 ``ms.weight = x``
+        setter: rather than re-weighting the children in place, request a new
+        sequence.
 
-        for mt in self._partition:
-            # for mt in self:
-            partRatio = mt._numerator / mt._denominator
-            mt.weight = value * (partRatio / totalRatio)
-            # mt.weight = (partRatio/totalRatio) #* totalRatio
-            # environLocal.printDebug(['setting weight based on part, total, weight',
-            #    partRatio, totalRatio, mt.weight])
+        >>> ms = meter.MeterSequence('4/4', 4)
+        >>> ms2 = ms.withWeight(1.0)
+        >>> [mt.weight for mt in ms2]
+        [0.25, 0.25, 0.25, 0.25]
+
+        * New in v11: replaces the ``weight`` setter.
+
+        AI-assisted (Claude).
+        '''
+        partition = _applyWeight(
+            self._partition, self._numerator, self._denominator, targetWeight)
+        return self._rebuild(partition)
 
     def _getFlatList(self):
         '''
@@ -1393,7 +1386,7 @@ class MeterSequence(MeterTerminal):
         to concatenate them.
 
         >>> a = meter.MeterSequence('3/4')
-        >>> a.partition(3)
+        >>> a = a.partition(3)
         >>> b = a._getFlatList()
         >>> b
         [<music21.meter.core.MeterTerminal 1/4>,
@@ -1402,7 +1395,7 @@ class MeterSequence(MeterTerminal):
         >>> len(b)
         3
 
-        >>> a[1] = a[1].subdivide(4)
+        >>> a = a.setIndex(1, a[1].subdivide(4))
         >>> len(a)
         3
         >>> a
@@ -1419,7 +1412,7 @@ class MeterSequence(MeterTerminal):
          <music21.meter.core.MeterTerminal 1/16>,
          <music21.meter.core.MeterTerminal 1/4>]
 
-        >>> a[1][2] = a[1][2].subdivide(4)
+        >>> a = a.setIndex(1, a[1].setIndex(2, a[1][2].subdivide(4)))
         >>> a
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
         >>> b = a._getFlatList()
@@ -1427,7 +1420,7 @@ class MeterSequence(MeterTerminal):
         9
         '''
         # Is this the same as getLevelList(0)?
-        mtList = []
+        mtList: list[MeterNode] = []
         for obj in self._partition:  # or for obj in self
             if not isinstance(obj, MeterSequence):
                 mtList.append(obj)
@@ -1449,12 +1442,11 @@ class MeterSequence(MeterTerminal):
         <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
         >>> len(b)
         3
-        >>> b is ms
-        False
 
-        Now take the original MeterSequence and subdivide the second beat into 4 parts:
+        Now take a MeterSequence and subdivide the second beat into 4 parts:
 
-        >>> ms[1] = ms[1].subdivide(4)
+        >>> ms = meter.MeterSequence('3/4', 3)
+        >>> ms = ms.setIndex(1, ms[1].subdivide(4))
         >>> ms
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> b = ms.flatten()
@@ -1463,7 +1455,7 @@ class MeterSequence(MeterTerminal):
         >>> b
         <music21.meter.core.MeterSequence {1/4+1/16+1/16+1/16+1/16+1/4}>
 
-        >>> ms[1][2] = ms[1][2].subdivide(4)
+        >>> ms = ms.setIndex(1, ms[1].setIndex(2, ms[1][2].subdivide(4)))
         >>> ms
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
         >>> b = ms.flatten()
@@ -1472,9 +1464,7 @@ class MeterSequence(MeterTerminal):
         >>> b
         <music21.meter.core.MeterSequence {1/4+1/16+1/16+1/64+1/64+1/64+1/64+1/16+1/4}>
         '''
-        post = MeterSequence()
-        post.load(self._getFlatList())
-        return post
+        return MeterSequence(self._getFlatList())
 
     @property
     def flatWeight(self):
@@ -1490,7 +1480,6 @@ class MeterSequence(MeterTerminal):
     def depth(self):
         '''
         Return how many unique levels deep this part is
-        This should be optimized to store values unless the structure has changed.
         '''
         depth = 0  # start with 0, will count this level
 
@@ -1516,11 +1505,11 @@ class MeterSequence(MeterTerminal):
         >>> ms = meter.MeterSequence('4/4')
         >>> ms.isUniformPartition()
         True
-        >>> ms.partition(4)
+        >>> ms = ms.partition(4)
         >>> ms.isUniformPartition()
         True
-        >>> ms[0] = ms[0].subdivideByCount(2)
-        >>> ms[1] = ms[1].subdivideByCount(4)
+        >>> ms = ms.setIndex(0, ms[0].subdivideByCount(2))
+        >>> ms = ms.setIndex(1, ms[1].subdivideByCount(4))
         >>> ms.isUniformPartition()
         True
         >>> ms.isUniformPartition(depth=1)
@@ -1533,7 +1522,7 @@ class MeterSequence(MeterTerminal):
         >>> ms = meter.MeterSequence('5/8', 5)
         >>> ms.isUniformPartition()
         True
-        >>> ms.partition(2)
+        >>> ms = ms.partition(2)
         >>> ms.isUniformPartition()
         False
 
@@ -1554,7 +1543,7 @@ class MeterSequence(MeterTerminal):
     # --------------------------------------------------------------------------
     # alternative representations
 
-    def getLevelList(self, levelCount: int, flat: bool = True) -> list[MeterTerminal]:
+    def getLevelList(self, levelCount: int, flat: bool = True) -> list[MeterNode]:
         '''
         Recursive utility function that gets everything at a certain level.
 
@@ -1565,9 +1554,9 @@ class MeterSequence(MeterTerminal):
         1 quarter, 2 eighth, 1 quarter, ((2-sixteenths) + 1 eighth).
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b[1] = b[1].subdivide(2)
-        >>> b[3] = b[3].subdivide(2)
-        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
 
@@ -1627,69 +1616,40 @@ class MeterSequence(MeterTerminal):
 
         OMIT_FROM_DOCS
 
-        Test that cache is used and does not get manipulated
+        A fresh list is returned each call, so a caller may mutate it safely:
 
         >>> b = meter.MeterSequence('3/4', 3)
-        >>> (0, True) in b._levelListCache
-        False
         >>> o = b.getLevelList(0)
-
-        Mess with the list:
-
         >>> o.append(meter.core.MeterTerminal('1/8'))
-        >>> o
-        [<music21.meter.core.MeterTerminal 1/4>,
-         <music21.meter.core.MeterTerminal 1/4>,
-         <music21.meter.core.MeterTerminal 1/4>,
-         <music21.meter.core.MeterTerminal 1/8>]
-
-        Cache is populated:
-
-        >>> (0, True) in b._levelListCache
-        True
-
-        But a new list is created.
-
+        >>> len(o)
+        4
         >>> b.getLevelList(0)
         [<music21.meter.core.MeterTerminal 1/4>,
          <music21.meter.core.MeterTerminal 1/4>,
          <music21.meter.core.MeterTerminal 1/4>]
-
         >>> b.getLevelList(0)[0] is o[0]
         True
         '''
-        cacheKey = (levelCount, flat)
-        try:  # check in cache
-            return list(tuple(self._levelListCache[cacheKey]))
-        except KeyError:
-            pass
-
-        mtList: list[MeterTerminal] = []
-        for i in range(len(self._partition)):
-            # environLocal.printDebug(['getLevelList weight', i, self[i].weight])
-            partition_i: MeterTerminal|MeterSequence = self._partition[i]
+        mtList: list[MeterNode] = []
+        for partition_i in self._partition:
             if not isinstance(partition_i, MeterSequence):
-                mt = self[i]  # a MeterTerminal
-                mtList.append(mt)
+                mtList.append(partition_i)  # a MeterTerminal
             else:  # it is a MeterSequence
                 if levelCount > 0:  # retain this sequence but get lower level
                     # reduce level by 1 when recursing; do not
                     # change levelCount here
-                    mtList += partition_i.getLevelList(
-                        levelCount - 1, flat)
+                    mtList += partition_i.getLevelList(levelCount - 1, flat)
                 else:  # level count is at zero
                     if flat:  # make sequence into a terminal
-                        mt = MeterTerminal(
-                            f'{partition_i.numerator}/{partition_i.denominator}'
-                        )
-                        # set weight to that of the sequence
-                        mt.weight = partition_i.weight
-                        mtList.append(mt)
+                        # weight matches that of the sequence it flattens
+                        mtList.append(getMeterTerminal(
+                            partition_i.numerator,
+                            partition_i.denominator,
+                            weight=partition_i.weight,
+                        ))
                     else:  # it is not a terminal, it is a meter sequence
                         mtList.append(partition_i)
 
-        # store in cache but let this be manipulated
-        self._levelListCache[cacheKey] = list(tuple(mtList))
         return mtList
 
     def getLevel(self, level=0, flat=True):
@@ -1699,9 +1659,9 @@ class MeterSequence(MeterTerminal):
         level. A sort of flatness with variable depth.
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b[1] = b[1].subdivide(2)
-        >>> b[3] = b[3].subdivide(2)
-        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevel(0)
@@ -1718,9 +1678,9 @@ class MeterSequence(MeterTerminal):
         For a given level, return the time span of each terminal or sequence
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b[1] = b[1].subdivide(2)
-        >>> b[3] = b[3].subdivide(2)
-        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelSpan(0)
@@ -1754,12 +1714,12 @@ class MeterSequence(MeterTerminal):
         >>> b.getLevelWeight(0)
         [0.25, 0.25, 0.25, 0.25]
 
-        >>> b[1] = b[1].subdivide(2)
-        >>> b[3] = b[3].subdivide(2)
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
         >>> b.getLevelWeight(0)
         [0.25, 0.25, 0.25, 0.25]
 
-        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelWeight(0)
@@ -1774,40 +1734,67 @@ class MeterSequence(MeterTerminal):
             post.append(mt.weight)
         return post
 
-    def setLevelWeight(self, weightList, level=0):
+    def setLevelWeight(self, weightList, level=0) -> MeterSequence:
         '''
         The `weightList` is an array of weights to be applied to a
-        single level of the MeterSequence.
+        single level of the MeterSequence.  Returns a new MeterSequence.
 
         >>> a = meter.MeterSequence('4/4', 4)
-        >>> a.setLevelWeight([1, 2, 3, 4])
+        >>> a = a.setLevelWeight([1.0, 2.0, 3.0, 4.0])
         >>> a.getLevelWeight()
-        [1, 2, 3, 4]
+        [1.0, 2.0, 3.0, 4.0]
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b.setLevelWeight([2, 3])
+        >>> b = b.setLevelWeight([2.0, 3.0])
         >>> b.getLevelWeight(0)
-        [2, 3, 2, 3]
+        [2.0, 3.0, 2.0, 3.0]
 
-        >>> b[1] = b[1].subdivide(2)
-        >>> b[3] = b[3].subdivide(2)
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
         >>> b.getLevelWeight(0)
-        [2, 3.0, 2, 3.0]
+        [2.0, 3.0, 2.0, 3.0]
 
-        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelWeight(0)
-        [2, 3.0, 2, 3.0]
+        [2.0, 3.0, 2.0, 3.0]
         >>> b.getLevelWeight(1)
-        [2, 1.5, 1.5, 2, 1.5, 1.5]
+        [2.0, 1.5, 1.5, 2.0, 1.5, 1.5]
         >>> b.getLevelWeight(2)
-        [2, 1.5, 1.5, 2, 0.75, 0.75, 1.5]
+        [2.0, 1.5, 1.5, 2.0, 0.75, 0.75, 1.5]
+
+        * Changed in v11: returns a new MeterSequence rather than mutating in place.
         '''
-        levelObjs = self.getLevelList(level)
-        for i in range(len(levelObjs)):
-            mt = levelObjs[i]
-            mt.weight = weightList[i % len(weightList)]
+        new, unused_idx = self._withLevelWeights(weightList, level, 0)
+        return new
+
+    def _withLevelWeights(self, weightList, level, startIndex=0) -> tuple[MeterSequence, int]:
+        '''
+        Recursively re-weight the leaf terminals reached at `level`, mirroring
+        the flattening order of :meth:`getLevelList` (flat=True) so that the same
+        terminals are affected and the same running index into `weightList` is
+        used.  Returns the new MeterSequence and the next running index.
+
+        AI-assisted (Claude).
+        '''
+        idx = startIndex
+        newPartition = list(self._partition)
+        for i, partition_i in enumerate(self._partition):
+            if not isinstance(partition_i, MeterSequence):
+                newWeight = weightList[idx % len(weightList)]
+                newPartition[i] = getMeterTerminal(
+                    partition_i.numerator, partition_i.denominator, weight=newWeight)
+                idx += 1
+            elif level > 0:
+                child, idx = partition_i._withLevelWeights(weightList, level - 1, idx)
+                newPartition[i] = child
+            else:
+                # getLevelList(flat=True) flattens this sequence to a single
+                # synthetic terminal that has no persistent home; only the index
+                # advances (matching the historical behavior).
+                idx += 1
+        return self._rebuild(newPartition), idx
 
     # --------------------------------------------------------------------------
     # given a quarter note position, return the active index
@@ -1822,13 +1809,13 @@ class MeterSequence(MeterTerminal):
         0
         >>> a.offsetToIndex(3.5)
         0
-        >>> a.partition(4)
+        >>> a = a.partition(4)
         >>> a.offsetToIndex(0.5)
         0
         >>> a.offsetToIndex(3.5)
         3
 
-        >>> a.partition([1, 2, 1])
+        >>> a = a.partition([1, 2, 1])
         >>> len(a)
         3
         >>> a.offsetToIndex(2.9)
@@ -1882,7 +1869,7 @@ class MeterSequence(MeterTerminal):
         The len of the returned list also provides the depth at the specified qLen.
 
         >>> a = meter.MeterSequence('3/4', 3)
-        >>> a[1] = a[1].subdivide(4)
+        >>> a = a.setIndex(1, a[1].subdivide(4))
         >>> a
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> len(a)
@@ -2015,9 +2002,9 @@ class MeterSequence(MeterTerminal):
         start, quantize, or end.
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b[1] = b[1].subdivide(2)
-        >>> b[3] = b[3].subdivide(2)
-        >>> b[3][0] = b[3][0].subdivide(2)
+        >>> b = b.setIndex(1, b[1].subdivide(2))
+        >>> b = b.setIndex(3, b[3].subdivide(2))
+        >>> b = b.setIndex(3, b[3].setIndex(0, b[3][0].subdivide(2)))
         >>> b
         <music21.meter.core.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.offsetToDepth(0)
@@ -2066,6 +2053,241 @@ class MeterSequence(MeterTerminal):
                     score += 1
 
         return score
+
+
+# -----------------------------------------------------------------------------
+# module-level building helpers for the immutable MeterSequence
+
+_meterSequenceCache: dict[
+    tuple[int, int, tuple, bool, bool], MeterSequence
+] = {}
+
+
+def makeSequence(
+    numerator: int,
+    denominator: int,
+    partition: tuple,
+    *,
+    parenthesis: bool = False,
+    summedNumerator: bool = False,
+) -> MeterSequence:
+    '''
+    Return a shared, cached, immutable MeterSequence for these values,
+    building it directly (bypassing __init__) when it is not already cached.
+
+    AI-assisted (Claude).
+    '''
+    key = (numerator, denominator, partition, parenthesis, summedNumerator)
+    cached = _meterSequenceCache.get(key)
+    if cached is not None:
+        return cached
+    ms = MeterSequence.__new__(MeterSequence)
+    object.__setattr__(ms, '_numerator', numerator)
+    object.__setattr__(ms, '_denominator', denominator)
+    object.__setattr__(ms, '_partition', partition)
+    object.__setattr__(ms, 'parenthesis', parenthesis)
+    object.__setattr__(ms, 'summedNumerator', summedNumerator)
+    _meterSequenceCache[key] = ms
+    return ms
+
+
+def getMeterSequence(
+    value: str | MeterTerminal | Sequence[MeterTerminal] | Sequence[str] | None = None,
+    partitionRequest: t.Any | None = None,
+) -> MeterSequence:
+    '''
+    Return a shared, cached, immutable :class:`MeterSequence` built from the
+    same inputs as the :class:`MeterSequence` constructor.
+
+    Because MeterSequences are immutable, identical inputs all share one
+    object -- so, e.g., every default ``4/4`` TimeSignature reuses the same
+    beam/beat/accent/display sequences.
+
+    >>> ms = meter.core.getMeterSequence('4/4', 4)
+    >>> ms
+    <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
+    >>> meter.core.getMeterSequence('4/4', 4) is ms
+    True
+
+    AI-assisted (Claude).
+    '''
+    built = MeterSequence(value, partitionRequest)
+    return makeSequence(
+        built._numerator, built._denominator, built._partition,
+        parenthesis=built.parenthesis, summedNumerator=built.summedNumerator)
+
+
+def _coerceTerminal(value: MeterTerminal | MeterSequence | str) -> MeterNode:
+    '''
+    Return a MeterTerminal/MeterSequence for the given value: if it is already a
+    MeterCore, return it as-is (they are immutable and shareable); if it is a
+    string, return the cached terminal for that slash notation.
+
+    AI-assisted (Claude).
+    '''
+    # NOTE: this is a performance critical helper
+    if isinstance(value, MeterCore):  # MeterTerminal or MeterSequence
+        return value
+    # assume it is a string; share the cached immutable terminal
+    values = tools.slashToTuple(value)
+    return getMeterTerminal(values.numerator, values.denominator)
+
+
+def _ratioFromPartition(partition) -> tuple[int, int]:
+    '''
+    Return the (numerator, denominator) sum (not reduced) for a partition of
+    MeterTerminals/MeterSequences.
+
+    AI-assisted (Claude).
+    '''
+    return tools.fractionSum(tuple((mt.numerator, mt.denominator) for mt in partition))
+
+
+def _applyWeight(partition, numerator: int, denominator: int, targetWeight: float) -> list:
+    '''
+    Return a new partition list whose members are re-weighted so that they
+    sum (proportionally by ratio) to ``targetWeight``.  Terminals are replaced
+    by cached re-weighted ones; nested sequences are re-weighted recursively.
+
+    AI-assisted (Claude).
+    '''
+    totalRatio = numerator / denominator
+    out: list[MeterNode] = []
+    for mt in partition:
+        partRatio = mt.numerator / mt.denominator
+        newWeight = targetWeight * (partRatio / totalRatio)
+        if isinstance(mt, MeterSequence):
+            out.append(mt.withWeight(newWeight))
+        else:
+            out.append(getMeterTerminal(mt.numerator, mt.denominator, weight=newWeight))
+    return out
+
+
+def _loadData(
+    value: str | MeterTerminal | Sequence[MeterTerminal] | Sequence[str] | None = None,
+    *,
+    autoWeight: bool = False,
+    targetWeight: float | None = None,
+) -> tuple[int, int, list, bool]:
+    '''
+    Build the raw data for a MeterSequence from a value: return
+    ``(numerator, denominator, partitionList, summedNumerator)``.
+
+    `autoWeight`/`targetWeight` mirror the old ``MeterSequence.load``: when
+    ``targetWeight`` is provided the members are re-weighted to sum to it.
+
+    AI-assisted (Claude).
+    '''
+    # NOTE: this is a performance critical helper
+    if not autoWeight:
+        targetWeight = None
+
+    if value is None:
+        return 1, 0, [], False
+
+    summedNumerator = False
+    partition: list[MeterNode] = []
+
+    if isinstance(value, str):
+        ratioList, summedNumerator = tools.slashMixedToFraction(value)
+        for n, d in ratioList:
+            partition.append(getMeterTerminal(n, d))
+        numerator, denominator = _ratioFromPartition(partition)
+        if targetWeight is not None:
+            partition = _applyWeight(partition, numerator, denominator, targetWeight)
+
+    elif isinstance(value, MeterCore):  # a MeterTerminal or MeterSequence
+        if targetWeight is not None:
+            if isinstance(value, MeterSequence):
+                value = value.withWeight(targetWeight)
+            else:
+                # a terminal is immutable: swap in a re-weighted cached one
+                value = getMeterTerminal(value.numerator, value.denominator,
+                                         weight=targetWeight)
+        partition.append(value)
+        numerator, denominator = _ratioFromPartition(partition)
+
+    elif common.isIterable(value):  # a list of Terminals or Sequences
+        for obj in value:
+            partition.append(_coerceTerminal(obj))
+        numerator, denominator = _ratioFromPartition(partition)
+        if targetWeight is not None:
+            partition = _applyWeight(partition, numerator, denominator, targetWeight)
+    else:
+        raise MeterException(f'cannot create a MeterSequence with a {value!r}')
+
+    return numerator, denominator, partition, summedNumerator
+
+
+def _buildSequence(
+    value=None,
+    partitionRequest=None,
+    *,
+    autoWeight: bool = False,
+    targetWeight: float | None = None,
+) -> MeterSequence:
+    '''
+    Build a cached, immutable MeterSequence from a value (and optional
+    partitionRequest), applying weights as the old ``load`` did.
+
+    AI-assisted (Claude).
+    '''
+    numerator, denominator, partition, summedNumerator = _loadData(
+        value, autoWeight=autoWeight, targetWeight=targetWeight)
+    ms = makeSequence(numerator, denominator, tuple(partition),
+                       summedNumerator=summedNumerator)
+    if partitionRequest is not None:
+        ms = ms.partition(partitionRequest)
+    return ms
+
+
+def _getAtPath(root: MeterSequence, path: tuple[int, ...]) -> MeterNode:
+    '''
+    Return the node reached by following `path` (a tuple of indices) from `root`.
+
+    AI-assisted (Claude).
+    '''
+    node: MeterNode = root
+    for i in path:
+        node = t.cast('MeterSequence', node)[i]
+    return node
+
+
+def _replaceAtPath(root: MeterSequence, path: tuple[int, ...], newNode) -> MeterSequence:
+    '''
+    Return a new root MeterSequence with the node at `path` replaced by
+    `newNode`, rebuilding each ancestor functionally.
+
+    AI-assisted (Claude).
+    '''
+    idx = path[0]
+    if len(path) == 1:
+        return root.setIndex(idx, newNode)
+    child = t.cast('MeterSequence', root[idx])
+    newChild = _replaceAtPath(child, path[1:], newNode)
+    return root.setIndex(idx, newChild)
+
+
+def _subdivideNestedByPaths(
+    root: MeterSequence,
+    paths: list[tuple[int, ...]],
+    divisions,
+) -> tuple[MeterSequence, list[tuple[int, ...]]]:
+    '''
+    Subdivide (equally) each node reached by a path in `paths`, rebuilding the
+    root functionally, and return the new root plus the list of paths to the
+    newly created child nodes.
+
+    AI-assisted (Claude).
+    '''
+    newPaths: list[tuple[int, ...]] = []
+    for p in paths:
+        node = t.cast('MeterSequence', _getAtPath(root, p))
+        newNode = node.subdividePartitionsEqual(divisions)
+        root = _replaceAtPath(root, p, newNode)
+        for j in range(len(newNode)):
+            newPaths.append(p + (j,))
+    return root, newPaths
 
 
 if __name__ == '__main__':
