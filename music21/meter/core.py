@@ -222,30 +222,9 @@ class MeterCore:
         ms = _buildSequence(self)  # do not need to autoWeight here
         return ms.partitionByList(numeratorList)  # this will split weight
 
-    def subdivideByOther(self, other: MeterSequence) -> MeterSequence:
-        '''
-        Return a MeterSequence based on another MeterSequence
-
-        >>> a = meter.MeterSequence('1/4+1/4+1/4')
-        >>> a
-        <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
-        >>> b = meter.MeterSequence('3/8+3/8')
-        >>> a.subdivideByOther(b)
-        <music21.meter.core.MeterSequence {{3/8+3/8}}>
-
-        >>> terminal = meter.MeterTerminal('1/4')
-        >>> divider = meter.MeterSequence('1/8+1/8')
-        >>> terminal.subdivideByOther(divider)
-        <music21.meter.core.MeterSequence {{1/8+1/8}}>
-        '''
-        if other.duration.quarterLength != self.duration.quarterLength:
-            raise MeterException(f'cannot subdivide by other: {other}')
-        # elevate to meter sequence
-        return _buildSequence(other)  # do not need to autoWeight here
-
     def subdivide(
         self,
-        value: Sequence[int | str] | MeterSequence | int
+        value: Sequence[int | str] | int
     ) -> MeterSequence:
         '''
         Subdivision takes a MeterTerminal and, making it into a collection of MeterTerminals,
@@ -258,8 +237,6 @@ class MeterCore:
         '''
         if common.isListLike(value):
             return self.subdivideByList(value)
-        elif isinstance(value, MeterSequence):
-            return self.subdivideByOther(value)
         elif common.isNum(value):
             return self.subdivideByCount(value)
         else:
@@ -548,9 +525,10 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
     * Changed in v11: MeterSequence is immutable, hashable, deep-copies to
       itself, and its formerly in-place operations return a new sequence.
-      Removed `load()` (set values when creating the sequence), the `weight`
-      setter (use `withWeight()`), and item assignment `ms[i] = x` (use
-      `setIndex()`).
+      Removed `load()` (set values when creating the sequence),
+      `subdivideByOther()` (it only wrapped its argument in a new sequence),
+      the `weight` setter (use `withWeight()`), and item assignment
+      `ms[i] = x` (use `setIndex()`).
 
     AI-assisted (Claude).
     '''
@@ -665,9 +643,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         if extra:
             raise ValueError(
                 f'MeterSequence.modify() does not accept {sorted(extra)}; allowed '
-                'keywords are partition, parenthesis, summedNumerator.  numerator, '
-                'denominator, and weight follow from the partition -- change them via '
-                'partition(), subdividePartitionsEqual(), setIndex(), etc.')
+                'keywords are partition, parenthesis, summedNumerator.')
         partition = tuple(keywords.get('partition', self._partition))
         numerator, denominator = _ratioFromPartition(partition)
         return makeSequence(
