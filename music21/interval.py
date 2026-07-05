@@ -3460,7 +3460,10 @@ class Interval(IntervalBase):
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
         oldDiatonicNum = pitch1.diatonicNoteNum
-        centsOrigin = pitch1.microtone.cents
+        if not pitch1.isTwelveTone():
+            centsOrigin = pitch1.microtone.cents
+        else:
+            centsOrigin = 0.0
         distanceToMove = self.diatonic.generic.staffDistance
 
         newDiatonicNumber = oldDiatonicNum + distanceToMove
@@ -3475,13 +3478,9 @@ class Interval(IntervalBase):
 
         # We have the right note name but not the right accidental
         interval2 = Interval(pitch1, pitch2)
-        # interval2 is measured from the microtonal pitch1, so halfStepsToFix
-        # carries the source microtone. Peel it off so it adjusts only the
-        # accidental; it is restored as a microtone once the accidental is set.
-        # Without this, the leaked cents corrupt the spelling (e.g. a +30c pitch
-        # transposed by P1 becomes a half-sharp) or raise AccidentalException.
         halfStepsToFix = self.chromatic.semitones - interval2.chromatic.semitones
         if centsOrigin:
+            # peel the source microtone off so it adjusts only the accidental
             halfStepsToFix = round(halfStepsToFix - centsOrigin / 100.0, 9)
 
         # environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix,
@@ -3533,8 +3532,8 @@ class Interval(IntervalBase):
                         and oldPitch2Accidental.name == 'natural'):
                     pitch2.accidental = oldPitch2Accidental
 
-        # restore the source microtone that was peeled off halfStepsToFix above
         if centsOrigin:
+            # restore the cents peeled off halfStepsToFix above
             pitch2.microtone = pitch2.microtone.cents + centsOrigin
 
         if useImplicitOctave:
