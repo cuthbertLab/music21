@@ -3460,7 +3460,11 @@ class Interval(IntervalBase):
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
         oldDiatonicNum = pitch1.diatonicNoteNum
-        if not pitch1.isTwelveTone():
+        # Only carry pitch1's microtone through when the interval is not itself
+        # microtonal: a microtonal interval already supplies the result's cents
+        # (e.g. scale realization), so preserving here would double-count.
+        intervalIsMicrotonal = self.chromatic.semitones != int(self.chromatic.semitones)
+        if not pitch1.isTwelveTone() and not intervalIsMicrotonal:
             centsOrigin = pitch1.microtone.cents
         else:
             centsOrigin = 0.0
@@ -3476,12 +3480,16 @@ class Interval(IntervalBase):
         # if this is not set to None then terrible things happen
         pitch2.microtone = None  # type: ignore
 
-        # We have the right note name but not the right accidental
-        interval2 = Interval(pitch1, pitch2)
-        halfStepsToFix = self.chromatic.semitones - interval2.chromatic.semitones
+        # We have the right note name but not the right accidental. Measure it
+        # from pitch1 without its microtone (reapplied to the result below); a
+        # microtonal endpoint here yields a fractional chromatic with no
+        # interval specifier.
+        pitch1ForAccidental = pitch1
         if centsOrigin:
-            # peel the source microtone off so it adjusts only the accidental
-            halfStepsToFix = round(halfStepsToFix - centsOrigin / 100.0, 9)
+            pitch1ForAccidental = copy.deepcopy(pitch1)
+            pitch1ForAccidental.microtone = None
+        interval2 = Interval(pitch1ForAccidental, pitch2)
+        halfStepsToFix = self.chromatic.semitones - interval2.chromatic.semitones
 
         # environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix,
         #    'centsOrigin', centsOrigin, 'interval2', interval2])
