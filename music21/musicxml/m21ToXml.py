@@ -4622,6 +4622,22 @@ class MeasureExporter(XMLExporterBase):
           </unpitched>
           <type>quarter</type>
         </note>
+
+        <unpitched> must come before <voice>, even when there is
+        no <duration>, as on a grace note in a voice:
+
+        >>> MEX.currentVoiceId = 1
+        >>> mxUnpitched = MEX.unpitchedToXml(graceUp)
+        >>> MEX.dump(mxUnpitched)
+        <note>
+          <grace slash="yes" />
+          <unpitched>
+            <display-step>D</display-step>
+            <display-octave>5</display-octave>
+          </unpitched>
+          <voice>1</voice>
+          <type>quarter</type>
+        </note>
         '''
         mxNote = self.noteToXml(up, noteIndexInChord=noteIndexInChord, chordParent=chordParent)
 
@@ -4629,7 +4645,14 @@ class MeasureExporter(XMLExporterBase):
         _setTagTextFromAttribute(up, mxUnpitched, 'display-step')
         _setTagTextFromAttribute(up, mxUnpitched, 'display-octave')
 
-        helpers.insertBeforeElements(mxNote, mxUnpitched, tagList=['duration', 'type'])
+        # within <note>, only <grace>, <cue>, and <chord> may precede
+        # <unpitched>, so insert after those rather than trying to list
+        # everything that can follow it (#1732)
+        helpers.insertAfterElements(
+            mxNote,
+            mxUnpitched,
+            tagList=['grace', 'cue', 'chord']
+        )
 
         return mxNote
 
