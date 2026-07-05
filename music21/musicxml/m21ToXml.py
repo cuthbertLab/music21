@@ -4645,12 +4645,13 @@ class MeasureExporter(XMLExporterBase):
         _setTagTextFromAttribute(up, mxUnpitched, 'display-step')
         _setTagTextFromAttribute(up, mxUnpitched, 'display-octave')
 
-        # anything that can follow <unpitched> within <note> must be listed
-        # here, since a grace note has no <duration> to insert before (#1732)
-        helpers.insertBeforeElements(
+        # within <note>, only <grace>, <cue>, and <chord> may precede
+        # <unpitched>, so insert after those rather than trying to list
+        # everything that can follow it (#1732)
+        helpers.insertAfterElements(
             mxNote,
             mxUnpitched,
-            tagList=['duration', 'tie', 'instrument', 'footnote', 'level', 'voice', 'type']
+            tagList=['grace', 'cue', 'chord']
         )
 
         return mxNote
