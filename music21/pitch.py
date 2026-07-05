@@ -5145,6 +5145,7 @@ class Pitch(prebase.ProtoM21Object):
             # and it is not a natural, it should always be set to display
             if (pPastInMeasure is False
                     and acc is not None
+                    and acc.name != 'natural'
                     and not self._nameInKeySignature(alteredPitches)):
                 acc.displayStatus = True
                 return  # do not search past
