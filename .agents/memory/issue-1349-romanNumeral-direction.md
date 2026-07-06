@@ -33,5 +33,8 @@ and the mismatch differs per degree.
 convention lives in three places that must stay in sync (see the maintenance
 comment in `correctRNAlterationForMinor`). The same session renamed
 `FigureTuple.aboveBass` to `degFromRefPitch` and `ChordFigureTuple` to
-`PitchFigureTuple`; the `bass` parameter of `figureTupleSolo` is still
-unrenamed, an open question.
+`PitchFigureTuple`, and replaced `figureTupleSolo` with the classmethod
+constructor `FigureTuple.fromPitchAndReference(pitchObj, keyObj, refPitch)`
+(old name kept as a deprecated v11→v12 alias). Myke is not all-in on
+classmethod constructors in general, but preferred one here over a
+module-level function whose name read as the verb "figure".
