@@ -32,6 +32,9 @@ and the mismatch differs per degree.
 **How to apply:** when returning to items 2+4, the minor-^6/^7 accidental
 convention lives in three places that must stay in sync (see the maintenance
 comment in `correctRNAlterationForMinor`). The same session renamed
-`FigureTuple.aboveBass` to `degFromRefPitch` and `ChordFigureTuple` to
-`PitchFigureTuple`; the `bass` parameter of `figureTupleSolo` is still
-unrenamed, an open question.
+`FigureTuple.aboveBass` to `degFromRefPitch`, `ChordFigureTuple` to
+`PitchFigureTuple`, and `figureTupleSolo` to `figureTupleFromPitch` (with
+`refPitch` replacing the `bass` parameter; the old name remains as a
+deprecated v11→v12 alias). Myke is not all-in on classmethod constructors —
+prefer module-level `<result>From<Source>` functions like
+`romanNumeralFromChord`.

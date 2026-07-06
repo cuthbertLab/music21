@@ -37,7 +37,7 @@ class FigureTuple(t.NamedTuple):
     A namedtuple of a scale step above a reference pitch, a chromatic
     alteration, and the accidental string to print before a figure.
 
-    Produced by :func:`~music21.roman.figureTupleSolo` and consumed by
+    Produced by :func:`~music21.roman.figureTupleFromPitch` and consumed by
     :func:`~music21.roman.romanNumeralFromChord` and
     :func:`~music21.roman.correctRNAlterationForMinor`.
 
@@ -78,7 +78,7 @@ class FigureTuple(t.NamedTuple):
 
     The `sixthMinor`/`seventhMinor` conventions
     (:class:`~music21.roman.Minor67Default`) are likewise *not* consulted
-    when a FigureTuple is created: `figureTupleSolo` renders `prefix`
+    when a FigureTuple is created: `figureTupleFromPitch` renders `prefix`
     purely from `alter`.  A convention enters only afterwards, when
     :func:`~music21.roman.correctRNAlterationForMinor` rewrites the tuple
     for a chord root on ^6 or ^7 in minor -- and that function hardcodes
@@ -553,7 +553,7 @@ def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[PitchFigu
     result = []
     bass = chordObject.bass()
     for thisPitch in chordObject.pitches:
-        shortTuple = figureTupleSolo(thisPitch, keyObject, bass)
+        shortTuple = figureTupleFromPitch(thisPitch, keyObject, bass)
         appendTuple = PitchFigureTuple(shortTuple.degFromRefPitch,
                                        shortTuple.alter,
                                        shortTuple.prefix,
@@ -562,21 +562,21 @@ def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[PitchFigu
     return result
 
 
-def figureTupleSolo(
+def figureTupleFromPitch(
     pitchObj: pitch.Pitch,
     keyObj: key.Key,
-    bass: pitch.Pitch
+    refPitch: pitch.Pitch,
 ) -> FigureTuple:
     '''
     Return a single :class:`~music21.roman.FigureTuple` for a pitch and key,
-    showing the 1-based degree of the pitch counted from the reference pitch
-    given as `bass`, its alteration from a step in the given key, and an
-    accidental prefix string.  (The reference need not be a sounding bass:
-    `romanNumeralFromChord` passes the tonic of the key here.)
+    showing the 1-based degree of the pitch counted from `refPitch`, its
+    alteration from a step in the given key, and an accidental prefix string.
+    (The reference need not be a sounding bass: `romanNumeralFromChord`
+    passes the tonic of the key here.)
 
     For instance, in C major, an A-3 above an F# bass would be:
 
-    >>> roman.figureTupleSolo(
+    >>> roman.figureTupleFromPitch(
     ...     pitch.Pitch('A-3'),
     ...     key.Key('C'),
     ...     pitch.Pitch('F#2'),
@@ -589,7 +589,7 @@ def figureTupleSolo(
     >>> c = key.Key('c')
     >>> c_as_bass = pitch.Pitch('C3')
     >>> for name in ('E--', 'E-', 'E', 'E#', 'A--', 'A-', 'A', 'A#', 'B--', 'B-', 'B', 'B#'):
-    ...     ft = roman.figureTupleSolo(pitch.Pitch(name + '4'), c, c_as_bass)
+    ...     ft = roman.figureTupleFromPitch(pitch.Pitch(name + '4'), c, c_as_bass)
     ...     print(f'{name:4s} {ft}')
     E--  FigureTuple(degFromRefPitch=3, alter=-1.0, prefix='b')
     E-   FigureTuple(degFromRefPitch=3, alter=0.0, prefix='')
@@ -605,10 +605,14 @@ def figureTupleSolo(
     B#   FigureTuple(degFromRefPitch=7, alter=2.0, prefix='##')
 
     Returns a :class:`~music21.roman.FigureTuple`.
+
+    * Changed in v11: renamed from `figureTupleSolo` (which remains as a
+      deprecated alias); the reference-pitch parameter is `refPitch`
+      (was `bass`).
     '''
     unused_scaleStep, scaleAccidental = keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
 
-    thisInterval = interval.Interval(bass, pitchObj)
+    thisInterval = interval.Interval(refPitch, pitchObj)
     degFromRefPitch = thisInterval.diatonic.generic.mod7
     if scaleAccidental is None:
         rootAlterationString = ''
@@ -625,6 +629,18 @@ def figureTupleSolo(
 
     appendTuple = FigureTuple(degFromRefPitch, alterDiff, rootAlterationString)
     return appendTuple
+
+
+@common.deprecated('v11', 'v12', 'use figureTupleFromPitch() instead')
+def figureTupleSolo(
+    pitchObj: pitch.Pitch,
+    keyObj: key.Key,
+    bass: pitch.Pitch
+) -> FigureTuple:
+    '''
+    Deprecated: use :func:`~music21.roman.figureTupleFromPitch` instead.
+    '''
+    return figureTupleFromPitch(pitchObj, keyObj, bass)
 
 
 def identifyAsTonicOrDominant(
@@ -1315,7 +1331,7 @@ def romanNumeralFromChord(
     elif isinstance(keyObj, str):
         keyObj = key.Key(keyObj)
 
-    ft = figureTupleSolo(root, keyObj, keyObj.tonic)  # a FigureTuple
+    ft = figureTupleFromPitch(root, keyObj, keyObj.tonic)  # a FigureTuple
     ft = correctRNAlterationForMinor(ft, keyObj, chordHasMajorThird=chordHasMajorThird)
 
     if ft.alter == 0:
