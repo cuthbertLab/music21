@@ -1737,20 +1737,20 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> tupDur1 == tupDur2
         False
 
-        If both durations have :attr:`expressionIsInferred` set to True, then
-        their expression (type, dots, tuplets, and components) can be freely
-        changed according to context, so only the `quarterLength` needs to
-        match.  Here a plain quarter note is equal to a half note in a 2:1
-        tuplet, since both span one quarter length and both are free to be
-        re-expressed:
+        If both durations have :attr:`expressionIsInferred` set to True (such as
+        if they were parsed from MIDI), then their expression (type, dots,
+        tuplets, and components) can be freely changed according to context, so
+        only the `quarterLength` needs to match.  Here a plain eighth note is
+        equal to a dotted eighth under a 3:2 triplet, since both span half a
+        quarter length and both are free to be re-expressed:
 
-        >>> plainDur = duration.Duration(1.0)
+        >>> plainDur = duration.Duration(0.5)
         >>> plainDur.type
-        'quarter'
-        >>> altDur = duration.Duration('half')
-        >>> altDur.appendTuplet(duration.Tuplet(2, 1))
+        'eighth'
+        >>> altDur = duration.Duration(type='eighth', dots=1)
+        >>> altDur.appendTuplet(duration.Tuplet(3, 2))
         >>> altDur.quarterLength
-        1.0
+        0.5
         >>> altDur.expressionIsInferred = True
         >>> plainDur == altDur
         True
