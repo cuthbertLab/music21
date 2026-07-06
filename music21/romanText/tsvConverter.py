@@ -1070,13 +1070,6 @@ def localKeyAsRn(local_key: key.Key, global_key: key.Key) -> str:
         'i' if letter.islower() else 'I', keyOrScale=local_key
     )
     r = roman.romanNumeralFromChord(chord.Chord(rn.pitches), keyObj=global_key)
-    # Temporary hack: for some reason this gives VI and VII instead of #VI and #VII *only*
-    #   when local_key is major and global_key is minor.
-    # see issue at https://github.com/cuthbertLab/music21/issues/1349#issue-1327713452
-    if (local_key.mode == 'major' and global_key.mode == 'minor'
-            and r.romanNumeral in ('VI', 'VII')
-            and (r.pitchClasses[0] - global_key.pitches[0].pitchClass) % 12 in (9, 11)):
-        return '#' + r.romanNumeral
     return r.romanNumeral
 
 def isMinor(test_key: str) -> bool:

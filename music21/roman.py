@@ -675,10 +675,12 @@ def romanInversionName(inChord: chord.Chord, inv: int|None = None) -> str:
 
 def correctRNAlterationForMinor(
     figureTuple: FigureTuple,
-    keyObj: key.Key
+    keyObj: key.Key,
+    *,
+    isMajorThird: bool = False,
 ) -> FigureTuple:
     '''
-    (This will become a private function in version 10)
+    (This will become a private function in a future version)
 
     Takes in a FigureTuple and a Key object and returns the same or a
     new FigureTuple correcting for the fact that, for instance, Ab in c minor
@@ -699,9 +701,21 @@ def correctRNAlterationForMinor(
     >>> roman.correctRNAlterationForMinor(ft6, key.Key('c'))
     FigureTuple(aboveBass=6, alter=0, prefix='b')
 
+    For a chord whose quality is minor, diminished, or half-diminished, a raised
+    root is implied by the lowercase numeral, so the sharp prefix is removed:
+
     >>> ft7 = roman.FigureTuple(aboveBass=7, alter=1, prefix='#')
     >>> roman.correctRNAlterationForMinor(ft7, key.Key('c'))
     FigureTuple(aboveBass=7, alter=0, prefix='')
+
+    But if the chord has a major third, pass `isMajorThird=True` so that the
+    sharp is kept: an uppercase VI or VII in minor already refers to the chord
+    on the *lowered* (natural minor) degree, so a major chord on the raised
+    degree needs its sharp to be distinguished from it:
+
+    >>> ft8 = roman.FigureTuple(aboveBass=7, alter=1, prefix='#')
+    >>> roman.correctRNAlterationForMinor(ft8, key.Key('c'), isMajorThird=True)
+    FigureTuple(aboveBass=7, alter=1, prefix='#')
 
     Does nothing for major and passes in the original Figure Tuple unchanged:
 
@@ -720,10 +734,20 @@ def correctRNAlterationForMinor(
     FigureTuple(aboveBass=4, alter=-1, prefix='b')
     >>> ft3 is ft4
     True
+
+    * Changed in v11: the keyword-only argument `isMajorThird` was added, so that
+      major-quality chords on raised ^6 and ^7 in minor keep their sharp prefix
+      (issue #1349).  This fix was AI-assisted (Claude).
     '''
     if keyObj.mode != 'minor':
         return figureTuple
     if figureTuple.aboveBass not in (6, 7):
+        return figureTuple
+    if isMajorThird and figureTuple.alter >= 1.0:
+        # Keep the sharp(s): plain VI or VII in minor means the chord on the
+        # lowered (natural minor) degree under both the QUALITY and CAUTIONARY
+        # conventions, so stripping the prefix would move the root down a
+        # semitone once the figure is parsed again (issue #1349).
         return figureTuple
 
     alter = figureTuple.alter
@@ -922,6 +946,24 @@ def romanNumeralFromChord(
     >>> romanNumeral11
     <music21.roman.RomanNumeral iii7 in C major>
 
+    A major triad on the raised sixth or seventh degree of a minor key keeps
+    its sharp, so that it is distinguished from the major triad on the lowered
+    (natural minor) degree, both in the figure and in
+    :attr:`~music21.roman.RomanNumeral.romanNumeral`:
+
+    >>> majorOnRaisedSix = roman.romanNumeralFromChord(
+    ...     chord.Chord('A3 C#4 E4'), key.Key('c'))
+    >>> majorOnRaisedSix
+    <music21.roman.RomanNumeral #VI in c minor>
+    >>> majorOnRaisedSix.romanNumeral
+    '#VI'
+    >>> majorOnLoweredSix = roman.romanNumeralFromChord(
+    ...     chord.Chord('A-3 C4 E-4'), key.Key('c'))
+    >>> majorOnLoweredSix
+    <music21.roman.RomanNumeral bVI in c minor>
+    >>> majorOnLoweredSix.romanNumeral
+    'VI'
+
     >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('c'))
     <music21.roman.RomanNumeral viø7 in c minor>
 
@@ -1046,6 +1088,12 @@ def romanNumeralFromChord(
     iv6, V, I.
     This kind of context-sensitivity is not currently included.
 
+    * Changed in v11: chords with a major third built on the raised sixth or
+      seventh scale degrees of a minor key keep their sharp prefix (previously
+      the alteration was buried in the inversion figures, e.g. `VI#63`, and
+      lost entirely from `.romanNumeral`; issue #1349).
+      This fix was AI-assisted (Claude).
+
     OMIT_FROM_DOCS
 
     Note that this should be III+642 gives III+#642 (# before 6 is unnecessary)
@@ -1165,7 +1213,7 @@ def romanNumeralFromChord(
         keyObj = key.Key(keyObj)
 
     ft = figureTupleSolo(root, keyObj, keyObj.tonic)  # a FigureTuple
-    ft = correctRNAlterationForMinor(ft, keyObj)
+    ft = correctRNAlterationForMinor(ft, keyObj, isMajorThird=isMajorThird)
 
     if ft.alter == 0:
         tonicPitch = keyObj.tonic
@@ -3353,6 +3401,30 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.romanNumeral
         'bbII'
 
+        Note that the alteration returned is the *sounding* alteration of the
+        root relative to the diatonic scale of the key -- for minor keys, the
+        natural minor scale -- which is not necessarily the accidental written
+        in the figure.  So a scale degree that is chromatically raised gains a
+        sharp even if none was written, because of the interpretation of
+        `sixthMinor` and `seventhMinor` (see :class:`~music21.roman.Minor67Default`):
+
+        >>> roman.RomanNumeral('vi', 'c').romanNumeral
+        '#vi'
+
+        while a merely cautionary accidental (one that does not change the
+        sounding pitch) is dropped:
+
+        >>> rn = roman.RomanNumeral('bVI', 'c',
+        ...     sixthMinor=roman.Minor67Default.CAUTIONARY)
+        >>> ' '.join(p.name for p in rn.pitches)
+        'A- C E-'
+        >>> rn.romanNumeral
+        'VI'
+
+        For the notation as originally written, use
+        :attr:`~music21.roman.RomanNumeral.figure` or combine
+        `frontAlterationString` with `romanNumeralAlone`.
+
         OMIT_FROM_DOCS
 
         >>> rn.romanNumeral = 'V'
@@ -4275,6 +4347,48 @@ class Test(unittest.TestCase):
 
         rn = roman.RomanNumeral('VI+', k)
         self.assertEqual(p(rn), 'A-4 C5 E5')
+
+    def testRomanNumeralFromChordRaised67(self):
+        '''
+        Major-quality chords on the raised sixth and seventh scale degrees of
+        a minor key keep their sharp prefix, so their figures round-trip and
+        `.romanNumeral` distinguishes them from the chords on the lowered
+        (natural minor) degrees.
+        https://github.com/cuthbertLab/music21/issues/1349
+
+        This test was AI-assisted (Claude).
+        '''
+        from music21 import roman
+
+        k = key.Key('c')
+        for pitchNames, expectedFigure, expectedRN in [
+            (('A-4', 'C5', 'E-5'), 'bVI', 'VI'),
+            (('A4', 'C#5', 'E5'), '#VI', '#VI'),
+            (('C#4', 'E4', 'A4'), '#VI6', '#VI'),
+            (('E4', 'A4', 'C#5'), '#VI64', '#VI'),
+            (('B-4', 'D5', 'F5'), 'bVII', 'VII'),
+            (('B4', 'D#5', 'F#5'), '#VII', '#VII'),
+            # unchanged: lowercase quality already implies the raised degree
+            (('A4', 'C5', 'E5'), 'vi', '#vi'),
+            (('B4', 'D5', 'F5'), 'viio', '#vii'),
+        ]:
+            with self.subTest(pitches=pitchNames):
+                c = chord.Chord(pitchNames)
+                rn = roman.romanNumeralFromChord(c, k)
+                self.assertEqual(rn.figure, expectedFigure)
+                self.assertEqual(rn.romanNumeral, expectedRN)
+                # the figure must round-trip to the same pitch names under
+                # the convention that romanNumeralFromChord itself uses.
+                roundTrip = roman.RomanNumeral(
+                    rn.figure,
+                    k,
+                    sixthMinor=roman.Minor67Default.CAUTIONARY,
+                    seventhMinor=roman.Minor67Default.CAUTIONARY,
+                )
+                self.assertEqual(
+                    [p_.name for p_ in roundTrip.pitches],
+                    [p_.name for p_ in c.pitches],
+                )
 
     def testAugmented(self):
         from music21 import roman
