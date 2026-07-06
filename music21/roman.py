@@ -834,17 +834,16 @@ def correctRNAlterationForMinor(
     >>> ft3 is ft4
     True
 
-    Maintenance note: this is one of three places that implement the
-    "what does an accidental mean on ^6/^7 in minor, given chord quality"
-    convention, each with its own rules.  The other two are the prefix
-    suppression for triads in `_postFigureFromChordAndKey` (generation of the
-    upper figures) and `RomanNumeral._adjustMinorVIandVIIByQuality` (parsing,
-    in the reverse direction).  Change one and check the others.
-
     * Changed in v11: the keyword-only argument `isMajorThird` was added, so that
       major-quality chords on raised ^6 and ^7 in minor keep their sharp prefix
       (issue #1349).  This fix was AI-assisted (Claude).
     '''
+    # Maintenance note: this is one of three places that implement the
+    # "what does an accidental mean on ^6/^7 in minor, given chord quality"
+    # convention, each with its own rules.  The other two are the prefix
+    # suppression for triads in _postFigureFromChordAndKey (generation of the
+    # upper figures) and RomanNumeral._adjustMinorVIandVIIByQuality (parsing,
+    # in the reverse direction).  Change one and check the others.
     if keyObj.mode != 'minor':
         return figureTuple
     if figureTuple.degFromRefPitch not in (6, 7):
