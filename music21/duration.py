@@ -1604,7 +1604,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
              expression.  For instance the duration of 0.5 is generally
              an eighth note, but in the middle of a triplet group might be
              better written as a dotted-eighth triplet.  If expressionIsInferred
-             is True then `music21` can change it according to complex.  If
+             is True then `music21` can change it according to context.  If
              False, then the type, dots, and tuplets are considered immutable.
 
              >>> d = duration.Duration(0.5)
@@ -1736,9 +1736,46 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> tupDur1.linked = False
         >>> tupDur1 == tupDur2
         False
+
+        If both durations have :attr:`expressionIsInferred` set to True, then
+        their expression (type, dots, tuplets, and components) can be freely
+        changed according to context, so only the `quarterLength` needs to
+        match.  Here a plain quarter note is equal to a half note in a 2:1
+        tuplet, since both span one quarter length and both are free to be
+        re-expressed:
+
+        >>> plainDur = duration.Duration(1.0)
+        >>> plainDur.type
+        'quarter'
+        >>> altDur = duration.Duration('half')
+        >>> altDur.appendTuplet(duration.Tuplet(2, 1))
+        >>> altDur.quarterLength
+        1.0
+        >>> altDur.expressionIsInferred = True
+        >>> plainDur == altDur
+        True
+
+        But if either duration's expression is *not* inferred, then type, dots,
+        tuplets, and components must all match as before:
+
+        >>> altDur.expressionIsInferred = False
+        >>> plainDur == altDur
+        False
+
+        * Changed in v11: if both durations have `expressionIsInferred` True,
+          only `quarterLength` must match.
         '''
         if type(other) is not type(self):
             return False
+
+        if self.linked != other.linked:
+            return False
+
+        # When both expressions are inferred from quarterLength, callers are
+        # free to re-express the type, dots, tuplets, and components, so only
+        # the quarterLength is meaningful for equality.
+        if self.expressionIsInferred and other.expressionIsInferred:
+            return self.quarterLength == other.quarterLength
 
         if self.isComplex != other.isComplex:
             return False
@@ -1755,8 +1792,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if self.tuplets != other.tuplets:
             return False
         if self.quarterLength != other.quarterLength:
-            return False
-        if self.linked != other.linked:
             return False
 
         return True
@@ -4026,6 +4061,52 @@ class Test(unittest.TestCase):
         # and quarterLength is usually accomplished in multiple
         # attribute assignments that could occur in any order
         self.assertEqual(d.expressionIsInferred, False)
+
+    def testEqualityExpressionIsInferred(self):
+        '''
+        When both durations infer their expression from quarterLength, only
+        quarterLength must match for equality (GH #1970).
+        '''
+        # A plain quarter note and a half note in a 2:1 tuplet both span one
+        # quarter length but differ in type and tuplets.
+        plainDur = Duration(1.0)
+        altDur = Duration('half')
+        altDur.appendTuplet(Tuplet(2, 1))
+        self.assertEqual(altDur.quarterLength, 1.0)
+        self.assertNotEqual(plainDur.type, altDur.type)
+        self.assertNotEqual(plainDur.tuplets, altDur.tuplets)
+
+        # altDur's expression is not inferred (built from a type), so strict
+        # comparison applies and they are not equal.
+        self.assertFalse(altDur.expressionIsInferred)
+        self.assertNotEqual(plainDur, altDur)
+
+        # Marking altDur's expression as inferred relaxes the comparison to
+        # quarterLength only.
+        altDur.expressionIsInferred = True
+        self.assertEqual(plainDur, altDur)
+        self.assertEqual(altDur, plainDur)  # symmetric
+
+        # Differing quarterLength is still unequal even when both are inferred.
+        altDur2 = Duration(2.0)
+        self.assertTrue(altDur2.expressionIsInferred)
+        self.assertNotEqual(plainDur, altDur2)
+
+        # Link status is still checked before the inference shortcut: an
+        # unlinked duration with the same quarterLength is never equal.
+        unlinkedDur = Duration(1.0)
+        unlinkedDur.linked = False
+        self.assertEqual(unlinkedDur.quarterLength, 1.0)
+        self.assertNotEqual(plainDur, unlinkedDur)
+
+        # Inference must be mutual: one inferred, one not -> strict.
+        eighthDur = Duration(0.5)
+        typedQuarter = Duration(type='quarter')
+        self.assertFalse(typedQuarter.expressionIsInferred)
+        # Same type/dots/QL, so equal even without inference relaxation.
+        self.assertEqual(plainDur, typedQuarter)
+        # But an inferred eighth is not equal to a typed quarter.
+        self.assertNotEqual(eighthDur, typedQuarter)
 
     def testExceptions(self):
         '''
