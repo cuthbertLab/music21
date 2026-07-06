@@ -41,17 +41,23 @@ class FigureTuple(t.NamedTuple):
     :func:`~music21.roman.romanNumeralFromChord` and
     :func:`~music21.roman.correctRNAlterationForMinor`.
 
-    >>> ft = roman.FigureTuple(aboveBass=6, alter=1.0, prefix='#')
+    >>> ft = roman.FigureTuple(degFromRefPitch=6, alter=1.0, prefix='#')
     >>> ft
-    FigureTuple(aboveBass=6, alter=1.0, prefix='#')
+    FigureTuple(degFromRefPitch=6, alter=1.0, prefix='#')
     >>> ft.alter
     1.0
 
-    `aboveBass` is the generic (diatonic) interval, mod 7, above whatever
-    reference pitch was supplied.  Despite the name, that reference is not
-    always the sounding bass: `romanNumeralFromChord` passes the *tonic* of
-    the key, so that there `aboveBass` means "scale degree of the chord's
-    root" (which is how `correctRNAlterationForMinor` reads it).
+    `degFromRefPitch` is the generic (diatonic) degree of the pitch counted
+    from whatever reference pitch was supplied, reduced to a simple
+    interval: always 1-7, 1-based as intervals and scale degrees are (the
+    reference itself is 1, not 0; an octave and a third is 3; an octave and
+    a seventh is 7).
+    Descending intervals invert, so a pitch a second *below* the reference
+    registers as 7.  The reference is the chord's sounding bass
+    in :func:`~music21.roman.figureTuples`, but the *tonic* of the key in
+    `romanNumeralFromChord` -- there the pitch measured is the chord's
+    root, so `degFromRefPitch` is the scale degree of the root (which is
+    how `correctRNAlterationForMinor` reads it).
 
     `alter` is the chromatic alteration in semitones (a float) of the pitch
     relative to the diatonic scale of the key.  For minor keys the natural
@@ -78,41 +84,49 @@ class FigureTuple(t.NamedTuple):
     for a chord root on ^6 or ^7 in minor -- and that function hardcodes
     the CAUTIONARY style (it takes no Minor67Default argument; see issue
     #1349).  That rewrite is where `prefix` and `alter` deliberately
-    diverge: for instance, `FigureTuple(aboveBass=6, alter=0.0, prefix='b')`
+    diverge: for instance, `FigureTuple(degFromRefPitch=6, alter=0.0, prefix='b')`
     means "diatonic in natural minor, but print a cautionary flat anyway."
     Do not assume that `prefix` can be recomputed from `alter`.
 
-    * Changed in v11: became a typed NamedTuple (was a collections.namedtuple).
-      This documentation was AI-assisted (Claude).
+    * Changed in v11: became a typed NamedTuple (was a collections.namedtuple),
+      and the first field was renamed from `aboveBass` to `degFromRefPitch`,
+      since the reference pitch is not always the bass and the count is
+      1-based.  This documentation was AI-assisted (Claude).
     '''
-    aboveBass: int
+    degFromRefPitch: int
     alter: float
     prefix: str
 
 
-class ChordFigureTuple(t.NamedTuple):
+class PitchFigureTuple(t.NamedTuple):
     '''
-    A :class:`~music21.roman.FigureTuple` that also carries the pitch it
-    describes, one entry per pitch of a chord.
+    Like a :class:`~music21.roman.FigureTuple` (not a subclass -- NamedTuples
+    cannot inherit fields, so the first three are repeated here) but also
+    carrying the pitch it describes, one entry per pitch of a chord.
 
     Produced by :func:`~music21.roman.figureTuples`, where -- unlike the
-    tonic-based use of `FigureTuple` in `romanNumeralFromChord` --
-    `aboveBass` really is reckoned above the sounding bass of the chord.
-    See `FigureTuple` for the meaning of the shared fields.  (NamedTuples
-    cannot inherit fields, so the first three are repeated here rather
-    than subclassed.)
+    tonic-based use of `FigureTuple` in `romanNumeralFromChord` -- the
+    reference pitch for `degFromRefPitch` is the sounding bass of the chord.
+    See `FigureTuple` for the meaning of the shared fields.
 
-    >>> cft = roman.ChordFigureTuple(6, 0.0, '', pitch.Pitch('A-4'))
-    >>> cft.pitch
+    Here is an A-flat a sixth above a C bass in c minor: diatonic there
+    (`alter=0.0`), so no accidental prefix is needed:
+
+    >>> pft = roman.PitchFigureTuple(6, 0.0, '', pitch.Pitch('A-4'))
+    >>> pft.pitch
     <music21.pitch.Pitch A-4>
 
-    * Changed in v11: became a typed NamedTuple (was a collections.namedtuple).
+    * Changed in v11: became a typed NamedTuple (was a collections.namedtuple);
+      renamed from `ChordFigureTuple`, since one tuple describes a single
+      pitch (a list of them describes a chord); and the first field was
+      renamed from `aboveBass` to `degFromRefPitch`, since the reference
+      pitch is not always the bass and the count is 1-based.
       This documentation was AI-assisted (Claude).
     '''
-    aboveBass: int
+    degFromRefPitch: int
     alter: float
     prefix: str
-    pitch: 'pitch.Pitch'
+    pitch: 'pitch.Pitch'  # needs quotes since 'pitch' is redefined by this field
 
 environLocal = environment.Environment('roman')
 
@@ -438,21 +452,21 @@ def _postFigureFromChordAndKey(chordObj: chord.Chord, keyObj: key.Key) -> str:
         )
 
     for ft in sorted(chordFigureTuples,
-                     key=lambda tup: (-1 * tup.aboveBass, tup.alter, tup.pitch.ps)):
+                     key=lambda tup: (-1 * tup.degFromRefPitch, tup.alter, tup.pitch.ps)):
         # (diatonicIntervalNum, alter, alterStr, pitchObj) = figureTuple
         prefix = ft.prefix
 
-        if ft.aboveBass != 1 and ft.pitch is third:
+        if ft.degFromRefPitch != 1 and ft.pitch is third:
             if isMajorTriad or isMinorTriad:
                 prefix = ''  # alterStr[1:]
             # elif isMinorTriad and ft.alter > 0:
             #    prefix = ''  # alterStr[1:]
-        elif (ft.aboveBass != 1
+        elif (ft.degFromRefPitch != 1
               and ft.pitch is fifth
               and chordObjIsStandardTriad):
             prefix = ''  # alterStr[1:]
 
-        if ft.aboveBass == 1:
+        if ft.degFromRefPitch == 1:
             if ft.alter != bassFigureAlter and prefix != '':
                 # mark altered octaves as 8 not 1
                 figureString = prefix + '8'
@@ -460,7 +474,7 @@ def _postFigureFromChordAndKey(chordObj: chord.Chord, keyObj: key.Key) -> str:
                     # filter duplicates and put at beginning
                     allFigureStringList.insert(0, figureString)
         else:
-            figureString = prefix + str(ft.aboveBass)
+            figureString = prefix + str(ft.degFromRefPitch)
             # filter out duplicates.
             if figureString not in allFigureStringList:
                 allFigureStringList.append(figureString)
@@ -484,11 +498,12 @@ def _postFigureFromChordAndKey(chordObj: chord.Chord, keyObj: key.Key) -> str:
     return allFigureString
 
 
-def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[ChordFigureTuple]:
+def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[PitchFigureTuple]:
     '''
-    Return a set of tuplets for each pitch showing the presence of a note, its
-    interval above the bass its alteration (float) from a step in the given
-    key, an `alterationString`, and the pitch object.
+    Return a list of :class:`~music21.roman.PitchFigureTuple` objects, one
+    per pitch of the chord, each showing the 1-based degree of the note
+    counted from the chord's bass, its alteration (float) from a step in the
+    given key, an accidental prefix string, and the pitch object.
 
     Note though that for roman numerals, the applicable key is almost always
     the root.
@@ -499,10 +514,10 @@ def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[ChordFigu
     ...     chord.Chord(['F#2', 'D3', 'A-3', 'C#4']),
     ...     key.Key('C'),
     ...     )
-    [ChordFigureTuple(aboveBass=1, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch F#2>),
-     ChordFigureTuple(aboveBass=6, alter=0.0, prefix='', pitch=<music21.pitch.Pitch D3>),
-     ChordFigureTuple(aboveBass=3, alter=-1.0, prefix='b', pitch=<music21.pitch.Pitch A-3>),
-     ChordFigureTuple(aboveBass=5, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch C#4>)]
+    [PitchFigureTuple(degFromRefPitch=1, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch F#2>),
+     PitchFigureTuple(degFromRefPitch=6, alter=0.0, prefix='', pitch=<music21.pitch.Pitch D3>),
+     PitchFigureTuple(degFromRefPitch=3, alter=-1.0, prefix='b', pitch=<music21.pitch.Pitch A-3>),
+     PitchFigureTuple(degFromRefPitch=5, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch C#4>)]
 
     In c-minor, the A- is a normal note, so the prefix is '' not 'b'.  The natural minor is used
     exclusively.
@@ -511,10 +526,10 @@ def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[ChordFigu
     ...     chord.Chord(['F#2', 'D3', 'A-3', 'C#4']),
     ...     key.Key('c'),
     ...     )
-    [ChordFigureTuple(aboveBass=1, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch F#2>),
-     ChordFigureTuple(aboveBass=6, alter=0.0, prefix='', pitch=<music21.pitch.Pitch D3>),
-     ChordFigureTuple(aboveBass=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch A-3>),
-     ChordFigureTuple(aboveBass=5, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch C#4>)]
+    [PitchFigureTuple(degFromRefPitch=1, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch F#2>),
+     PitchFigureTuple(degFromRefPitch=6, alter=0.0, prefix='', pitch=<music21.pitch.Pitch D3>),
+     PitchFigureTuple(degFromRefPitch=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch A-3>),
+     PitchFigureTuple(degFromRefPitch=5, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch C#4>)]
 
     A C dominant-seventh chord in c minor alters the bass but not the 7th degree.
 
@@ -522,25 +537,25 @@ def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[ChordFigu
     ...     chord.Chord(['E3', 'C4', 'G4', 'B-5']),
     ...     key.Key('c'),
     ...     )
-    [ChordFigureTuple(aboveBass=1, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch E3>),
-     ChordFigureTuple(aboveBass=6, alter=0.0, prefix='', pitch=<music21.pitch.Pitch C4>),
-     ChordFigureTuple(aboveBass=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch G4>),
-     ChordFigureTuple(aboveBass=5, alter=0.0, prefix='', pitch=<music21.pitch.Pitch B-5>)]
+    [PitchFigureTuple(degFromRefPitch=1, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch E3>),
+     PitchFigureTuple(degFromRefPitch=6, alter=0.0, prefix='', pitch=<music21.pitch.Pitch C4>),
+     PitchFigureTuple(degFromRefPitch=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch G4>),
+     PitchFigureTuple(degFromRefPitch=5, alter=0.0, prefix='', pitch=<music21.pitch.Pitch B-5>)]
 
     >>> roman.figureTuples(
     ...     chord.Chord(['C4', 'E4', 'G4', 'C#4']),
     ...     key.Key('C'),
     ...     )
-    [ChordFigureTuple(aboveBass=1, alter=0.0, prefix='', pitch=<music21.pitch.Pitch C4>),
-     ChordFigureTuple(aboveBass=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch E4>),
-     ChordFigureTuple(aboveBass=5, alter=0.0, prefix='', pitch=<music21.pitch.Pitch G4>),
-     ChordFigureTuple(aboveBass=1, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch C#4>)]
+    [PitchFigureTuple(degFromRefPitch=1, alter=0.0, prefix='', pitch=<music21.pitch.Pitch C4>),
+     PitchFigureTuple(degFromRefPitch=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch E4>),
+     PitchFigureTuple(degFromRefPitch=5, alter=0.0, prefix='', pitch=<music21.pitch.Pitch G4>),
+     PitchFigureTuple(degFromRefPitch=1, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch C#4>)]
     '''
     result = []
     bass = chordObject.bass()
     for thisPitch in chordObject.pitches:
         shortTuple = figureTupleSolo(thisPitch, keyObject, bass)
-        appendTuple = ChordFigureTuple(shortTuple.aboveBass,
+        appendTuple = PitchFigureTuple(shortTuple.degFromRefPitch,
                                        shortTuple.alter,
                                        shortTuple.prefix,
                                        thisPitch)
@@ -554,9 +569,11 @@ def figureTupleSolo(
     bass: pitch.Pitch
 ) -> FigureTuple:
     '''
-    Return a single tuple for a pitch and key showing the interval above
-    the bass, its alteration from a step in the given key, an alteration
-    string, and the pitch object.
+    Return a single :class:`~music21.roman.FigureTuple` for a pitch and key,
+    showing the 1-based degree of the pitch counted from the reference pitch
+    given as `bass`, its alteration from a step in the given key, and an
+    accidental prefix string.  (The reference need not be a sounding bass:
+    `romanNumeralFromChord` passes the tonic of the key here.)
 
     For instance, in C major, an A-3 above an F# bass would be:
 
@@ -565,7 +582,7 @@ def figureTupleSolo(
     ...     key.Key('C'),
     ...     pitch.Pitch('F#2'),
     ...     )
-    FigureTuple(aboveBass=3, alter=-1.0, prefix='b')
+    FigureTuple(degFromRefPitch=3, alter=-1.0, prefix='b')
 
     These figures can be more complex in minor, so this is a good reference, showing
     that natural minor is always used.
@@ -575,25 +592,25 @@ def figureTupleSolo(
     >>> for name in ('E--', 'E-', 'E', 'E#', 'A--', 'A-', 'A', 'A#', 'B--', 'B-', 'B', 'B#'):
     ...     ft = roman.figureTupleSolo(pitch.Pitch(name + '4'), c, c_as_bass)
     ...     print(f'{name:4s} {ft}')
-    E--  FigureTuple(aboveBass=3, alter=-1.0, prefix='b')
-    E-   FigureTuple(aboveBass=3, alter=0.0, prefix='')
-    E    FigureTuple(aboveBass=3, alter=1.0, prefix='#')
-    E#   FigureTuple(aboveBass=3, alter=2.0, prefix='##')
-    A--  FigureTuple(aboveBass=6, alter=-1.0, prefix='b')
-    A-   FigureTuple(aboveBass=6, alter=0.0, prefix='')
-    A    FigureTuple(aboveBass=6, alter=1.0, prefix='#')
-    A#   FigureTuple(aboveBass=6, alter=2.0, prefix='##')
-    B--  FigureTuple(aboveBass=7, alter=-1.0, prefix='b')
-    B-   FigureTuple(aboveBass=7, alter=0.0, prefix='')
-    B    FigureTuple(aboveBass=7, alter=1.0, prefix='#')
-    B#   FigureTuple(aboveBass=7, alter=2.0, prefix='##')
+    E--  FigureTuple(degFromRefPitch=3, alter=-1.0, prefix='b')
+    E-   FigureTuple(degFromRefPitch=3, alter=0.0, prefix='')
+    E    FigureTuple(degFromRefPitch=3, alter=1.0, prefix='#')
+    E#   FigureTuple(degFromRefPitch=3, alter=2.0, prefix='##')
+    A--  FigureTuple(degFromRefPitch=6, alter=-1.0, prefix='b')
+    A-   FigureTuple(degFromRefPitch=6, alter=0.0, prefix='')
+    A    FigureTuple(degFromRefPitch=6, alter=1.0, prefix='#')
+    A#   FigureTuple(degFromRefPitch=6, alter=2.0, prefix='##')
+    B--  FigureTuple(degFromRefPitch=7, alter=-1.0, prefix='b')
+    B-   FigureTuple(degFromRefPitch=7, alter=0.0, prefix='')
+    B    FigureTuple(degFromRefPitch=7, alter=1.0, prefix='#')
+    B#   FigureTuple(degFromRefPitch=7, alter=2.0, prefix='##')
 
     Returns a :class:`~music21.roman.FigureTuple`.
     '''
     unused_scaleStep, scaleAccidental = keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
 
     thisInterval = interval.Interval(bass, pitchObj)
-    aboveBass = thisInterval.diatonic.generic.mod7
+    degFromRefPitch = thisInterval.diatonic.generic.mod7
     if scaleAccidental is None:
         rootAlterationString = ''
         alterDiff = 0.0
@@ -607,7 +624,7 @@ def figureTupleSolo(
         else:
             rootAlterationString = ''
 
-    appendTuple = FigureTuple(aboveBass, alterDiff, rootAlterationString)
+    appendTuple = FigureTuple(degFromRefPitch, alterDiff, rootAlterationString)
     return appendTuple
 
 
@@ -772,48 +789,48 @@ def correctRNAlterationForMinor(
 
     These return new FigureTuple objects
 
-    >>> ft5 = roman.FigureTuple(aboveBass=6, alter=-1, prefix='')
+    >>> ft5 = roman.FigureTuple(degFromRefPitch=6, alter=-1, prefix='')
     >>> ft5a = roman.correctRNAlterationForMinor(ft5, key.Key('c'))
     >>> ft5a
-    FigureTuple(aboveBass=6, alter=-1, prefix='b')
+    FigureTuple(degFromRefPitch=6, alter=-1, prefix='b')
     >>> ft5a is ft5
     False
 
-    >>> ft6 = roman.FigureTuple(aboveBass=6, alter=0, prefix='')
+    >>> ft6 = roman.FigureTuple(degFromRefPitch=6, alter=0, prefix='')
     >>> roman.correctRNAlterationForMinor(ft6, key.Key('c'))
-    FigureTuple(aboveBass=6, alter=0, prefix='b')
+    FigureTuple(degFromRefPitch=6, alter=0, prefix='b')
 
     For a chord whose quality is minor, diminished, or half-diminished, a raised
     root is implied by the lowercase numeral, so the sharp prefix is removed:
 
-    >>> ft7 = roman.FigureTuple(aboveBass=7, alter=1, prefix='#')
+    >>> ft7 = roman.FigureTuple(degFromRefPitch=7, alter=1, prefix='#')
     >>> roman.correctRNAlterationForMinor(ft7, key.Key('c'))
-    FigureTuple(aboveBass=7, alter=0, prefix='')
+    FigureTuple(degFromRefPitch=7, alter=0, prefix='')
 
     But if the chord has a major third, pass `isMajorThird=True` so that the
     sharp is kept: an uppercase VI or VII in minor already refers to the chord
     on the *lowered* (natural minor) degree, so a major chord on the raised
     degree needs its sharp to be distinguished from it:
 
-    >>> ft8 = roman.FigureTuple(aboveBass=7, alter=1, prefix='#')
+    >>> ft8 = roman.FigureTuple(degFromRefPitch=7, alter=1, prefix='#')
     >>> roman.correctRNAlterationForMinor(ft8, key.Key('c'), isMajorThird=True)
-    FigureTuple(aboveBass=7, alter=1, prefix='#')
+    FigureTuple(degFromRefPitch=7, alter=1, prefix='#')
 
     Does nothing for major and passes in the original Figure Tuple unchanged:
 
-    >>> ft1 = roman.FigureTuple(aboveBass=6, alter=-1, prefix='b')
+    >>> ft1 = roman.FigureTuple(degFromRefPitch=6, alter=-1, prefix='b')
     >>> ft2 = roman.correctRNAlterationForMinor(ft1, key.Key('C'))
     >>> ft2
-    FigureTuple(aboveBass=6, alter=-1, prefix='b')
+    FigureTuple(degFromRefPitch=6, alter=-1, prefix='b')
     >>> ft1 is ft2
     True
 
     Does nothing for steps other than 6 or 7:
 
-    >>> ft3 = roman.FigureTuple(aboveBass=4, alter=-1, prefix='b')
+    >>> ft3 = roman.FigureTuple(degFromRefPitch=4, alter=-1, prefix='b')
     >>> ft4 = roman.correctRNAlterationForMinor(ft3, key.Key('c'))
     >>> ft4
-    FigureTuple(aboveBass=4, alter=-1, prefix='b')
+    FigureTuple(degFromRefPitch=4, alter=-1, prefix='b')
     >>> ft3 is ft4
     True
 
@@ -830,7 +847,7 @@ def correctRNAlterationForMinor(
     '''
     if keyObj.mode != 'minor':
         return figureTuple
-    if figureTuple.aboveBass not in (6, 7):
+    if figureTuple.degFromRefPitch not in (6, 7):
         return figureTuple
     if isMajorThird and figureTuple.alter >= 1.0:
         # Keep the sharp(s): plain VI or VII in minor means the chord on the
@@ -855,7 +872,7 @@ def correctRNAlterationForMinor(
     elif alter < 0.0:
         rootAlterationString = 'b' + rootAlterationString
 
-    return FigureTuple(figureTuple.aboveBass, alter, rootAlterationString)
+    return FigureTuple(figureTuple.degFromRefPitch, alter, rootAlterationString)
 
 
 def romanNumeralFromChord(
@@ -1323,7 +1340,7 @@ def romanNumeralFromChord(
 
     alteredKeyObj = _getKeyFromCache(tonicPitchName)
 
-    stepRoman = common.toRoman(ft.aboveBass)
+    stepRoman = common.toRoman(ft.degFromRefPitch)
     if isMajorThird:
         pass
     elif not isMajorThird:
