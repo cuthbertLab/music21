@@ -7,9 +7,12 @@ metadata:
 
 As of 2026-07-06 (branch `fix-1349-raised-67`): the core raised-^6/^7 bug in
 GitHub issue #1349 is FIXED — `correctRNAlterationForMinor` gained a
-keyword-only `uppercaseNumeral` argument so major-quality chords on raised
+keyword-only `chordHasMajorThird` argument so major-quality chords on raised
 ^6/^7 in minor keep their sharp (figure `#VI`, `.romanNumeral` `'#VI'`), and
-the tsvConverter `localKeyAsRn` workaround was removed. Myke decided NOT to
+the tsvConverter `localKeyAsRn` workaround was removed. (Naming settled after
+two rounds: name the parameter for the chord-level fact it carries, not for
+its consequence like "uppercaseNumeral" — the numeral doesn't exist yet when
+the function runs.) Myke decided NOT to
 flip the `romanNumeralFromChord` default from CAUTIONARY to QUALITY (her 2022
 idea in the issue) for now. Still open, to discuss with contributor pablopupo
 and Malcolm Sailor on the issue: (2) adding `sixthMinor`/`seventhMinor`
