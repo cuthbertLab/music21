@@ -1302,12 +1302,9 @@ def romanNumeralFromChord(
     #                   'augmented': {5: 1},
     #                   }
     root = chordObj.root()
-    thirdType = chordObj.semitonesFromChordStep(3)
-    if thirdType == 4:
-        chordHasMajorThird = True
-    else:
-        chordHasMajorThird = False
-
+    # semitonesFromChordStep(3) returns None for third-less chords, so this
+    # is False for them, and they get lowercase numerals below.
+    chordHasMajorThird = chordObj.semitonesFromChordStep(3) == 4
 
     if keyObj is None:
         if chordHasMajorThird:
@@ -1341,9 +1338,7 @@ def romanNumeralFromChord(
     alteredKeyObj = _getKeyFromCache(tonicPitchName)
 
     stepRoman = common.toRoman(ft.degFromRefPitch)
-    if chordHasMajorThird:
-        pass
-    elif not chordHasMajorThird:
+    if not chordHasMajorThird:
         stepRoman = stepRoman.lower()
     inversionString = _postFigureFromChordAndKey(chordObj, alteredKeyObj)
 
