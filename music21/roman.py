@@ -100,9 +100,8 @@ class FigureTuple(t.NamedTuple):
 
 class PitchFigureTuple(t.NamedTuple):
     '''
-    Like a :class:`~music21.roman.FigureTuple` (not a subclass -- NamedTuples
-    cannot inherit fields, so the first three are repeated here) but also
-    carrying the pitch it describes, one entry per pitch of a chord.
+    Like a :class:`~music21.roman.FigureTuple` but also carrying the pitch
+    it describes, one entry per pitch of a chord.
 
     Produced by :func:`~music21.roman.figureTuples`, where -- unlike the
     tonic-based use of `FigureTuple` in `romanNumeralFromChord` -- the
@@ -1305,13 +1304,13 @@ def romanNumeralFromChord(
     root = chordObj.root()
     thirdType = chordObj.semitonesFromChordStep(3)
     if thirdType == 4:
-        isMajorThird = True
+        chordHasMajorThird = True
     else:
-        isMajorThird = False
+        chordHasMajorThird = False
 
 
     if keyObj is None:
-        if isMajorThird:
+        if chordHasMajorThird:
             rootKeyObj = _getKeyFromCache(root.name.upper())
         else:
             rootKeyObj = _getKeyFromCache(root.name.lower())
@@ -1320,7 +1319,7 @@ def romanNumeralFromChord(
         keyObj = key.Key(keyObj)
 
     ft = figureTupleSolo(root, keyObj, keyObj.tonic)  # a FigureTuple
-    ft = correctRNAlterationForMinor(ft, keyObj, uppercaseNumeral=isMajorThird)
+    ft = correctRNAlterationForMinor(ft, keyObj, uppercaseNumeral=chordHasMajorThird)
 
     if ft.alter == 0:
         tonicPitch = keyObj.tonic
@@ -1342,20 +1341,20 @@ def romanNumeralFromChord(
     alteredKeyObj = _getKeyFromCache(tonicPitchName)
 
     stepRoman = common.toRoman(ft.degFromRefPitch)
-    if isMajorThird:
+    if chordHasMajorThird:
         pass
-    elif not isMajorThird:
+    elif not chordHasMajorThird:
         stepRoman = stepRoman.lower()
     inversionString = _postFigureFromChordAndKey(chordObj, alteredKeyObj)
 
     rnString = ft.prefix + stepRoman + inversionString
 
-    if (not isMajorThird
+    if (not chordHasMajorThird
             and inversionString in minorSeventhSubs
             # only do expensive call in case it might be possible
             and chordObj.isSeventhOfType((0, 3, 7, 10))):
         rnString = ft.prefix + stepRoman + minorSeventhSubs[inversionString]
-    elif (not isMajorThird
+    elif (not chordHasMajorThird
               and inversionString in minorMajorSeventhSubs
               and chordObj.isSeventhOfType((0, 3, 7, 11))):
         rnString = ft.prefix + stepRoman + minorMajorSeventhSubs[inversionString]
