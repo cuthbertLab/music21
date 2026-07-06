@@ -19,8 +19,6 @@ import re
 import typing as t
 import unittest
 
-from collections import namedtuple
-
 from music21 import chord
 from music21 import common
 from music21 import defaults
@@ -34,8 +32,87 @@ from music21 import note
 from music21 import pitch
 from music21 import scale
 
-FigureTuple = namedtuple('FigureTuple', ['aboveBass', 'alter', 'prefix'])
-ChordFigureTuple = namedtuple('ChordFigureTuple', ['aboveBass', 'alter', 'prefix', 'pitch'])
+class FigureTuple(t.NamedTuple):
+    '''
+    A namedtuple of a scale step above a reference pitch, a chromatic
+    alteration, and the accidental string to print before a figure.
+
+    Produced by :func:`~music21.roman.figureTupleSolo` and consumed by
+    :func:`~music21.roman.romanNumeralFromChord` and
+    :func:`~music21.roman.correctRNAlterationForMinor`.
+
+    >>> ft = roman.FigureTuple(aboveBass=6, alter=1.0, prefix='#')
+    >>> ft
+    FigureTuple(aboveBass=6, alter=1.0, prefix='#')
+    >>> ft.alter
+    1.0
+
+    `aboveBass` is the generic (diatonic) interval, mod 7, above whatever
+    reference pitch was supplied.  Despite the name, that reference is not
+    always the sounding bass: `romanNumeralFromChord` passes the *tonic* of
+    the key, so that there `aboveBass` means "scale degree of the chord's
+    root" (which is how `correctRNAlterationForMinor` reads it).
+
+    `alter` is the chromatic alteration in semitones (a float) of the pitch
+    relative to the diatonic scale of the key.  For minor keys the natural
+    minor scale is always the reference, so in c minor, A-flat has
+    `alter=0.0` and A-natural has `alter=1.0`.  It is an alteration of a
+    scale step, never an interval above the bass.
+
+    `prefix` is the string of accidentals ('#', '##', 'b', 'bb', ...) to
+    print before the figure.  It is a figured-bass-style alteration in
+    music21's Roman-numeral spelling: it says how the pitch differs from
+    the pitches implied by the key signature (the key's diatonic scale),
+    with '#' meaning raised a semitone and 'b' lowered, regardless of what
+    accidental would appear on the note in staff notation.  So A-natural
+    on ^6 in c minor gets `prefix='#'` even though the note itself would
+    be printed with a natural sign.  No notational context is consulted --
+    not the measure's accidental state, not courtesy accidentals, only
+    pitch versus key.
+
+    The `sixthMinor`/`seventhMinor` conventions
+    (:class:`~music21.roman.Minor67Default`) are likewise *not* consulted
+    when a FigureTuple is created: `figureTupleSolo` renders `prefix`
+    purely from `alter`.  A convention enters only afterwards, when
+    :func:`~music21.roman.correctRNAlterationForMinor` rewrites the tuple
+    for a chord root on ^6 or ^7 in minor -- and that function hardcodes
+    the CAUTIONARY style (it takes no Minor67Default argument; see issue
+    #1349).  That rewrite is where `prefix` and `alter` deliberately
+    diverge: for instance, `FigureTuple(aboveBass=6, alter=0.0, prefix='b')`
+    means "diatonic in natural minor, but print a cautionary flat anyway."
+    Do not assume that `prefix` can be recomputed from `alter`.
+
+    * Changed in v11: became a typed NamedTuple (was a collections.namedtuple).
+      This documentation was AI-assisted (Claude).
+    '''
+    aboveBass: int
+    alter: float
+    prefix: str
+
+
+class ChordFigureTuple(t.NamedTuple):
+    '''
+    A :class:`~music21.roman.FigureTuple` that also carries the pitch it
+    describes, one entry per pitch of a chord.
+
+    Produced by :func:`~music21.roman.figureTuples`, where -- unlike the
+    tonic-based use of `FigureTuple` in `romanNumeralFromChord` --
+    `aboveBass` really is reckoned above the sounding bass of the chord.
+    See `FigureTuple` for the meaning of the shared fields.  (NamedTuples
+    cannot inherit fields, so the first three are repeated here rather
+    than subclassed.)
+
+    >>> cft = roman.ChordFigureTuple(6, 0.0, '', pitch.Pitch('A-4'))
+    >>> cft.pitch
+    <music21.pitch.Pitch A-4>
+
+    * Changed in v11: became a typed NamedTuple (was a collections.namedtuple).
+      This documentation was AI-assisted (Claude).
+    '''
+    aboveBass: int
+    alter: float
+    prefix: str
+    pitch: 'pitch.Pitch'
 
 environLocal = environment.Environment('roman')
 
@@ -511,7 +588,7 @@ def figureTupleSolo(
     B    FigureTuple(aboveBass=7, alter=1.0, prefix='#')
     B#   FigureTuple(aboveBass=7, alter=2.0, prefix='##')
 
-    Returns a namedtuple called a FigureTuple.
+    Returns a :class:`~music21.roman.FigureTuple`.
     '''
     unused_scaleStep, scaleAccidental = keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
 
@@ -686,6 +763,11 @@ def correctRNAlterationForMinor(
     new FigureTuple correcting for the fact that, for instance, Ab in c minor
     is VI not vi.  Works properly only if the note is the root of the chord.
 
+    The convention applied is the cautionary style of
+    :class:`~music21.roman.Minor67Default` `.CAUTIONARY` -- hardcoded: the
+    function does not (yet) take `sixthMinor`/`seventhMinor` arguments
+    (see issue #1349).
+
     Used in RomanNumeralFromChord
 
     These return new FigureTuple objects
@@ -734,6 +816,13 @@ def correctRNAlterationForMinor(
     FigureTuple(aboveBass=4, alter=-1, prefix='b')
     >>> ft3 is ft4
     True
+
+    Maintenance note: this is one of three places that implement the
+    "what does an accidental mean on ^6/^7 in minor, given chord quality"
+    convention, each with its own rules.  The other two are the prefix
+    suppression for triads in `_postFigureFromChordAndKey` (generation of the
+    upper figures) and `RomanNumeral._adjustMinorVIandVIIByQuality` (parsing,
+    in the reverse direction).  Change one and check the others.
 
     * Changed in v11: the keyword-only argument `isMajorThird` was added, so that
       major-quality chords on raised ^6 and ^7 in minor keep their sharp prefix
