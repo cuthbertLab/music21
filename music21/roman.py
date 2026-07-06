@@ -771,7 +771,7 @@ def correctRNAlterationForMinor(
     figureTuple: FigureTuple,
     keyObj: key.Key,
     *,
-    isMajorThird: bool = False,
+    uppercaseNumeral: bool = False,
 ) -> FigureTuple:
     '''
     (This will become a private function in a future version)
@@ -807,13 +807,14 @@ def correctRNAlterationForMinor(
     >>> roman.correctRNAlterationForMinor(ft7, key.Key('c'))
     FigureTuple(degFromRefPitch=7, alter=0, prefix='')
 
-    But if the chord has a major third, pass `isMajorThird=True` so that the
-    sharp is kept: an uppercase VI or VII in minor already refers to the chord
-    on the *lowered* (natural minor) degree, so a major chord on the raised
-    degree needs its sharp to be distinguished from it:
+    But when the numeral will be written in uppercase (major and augmented
+    qualities), pass `uppercaseNumeral=True` so that the sharp is kept: an
+    uppercase VI or VII in minor already refers to the chord on the *lowered*
+    (natural minor) degree, so a major chord on the raised degree needs its
+    sharp to be distinguished from it:
 
     >>> ft8 = roman.FigureTuple(degFromRefPitch=7, alter=1, prefix='#')
-    >>> roman.correctRNAlterationForMinor(ft8, key.Key('c'), isMajorThird=True)
+    >>> roman.correctRNAlterationForMinor(ft8, key.Key('c'), uppercaseNumeral=True)
     FigureTuple(degFromRefPitch=7, alter=1, prefix='#')
 
     Does nothing for major and passes in the original Figure Tuple unchanged:
@@ -834,9 +835,10 @@ def correctRNAlterationForMinor(
     >>> ft3 is ft4
     True
 
-    * Changed in v11: the keyword-only argument `isMajorThird` was added, so that
-      major-quality chords on raised ^6 and ^7 in minor keep their sharp prefix
-      (issue #1349).  This fix was AI-assisted (Claude).
+    * Changed in v11: the keyword-only argument `uppercaseNumeral` was added,
+      so that chords whose numerals are written in uppercase keep their sharp
+      prefix on raised ^6 and ^7 in minor (issue #1349).
+      This fix was AI-assisted (Claude).
     '''
     # Maintenance note: this is one of three places that implement the
     # "what does an accidental mean on ^6/^7 in minor, given chord quality"
@@ -848,7 +850,7 @@ def correctRNAlterationForMinor(
         return figureTuple
     if figureTuple.degFromRefPitch not in (6, 7):
         return figureTuple
-    if isMajorThird and figureTuple.alter >= 1.0:
+    if uppercaseNumeral and figureTuple.alter >= 1.0:
         # Keep the sharp(s): plain VI or VII in minor means the chord on the
         # lowered (natural minor) degree under both the QUALITY and CAUTIONARY
         # conventions, so stripping the prefix would move the root down a
@@ -1318,7 +1320,7 @@ def romanNumeralFromChord(
         keyObj = key.Key(keyObj)
 
     ft = figureTupleSolo(root, keyObj, keyObj.tonic)  # a FigureTuple
-    ft = correctRNAlterationForMinor(ft, keyObj, isMajorThird=isMajorThird)
+    ft = correctRNAlterationForMinor(ft, keyObj, uppercaseNumeral=isMajorThird)
 
     if ft.alter == 0:
         tonicPitch = keyObj.tonic
