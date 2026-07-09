@@ -1290,6 +1290,27 @@ class SelectMusicXMLReader(SelectFilePath):
                         break
 
             return post
+        
+    def _getMuseScorePNGPathFromApp(self, musicxmlPath: str) -> str:
+        '''
+        Given the path to a MuseScore application bundle (macOS) or executable,
+        return the path suitable for headless PNG generation
+        (`musescoreDirectPNGPath`).
+        '''
+        platform = common.getPlatform()
+        if platform == 'darwin' and musicxmlPath.endswith('.app'):
+            possible_names = ['mscore', 'MuseScore', 'MuseScore4', 'MuseScore3']
+            for name in possible_names:
+                exe = os.path.join(musicxmlPath, 'Contents', 'MacOS', name)
+                if os.path.isfile(exe):
+                    return exe
+            # If nothing matches, fall back to the app path itself (best effort).
+            environLocal.printDebug(
+                f'Could not find MuseScore executable inside {musicxmlPath}; '
+                f'using app bundle path as fallback.')
+            return musicxmlPath
+        # On Windows the discovered path is already the .exe, on Linux it's the executable.
+        return musicxmlPath
 
     def _performAction(self, simulate=False):
         '''
@@ -1304,6 +1325,16 @@ class SelectMusicXMLReader(SelectFilePath):
             environment.set('musicxmlPath', result)
             musicXmlNew = environment.get('musicxmlPath')
             self._writeToUser([f'MusicXML Reader set to: {musicXmlNew}', ' '])
+            # If the chosen reader is MuseScore, also set the PNG generation path
+            # to avoid stale/broken values.
+            if 'MuseScore' in result:
+                pngPath = self._getMuseScorePNGPathFromApp(result)
+                environment.set('musescoreDirectPNGPath', pngPath)
+                pngPathCheck = environment.get('musescoreDirectPNGPath')
+                self._writeToUser([
+                    f'MuseScore PNG generator set to: {pngPathCheck}',
+                    ' '
+                ])
 
 
 # ------------------------------------------------------------------------------
