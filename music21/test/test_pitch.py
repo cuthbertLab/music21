@@ -407,6 +407,18 @@ class Test(unittest.TestCase):
         p.makeAccidentals(inPlace=True)
         self.assertIs(last_note.pitch.accidental.displayStatus, False)
 
+    def testExplicitNaturalDisplayStatusNone(self):
+        p = converter.parse('tinyNotation: d1 d1')
+        first_note = p.recurse().notes.first()
+        last_note = p.recurse().notes.last()
+        first_note.pitch.accidental = pitch.Accidental('natural')
+        last_note.pitch.accidental = pitch.Accidental('natural')
+        self.assertIsNone(first_note.pitch.accidental.displayStatus)
+        self.assertIsNone(last_note.pitch.accidental.displayStatus)
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(first_note.pitch.accidental.displayStatus, False)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
     def testIfAbsolutelyNecessary(self):
         '''
         Beginning of test cases for if-absolutely-necessary.
