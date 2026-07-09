@@ -33,7 +33,6 @@ import typing as t
 from typing import overload
 
 import xml.etree.ElementTree as ET
-from xml.sax import saxutils
 
 from music21 import exceptions21
 from music21 import common
@@ -234,11 +233,6 @@ class _EnvironmentCore:
         return '<Environment>'
 
     def __setitem__(self, key, value):
-        # saxutils.escape  # used for escaping strings going to xml
-        # with unicode encoding
-        # http://www.xml.com/pub/a/2002/11/13/py-xml.html?page=2
-        # saxutils.escape(msg).encode('UTF-8')
-
         # add local corpus path as a key
         # if isinstance(value, bytes):
         #    value = value.decode(errors='replace')
@@ -275,9 +269,8 @@ class _EnvironmentCore:
             raise EnvironmentException(
                 f'{value} is not an acceptable value for preference: {key}')
 
-        # need to escape problematic characters for xml storage
-        if isinstance(value, str):
-            value = saxutils.escape(value)  # .encode('UTF-8')
+        # ElementTree handles XML escaping when serializing in toSettingsXML.
+
         # set value
         if key == 'localCorpusPath':
             # only add if unique
@@ -885,8 +878,8 @@ class Environment:
         >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a['graphicsPath'] = '/test&Encode'
-        >>> 'test&amp;Encode' in str(a['graphicsPath'])
-        True
+        >>> str(a['graphicsPath'])
+        '/test&Encode'
         >>> isinstance(a['graphicsPath'], Path)
         True
 
@@ -902,6 +895,8 @@ class Environment:
 
         >>> a['showFormat'] = 'musicxml'
         >>> a['localCorpusPath'] = '/path/to/local'
+
+        * Fixed in v11: values containing ``&`` etc. are properly stored and retrieved.
         '''
         envSingleton().__setitem__(key, value)
 
@@ -1539,6 +1534,30 @@ class Test(unittest.TestCase):
         true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
             '/System/Applications/Preview', '/Applications/Preview'), match)
         self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
+
+    @unittest.skipIf(common.getPlatform() == 'win', 'test assumes Unix-style paths')
+    def testSpecialCharactersRoundTrip(self):
+        '''
+        A path containing XML special characters such as "&" is stored
+        unescaped, serialized escaped by ElementTree, and comes back
+        unescaped after parsing.
+
+        AI-assisted (Claude).
+        '''
+        core = _EnvironmentCore(forcePlatform='darwin')
+        fp = '/Applications/Q&A <Beta>/MuseScore 4.app'
+
+        # these lines use overridden __setitem__ and __getitem__ internally
+        core['musicxmlPath'] = fp
+        self.assertEqual(str(core['musicxmlPath']), fp)
+
+        settingsTree = core.toSettingsXML()
+        match = self.stringFromTree(settingsTree)
+        self.assertIn('Q&amp;A &lt;Beta&gt;', match)
+
+        ref = {'musicxmlPath': None}
+        core._fromSettings(settingsTree, ref)
+        self.assertEqual(ref['musicxmlPath'], fp)
 
     @unittest.skipIf(common.getPlatform() == 'win', 'test assumes Unix-style paths')
     def testFromSettings(self):
