@@ -1546,8 +1546,10 @@ class Test(unittest.TestCase):
         '''
         core = _EnvironmentCore(forcePlatform='darwin')
         fp = '/Applications/Q&A <Beta>/MuseScore 4.app'
-        core.__setitem__('musicxmlPath', fp)
-        self.assertEqual(str(core.__getitem__('musicxmlPath')), fp)
+
+        # these lines use overridden __setitem__ and __getitem__ internally
+        core['musicxmlPath'] = fp
+        self.assertEqual(str(core['musicxmlPath']), fp)
 
         settingsTree = core.toSettingsXML()
         match = self.stringFromTree(settingsTree)

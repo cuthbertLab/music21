@@ -3,8 +3,9 @@
 # Purpose:      Installation and Configuration Utilities
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2019 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -1298,15 +1299,11 @@ class SelectMusicXMLReader(SelectFilePath):
         '''
         Set musicxmlPath to the selected reader.  If the reader is a version
         of MuseScore, also set musescoreDirectPNGPath to it.
-
-        AI-assisted (Claude).
         '''
         result = self.getResult()
         if result is not None and not isinstance(result, DialogError):
             # noinspection PyTypeChecker
             reload(environment)
-            # us = environment.UserSettings()
-            # us['musicxmlPath'] = result  # automatically writes
             environment.set('musicxmlPath', result)
             musicXmlNew = environment.get('musicxmlPath')
             if reMuseScoreName.search(pathlib.Path(str(result)).name):
