@@ -70,7 +70,7 @@ LINE_WIDTH = 78
 
 def writeToUser(msg, wrapLines=True, linesPerPage=20):
     '''
-    Display a message to the user, handling multiple lines as necessary and wrapping text
+    Display a message to the user, handling multiple lines as necessary and wrapping text.
     '''
     # wrap everything to 60 lines
     if common.isListLike(msg):
@@ -122,7 +122,7 @@ def getSitePackages():
 
 def getUserData():
     '''
-    Return a dictionary with user data
+    Return a dictionary with user data.
     '''
     post = {}
     try:
@@ -236,7 +236,7 @@ class Dialog:
     Model a dialog as a question and response. Have different subclasses for
     different types of questions. Store all in a Conversation, or multiple dialog passes.
 
-    A `default`, if provided, is returned if the users provides no input and just enters return.
+    A `default`, if provided, is returned if the user provides no input and just enters return.
 
     The `tryAgain` option determines if, if a user provides incomplete or no response,
     and there is no default (for no response), whether the user is given another chance
@@ -274,7 +274,7 @@ class Dialog:
 
     def _writeToUser(self, msg):
         '''
-        Write output to user. Call module-level function
+        Write output to user. Call module-level function.
         '''
         writeToUser(msg)
 
@@ -333,7 +333,7 @@ class Dialog:
 
     def _askTryAgain(self, default=True, force=None):
         '''
-        What to do if input is incomplete
+        What to do if input is incomplete.
 
         >>> prompt = configure.YesOrNo(default=True)
         >>> prompt._askTryAgain(force='yes')
@@ -386,7 +386,7 @@ class Dialog:
 
     def _rawQueryPrepareFooter(self, msg=''):
         '''
-        Prepare the end of the query message
+        Prepare the end of the query message.
         '''
         if self._default is not None:
             msg = msg.strip()
@@ -706,7 +706,7 @@ class YesOrNo(Dialog):
 # ------------------------------------------------------------------------------
 class AskOpenInBrowser(YesOrNo):
     '''
-    Ask the user if the want to open a URL in a browser.
+    Ask the user if they want to open a URL in a browser.
 
     >>> d = configure.AskOpenInBrowser('https://www.music21.org/')
     '''
@@ -833,7 +833,7 @@ class SelectFromList(Dialog):
 
     def _formatResultForUser(self, result):
         '''
-        Reduce each complete file path to stub, or otherwise compact display
+        Reduce each complete file path to stub, or otherwise compact display.
         '''
         return result
 
@@ -997,7 +997,7 @@ class AskAutoDownload(SelectFromList):
 
     def _getValidResults(self, force=None):
         '''
-        Just return number options
+        Just return number options.
         '''
         if force is not None:
             return force
@@ -1034,7 +1034,7 @@ class AskAutoDownload(SelectFromList):
 
     def _performAction(self, simulate=False):
         '''
-        override base.
+        Override base.
         '''
         result = self.getResult()
         if result in [1, 2, 3]:
@@ -1069,7 +1069,7 @@ class SelectFilePath(SelectFromList):
         '''
         Uses comparisonFunction to see if a file in path0 matches
         the RE embedded in comparisonFunction and if so manipulate the list
-        in post
+        in post.
 
         comparisonFunction = function (lambda function on path returning True/False)
         path0 = os-specific string
@@ -1084,7 +1084,7 @@ class SelectFilePath(SelectFromList):
     def _getDarwinApp(self, comparisonFunction) -> list[str]:
         '''
         Provide a comparison function that returns True or False based on the file name.
-        This looks at everything in Applications, as well as every directory in Applications
+        This looks at everything in Applications, as well as every directory in Applications.
         '''
         post: list[str] = []
         for path0 in ('/Applications', common.cleanpath('~/Applications', returnPathlib=False)):
@@ -1165,7 +1165,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
     def _getMusicXMLReaderDarwin(self):
         '''
-        Get all possible MusicXML Reader paths on Darwin (i.e., macOS)
+        Get all possible MusicXML Reader paths on Darwin (i.e., macOS).
         '''
         def comparisonFinale(x):
             return reFinaleApp.search(x) is not None
@@ -1199,7 +1199,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
     def _getMusicXMLReaderWin(self):
         '''
-        Get all possible MusicXML Reader paths on Windows
+        Get all possible MusicXML Reader paths on Windows.
         '''
         def comparisonFinale(x):
             return reFinaleExe.search(x) is not None
@@ -1229,7 +1229,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
     def _getMusicXMLReaderNix(self):
         '''
-        Get all possible MusicXML Reader paths on Unix
+        Get all possible MusicXML Reader paths on Unix.
         '''
         return []
 
@@ -1290,7 +1290,7 @@ class SelectMusicXMLReader(SelectFilePath):
                         break
 
             return post
-
+        
     def _getMuseScorePNGPathFromApp(self, musicxmlPath: str) -> str:
         '''
         Given the path to a MuseScore application bundle (macOS) or executable,
@@ -1299,36 +1299,32 @@ class SelectMusicXMLReader(SelectFilePath):
         '''
         platform = common.getPlatform()
         if platform == 'darwin' and musicxmlPath.endswith('.app'):
-            # Typical structure: /Applications/MuseScore 4.app/Contents/MacOS/mscore
-            executable = os.path.join(musicxmlPath, 'Contents', 'MacOS', 'mscore')
-            if os.path.isfile(executable):
-                return executable
-            else:
-                # Fallback: some older MuseScore versions use 'MuseScore'
-                fallback = os.path.join(musicxmlPath, 'Contents', 'MacOS', 'MuseScore')
-                if os.path.isfile(fallback):
-                    return fallback
-                # If neither is found, return the original path (best effort)
-                environLocal.printDebug(
-                    f'Could not find MuseScore executable inside {musicxmlPath}; '
-                    f'using app bundle path as fallback.')
-                return musicxmlPath
-        # On Windows the found path is already the .exe, on Linux/nix we assume it’s correct.
+            possible_names = ['mscore', 'MuseScore', 'MuseScore4', 'MuseScore3']
+            for name in possible_names:
+                exe = os.path.join(musicxmlPath, 'Contents', 'MacOS', name)
+                if os.path.isfile(exe):
+                    return exe
+            # If nothing matches, fall back to the app path itself (best effort).
+            environLocal.printDebug(
+                f'Could not find MuseScore executable inside {musicxmlPath}; '
+                f'using app bundle path as fallback.')
+            return musicxmlPath
+        # On Windows the discovered path is already the .exe, on Linux it's the executable.
         return musicxmlPath
 
     def _performAction(self, simulate=False):
         '''
-        The action here is to set the musicxmlPath and, when the reader is MuseScore,
-        also set the musescoreDirectPNGPath.
+        The action here is to open the stored URL in a browser, if the user agrees.
         '''
         result = self.getResult()
         if result is not None and not isinstance(result, DialogError):
+            # noinspection PyTypeChecker
             reload(environment)
-            # Set the MusicXML reader path
+            # us = environment.UserSettings()
+            # us['musicxmlPath'] = result  # automatically writes
             environment.set('musicxmlPath', result)
             musicXmlNew = environment.get('musicxmlPath')
             self._writeToUser([f'MusicXML Reader set to: {musicXmlNew}', ' '])
-
             # If the chosen reader is MuseScore, also set the PNG generation path
             # to avoid stale/broken values.
             if 'MuseScore' in result:
