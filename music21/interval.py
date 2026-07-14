@@ -3460,7 +3460,14 @@ class Interval(IntervalBase):
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
         oldDiatonicNum = pitch1.diatonicNoteNum
-        # centsOrigin = pitch1.microtone.cents  # unused!!
+        # Only carry pitch1's microtone through when the interval is not itself
+        # microtonal: a microtonal interval already supplies the result's cents
+        # (e.g. scale realization), so preserving here would double-count.
+        intervalIsMicrotonal = self.chromatic.semitones != int(self.chromatic.semitones)
+        if not pitch1.isTwelveTone() and not intervalIsMicrotonal:
+            centsOrigin = pitch1.microtone.cents
+        else:
+            centsOrigin = 0.0
         distanceToMove = self.diatonic.generic.staffDistance
 
         newDiatonicNumber = oldDiatonicNum + distanceToMove
@@ -3473,9 +3480,15 @@ class Interval(IntervalBase):
         # if this is not set to None then terrible things happen
         pitch2.microtone = None  # type: ignore
 
-        # We have the right note name but not the right accidental
-        interval2 = Interval(pitch1, pitch2)
-        # halfStepsToFix already has any microtones
+        # We have the right note name but not the right accidental. Measure it
+        # from pitch1 without its microtone (reapplied to the result below); a
+        # microtonal endpoint here yields a fractional chromatic with no
+        # interval specifier.
+        pitch1ForAccidental = pitch1
+        if centsOrigin:
+            pitch1ForAccidental = copy.deepcopy(pitch1)
+            pitch1ForAccidental.microtone = None
+        interval2 = Interval(pitch1ForAccidental, pitch2)
         halfStepsToFix = self.chromatic.semitones - interval2.chromatic.semitones
 
         # environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix,
@@ -3526,6 +3539,10 @@ class Interval(IntervalBase):
                 if (oldPitch2Accidental is not None
                         and oldPitch2Accidental.name == 'natural'):
                     pitch2.accidental = oldPitch2Accidental
+
+        if centsOrigin:
+            # restore the cents peeled off halfStepsToFix above
+            pitch2.microtone = pitch2.microtone.cents + centsOrigin
 
         if useImplicitOctave:
             pitch2.octave = None
