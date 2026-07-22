@@ -362,6 +362,31 @@ class Test(unittest.TestCase):
         self.assertEqual(unscrambledChord3.pitches[3].name, 'F')
         self.assertEqual(unscrambledChord3.pitches[4].name, 'A-')
 
+    def testSus4RootFinding(self):
+        # Regression test for https://github.com/cuthbertLab/music21/issues/1650
+        # sus4 chords should correctly identify their root
+
+        # Basic sus4 seventh chord from the issue report
+        sus4_seventh = chord.Chord('F B- C E-')
+        self.assertEqual(sus4_seventh.root().name, 'F')
+
+        # Simple sus4 triad
+        sus4_triad = chord.Chord('C F G')
+        self.assertEqual(sus4_triad.root().name, 'C')
+
+        # sus4 in different inversion (F in bass)
+        sus4_inv = chord.Chord('C F G B-')
+        self.assertEqual(sus4_inv.root().name, 'C')
+
+        # Regular chords should still work correctly
+        self.assertEqual(chord.Chord('C E G').root().name, 'C')
+        self.assertEqual(chord.Chord('C E- G').root().name, 'C')
+        self.assertEqual(chord.Chord('C E G B-').root().name, 'C')
+
+        # C11 chord (has both 3rd and 11th) should still return C, not F
+        c11 = chord.Chord('C E G B- D F')
+        self.assertEqual(c11.root().name, 'C')
+
     def testEnharmonicSimplification(self):
         eFlat = note.Note(63)
         self.assertEqual(eFlat.pitch.name, 'E-')

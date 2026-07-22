@@ -1668,7 +1668,7 @@ class Chord(ChordBase):
         Generally use root() instead, since if a chord doesn't know its root,
         root() will run ._findRoot() automatically.
         '''
-        def rootnessFunction(rootThirdList):
+        def rootnessFunction(rootThirdList, is_sus4_chord=False):
             '''
             Returns a value for how likely this pitch is to be a root given the
             number of thirds and fifths above it.
@@ -1687,6 +1687,14 @@ class Chord(ChordBase):
             for root_index, val in enumerate(rootThirdList):
                 if val is True:
                     score += 1 / (root_index + 6)
+            # sus4 bonus: for sus4 chords (no note has both a 3rd and 5th above it),
+            # reward a note that has a 4th (index 4) and 5th (index 1) above it.
+            # orderedChordSteps = (3, 5, 7, 2, 4, 6) so index 0=3rd, 1=5th, 4=4th
+            if is_sus4_chord:
+                has_fifth = rootThirdList[1] if len(rootThirdList) > 1 else False
+                has_fourth = rootThirdList[4] if len(rootThirdList) > 4 else False
+                if has_fourth and has_fifth:
+                    score += 1 / 6  # same weight as having a third
             return score
 
         # FIND ROOT FAST -- for cases where one note has perfectly stacked
@@ -1735,6 +1743,12 @@ class Chord(ChordBase):
         rootnessFunctionScores = []
         orderedChordSteps = (3, 5, 7, 2, 4, 6)
 
+        # Detect sus4 chords: no note has both a 3rd (step+2) and 5th (step+4) above it
+        is_sus4_chord = not any(
+            (sn + 2) % 7 in stepNumsToPitches and (sn + 4) % 7 in stepNumsToPitches
+            for sn in stepNums
+        )
+
         for p in nonDuplicatingPitches:
             currentListOfThirds = []
             this_step_num = pitch.STEP_TO_DNN_OFFSET[p.step]
@@ -1744,7 +1758,7 @@ class Chord(ChordBase):
                 else:
                     currentListOfThirds.append(False)
 
-            rootnessScore = rootnessFunction(currentListOfThirds)
+            rootnessScore = rootnessFunction(currentListOfThirds, is_sus4_chord=is_sus4_chord)
             rootnessFunctionScores.append(rootnessScore)
 
         mostRootyIndex = rootnessFunctionScores.index(max(rootnessFunctionScores))
