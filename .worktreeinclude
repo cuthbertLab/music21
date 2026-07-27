@@ -1,0 +1,23 @@
+# .worktreeinclude
+#
+# Paths that are git-ignored (see .gitignore) but are expensive to regenerate
+# and worth copying into a fresh worktree, so a new worktree is usable
+# immediately instead of after a full rebuild.
+#
+# Keep this list small: every entry is copied file-by-file into each worktree.
+# Anything large, cheap to regenerate, or holding absolute paths belongs in
+# .gitignore only:
+#   .venv               run `uv sync` in the new worktree instead; a copy is
+#                       ~560 MB / 18k files and its interpreter symlinks point
+#                       back at the source checkout.
+#   .mypy_cache         ~210 MB, and mypy rebuilds it on first run.
+#   documentation/build ~150 MB of Sphinx HTML; rebuild with
+#                       `documentation/make.py` on the rare occasion it is needed.
+
+# Build / packaging artifacts
+dist
+build
+
+# Tool caches that speed up repeated runs
+.pytest_cache
+.coverage
