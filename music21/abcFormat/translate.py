@@ -109,6 +109,7 @@ def abcToStreamPart(
 
     barCount = 0
     measureNumber = 1
+    lyricTargets: list[note.GeneralNote] = []
     # merged handler are ABCHandlerBar objects, defining attributes for barlines
 
     for mh in mergedHandlers:
@@ -181,7 +182,9 @@ def abcToStreamPart(
         # environLocal.printDebug([mh, 'dst', dst])
         # ql = 0  # might not be zero if there is a pickup
 
-        postTransposition, clefSet = parseTokens(mh, dst, p, useMeasures)
+        postTransposition, clefSet = parseTokens(
+            mh, dst, p, useMeasures, lyricTargets
+        )
 
         # append measure to part; in the case of trailing metadata
         # dst may be part, even though useMeasures is True
@@ -253,7 +256,8 @@ def parseTokens(
     mh: abcFormat.ABCHandler,
     dst: stream.Measure|stream.Part,
     p: stream.Part,
-    useMeasures: bool
+    useMeasures: bool,
+    lyricTargets: list[note.GeneralNote],
 ) -> tuple[int, bool]:
     '''
     Parses all the tokens in a measure or part.
@@ -265,11 +269,16 @@ def parseTokens(
     clefSet = False
     for t in mh.tokens:
         if isinstance(t, abcFormat.ABCMetadata):
+            if t.tag == 'w':
+                addABCLyrics(t.data, lyricTargets)
+                lyricTargets.clear()
             postTransposition, clefSet = metadataToM21Object(
                 t, dst, postTransposition, clefSet, useMeasures
             )
         elif isinstance(t, abcFormat.ABCNote):
-            parseABCNote(t, dst)
+            m21Note = parseABCNote(t, dst)
+            if m21Note is not None and not isinstance(m21Note, note.Rest) and not t.inGrace:
+                lyricTargets.append(m21Note)
         elif isinstance(t, abcFormat.ABCSlurStart):
             if typing.TYPE_CHECKING:
                 assert t.slurObj is not None
@@ -285,10 +294,36 @@ def parseTokens(
     dst.coreElementsChanged()
     return postTransposition, clefSet
 
+
+def addABCLyrics(lyricData: str, lyricTargets: list[note.GeneralNote]) -> None:
+    '''
+    Attach simple ``w:`` ABC lyric syllables to their corresponding notes.
+
+    AI-assisted implementation.
+    '''
+    lyricTargetIndex = 0
+    for lyricWord in lyricData.split():
+        if lyricWord in ('*', '-'):
+            lyricTargetIndex += 1
+            continue
+
+        syllables = lyricWord.split('-')
+        for syllableIndex, syllable in enumerate(syllables):
+            if not syllable:
+                lyricTargetIndex += 1
+                continue
+            if lyricTargetIndex >= len(lyricTargets):
+                return
+            prefix = '-' if syllableIndex else ''
+            suffix = '-' if syllableIndex < len(syllables) - 1 else ''
+            lyricTargets[lyricTargetIndex].addLyric(prefix + syllable + suffix)
+            lyricTargetIndex += 1
+
+
 def parseABCNote(
     t: abcFormat.ABCNote,
     dst: stream.Measure|stream.Part,
-) -> None:
+) -> note.GeneralNote|None:
     '''
     Parse an ABCNote object and add it to the destination stream.
     '''
@@ -307,7 +342,7 @@ def parseABCNote(
             if cs_name in ('NC', 'N.C.', 'No Chord', 'None'):
                 cs = harmony.NoChord(cs_name)
             elif cs_name.startswith('>'):
-                return  # fingering diagram?  Appears in some pieces, ryans-Neumedia
+                return None  # fingering diagram?  Appears in some pieces, ryans-Neumedia
             else:
                 cs = harmony.ChordSymbol(cs_name)
             dst.coreAppend(cs, setActiveSite=False)
@@ -319,7 +354,7 @@ def parseABCNote(
     if isinstance(t, abcFormat.ABCChord):
         # Skip an empty chord
         if not t.subTokens:
-            return
+            return None
 
         # may have more than notes?
         pitchNameList: list[str] = []
@@ -345,6 +380,7 @@ def parseABCNote(
             if acc is not None:
                 acc.displayStatus = accStatusList[pIndex]
         dst.coreAppend(c)
+        return c
 
         # ql += t.quarterLength
     else:
@@ -388,6 +424,7 @@ def parseABCNote(
             n.articulations.append(m21ArticulationObj)
 
         dst.coreAppend(n, setActiveSite=False)
+        return n
 
 
 def metadataToM21Object(
@@ -885,23 +922,28 @@ class Test(unittest.TestCase):
         self.assertEqual(len(op), 8)
 
     def testLyrics(self):
-        # TODO(msc) -- test better
-
         from music21 import abcFormat
-        from music21.abcFormat import testFiles
-
-        tf = testFiles.sicutRosa
         af = abcFormat.ABCFile()
-        s = abcToStreamScore(af.readstr(tf))
+        s = abcToStreamScore(af.readstr('''
+X:1
+T:Lyrics
+M:4/4
+L:1/4
+K:C
+C D E F|G A B c|
+w:hel-lo world * one two three four
+'''))
         assert s is not None
 
-        # s.show()
-        # self.assertEqual(len(s.parts), 3)
-        # self.assertEqual(len(s.parts[0].notesAndRests), 6)
-        # self.assertEqual(len(s.parts[1].notesAndRests), 20)
-        # self.assertEqual(len(s.parts[2].notesAndRests), 6)
-        # s.show()
-        # s.show('midi')
+        notes = s.parts[0].recurse().notes
+        self.assertEqual(notes[0].lyric, 'hel')
+        self.assertEqual(notes[0].lyrics[0].syllabic, 'begin')
+        self.assertEqual(notes[1].lyric, 'lo')
+        self.assertEqual(notes[1].lyrics[0].syllabic, 'end')
+        self.assertEqual(notes[2].lyric, 'world')
+        self.assertEqual(notes[3].lyrics, [])
+        self.assertEqual([m21Note.lyric for m21Note in notes[4:]],
+                         ['one', 'two', 'three', 'four'])
 
     def testMultiWorkImported(self):
 
