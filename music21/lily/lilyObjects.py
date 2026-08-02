@@ -867,23 +867,34 @@ class LyTempoEvent(LyObject):
     r'''
     tempo_event: "\tempo" steno_duration '=' tempo_range
                | "\tempo" scalar steno_duration '=' tempo_range
+               | "\tempo" steno_duration '=' scalar
                | "\tempo" scalar
 
     >>> lte = lily.lilyObjects.LyTempoEvent(scalar='40')
     >>> str(lte)
     '\\tempo 40'
 
-    More complex:
+    A steno_duration paired with a single bpm scalar (and no tempoRange)
+    is the common case for a music21 MetronomeMark, e.g. quarter = 87:
 
-    >>> steno = lily.lilyObjects.LyStenoDuration('quarter')
+    >>> steno = lily.lilyObjects.LyStenoDuration('4')
+    >>> lte = lily.lilyObjects.LyTempoEvent(stenoDuration=steno, scalar=87)
+    >>> str(lte)
+    '\\tempo 4  = 87'
+
+    More complex, with a tempo range. Note that steno_duration takes a
+    Lilypond duration number such as '4' for a quarter note, not the
+    English name 'quarter':
+
+    >>> steno = lily.lilyObjects.LyStenoDuration('4')
     >>> tempoRange = lily.lilyObjects.LyTempoRange(70, 100)
     >>> lte = lily.lilyObjects.LyTempoEvent(tempoRange=tempoRange, stenoDuration=steno)
     >>> str(lte)
-    '\\tempo quarter  = 70~100 '
+    '\\tempo 4  = 70~100 '
 
     >>> lte.scalar = 85
     >>> str(lte)
-    '\\tempo 85 quarter  = 70~100 '
+    '\\tempo 85 4  = 70~100 '
     '''
 
     def __init__(self, tempoRange=None, stenoDuration=None, scalar=None):
@@ -906,6 +917,11 @@ class LyTempoEvent(LyObject):
             else:
                 return ' '.join([base, self.stenoDuration.stringOutput(),
                                  '=', self.tempoRange.stringOutput()])
+        elif self.stenoDuration is not None:
+            if self.scalar is None:  # pragma: no cover
+                raise LilyObjectsException(
+                    'If tempoRange is not defined but stenoDuration is, need a scalar')
+            return ' '.join([base, self.stenoDuration.stringOutput(), '=', str(self.scalar)])
         elif self.scalar is None:  # pragma: no cover
             raise LilyObjectsException('If tempoRange is not defined then need scalar')
 

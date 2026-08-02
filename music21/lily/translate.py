@@ -33,6 +33,7 @@ from music21 import exceptions21
 from music21 import key
 from music21 import note
 from music21 import stream
+from music21 import tempo
 from music21 import variant
 
 from music21.lily import lilyObjects as lyo
@@ -1096,6 +1097,11 @@ class LilypondConverter:
             lyObject = self.lyEmbeddedScmFromTimeSignature(thisObject)
             currentMusicList.append(lyObject)
             lyObject.setParent(contextObject)
+        elif 'MetronomeMark' in c:
+            lyObject = self.lyEmbeddedScmFromMetronomeMark(thisObject)
+            if lyObject is not None:
+                currentMusicList.append(lyObject)
+                lyObject.setParent(contextObject)
         elif 'Variant' in c:
             self.appendContextFromVariant(thisObject, coloredVariants=self.coloredVariants)
         elif 'SystemLayout' in c:
@@ -1678,6 +1684,38 @@ class LilypondConverter:
         lpEmbeddedScm = lyo.LyEmbeddedScm()
         keyScheme = lpEmbeddedScm.backslash + 'time ' + ts.ratioString + lpEmbeddedScm.newlineIndent
         lpEmbeddedScm.content = keyScheme
+        return lpEmbeddedScm
+
+    def lyEmbeddedScmFromMetronomeMark(self, mm: tempo.MetronomeMark) -> lyo.LyEmbeddedScm|None:
+        # noinspection PyShadowingNames
+        r'''
+        convert a :class:`~music21.tempo.MetronomeMark` object
+        to a lilyObjects.LyEmbeddedScm object
+
+        * New in v11: MetronomeMark objects are now written out when
+          converting a Stream to Lilypond; previously they were silently dropped.
+
+        >>> mm = tempo.MetronomeMark(number=87, referent=note.Note(type='quarter'))
+        >>> conv = lily.translate.LilypondConverter()
+        >>> print(conv.lyEmbeddedScmFromMetronomeMark(mm))
+        \tempo 4  = 87
+
+        A MetronomeMark without a number produces no output:
+
+        >>> mm = tempo.MetronomeMark()
+        >>> mm.number is None
+        True
+        >>> conv.lyEmbeddedScmFromMetronomeMark(mm) is None
+        True
+        '''
+        if mm.number is None:
+            return None
+
+        multipliedDuration = self.lyMultipliedDurationFromDuration(mm.referent)
+        tempoEvent = lyo.LyTempoEvent(stenoDuration=multipliedDuration.stenoDur, scalar=mm.number)
+
+        lpEmbeddedScm = lyo.LyEmbeddedScm()
+        lpEmbeddedScm.content = tempoEvent.stringOutput() + lpEmbeddedScm.newlineIndent
         return lpEmbeddedScm
 
     def setContextForTupletStart(self, inObj):
@@ -2595,6 +2633,27 @@ class Test(unittest.TestCase):
             r'\override Stem.color = "darkgreen"' '\n'
             "c' 4  "
         )
+
+    def testMetronomeMark(self):
+        mm = tempo.MetronomeMark(number=87, referent=note.Note(type='quarter'))
+        lpEmbeddedScm = LilypondConverter().lyEmbeddedScmFromMetronomeMark(mm)
+        self.assertEqual(str(lpEmbeddedScm).strip(), r'\tempo 4  = 87')
+
+        # a MetronomeMark with no number produces no output
+        textOnly = tempo.MetronomeMark()
+        self.assertIsNone(LilypondConverter().lyEmbeddedScmFromMetronomeMark(textOnly))
+
+    def testMetronomeMarkWrittenInStream(self):
+        # https://github.com/cuthbertLab/music21/issues/1852
+        from music21 import key
+        from music21 import meter
+        keysig = key.Key('a-')
+        mm = tempo.MetronomeMark(number=87, referent=note.Note(type='quarter'))
+        timesig = meter.TimeSignature('3/4')
+        s = stream.Stream([keysig, mm, timesig, note.Note()])
+        lpc = LilypondConverter()
+        lpc.loadObjectFromScore(s, makeNotation=False)
+        self.assertIn(r'\tempo 4  = 87', str(lpc.topLevelObject))
 
 class TestExternal(unittest.TestCase):
     show = True
