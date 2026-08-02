@@ -945,6 +945,25 @@ w:hel-lo world * one two three four
         self.assertEqual([m21Note.lyric for m21Note in notes[4:]],
                          ['one', 'two', 'three', 'four'])
 
+    def testLyricsIgnoreSyllablesAfterLastNote(self):
+        '''AI-assisted regression coverage for surplus lyric syllables.'''
+        from music21 import abcFormat
+        af = abcFormat.ABCFile()
+        s = abcToStreamScore(af.readstr('''
+X:1
+T:Lyrics with extra words
+M:4/4
+L:1/4
+K:C
+C D|
+w:first second third
+'''))
+        assert s is not None
+
+        notes = s.parts[0].recurse().notes
+        self.assertEqual([m21Note.lyric for m21Note in notes],
+                         ['first', 'second'])
+
     def testMultiWorkImported(self):
 
         from music21 import corpus
