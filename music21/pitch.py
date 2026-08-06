@@ -4984,20 +4984,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> a4.accidental is None
         True
 
-        `cautionaryAll` and a `displayType` of 'always' or 'even-tied' are honored
-        even when nothing precedes the pitch, and regardless of the key signature:
-
-        >>> fSharp = pitch.Pitch('F#4')
-        >>> fSharp.accidental.displayType = 'always'
-        >>> fSharp.updateAccidentalDisplay(alteredPitches=key.Key('G').alteredPitches)
-        >>> fSharp.accidental.displayStatus
-        True
-
         v8 -- made keyword-only and added `otherSimultaneousPitches`.
-
-        * Changed in v11: `cautionaryAll` and `displayType` of 'always'/'even-tied'
-          are honored for the first pitch of a part (previously an empty `pitchPast`
-          fell through to key-signature logic and could turn the accidental off).
         '''
         # N.B. -- this is a very complex method
         # do not alter it without significant testing.
