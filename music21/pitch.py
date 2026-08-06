@@ -5048,6 +5048,17 @@ class Pitch(prebase.ProtoM21Object):
             set_displayStatus(True)
             return
 
+        # here tied and always are treated the same; we assume that
+        # making ties sets the displayStatus, and thus we would not be
+        # overriding that display status here
+        if (cautionaryAll is True
+            or (acc is not None
+                and acc.displayType in ('even-tied', 'always'))):
+            # show all accidentals, no matter what is in the past
+            # or in the key signature
+            set_displayStatus(True)
+            return  # do not search past
+
         # no pitches in the past list
         if not pitchPastAll:
             # if we have no past, we show the accidental if this pitch name
@@ -5088,16 +5099,6 @@ class Pitch(prebase.ProtoM21Object):
                 else:  # names are the same, skip this line of questioning
                     break
         # nope, no conflicting accidentals at this name and octave in the past
-
-        # here tied and always are treated the same; we assume that
-        # making ties sets the displayStatus, and thus we would not be
-        # overriding that display status here
-        if (cautionaryAll is True
-            or (acc is not None
-                and acc.displayType in ('even-tied', 'always'))):
-            # show all accidentals, even if past encountered
-            set_displayStatus(True)
-            return  # do not search past
 
         # store if a match was found and display set from past pitches
         setFromPitchPast = False

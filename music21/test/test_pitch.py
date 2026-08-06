@@ -396,6 +396,55 @@ class Test(unittest.TestCase):
         n.pitch.updateAccidentalDisplay(overrideStatus=True, alteredPitches=k.alteredPitches)
         self.assertIs(n.pitch.accidental.displayStatus, False)
 
+    def testDisplayTypeAlwaysWithNothingInPast(self):
+        '''
+        `displayType='always'` and `cautionaryAll` win over the key signature
+        even for the first pitch of a part, where nothing precedes it.
+
+        AI-assisted (Claude).
+        '''
+        p = Pitch('An2')
+        p.accidental.displayType = 'always'
+        p.updateAccidentalDisplay()
+        self.assertIs(p.accidental.displayStatus, True)
+
+        # a sharp already implied by the key signature still shows
+        p = Pitch('F#4')
+        p.accidental.displayType = 'always'
+        p.updateAccidentalDisplay(alteredPitches=key.Key('G').alteredPitches)
+        self.assertIs(p.accidental.displayStatus, True)
+
+        # cautionaryAll creates the natural that was not there
+        p = Pitch('B4')
+        p.updateAccidentalDisplay(cautionaryAll=True)
+        self.assertEqual(p.accidental.name, 'natural')
+        self.assertIs(p.accidental.displayStatus, True)
+
+        # 'even-tied' behaves the same as 'always' here
+        p = Pitch('E-3')
+        p.accidental.displayType = 'even-tied'
+        p.updateAccidentalDisplay(alteredPitches=key.Key('E-').alteredPitches)
+        self.assertIs(p.accidental.displayStatus, True)
+
+        # in a stream, every note of the part shows, not just the ones after the first
+        s = converter.parse('tinyNotation: AAn2 Fn')
+        for n in s.recurse().notes:
+            n.pitch.accidental.displayType = 'always'
+        s.makeAccidentals(inPlace=True)
+        self.assertEqual([n.pitch.accidental.displayStatus for n in s.recurse().notes],
+                         [True, True])
+
+        # regression guard: a normal displayType is untouched by the above
+        p = Pitch('F#4')
+        p.updateAccidentalDisplay(alteredPitches=key.Key('G').alteredPitches)
+        self.assertIs(p.accidental.displayStatus, False)
+
+        # regression guard: with a non-empty past, repeated pitches are unchanged
+        past = [Pitch('c#4')]
+        p = Pitch('c#4')
+        p.updateAccidentalDisplay(pitchPast=past)
+        self.assertIs(p.accidental.displayStatus, False)
+
     def testImplicitToExplicitNatural(self):
         p = converter.parse('tinyNotation: 2/4 f4 fn4')
         last_note = p.recurse().notes.last()
