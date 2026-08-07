@@ -13,22 +13,12 @@ music21 translates to LilyPond format and if LilyPond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
 of musical files using LilyPond.
 
-The class hierarchy mirrors the LilyPond grammar as published in
-http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
+The class hierarchy mirrors the grammar in
+https://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
+(the last LilyPond to publish one is v2.19; since then it is `lily/parser.yy`).
 
-**Targeted LilyPond version: 2.24 (December 2022).**
-
-Output is written for LilyPond 2.24 and checked against it.  LilyPond's input
-syntax changes between stable releases, so a construct taken from the v2.14
-grammar above is not necessarily still valid: `\\markuplines` became
-`\\markuplist` in 2.16, tempo ranges moved from `70~100` to `70-100` in 2.18,
-and most bar line names were reworked in 2.18 and again in 2.23.  When adding
-or changing output, check it against a real LilyPond 2.24 run, and use
-LilyPond's own `convert-ly` (its `python/convertrules.py` is the authoritative
-list of syntax changes) to find anything left over from an older grammar.
-
-The policy is to support back roughly four years from a music21 release, so
-raise this target when 2.24 falls outside that window.
+Output is written for LilyPond 2.24 and checked against it.  Aim to support
+3-4 years of LilyPond.
 '''
 from __future__ import annotations
 
