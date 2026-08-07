@@ -1692,9 +1692,6 @@ class LilypondConverter:
         convert a :class:`~music21.tempo.MetronomeMark` object
         to a lilyObjects.LyEmbeddedScm object
 
-        * New in v11: MetronomeMark objects are now written out when
-          converting a Stream to Lilypond; previously they were silently dropped.
-
         >>> mm = tempo.MetronomeMark(number=87, referent=note.Note(type='quarter'))
         >>> conv = lily.translate.LilypondConverter()
         >>> print(conv.lyEmbeddedScmFromMetronomeMark(mm))
@@ -1707,6 +1704,9 @@ class LilypondConverter:
         True
         >>> conv.lyEmbeddedScmFromMetronomeMark(mm) is None
         True
+
+        * New in v11: MetronomeMark objects are now written out when
+          converting a Stream to LilyPond; previously they were silently dropped.
         '''
         if mm.number is None:
             return None
@@ -2645,7 +2645,6 @@ class Test(unittest.TestCase):
 
     def testMetronomeMarkWrittenInStream(self):
         # https://github.com/cuthbertLab/music21/issues/1852
-        from music21 import key
         from music21 import meter
         keysig = key.Key('a-')
         mm = tempo.MetronomeMark(number=87, referent=note.Note(type='quarter'))
