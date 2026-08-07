@@ -46,8 +46,7 @@ class LyObject(prebase.ProtoM21Object):
     >>> lyo.stringOutput()
     ''
 
-    * Changed in v11: `stringOutput()` always returns a `str`; the subclasses that
-      returned None for empty contents now return `''`.
+    * Changed in v11: `stringOutput()` always returns a `str`, never None.
     '''
     supportedClasses: list[str] = []  # ordered list of classes to support
     m21toLy: dict[str, dict[str, str]] = {}
@@ -1355,10 +1354,7 @@ class LyPrefixCompositeMusic(LyObject):
     modeChanging, modeChangingWith, relative,
     rhythmed
 
-    The 'tuplet' fraction is the LilyPond `\tuplet` fraction, actual/normal:
-    `3/2` means three notes in the time of two.  (The v2.14 grammar below
-    spells this `\times`, whose fraction is the inverse; `\tuplet` replaced it
-    in LilyPond 2.18.)
+    The 'tuplet' fraction is actual/normal: `3/2` is three notes in the time of two.
 
     prefix_composite_music: generic_prefix_music_scm
                        | "\context"
@@ -1468,7 +1464,7 @@ class LyModeChangingHead(LyObject):
     >>> print(l2.stringOutput())
     \chords
 
-    'note' has no context-creating shorthand in LilyPond, so it always gives `\notemode`:
+    Mode 'note' always gives `\notemode`:
 
     >>> l3 = lily.lilyObjects.LyModeChangingHead(hasContext=False, mode='note')
     >>> print(l3.stringOutput())
@@ -1858,7 +1854,7 @@ class LyCommandElement(LyObject):
             argOut = arg.stringOutput() if isinstance(arg, LyObject) else str(arg)
             return self.backslash + ct + ' ' + argOut
         elif ct == '[':
-            # \[ and \] are ligature brackets; manual beams are plain [ and ]
+            # ligature brackets; manual beams are plain [ and ]
             return self.backslash + '[ '
         elif ct == ']':
             return self.backslash + '] '
@@ -1884,7 +1880,7 @@ class LyCommandEvent(LyObject):
     def stringOutput(self) -> str:
         ct = self.commandType
         if ct == '~':
-            # E_TILDE: the pes-or-flexa ligature event, not a tie (a tie is a bare ~)
+            # E_TILDE, the pes-or-flexa ligature event
             return self.backslash + '~ '
         elif ct == 'mark-default':
             return self.backslash + 'mark ' + self.backslash + 'default '
@@ -2242,7 +2238,6 @@ class LyFullMarkupList(LyObject):
         elif mli is None:  # pragma: no cover
             raise LilyObjectsException('need a markup list or identifier')
         else:
-            # \markuplines was renamed \markuplist in LilyPond 2.16
             return self.backslash + 'markuplist ' + mli.stringOutput()
 
 

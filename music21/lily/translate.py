@@ -141,8 +141,7 @@ class LilypondConverter:
                          'half-flat': 'eh',
                          }
 
-    # bar line names as defined by LilyPond 2.18 and later; unknown names
-    # are silently drawn as nothing.
+    # bar line names as defined in LilyPond's scm/lily/bar-line.scm
     barlineDict = {'regular': '|',
                    'dotted': ';',
                    'dashed': '!',
@@ -1716,8 +1715,7 @@ class LilypondConverter:
         >>> conv.lyEmbeddedScmFromMetronomeMark(mm) is None
         True
 
-        * New in v11: MetronomeMark objects are now written out when
-          converting a Stream to LilyPond; previously they were silently dropped.
+        * New in v11.
         '''
         if mm.number is None:
             return None
@@ -1762,8 +1760,8 @@ class LilypondConverter:
     ) -> lyo.LyMusicList:
         r'''
         Explicitly starts a new context for scaled music (tuplets, etc.) for the
-        given LilyPond `\tuplet` fraction, actual/normal: 5/4 means five notes in
-        the time of four.  Either part may be an int or a string.
+        given fraction, actual/normal: 5/4 is five notes in the time of four.
+        Either part may be an int or a string.
 
         Returns an lpMusicList object contained in an lpSequentialMusic object
         in an lpPrefixCompositeMusic object which sets the tuplet to a particular
@@ -1793,9 +1791,7 @@ class LilypondConverter:
         >>> lpc.context.getParent().getParent().getParent() is lyTop
         True
 
-        * Changed in v11: emits `\tuplet actual/normal` rather than the
-          `\times normal/actual` removed after LilyPond 2.16; the arguments
-          are correspondingly swapped.
+        * Changed in v11: emits `\tuplet`; the arguments are now actual, normal.
         '''
         fraction = str(actual) + '/' + str(normal)
         lpMusicList = lyo.LyMusicList()
