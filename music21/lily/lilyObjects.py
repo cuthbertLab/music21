@@ -13,8 +13,22 @@ music21 translates to LilyPond format and if LilyPond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
 of musical files using LilyPond.
 
-The Grammar for LilyPond comes from
+The class hierarchy mirrors the LilyPond grammar as published in
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
+
+**Targeted LilyPond version: 2.24 (December 2022).**
+
+Output is written for LilyPond 2.24 and checked against it.  LilyPond's input
+syntax changes between stable releases, so a construct taken from the v2.14
+grammar above is not necessarily still valid: `\\markuplines` became
+`\\markuplist` in 2.16, tempo ranges moved from `70~100` to `70-100` in 2.18,
+and most bar line names were reworked in 2.18 and again in 2.23.  When adding
+or changing output, check it against a real LilyPond 2.24 run, and use
+LilyPond's own `convert-ly` (its `python/convertrules.py` is the authoritative
+list of syntax changes) to find anything left over from an older grammar.
+
+The policy is to support back roughly four years from a music21 release, so
+raise this target when 2.24 falls outside that window.
 '''
 from __future__ import annotations
 
@@ -918,15 +932,23 @@ class LyTempoEvent(LyObject):
     r'''
     tempo_event: "\tempo" steno_duration '=' tempo_range
                | "\tempo" scalar steno_duration '=' tempo_range
+               | "\tempo" steno_duration '=' scalar
                | "\tempo" scalar
 
     >>> lte = lily.lilyObjects.LyTempoEvent(scalar='40')
     >>> str(lte)
     '\\tempo 40'
 
-    More complex:
+    A steno_duration paired with a single bpm scalar (and no tempoRange)
+    is the common case for a music21 MetronomeMark, e.g. quarter = 87:
 
     >>> steno = lily.lilyObjects.LyStenoDuration(4)
+    >>> lte = lily.lilyObjects.LyTempoEvent(stenoDuration=steno, scalar=87)
+    >>> str(lte)
+    '\\tempo 4  = 87'
+
+    More complex, with a tempo range:
+
     >>> tempoRange = lily.lilyObjects.LyTempoRange(70, 100)
     >>> lte = lily.lilyObjects.LyTempoEvent(tempoRange=tempoRange, stenoDuration=steno)
     >>> str(lte)
@@ -961,6 +983,11 @@ class LyTempoEvent(LyObject):
             else:
                 return ' '.join([base, self.stenoDuration.stringOutput(),
                                  '=', self.tempoRange.stringOutput()])
+        elif self.stenoDuration is not None:
+            if self.scalar is None:  # pragma: no cover
+                raise LilyObjectsException(
+                    'If tempoRange is not defined but stenoDuration is, need a scalar')
+            return ' '.join([base, self.stenoDuration.stringOutput(), '=', str(self.scalar)])
         elif self.scalar is None:  # pragma: no cover
             raise LilyObjectsException('If tempoRange is not defined then need scalar')
 
@@ -1334,9 +1361,14 @@ class LyPrefixCompositeMusic(LyObject):
     r'''
     type must be specified.  Should be one of:
 
-    scheme, context, new, times, repeated, transpose,
+    scheme, context, new, tuplet, repeated, transpose,
     modeChanging, modeChangingWith, relative,
     rhythmed
+
+    The 'tuplet' fraction is the LilyPond `\tuplet` fraction, actual/normal:
+    `3/2` means three notes in the time of two.  (The v2.14 grammar below
+    spells this `\times`, whose fraction is the inverse; `\tuplet` replaced it
+    in LilyPond 2.18.)
 
     prefix_composite_music: generic_prefix_music_scm
                        | "\context"
@@ -1349,7 +1381,7 @@ class LyPrefixCompositeMusic(LyObject):
                                 optional_id
                                 optional_context_mod
                                 music
-                       | "\times" fraction music
+                       | "\tuplet" fraction music
                        | repeated_music
                        | "\transpose"
                                 pitch_also_in_chords
@@ -1409,8 +1441,8 @@ class LyPrefixCompositeMusic(LyObject):
                 c += str(self.optionalContextMod) + ' '
             c += str(self.music) + ' '
             return c
-        elif myType == 'times':
-            return self.backslash + 'times ' + str(self.fraction) + ' ' + str(self.music) + ' '
+        elif myType == 'tuplet':
+            return self.backslash + 'tuplet ' + str(self.fraction) + ' ' + str(self.music) + ' '
         elif myType == 'repeated':
             return str(self.repeatedMusic)
         elif myType == 'transpose':

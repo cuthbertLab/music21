@@ -40,6 +40,7 @@ from music21 import meter
 from music21 import note
 from music21 import pitch
 from music21 import stream
+from music21 import tempo
 from music21 import variant
 
 from music21.lily import lilyObjects as lyo
@@ -98,11 +99,11 @@ def makeLettersOnlyId(inputString: str|int) -> str:
 class LilypondConverter:
     fictaDef = (
         r'''
-    ficta = #(define-music-function (parser location) () #{ \once \set suggestAccidentals = ##t #})
+    ficta = #(define-music-function () () #{ \once \set suggestAccidentals = ##t #})
     '''.lstrip())
     colorDef = (
         r'''
-    color = #(define-music-function (parser location color) (string?) #{
+    color = #(define-music-function (color) (string?) #{
         \once \override NoteHead.color = #(x11-color color)
         \once \override Stem.color = #(x11-color color)
         \once \override Rest.color = #(x11-color color)
@@ -266,7 +267,7 @@ class LilypondConverter:
         >>> print(lily.translate.LilypondConverter().textFromMusic21Object(n))
         \version "2..."
         \include "lilypond-book-preamble.ly"
-        color = #(define-music-function (parser location color) (string?) #{
+        color = #(define-music-function (color) (string?) #{
                 \once \override NoteHead.color = #(x11-color color)
                 \once \override Stem.color = #(x11-color color)
                 \once \override Rest.color = #(x11-color color)
@@ -465,8 +466,7 @@ class LilypondConverter:
                           \override TupletBracket.bracket-visibility = ##f
                           \override TupletNumber.stencil = ##f
                           \override Clef.transparent = ##t
-                          \override OctavateEight.transparent = ##t
-                          \consists "Default_bar_line_engraver"
+                          \override ClefModifier.transparent = ##t
                         }
                  { \stopStaff s1 s1 s1 s1 }
         \new Staff  = romepa
@@ -479,8 +479,7 @@ class LilypondConverter:
                           \override TupletBracket.bracket-visibility = ##f
                           \override TupletNumber.stencil = ##f
                           \override Clef.transparent = ##t
-                          \override OctavateEight.transparent = ##t
-                          \consists "Default_bar_line_engraver"
+                          \override ClefModifier.transparent = ##t
                         }
                  { \stopStaff s1 s1 s1 s1 }
         \new Staff  = pb { \stopStaff s1 s1 s1 s1 }
@@ -494,8 +493,7 @@ class LilypondConverter:
                           \override TupletBracket.bracket-visibility = ##f
                           \override TupletNumber.stencil = ##f
                           \override Clef.transparent = ##t
-                          \override OctavateEight.transparent = ##t
-                          \consists "Default_bar_line_engraver"
+                          \override ClefModifier.transparent = ##t
                         }
                  { \stopStaff s1 s1 s1 s1 }
         \new Staff  = romepb
@@ -508,8 +506,7 @@ class LilypondConverter:
                           \override TupletBracket.bracket-visibility = ##f
                           \override TupletNumber.stencil = ##f
                           \override Clef.transparent = ##t
-                          \override OctavateEight.transparent = ##t
-                          \consists "Default_bar_line_engraver"
+                          \override ClefModifier.transparent = ##t
                         }
                  { \stopStaff s1 s1 s1 s1 }
         '''
@@ -550,8 +547,7 @@ class LilypondConverter:
                                       r'\override TupletBracket.bracket-visibility = ##f',
                                       r'\override TupletNumber.stencil = ##f',
                                       r'\override Clef.transparent = ##t',
-                                      r'\override OctavateEight.transparent = ##t',
-                                      r'\consists "Default_bar_line_engraver"',
+                                      r'\override ClefModifier.transparent = ##t',
                                       ]
                     optionalContextMod = lyo.LyContextModification(contextModList)
                     lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
@@ -1098,6 +1094,11 @@ class LilypondConverter:
             lyObject = self.lyEmbeddedScmFromTimeSignature(thisObject)
             currentMusicList.append(lyObject)
             lyObject.setParent(contextObject)
+        elif isinstance(thisObject, tempo.MetronomeMark):
+            lyObject = self.lyEmbeddedScmFromMetronomeMark(thisObject)
+            if lyObject is not None:
+                currentMusicList.append(lyObject)
+                lyObject.setParent(contextObject)
         elif isinstance(thisObject, variant.Variant):
             self.appendContextFromVariant(thisObject, coloredVariants=self.coloredVariants)
         elif isinstance(thisObject, layout.SystemLayout):
@@ -1146,7 +1147,7 @@ class LilypondConverter:
 
         >>> print(lpc.context)
         cis' 4
-        \times 2/3 { dis' 8
+        \tuplet 3/2 { dis' 8
            e' 8
            f' 8
             }
@@ -1211,7 +1212,7 @@ class LilypondConverter:
 
         >>> print(lpc.context)
         < c'  e'  g'  > 4
-        \times 2/3 { < d'  fis'  a'  > 8
+        \tuplet 3/2 { < d'  fis'  a'  > 8
            < d'  f'  g'  > 8
            < c'  e'  g'  c''  > 8
             }
@@ -1696,6 +1697,38 @@ class LilypondConverter:
         lpEmbeddedScm.content = keyScheme
         return lpEmbeddedScm
 
+    def lyEmbeddedScmFromMetronomeMark(self, mm: tempo.MetronomeMark) -> lyo.LyEmbeddedScm|None:
+        # noinspection PyShadowingNames
+        r'''
+        convert a :class:`~music21.tempo.MetronomeMark` object
+        to a lilyObjects.LyEmbeddedScm object
+
+        >>> mm = tempo.MetronomeMark(number=87, referent=note.Note(type='quarter'))
+        >>> conv = lily.translate.LilypondConverter()
+        >>> print(conv.lyEmbeddedScmFromMetronomeMark(mm))
+        \tempo 4  = 87
+
+        A MetronomeMark without a number produces no output:
+
+        >>> mm = tempo.MetronomeMark()
+        >>> mm.number is None
+        True
+        >>> conv.lyEmbeddedScmFromMetronomeMark(mm) is None
+        True
+
+        * New in v11: MetronomeMark objects are now written out when
+          converting a Stream to LilyPond; previously they were silently dropped.
+        '''
+        if mm.number is None:
+            return None
+
+        multipliedDuration = self.lyMultipliedDurationFromDuration(mm.referent)
+        tempoEvent = lyo.LyTempoEvent(stenoDuration=multipliedDuration.stenoDur, scalar=mm.number)
+
+        lpEmbeddedScm = lyo.LyEmbeddedScm()
+        lpEmbeddedScm.content = tempoEvent.stringOutput() + lpEmbeddedScm.newlineIndent
+        return lpEmbeddedScm
+
     def setContextForTupletStart(self, inObj: base.Music21Object) -> lyo.LyMusicList|None:
         r'''
         if the inObj has tuplets then we set a new context
@@ -1715,24 +1748,25 @@ class LilypondConverter:
         if not inObj.duration.tuplets:
             return None
         elif inObj.duration.tuplets[0].type == 'start':
-            numerator = str(int(inObj.duration.tuplets[0].tupletNormal[0]))
-            denominator = str(int(inObj.duration.tuplets[0].tupletActual[0]))
-            lpMusicList = self.setContextForTimeFraction(numerator, denominator)
+            actual = str(int(inObj.duration.tuplets[0].tupletActual[0]))
+            normal = str(int(inObj.duration.tuplets[0].tupletNormal[0]))
+            lpMusicList = self.setContextForTimeFraction(actual, normal)
             return lpMusicList
         else:
             return None
 
     def setContextForTimeFraction(
         self,
-        numerator: int|str,
-        denominator: int|str,
+        actual: int|str,
+        normal: int|str,
     ) -> lyo.LyMusicList:
         r'''
-        Explicitly starts a new context for scaled music (tuplets, etc.)
-        for the given numerator and denominator (either an int or a string or unicode)
+        Explicitly starts a new context for scaled music (tuplets, etc.) for the
+        given LilyPond `\tuplet` fraction, actual/normal: 5/4 means five notes in
+        the time of four.  Either part may be an int or a string.
 
         Returns an lpMusicList object contained in an lpSequentialMusic object
-        in an lpPrefixCompositeMusic object which sets the times object to a particular
+        in an lpPrefixCompositeMusic object which sets the tuplet to a particular
         fraction.
 
         >>> lpc = lily.translate.LilypondConverter()
@@ -1749,24 +1783,28 @@ class LilypondConverter:
         >>> lpc.context.getParent()
         <music21.lily.lilyObjects.LySequentialMusic {  }>
         >>> lpc.context.getParent().getParent()
-        <music21.lily.lilyObjects.LyPrefixCompositeMusic \times 5/4...>
+        <music21.lily.lilyObjects.LyPrefixCompositeMusic \tuplet 5/...>
         >>> lpc.context.getParent().getParent().fraction
         '5/4'
         >>> lpc.context.getParent().getParent().type
-        'times'
+        'tuplet'
         >>> lpc.context.getParent().getParent().getParent()
-        <music21.lily.lilyObjects.LyLilypondTop \times 5/4...>
+        <music21.lily.lilyObjects.LyLilypondTop \tuplet 5/...>
         >>> lpc.context.getParent().getParent().getParent() is lyTop
         True
+
+        * Changed in v11: emits `\tuplet actual/normal` rather than the
+          `\times normal/actual` removed after LilyPond 2.16; the arguments
+          are correspondingly swapped.
         '''
-        fraction = str(numerator) + '/' + str(denominator)
+        fraction = str(actual) + '/' + str(normal)
         lpMusicList = lyo.LyMusicList()
         lpSequentialMusic = lyo.LySequentialMusic(musicList=lpMusicList)
         # technically needed, but we can speed things up
         # lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic=lpSequentialMusic)
         # lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList=lpGroupedMusicList)
         # lpMusic = lyo.LyMusic(compositeMusic=lpCompositeMusic)
-        lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type='times',
+        lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type='tuplet',
                                                             fraction=fraction,
                                                             music=lpSequentialMusic)
         currentContents = self.contextContents()
@@ -1915,7 +1953,7 @@ class LilypondConverter:
 
         >>> print(lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList,
         ...                activeSite=activeSite)[0])
-        \new Staff  = london... { { \times 1/2 {\startStaff \clef "treble"
+        \new Staff  = london... { { \tuplet 2/1 {\startStaff \clef "treble"
               a' 4
               a' 4
               a' 4
@@ -2043,11 +2081,11 @@ class LilypondConverter:
 
             lpOssiaMusicVariant: lyo.LyObject
             if variantLength != replacedElementsLength:
-                numerator, denominator = common.decimalToTuplet(
+                normal, actual = common.decimalToTuplet(
                     replacedElementsLength / variantLength)
-                fraction = str(numerator) + '/' + str(denominator)
+                fraction = str(actual) + '/' + str(normal)
                 lpOssiaMusicVariantPreFraction = self.lyOssiaMusicFromVariant(vStripped)
-                lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times',
+                lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='tuplet',
                                                              fraction=fraction,
                                                              music=lpOssiaMusicVariantPreFraction)
 
@@ -2176,9 +2214,9 @@ class LilypondConverter:
 
         self.variantMode = True
         if variantLength != replacedElementsLength:
-            numerator, denominator = common.decimalToTuplet(replacedElementsLength / variantLength)
-            fraction = str(numerator) + '/' + str(denominator)
-            lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times',
+            normal, actual = common.decimalToTuplet(replacedElementsLength / variantLength)
+            fraction = str(actual) + '/' + str(normal)
+            lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='tuplet',
                                                          fraction=fraction,
                                                          music=lpOssiaMusicVariant)
             lpInternalSequentialMusic = lyo.LySequentialMusic(musicList=lpVariantTuplet)
@@ -2631,6 +2669,25 @@ class Test(unittest.TestCase):
             r'\override Stem.color = "darkgreen"' '\n'
             "c' 4  "
         )
+
+    def testMetronomeMark(self):
+        mm = tempo.MetronomeMark(number=87, referent=note.Note(type='quarter'))
+        lpEmbeddedScm = LilypondConverter().lyEmbeddedScmFromMetronomeMark(mm)
+        self.assertEqual(str(lpEmbeddedScm).strip(), r'\tempo 4  = 87')
+
+        # a MetronomeMark with no number produces no output
+        textOnly = tempo.MetronomeMark()
+        self.assertIsNone(LilypondConverter().lyEmbeddedScmFromMetronomeMark(textOnly))
+
+    def testMetronomeMarkWrittenInStream(self):
+        # https://github.com/cuthbertLab/music21/issues/1852
+        keysig = key.Key('a-')
+        mm = tempo.MetronomeMark(number=87, referent=note.Note(type='quarter'))
+        timesig = meter.TimeSignature('3/4')
+        s = stream.Stream([keysig, mm, timesig, note.Note()])
+        lpc = LilypondConverter()
+        lpc.loadObjectFromScore(s, makeNotation=False)
+        self.assertIn(r'\tempo 4  = 87', str(lpc.topLevelObject))
 
 class TestExternal(unittest.TestCase):
     show = True
