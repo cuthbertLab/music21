@@ -75,6 +75,12 @@ So: a fix for a crash on an edge case, a check that some input no longer
 produces invalid output, an assertion tied to an issue number — unittest. An
 example a user would want to read — doctest.
 
+The trap is the one-line `Traceback` example proving that bad input now raises.
+It looks like documentation and costs almost nothing to add, but the input comes
+from the bug rather than from anything a user would write, so it teaches nothing
+while making an obscure corner one of the first things a reader meets. It is a
+unittest.
+
 Naming the guarded bug **is** appropriate in a unittest; that is what the test
 is for. The rule against narrating old bugs applies to docstrings and to
 comments in shipping code, not to tests.
