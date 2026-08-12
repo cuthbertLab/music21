@@ -3620,7 +3620,7 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         from music21 import stream
 
-        # TODO: v8 -- expose as public.
+        # TODO: expose as public.
         activeS = self.activeSite
         if activeS is not None and isinstance(activeS, stream.Measure):
             # environLocal.printDebug(['found activeSite as Measure, using for offset'])
