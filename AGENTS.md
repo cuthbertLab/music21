@@ -40,6 +40,7 @@
   - If the stale result could have spread to other users/devs, increment the music21
     patch/beta version (see "PRs and Issues" below) — bumping the version invalidates all
     caches everywhere.
+  - Doctests are not normally the place to demonstrate bug fixes - nor do simple bug fixes get a "Changed in vXX" message. Doctests demonstrate usage for the future.  Unittests are for regression testing.
 
 # Setup
 

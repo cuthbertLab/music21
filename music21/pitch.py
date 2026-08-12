@@ -4984,7 +4984,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> a4.accidental is None
         True
 
-        v8 -- made keyword-only and added `otherSimultaneousPitches`.
+        * Changed in v8: all parameteres are keyword-only; added `otherSimultaneousPitches`.
         '''
         # N.B. -- this is a very complex method
         # do not alter it without significant testing.
