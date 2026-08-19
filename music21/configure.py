@@ -3,8 +3,9 @@
 # Purpose:      Installation and Configuration Utilities
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2019 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -41,6 +42,9 @@ reSibeliusExe = re.compile(r'Sibelius\.exe', IGNORECASE)
 reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
 reMuseScoreApp = re.compile(r'MuseScore.*\.app', IGNORECASE)
 reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
+# matches any MuseScore file/app name regardless of version or platform:
+# MuseScore.app, MuseScore 4.app, MuseScore3.exe, mscore, mscore4portable, etc.
+reMuseScoreName = re.compile(r'MuseScore|mscore', IGNORECASE)
 reDoricoApp = re.compile(r'Dorico.*\.app', IGNORECASE)
 reDoricoExe = re.compile(r'Dorico.*\.exe', IGNORECASE)
 
@@ -1293,17 +1297,21 @@ class SelectMusicXMLReader(SelectFilePath):
 
     def _performAction(self, simulate=False):
         '''
-        The action here is to open the stored URL in a browser, if the user agrees.
+        Set musicxmlPath to the selected reader.  If the reader is a version
+        of MuseScore, also set musescoreDirectPNGPath to it.
         '''
         result = self.getResult()
         if result is not None and not isinstance(result, DialogError):
             # noinspection PyTypeChecker
             reload(environment)
-            # us = environment.UserSettings()
-            # us['musicxmlPath'] = result  # automatically writes
             environment.set('musicxmlPath', result)
             musicXmlNew = environment.get('musicxmlPath')
-            self._writeToUser([f'MusicXML Reader set to: {musicXmlNew}', ' '])
+            if reMuseScoreName.search(pathlib.Path(str(result)).name):
+                environment.set('musescoreDirectPNGPath', musicXmlNew)
+                self._writeToUser(
+                    [f'MusicXML Reader and PNG/PDF generator set to: {musicXmlNew}', ' '])
+            else:
+                self._writeToUser([f'MusicXML Reader set to: {musicXmlNew}', ' '])
 
 
 # ------------------------------------------------------------------------------
@@ -1578,6 +1586,18 @@ class Test(unittest.TestCase):
         post = d.getResult()
         # returns a bad condition b/c there are no options and user entered 'n'
         self.assertIsInstance(post, configure.BadConditions)
+
+    def testMuseScoreNameRe(self):
+        '''
+        AI-assisted (Claude).
+        '''
+        for name in ('MuseScore.app', 'MuseScore 4.app', 'MuseScore 4.5.app',
+                     'MuseScore3.exe', 'MuseScore4.exe', 'MuseScore Studio.app',
+                     'mscore', 'mscore3', 'mscore4portable'):
+            self.assertIsNotNone(reMuseScoreName.search(name), name)
+        for name in ('Finale 2011.app', 'Finale.exe', 'Sibelius.app',
+                     'Dorico 5.app', 'Finale Reader.app'):
+            self.assertIsNone(reMuseScoreName.search(name), name)
 
     def testRe(self):
         g = reFinaleApp.search('Finale 2011.app')

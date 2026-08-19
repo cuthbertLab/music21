@@ -4375,7 +4375,7 @@ class Chord(ChordBase):
         for i in range(len(pitches)):
             returnObj._notes[i].pitch = pitches[i]
 
-        if inPlace is False:
+        if not inPlace:
             return returnObj
 
     @overload

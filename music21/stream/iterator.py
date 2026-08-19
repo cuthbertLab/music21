@@ -219,7 +219,7 @@ class StreamIterator[M21ObjType: base.Music21Object](prebase.ProtoM21Object, Seq
 
     def __getattr__(self, attr):
         '''
-        DEPRECATED in v8 -- will be removed in v9.
+        DEPRECATED in v8 -- will be removed in soon.
 
         In case an attribute is defined on Stream but not on a StreamIterator,
         create a Stream and then return that attribute.  This is NOT performance

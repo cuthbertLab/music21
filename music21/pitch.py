@@ -539,6 +539,7 @@ def _convertHarmonicToCents(value: int|float) -> int:
 
 
 def _dissonanceScore(pitches: list[Pitch],
+                     *,
                      smallPythagoreanRatio: bool = True,
                      accidentalPenalty: bool = True,
                      triadAward: bool = True) -> float:
@@ -549,7 +550,10 @@ def _dissonanceScore(pitches: list[Pitch],
     Pythagorean ratios of its constituent intervals are small (`smallPythagoreanRatio`),
     (2) it shows few double- or triple-accidentals (`accidentalPenalty`), and (3) it shows
     thirds that can form some triad (`triadAward`).
+
+    * Changed in v11: all options except pitches are keyword only.
     '''
+    # TODO: test other options.
     score_accidentals = 0.0
     score_ratio = 0.0
     score_triad = 0.0
@@ -579,6 +583,10 @@ def _dissonanceScore(pitches: list[Pitch],
         for this_interval in intervals:
             # does not accept weird intervals, e.g. with semitones
             ratio = interval.intervalToPythagoreanRatio(this_interval)
+            # The constant 0.075853.... is 1 / ln(3**12), where 3**12 is 531441, the numerator
+            # of 531441/524288 -- the Pythagorean comma: it normalizes the penalty so a
+            # diminished second (the Pythagorean comma; slightly more than a unison),
+            # scores exactly 1.0, and all other penalties are based on that.
             penalty = math.log(ratio.denominator) * 0.07585326888
             score_ratio += penalty
 
@@ -626,6 +634,7 @@ def _greedyEnharmonicsSearch(
 
 def simplifyMultipleEnharmonics(
     pitches: t.Iterable[Pitch|str|int|float],
+    *,
     criterion: t.Callable[[list[Pitch]], float] = _dissonanceScore,
     keyContext: key.KeySignature|None = None
 ) -> list[Pitch]:
@@ -675,13 +684,15 @@ def simplifyMultipleEnharmonics(
     ...                                    keyContext=key.Key('C'))
     [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
 
-    * Changed in v7.3: fixed a bug with compound intervals (such as formed against
-      the tonic of a KeySignature defaulting to octave 4):
+    Former bug: simplifying enharmonics in a key context will not remove octaves.
 
     >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('B5')], keyContext=key.Key('D'))
     [<music21.pitch.Pitch B5>]
-    '''
 
+    * Changed in v7.3: fixed a bug with compound intervals (such as those formed against
+      the tonic of a KeySignature defaulting to octave 4).
+    * Changed in v11: crtierion and keyContext are keyword only.
+    '''
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
 
     if keyContext:
@@ -4973,7 +4984,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> a4.accidental is None
         True
 
-        v8 -- made keyword-only and added `otherSimultaneousPitches`.
+        * Changed in v8: all parameteres are keyword-only; added `otherSimultaneousPitches`.
         '''
         # N.B. -- this is a very complex method
         # do not alter it without significant testing.
@@ -5037,6 +5048,17 @@ class Pitch(prebase.ProtoM21Object):
             set_displayStatus(True)
             return
 
+        # here tied and always are treated the same; we assume that
+        # making ties sets the displayStatus, and thus we would not be
+        # overriding that display status here
+        if (cautionaryAll is True
+            or (acc is not None
+                and acc.displayType in ('even-tied', 'always'))):
+            # show all accidentals, no matter what is in the past
+            # or in the key signature
+            set_displayStatus(True)
+            return  # do not search past
+
         # no pitches in the past list
         if not pitchPastAll:
             # if we have no past, we show the accidental if this pitch name
@@ -5077,16 +5099,6 @@ class Pitch(prebase.ProtoM21Object):
                 else:  # names are the same, skip this line of questioning
                     break
         # nope, no conflicting accidentals at this name and octave in the past
-
-        # here tied and always are treated the same; we assume that
-        # making ties sets the displayStatus, and thus we would not be
-        # overriding that display status here
-        if (cautionaryAll is True
-            or (acc is not None
-                and acc.displayType in ('even-tied', 'always'))):
-            # show all accidentals, even if past encountered
-            set_displayStatus(True)
-            return  # do not search past
 
         # store if a match was found and display set from past pitches
         setFromPitchPast = False
@@ -5145,6 +5157,7 @@ class Pitch(prebase.ProtoM21Object):
             # and it is not a natural, it should always be set to display
             if (pPastInMeasure is False
                     and acc is not None
+                    and acc.name != 'natural'
                     and not self._nameInKeySignature(alteredPitches)):
                 acc.displayStatus = True
                 return  # do not search past

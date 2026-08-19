@@ -202,7 +202,7 @@ environLocal = environment.Environment('roman')
 # -----------------------------------------------------------------------------
 
 
-SHORTHAND_RE = re.compile(r'#*-*b*o*[1-9xyz]')
+SHORTHAND_RE = re.compile(r'#*-*b*o*[1-9⑪⑬⑮]')
 ENDWITHFLAT_RE = re.compile(r'[b\-]$')
 
 # cache all Key/Scale objects created or passed in; re-use
@@ -390,18 +390,16 @@ def expandShortHand(shorthand):
     shorthand = shorthand.replace('/', '')  # this line actually seems unnecessary.
     if ENDWITHFLAT_RE.match(shorthand):
         shorthand += '3'
-    shorthand = re.sub('11', 'x', shorthand)
-    shorthand = re.sub('13', 'y', shorthand)
-    shorthand = re.sub('15', 'z', shorthand)
+    # single characters for the two-digit figures, so that each group
+    # SHORTHAND_RE finds is one figure.
+    shorthand = shorthand.replace('11', '⑪').replace('13', '⑬').replace('15', '⑮')
     shorthandGroups = SHORTHAND_RE.findall(shorthand)
     if len(shorthandGroups) == 1 and shorthandGroups[0].endswith('3'):
         shorthandGroups = ['5', shorthandGroups[0]]
 
     shGroupOut = []
     for sh in shorthandGroups:
-        sh = re.sub('x', '11', sh)
-        sh = re.sub('y', '13', sh)
-        sh = re.sub('z', '15', sh)
+        sh = sh.replace('⑪', '11').replace('⑬', '13').replace('⑮', '15')
         shGroupOut.append(sh)
     return shGroupOut
 
@@ -2586,6 +2584,9 @@ class RomanNumeral(harmony.Harmony):
 
         if not all(char.isalnum() or char in '#°+-/[]' for char in figure):
             # V, b, ø, no, etc. already covered by isalnum()
+            raise RomanNumeralException(f'Invalid figure: {figure}')
+        if any(char in 'xyz' for char in figure):
+            # no roman numeral figure contains these letters
             raise RomanNumeralException(f'Invalid figure: {figure}')
 
         # Store raw figure before calling setKeyOrScale:
@@ -4860,6 +4861,12 @@ class Test(unittest.TestCase):
         _keyCache[_keyCacheKey(key.Key('C', 'lydian'))] = key.Key('C', 'lydian')
         self.assertEqual(_getKeyFromCache('C').mode, 'major')
         self.assertEqual(_getKeyFromCache('c').mode, 'minor')
+
+    def testXYZAreNotFigures(self):
+        for fig in ('Ix', 'Iy', 'Iz', 'V7/ix'):
+            with self.subTest(figure=fig):
+                with self.assertRaises(RomanNumeralException):
+                    RomanNumeral(fig, 'C')
 
 
 class TestExternal(unittest.TestCase):

@@ -94,7 +94,7 @@ environLocal = environment.Environment('articulations')
 # ------------------------------------------------------------------------------
 class Articulation(base.Music21Object):
     '''
-    Base class for all Articulation sub-classes.
+    Base class for all Articulation subclasses.
 
     >>> x = articulations.Articulation()
     >>> x.placement = 'below'
