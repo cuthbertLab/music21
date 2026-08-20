@@ -9,3 +9,4 @@ Project-shared agent memory for music21. One file per fact; see frontmatter for 
 - [Docs: audience separation](docs-audience-separation.md) — maintenance notes and private-method references go in code comments, never public docstrings
 - [Docs: no untaken paths](docs-no-untaken-paths.md) — docstrings state what the code does, never contrast with rejected designs
 - [Issue #1349 romanNumeral direction](issue-1349-romanNumeral-direction.md) — raised-^6/^7 fix landed; CAUTIONARY default kept; items 2+4 open with pablopupo/Malcolm
+- [Meter immutability re-apply](meter-immutability-reapply.md) — meter-speed is too stale to merge; re-apply FrozenDuration + immutable MeterTerminal + tuple NumDenom fresh on master
