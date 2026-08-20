@@ -13,7 +13,7 @@ the tsvConverter `localKeyAsRn` workaround was removed. (Naming settled after
 two rounds: name the parameter for the chord-level fact it carries, not for
 its consequence like "uppercaseNumeral" — the numeral doesn't exist yet when
 the function runs.) Myke decided NOT to
-flip the `romanNumeralFromChord` default from CAUTIONARY to QUALITY (her 2022
+flip the `romanNumeralFromChord` default from CAUTIONARY to QUALITY (the 2022
 idea in the issue) for now. Still open, to discuss with contributor pablopupo
 and Malcolm Sailor on the issue: (2) adding `sixthMinor`/`seventhMinor`
 parameters to `romanNumeralFromChord` and possibly flipping its default, and

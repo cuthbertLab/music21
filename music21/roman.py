@@ -30,6 +30,7 @@ from music21 import interval
 from music21 import key
 from music21 import note
 from music21 import pitch
+from music21.pitch import Pitch
 from music21 import scale
 
 class FigureTuple(t.NamedTuple):
@@ -38,7 +39,7 @@ class FigureTuple(t.NamedTuple):
     alteration, and the accidental string to print before a figure.
 
     Produced by :meth:`~music21.roman.FigureTuple.fromPitchAndReference`
-    and consumed by :func:`~music21.roman.romanNumeralFromChord` and
+    and used in :func:`~music21.roman.romanNumeralFromChord` and
     :func:`~music21.roman.correctRNAlterationForMinor`.
 
     >>> ft = roman.FigureTuple(degFromRefPitch=6, alter=1.0, prefix='#')
@@ -49,26 +50,24 @@ class FigureTuple(t.NamedTuple):
 
     `degFromRefPitch` is the generic (diatonic) degree of the pitch counted
     from whatever reference pitch was supplied, reduced to a simple
-    interval: always 1-7, 1-based as intervals and scale degrees are (the
-    reference itself is 1, not 0; an octave and a third is 3; an octave and
-    a seventh is 7).
-    Descending intervals invert, so a pitch a second *below* the reference
-    registers as 7.  The reference is the chord's sounding bass
-    in :func:`~music21.roman.figureTuples`, but the *tonic* of the key in
-    `romanNumeralFromChord` -- there the pitch measured is the chord's
-    root, so `degFromRefPitch` is the scale degree of the root (which is
-    how `correctRNAlterationForMinor` reads it).
+    interval: always 1-7, 1-based (unison, octave = 1, 10th = 3, etc.).
+    Descending intervals report complements, so a pitch a
+    second *below* the reference is 7.
+
+    We use the vague term "RefPitch" because it varies based on use.
+    For instance, the reference pitch is the chord's sounding *bass*
+    in :func:`~music21.roman.figureTuples` (for generating figured bass
+    numerals).  But the reference is the *tonic of the key* in
+    `romanNumeralFromChord`, where we are trying to figure out the
+    scale degree of the root.
 
     `alter` is the chromatic alteration in semitones (a float) of the pitch
-    relative to the diatonic scale of the key.  For minor keys the natural
-    minor scale is always the reference, so in c minor, A-flat has
-    `alter=0.0` and A-natural has `alter=1.0`.  It is an alteration of a
-    scale step, never an interval above the bass.
+    relative to normal pitch for the degree in the diatonic scale of the key.
+    For minor keys the natural minor scale is always the reference,
+    so in c minor, A-flat has `alter=0.0` and A-natural has `alter=1.0`.
 
     `prefix` is the string of accidentals ('#', '##', 'b', 'bb', ...) to
-    print before the figure.  It is a figured-bass-style alteration in
-    music21's Roman-numeral spelling: it says how the pitch differs from
-    the pitches implied by the key signature (the key's diatonic scale),
+    print before the figure.  It is a figured-bass-style alteration,
     with '#' meaning raised a semitone and 'b' lowered, regardless of what
     accidental would appear on the note in staff notation.  So A-natural
     on ^6 in c minor gets `prefix='#'` even though the note itself would
@@ -79,19 +78,11 @@ class FigureTuple(t.NamedTuple):
     The `sixthMinor`/`seventhMinor` conventions
     (:class:`~music21.roman.Minor67Default`) are likewise *not* consulted
     when a FigureTuple is created: `fromPitchAndReference` renders `prefix`
-    purely from `alter`.  A convention enters only afterwards, when
-    :func:`~music21.roman.correctRNAlterationForMinor` rewrites the tuple
-    for a chord root on ^6 or ^7 in minor -- and that function hardcodes
-    the CAUTIONARY style (it takes no Minor67Default argument; see issue
-    #1349).  That rewrite is where `prefix` and `alter` deliberately
-    diverge: for instance, `FigureTuple(degFromRefPitch=6, alter=0.0, prefix='b')`
-    means "diatonic in natural minor, but print a cautionary flat anyway."
-    Do not assume that `prefix` can be recomputed from `alter`.
+    purely from `alter`.
 
     * Changed in v11: became a typed NamedTuple (was a collections.namedtuple),
       and the first field was renamed from `aboveBass` to `degFromRefPitch`,
-      since the reference pitch is not always the bass and the count is
-      1-based.  This documentation was AI-assisted (Claude).
+      since the reference pitch is not always the bass.
     '''
     degFromRefPitch: int
     alter: float
@@ -100,18 +91,17 @@ class FigureTuple(t.NamedTuple):
     @classmethod
     def fromPitchAndReference(
         cls,
-        pitchObj: pitch.Pitch,
+        pitchObj: Pitch,
         keyObj: key.Key,
-        refPitch: pitch.Pitch,
+        refPitch: Pitch,
     ) -> FigureTuple:
         '''
-        Measure a pitch against a key and a reference pitch, returning the
-        FigureTuple of the 1-based degree of the pitch counted from
-        `refPitch`, its alteration from a step in the given key, and an
-        accidental prefix string.  (The reference need not be a sounding
-        bass: `romanNumeralFromChord` passes the tonic of the key here.)
+        Return a FigureTuple of the `pitchObj` above
+        `refPitch` in a given key
 
-        For instance, in C major, an A-3 above an F# bass would be:
+        E.g., get the FigureTuple for an A-flat above an F# bass in C major, showing that
+        it is a third above the F# and a half step down from the normally expected
+        note A in C major.
 
         >>> roman.FigureTuple.fromPitchAndReference(
         ...     pitch.Pitch('A-3'),
@@ -120,8 +110,10 @@ class FigureTuple(t.NamedTuple):
         ...     )
         FigureTuple(degFromRefPitch=3, alter=-1.0, prefix='b')
 
-        These figures can be more complex in minor, so this is a good
-        reference, showing that natural minor is always used.
+        These figures can be more complex in minor, but the natural minor is always used.
+
+        Here are the various forms of ^3, ^6, and ^7 (including weird ones) that might
+        appear in C minor, above the tonic "C", expressed as FigureTuples.
 
         >>> c = key.Key('c')
         >>> c_as_bass = pitch.Pitch('C3')
@@ -168,36 +160,57 @@ class FigureTuple(t.NamedTuple):
 
 class PitchFigureTuple(t.NamedTuple):
     '''
-    Like a :class:`~music21.roman.FigureTuple` but also carrying the pitch
-    it describes, one entry per pitch of a chord.
-
-    Produced by :func:`~music21.roman.figureTuples`, where -- unlike the
-    tonic-based use of `FigureTuple` in `romanNumeralFromChord` -- the
-    reference pitch for `degFromRefPitch` is the sounding bass of the chord.
-    See `FigureTuple` for the meaning of the shared fields.
-
-    Here is an A-flat a sixth above a C bass in c minor: diatonic there
-    (`alter=0.0`), so no accidental prefix is needed:
+    Like a :class:`~music21.roman.FigureTuple` but which also stores the pitch
+    it describes as `.pitch`.
 
     >>> pft = roman.PitchFigureTuple(6, 0.0, '', pitch.Pitch('A-4'))
-    >>> pft.pitch
-    <music21.pitch.Pitch A-4>
+    >>> pft
+    PitchFigureTuple(degFromRefPitch=6, alter=0.0, prefix='', pitch=<music21.pitch.Pitch A-4>)
 
     * Changed in v11: became a typed NamedTuple (was a collections.namedtuple);
-      renamed from `ChordFigureTuple`, since one tuple describes a single
-      pitch (a list of them describes a chord); and the first field was
-      renamed from `aboveBass` to `degFromRefPitch`, since the reference
-      pitch is not always the bass and the count is 1-based.
-      This documentation was AI-assisted (Claude).
+      renamed from `ChordFigureTuple`, since this tuple describes a single
+      pitch; first field renamed to `degFromRefPitch` as with FigureTuple above.
     '''
     degFromRefPitch: int
     alter: float
     prefix: str
-    pitch: 'pitch.Pitch'  # needs quotes since 'pitch' is redefined by this field
+    pitch: Pitch
+
+    @classmethod
+    def fromPitchAndReference(
+        cls,
+        pitchObj: Pitch,
+        keyObj: key.Key,
+        refPitch: Pitch,
+    ) -> PitchFigureTuple:
+        '''
+        Return a PitchFigureTuple of the `pitchObj` above `refPitch` in a given key.
+
+        See FigureTuple.fromPitchAndReference for details.
+
+        Here is a B-flat above an E in the key of F major (perhaps a member of a V65 chord)
+
+        >>> roman.PitchFigureTuple.fromPitchAndReference(pitch.Pitch('B-4'),
+        ...                                              key.Key('F'),
+        ...                                              pitch.Pitch('E4'))
+        PitchFigureTuple(degFromRefPitch=5, alter=0.0, prefix='',
+                         pitch=<music21.pitch.Pitch B-4>)
+
+        And the same in G major:
+
+        >>> roman.PitchFigureTuple.fromPitchAndReference(pitch.Pitch('B-4'),
+        ...                                              key.Key('G'),
+        ...                                              pitch.Pitch('E4'))
+        PitchFigureTuple(degFromRefPitch=5, alter=-1.0, prefix='b',
+                         pitch=<music21.pitch.Pitch B-4>)
+        '''
+        ft = FigureTuple.fromPitchAndReference(pitchObj, keyObj, refPitch)
+        return cls(ft.degFromRefPitch, ft.alter, ft.prefix, pitchObj)
+
 
 environLocal = environment.Environment('roman')
 
-# TODO: setting inversion should change the figure
+# TODO: make inversion read-only and use a separate setInversion to change
 
 # -----------------------------------------------------------------------------
 
@@ -566,12 +579,9 @@ def _postFigureFromChordAndKey(chordObj: chord.Chord, keyObj: key.Key) -> str:
 def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[PitchFigureTuple]:
     '''
     Return a list of :class:`~music21.roman.PitchFigureTuple` objects, one
-    per pitch of the chord, each showing the 1-based degree of the note
-    counted from the chord's bass, its alteration (float) from a step in the
-    given key, an accidental prefix string, and the pitch object.
-
-    Note though that for roman numerals, the applicable key is almost always
-    the root.
+    per pitch of the chord, each showing the simplied (1-7) generic interval of the note
+    above the chord's bass, etc. (see PitchFigureTuple and :class:`~music21.roman.FigureTuple`
+    for reference).
 
     For instance, in C major, F# D A- C# would be:
 
@@ -596,7 +606,7 @@ def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[PitchFigu
      PitchFigureTuple(degFromRefPitch=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch A-3>),
      PitchFigureTuple(degFromRefPitch=5, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch C#4>)]
 
-    A C dominant-seventh chord in c minor alters the bass but not the 7th degree.
+    A C dominant seventh chord in c minor alters the bass but not the 7th degree.
 
     >>> roman.figureTuples(
     ...     chord.Chord(['E3', 'C4', 'G4', 'B-5']),
@@ -607,32 +617,31 @@ def figureTuples(chordObject: chord.Chord, keyObject: key.Key) -> list[PitchFigu
      PitchFigureTuple(degFromRefPitch=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch G4>),
      PitchFigureTuple(degFromRefPitch=5, alter=0.0, prefix='', pitch=<music21.pitch.Pitch B-5>)]
 
+    The same degree can appear more than once with the same or different alters and prefixes:
+
     >>> roman.figureTuples(
-    ...     chord.Chord(['C4', 'E4', 'G4', 'C#4']),
+    ...     chord.Chord(['C4', 'E4', 'G4', 'C#4', 'E5']),
     ...     key.Key('C'),
     ...     )
     [PitchFigureTuple(degFromRefPitch=1, alter=0.0, prefix='', pitch=<music21.pitch.Pitch C4>),
      PitchFigureTuple(degFromRefPitch=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch E4>),
      PitchFigureTuple(degFromRefPitch=5, alter=0.0, prefix='', pitch=<music21.pitch.Pitch G4>),
-     PitchFigureTuple(degFromRefPitch=1, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch C#4>)]
+     PitchFigureTuple(degFromRefPitch=1, alter=1.0, prefix='#', pitch=<music21.pitch.Pitch C#4>),
+     PitchFigureTuple(degFromRefPitch=3, alter=0.0, prefix='', pitch=<music21.pitch.Pitch E5>)]
     '''
     result = []
     bass = chordObject.bass()
     for thisPitch in chordObject.pitches:
-        shortTuple = FigureTuple.fromPitchAndReference(thisPitch, keyObject, bass)
-        appendTuple = PitchFigureTuple(shortTuple.degFromRefPitch,
-                                       shortTuple.alter,
-                                       shortTuple.prefix,
-                                       thisPitch)
+        appendTuple = PitchFigureTuple.fromPitchAndReference(thisPitch, keyObject, bass)
         result.append(appendTuple)
     return result
 
 
 @common.deprecated('v11', 'v12', 'use FigureTuple.fromPitchAndReference() instead')
 def figureTupleSolo(
-    pitchObj: pitch.Pitch,
+    pitchObj: Pitch,
     keyObj: key.Key,
-    bass: pitch.Pitch
+    bass: Pitch
 ) -> FigureTuple:
     '''
     Deprecated: use :meth:`~music21.roman.FigureTuple.fromPitchAndReference`
@@ -787,7 +796,7 @@ def correctRNAlterationForMinor(
     chordHasMajorThird: bool = False,
 ) -> FigureTuple:
     '''
-    (This will become a private function in a future version)
+    (This may become a private function in a future version)
 
     Takes in a FigureTuple and a Key object and returns the same or a
     new FigureTuple correcting for the fact that, for instance, Ab in c minor
@@ -814,23 +823,44 @@ def correctRNAlterationForMinor(
     FigureTuple(degFromRefPitch=6, alter=0, prefix='b')
 
     For a chord whose quality is minor, diminished, or half-diminished, a raised
-    root is implied by the lowercase numeral, so the sharp prefix is removed:
+    root is implied by the lowercase numeral, so the sharp prefix is removed.
 
-    >>> ft7 = roman.FigureTuple(degFromRefPitch=7, alter=1, prefix='#')
-    >>> roman.correctRNAlterationForMinor(ft7, key.Key('c'))
-    FigureTuple(degFromRefPitch=7, alter=0, prefix='')
+    Take for instance, the figure tuple of a B-natural in C minor:
+
+    >>> ft_b_in_c_minor = roman.FigureTuple.fromPitchAndReference(
+    ...     pitch.Pitch('B5'),
+    ...     key.Key('c'),
+    ...     pitch.Pitch('C3'),
+    ... )
+
+    Because B-natural is raised compared to the B-flat of the natural
+    minor scale, it has an alter of 1.0 and a prefix of '#'
+
+    >>> ft_b_in_c_minor
+    FigureTuple(degFromRefPitch=7, alter=1.0, prefix='#')
+
+    When used as the root of viio or viio6, for the purposes of
+    labeling as a Roman numeral (where QUALITY of chord determines
+    scale degrees), the Roman numeral needs no alter or prefix:
+
+    >>> roman.correctRNAlterationForMinor(ft_b_in_c_minor, key.Key('c'))
+    FigureTuple(degFromRefPitch=7, alter=0.0, prefix='')
 
     But when the chord has a major third (and thus an uppercase numeral),
-    pass `chordHasMajorThird=True` so that the sharp is kept: an uppercase
-    VI or VII in minor already refers to the chord on the *lowered* (natural
-    minor) degree, so a major chord on the raised degree needs its sharp to
-    be distinguished from it:
+    pass `chordHasMajorThird=True` so that the sharp is kept on pitches which
+    might otherwise lose them. For instance, when generating a Roman numeral from
+    a figure like (uppercase) VI or VII in minor, the figure generally refers to the chord
+    on the *lowered* (natural minor) degree, so
+    if we want to show a major chord on the *raised* degree
+    the figure needs a sharp to distinguish it.  Take, for instance,
+    a B-natural in C minor that will be the root of a B-major triad
+    (B-D#-F# -- strange but possible).
+    In this case we want to retain the sharp on #VII.
 
-    >>> ft8 = roman.FigureTuple(degFromRefPitch=7, alter=1, prefix='#')
-    >>> roman.correctRNAlterationForMinor(ft8, key.Key('c'), chordHasMajorThird=True)
-    FigureTuple(degFromRefPitch=7, alter=1, prefix='#')
+    >>> roman.correctRNAlterationForMinor(ft_b_in_c_minor, key.Key('c'), chordHasMajorThird=True)
+    FigureTuple(degFromRefPitch=7, alter=1.0, prefix='#')
 
-    Does nothing for major and passes in the original Figure Tuple unchanged:
+    This function does nothing to FigureTuples for major keys:
 
     >>> ft1 = roman.FigureTuple(degFromRefPitch=6, alter=-1, prefix='b')
     >>> ft2 = roman.correctRNAlterationForMinor(ft1, key.Key('C'))
@@ -839,7 +869,8 @@ def correctRNAlterationForMinor(
     >>> ft1 is ft2
     True
 
-    Does nothing for steps other than 6 or 7:
+    The function also does nothing to FigureTuples on degFromRefPitch
+    other than 6 or 7 (typically used to filter out chords not built on ^6 or ^7).
 
     >>> ft3 = roman.FigureTuple(degFromRefPitch=4, alter=-1, prefix='b')
     >>> ft4 = roman.correctRNAlterationForMinor(ft3, key.Key('c'))
@@ -851,14 +882,13 @@ def correctRNAlterationForMinor(
     * Changed in v11: the keyword-only argument `chordHasMajorThird` was
       added, so that major-quality chords keep their sharp prefix on raised
       ^6 and ^7 in minor (issue #1349).
-      This fix was AI-assisted (Claude).
     '''
     # Maintenance note: this is one of three places that implement the
     # "what does an accidental mean on ^6/^7 in minor, given chord quality"
     # convention, each with its own rules.  The other two are the prefix
     # suppression for triads in _postFigureFromChordAndKey (generation of the
     # upper figures) and RomanNumeral._adjustMinorVIandVIIByQuality (parsing,
-    # in the reverse direction).  Change one and check the others.
+    # in the reverse direction).  If one changes, the others need to be checked.
     if keyObj.mode != 'minor':
         return figureTuple
     if figureTuple.degFromRefPitch not in (6, 7):
@@ -874,10 +904,10 @@ def correctRNAlterationForMinor(
     rootAlterationString = figureTuple.prefix
 
     if alter == 1.0:
-        alter = 0
+        alter = 0.0
         rootAlterationString = ''
     elif alter == 0.0:
-        alter = 0  # NB! does not change!
+        # alter does not change, just prefix
         rootAlterationString = 'b'
     # more exotic:
     elif alter > 1.0:
@@ -1066,8 +1096,8 @@ def romanNumeralFromChord(
     >>> romanNumeral11
     <music21.roman.RomanNumeral iii7 in C major>
 
-    A major triad on the raised sixth or seventh degree of a minor key keeps
-    its sharp, so that it is distinguished from the major triad on the lowered
+    A (highly unusual) major triad on the raised sixth or seventh degree
+    of a minor key keeps its sharp, so that it is distinguished from the major triad on the lowered
     (natural minor) degree, both in the figure and in
     :attr:`~music21.roman.RomanNumeral.romanNumeral`:
 
@@ -1209,10 +1239,7 @@ def romanNumeralFromChord(
     This kind of context-sensitivity is not currently included.
 
     * Changed in v11: chords with a major third built on the raised sixth or
-      seventh scale degrees of a minor key keep their sharp prefix (previously
-      the alteration was buried in the inversion figures, e.g. `VI#63`, and
-      lost entirely from `.romanNumeral`; issue #1349).
-      This fix was AI-assisted (Claude).
+      seventh scale degrees of a minor key keep their sharp prefix.
 
     OMIT_FROM_DOCS
 
@@ -1607,7 +1634,7 @@ class RomanNumeral(harmony.Harmony):
     >>> V.scaleDegree
     5
 
-    Default key is C Major
+    The default key is C Major
 
     >>> for p in V.pitches:
     ...     p
@@ -3500,17 +3527,22 @@ class RomanNumeral(harmony.Harmony):
     @property
     def romanNumeral(self) -> str:
         '''
-        Read-only property that returns either the romanNumeralAlone (e.g. just
-        II) or the frontAlterationAccidental.modifier (with 'b' for '-') + romanNumeralAlone
-        (e.g. #II, bII)
+        Read-only property that returns the roman numeral stripped of figures (7, 65, etc.) with
+        any frontAlterationAccidental.modifier with 'b' for '-' (but with some caveats
+        for minor that make it easier to for other parsers, see below).
 
         >>> rn = roman.RomanNumeral('#II7')
         >>> rn.romanNumeral
         '#II'
 
-        >>> rn = roman.RomanNumeral('Ger+6')
+        Diminished and augmented symbols are removed.
+
+        >>> rn = roman.RomanNumeral('viio')
         >>> rn.romanNumeral
-        'Ger'
+        'vii'
+
+        Double flats can be written as either `bb` or `--` in instantiation,
+        but will show `bb` on output, and applied chord's tonicized goals are removed.
 
         >>> rn = roman.RomanNumeral('bbII/V')
         >>> rn.romanNumeral
@@ -3519,29 +3551,50 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.romanNumeral
         'bbII'
 
-        Note that the alteration returned is the *sounding* alteration of the
-        root relative to the diatonic scale of the key -- for minor keys, the
-        natural minor scale -- which is not necessarily the accidental written
-        in the figure.  So a scale degree that is chromatically raised gains a
-        sharp even if none was written, because of the interpretation of
-        `sixthMinor` and `seventhMinor` (see :class:`~music21.roman.Minor67Default`):
+        Augmented-sixth chord symbols (German, French, etc.) are considered Roman numerals.
+        This behavior may change at a future date.
 
-        >>> roman.RomanNumeral('vi', 'c').romanNumeral
+        >>> rn = roman.RomanNumeral('Ger+6')
+        >>> rn.romanNumeral
+        'Ger'
+
+
+        The accidental in `.romanNumeral` is the accidental needed compared to the standard scale
+        degree in major or *natural minor*. It will resolve to the same root
+        only if sixthMinor=FLAT and seventhMinor=FLAT are both used.
+
+        For instance, in c minor, with natural-minor diatonic 6̂ = A♭,
+        RomanNumeral('vi', 'c') has root A♮ — a raised sixth degree — interpreted using QUALITY
+        since this is the only normally used minor triad on the sixth scale degree.
+        However because A♮ is raised compared to the natural minor, .romanNumeral returns '#vi'
+        even though no # was used in the construction.
+
+        >>> a_min = roman.RomanNumeral('vi', 'c')
+        >>> ' '.join(p.name for p in a_min.pitches)
+        'A C E'
+        >>> a_min.romanNumeral
         '#vi'
 
-        while a merely cautionary accidental (one that does not change the
-        sounding pitch) is dropped:
+        On the other hand, RomanNumeral('bVI', 'c', sixthMinor=CAUTIONARY) has
+        root A♭ which is part of the natural minor scale, so .romanNumeral returns
+        'VI' even though a b *was* written in the original.
 
-        >>> rn = roman.RomanNumeral('bVI', 'c',
-        ...     sixthMinor=roman.Minor67Default.CAUTIONARY)
-        >>> ' '.join(p.name for p in rn.pitches)
+        >>> ab_maj = roman.RomanNumeral('bVI', 'c',
+        ...                             sixthMinor=roman.Minor67Default.CAUTIONARY)
+        >>> ' '.join(p.name for p in ab_maj.pitches)
         'A- C E-'
-        >>> rn.romanNumeral
+        >>> ab_maj.romanNumeral
         'VI'
 
-        For the notation as originally written, use
-        :attr:`~music21.roman.RomanNumeral.figure` or combine
-        `frontAlterationString` with `romanNumeralAlone`.
+        To get back the notation as it was originally written, use
+        :attr:`~music21.roman.RomanNumeral.figure`
+        (if you also want any inversion marks, etc.) or combine
+        `frontAlterationString` with `romanNumeralAlone`:
+
+        >>> a_min.frontAlterationString + a_min.romanNumeralAlone
+        'vi'
+        >>> ab_maj.frontAlterationString + ab_maj.romanNumeralAlone
+        'bVI'
 
         OMIT_FROM_DOCS
 
