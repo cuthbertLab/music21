@@ -165,7 +165,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         self.protoSpines: list[ProtoSpine] = []
         self.eventCollections: list[EventCollection] = []
         self.spineCollection: SpineCollection|None = None
-        # populated by insertGlobalEvents(), consumed by parseMetadata()
+        # populated by insertGlobalEvents(), used by parseMetadata()
         self.globalReferences: list[GlobalReference] = []
 
         if isinstance(dataStream, str):
