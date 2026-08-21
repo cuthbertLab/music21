@@ -1975,8 +1975,7 @@ class Pitch(prebase.ProtoM21Object):
             else:
                 self.microtone = Microtone(microtone)
         if pitchClass is not None:
-            # type ignore until https://github.com/python/mypy/issues/3004 resolved
-            self.pitchClass = pitchClass  # type: ignore
+            self.pitchClass = pitchClass
         if fundamental is not None:
             self.fundamental = fundamental
         if midi is not None:
