@@ -103,7 +103,7 @@ Making pull requests is easy:
     functionality?
 
     When you've finished writing your description, click on the ``Send pull
-    request`` button. You've sent your pull pull request!
+    request`` button. You've sent your pull request!
 
     ..  image:: images/usingGit/github__pull_requests__3.png
 
