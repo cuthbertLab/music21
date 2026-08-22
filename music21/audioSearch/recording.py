@@ -39,7 +39,7 @@ default_recordChunkLength = 1024
 
 
 def samplesFromRecording(seconds=10.0,
-                         storeFile: bool = True,
+                         storeFile: bool|str = True,
                          recordFormat=None,
                          recordChannels=default_recordChannels,
                          recordSampleRate=default_recordSampleRate,
@@ -78,7 +78,7 @@ def samplesFromRecording(seconds=10.0,
     st.close()
     p_audio.terminate()
 
-    if not storeFile:
+    if storeFile:
         if isinstance(storeFile, str):
             waveFilename = storeFile
         else:

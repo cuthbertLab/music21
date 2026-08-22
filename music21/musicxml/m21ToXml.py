@@ -4106,7 +4106,7 @@ class MeasureExporter(XMLExporterBase):
         elif n.isRest:
             SubElement(mxNote, 'rest')
 
-        if d.isGrace:
+        if not d.isGrace:
             mxDuration = self.durationXml(d)
             mxNote.append(mxDuration)
             # divisions only
