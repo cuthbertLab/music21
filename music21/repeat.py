@@ -452,7 +452,7 @@ def insertRepeatEnding(s, start, end, endingNumber: int = 1, *, inPlace=False):
     rbOffset = measures[0].getOffsetBySite(s)
     s.insert(rbOffset, rb)
 
-    if inPlace is True:
+    if inPlace:
         return
     else:
         return s
@@ -774,7 +774,7 @@ class Expander[StreamType: 'music21.stream.Stream']:
 
         # need to copy source measures, as may later measures before copying
         # them, and this can result in orphaned spanners
-        if deepcopy is not False:
+        if deepcopy:
             srcStream = self._srcMeasureStream.coreCopyAsDerivation('expandRepeats')
         else:
             srcStream = self._srcMeasureStream

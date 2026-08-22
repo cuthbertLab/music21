@@ -351,7 +351,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         self._atSoundingPitch: bool|t.Literal['unknown'] = 'unknown'
 
         # experimental
-        self._mutable = True
+        self._mutable: bool = True
 
         if givenElements is None:
             return
@@ -8295,7 +8295,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         Clean this Stream: for self and all elements, purge all dead locations
         and remove all non-contained sites. Further, restore all active sites.
         '''
-        if self._mutable is not False:
+        if self._mutable:
             self.sort()  # must sort before making immutable
         for e in self.recurse(streamsOnly=True, includeSelf=False):
             # e.purgeLocations(rescanIsDead=True)
@@ -8308,6 +8308,10 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         self._mutable = False
 
     def makeMutable(self, recurse=True):
+        '''
+        Soft-Deprecated -- this will return a New Stream at some point --
+        once immutable, never mutable.
+        '''
         self._mutable = True
         if recurse:
             for e in self.recurse(streamsOnly=True):

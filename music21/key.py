@@ -1295,7 +1295,7 @@ class Key(KeySignature, scale.DiatonicScale):
         >>> changingKey
         <music21.key.Key of g# minor>
         '''
-        if inPlace is True:
+        if inPlace:
             super().transpose(value, inPlace=inPlace)
             post = self
         else:

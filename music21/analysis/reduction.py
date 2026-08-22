@@ -1121,7 +1121,7 @@ class Test(unittest.TestCase):
             s.insert(0, p)
             pCount += 1
 
-        if show is True:
+        if show:
             s.show()
 
         pr = analysis.reduction.PartReduction(s, normalize=False)
@@ -1140,7 +1140,7 @@ class Test(unittest.TestCase):
 
         self._matchWeightedData(match, target)
 
-        if show is True:
+        if show:
             p = graph.plot.Dolan(s, title='Dynamics')
             p.run()
 

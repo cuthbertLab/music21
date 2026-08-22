@@ -204,10 +204,10 @@ class StreamIterator[M21ObjType: base.Music21Object](prebase.ProtoM21Object, Seq
                 continue
 
             self.elementIndex += 1
-            if self.matchesFilters(e) is False:
+            if not self.matchesFilters(e):
                 continue
 
-            if self.restoreActiveSites is True:
+            if self.restoreActiveSites:
                 self.srcStream.coreSelfActiveSite(e)
 
             self.updateActiveInformation()
@@ -1827,10 +1827,10 @@ class RecursiveIterator[M21ObjType: base.Music21Object](
 
                 childRecursiveIterator.iteratorStartOffsetInHierarchy = newStartOffset
                 self.childRecursiveIterator = childRecursiveIterator
-            if self.matchesFilters(e) is False:
+            if not self.matchesFilters(e):
                 continue
 
-            if self.restoreActiveSites is True:
+            if self.restoreActiveSites:
                 self.srcStream.coreSelfActiveSite(e)
 
             self.updateActiveInformation()

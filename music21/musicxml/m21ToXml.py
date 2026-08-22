@@ -795,7 +795,7 @@ class XMLExporterBase:
         '''
         if isinstance(m21Object, style.Style):
             stObj = m21Object
-        elif m21Object.hasStyleInformation is False:
+        elif not m21Object.hasStyleInformation:
             return
         else:
             stObj = m21Object.style
@@ -1000,7 +1000,7 @@ class XMLExporterBase:
           <level reference="yes">hello</level>
         </note>
         '''
-        if m21Object.hasEditorialInformation is False:
+        if not m21Object.hasEditorialInformation:
             return
         # MusicXML allows only one footnote or level, so we take the first.
 
@@ -2186,9 +2186,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             self.setPosition(mxGroupSymbol, staffGroup)
 
         mxGroupBarline = SubElement(mxPartGroup, 'group-barline')
-        if staffGroup.barTogether is True:
+        if staffGroup.barTogether is True:  # not a bool.
             mxGroupBarline.text = 'yes'
-        elif staffGroup.barTogether is False:
+        elif staffGroup.barTogether is False:  # not a bool.
             mxGroupBarline.text = 'no'
         elif staffGroup.barTogether == 'Mensurstrich':
             mxGroupBarline.text = 'Mensurstrich'
@@ -2268,7 +2268,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             self.mxIdentification = mxId
 
         # creators
-        foundOne = False
+        foundOne: bool = False
         if self.scoreMetadata is not None:
             # We ignore the name ('namespace:name') here, and use
             # c.role instead so we can represent non-standard roles.
@@ -2282,7 +2282,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 mxId.append(mxCreator)
                 foundOne = True
 
-        if foundOne is False and defaults.author:
+        if not foundOne and defaults.author:
             mxCreator = SubElement(mxId, 'creator')
             mxCreator.set('type', 'composer')
             mxCreator.text = defaults.author
@@ -3417,12 +3417,12 @@ class MeasureExporter(XMLExporterBase):
                     parsedObject = True
                     break
 
-            if parsedObject is False:
+            if not parsedObject:
                 for className in classes:
                     if className in self.ignoreOnParseClasses:
                         parsedObject = True
                         break
-                if parsedObject is False:
+                if not parsedObject:
                     environLocal.printDebug(['did not convert object', obj])
 
         else:  # appendSpanners == AppendSpanners.RELATED_ONLY
@@ -3812,10 +3812,10 @@ class MeasureExporter(XMLExporterBase):
                     isFirstOrLast = True
                 # print('Trill is last')
 
-            if isFirstOrLast is False:
+            if not isFirstOrLast:
                 continue  # do not put a wavy-line tag on mid-trill notes
             ornaments.append(mxWavyLine)
-            if isFirstANDLast is True:
+            if isFirstANDLast:
                 # make another one:
                 mxWavyLine = Element('wavy-line')
                 mxWavyLine.set('number', str(su.idLocal))
@@ -4034,7 +4034,7 @@ class MeasureExporter(XMLExporterBase):
 
         TODO: Test with spanners
         '''
-        addChordTag = (noteIndexInChord != 0)
+        addChordTag: bool = (noteIndexInChord != 0)
         setb = setAttributeFromAttribute
 
         mxNote = Element('note')
@@ -4106,7 +4106,7 @@ class MeasureExporter(XMLExporterBase):
         elif n.isRest:
             SubElement(mxNote, 'rest')
 
-        if d.isGrace is not True:
+        if d.isGrace:
             mxDuration = self.durationXml(d)
             mxNote.append(mxDuration)
             # divisions only
@@ -4168,7 +4168,7 @@ class MeasureExporter(XMLExporterBase):
         stemDirection = None
         # if we are not in a chord, or we are the first note of a chord, get stem
         # direction from the chordOrNote object
-        if (addChordTag is False
+        if (not addChordTag
                 and isinstance(chordOrN, note.NotRest)
                 and chordOrN.stemDirection != 'unspecified'):
             chordOrN = t.cast(note.NotRest, chordOrN)
@@ -4211,7 +4211,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: notehead-text
 
         # beam
-        if addChordTag is False:
+        if not addChordTag:
             if isinstance(chordOrN, note.NotRest) and chordOrN.beams is not None:
                 nBeamsList = self.beamsToXml(chordOrN.beams)
                 for mxB in nBeamsList:
@@ -4220,7 +4220,7 @@ class MeasureExporter(XMLExporterBase):
         mxNotationsList = self.noteToNotations(n, noteIndexInChord, chordParent)
 
         # add tuplets if it's a note or the first <note> of a chord.
-        if addChordTag is False:
+        if not addChordTag:
             for i, tup in enumerate(d.tuplets):
                 tupTagList = self.tupletToXmlTuplet(tup, i + 1)
                 mxNotationsList.extend(tupTagList)
@@ -4231,7 +4231,7 @@ class MeasureExporter(XMLExporterBase):
                 mxNotations.append(mxN)
 
         # lyric
-        if addChordTag is False:
+        if not addChordTag:
             for lyricObj in chordOrN.lyrics:
                 if lyricObj.text is None:
                     continue  # happens sometimes!
@@ -4815,7 +4815,7 @@ class MeasureExporter(XMLExporterBase):
 
         Returns nothing.  The mxNote is modified in place.
         '''
-        foundANotehead = False
+        foundANotehead: bool = False
         if (isinstance(n, note.NotRest)
             and (n.notehead != 'normal'
                  or n.noteheadParenthesis
@@ -4825,7 +4825,7 @@ class MeasureExporter(XMLExporterBase):
             foundANotehead = True
             mxNotehead = self.noteheadToXml(n)
             mxNote.append(mxNotehead)
-        if foundANotehead is False and chordParent is not None:
+        if not foundANotehead and chordParent is not None:
             if (hasattr(chordParent, 'notehead')
                 and (chordParent.notehead != 'normal'
                      or chordParent.noteheadParenthesis
@@ -5737,7 +5737,7 @@ class MeasureExporter(XMLExporterBase):
             <type>quarter</type>
         </note>
         '''
-        if cs.writeAsChord is True:
+        if cs.writeAsChord:
             r = note.Rest(duration=cs.duration)
             return self.restToXml(r)
 

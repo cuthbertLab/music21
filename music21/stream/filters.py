@@ -361,15 +361,13 @@ class OffsetFilter(StreamFilter):
         super().__init__()
 
         self.offsetStart = opFrac(offsetStart)
+        self.zeroLengthSearch: bool = True
         if offsetEnd is None:
             self.offsetEnd = offsetStart
-            self.zeroLengthSearch = True
         else:
             self.offsetEnd = opFrac(offsetEnd)
             if offsetEnd > offsetStart:
                 self.zeroLengthSearch = False
-            else:
-                self.zeroLengthSearch = True
 
         self.mustFinishInSpan = mustFinishInSpan
         self.mustBeginInSpan = mustBeginInSpan
@@ -432,35 +430,35 @@ class OffsetFilter(StreamFilter):
         else:
             elementIsZeroLength = False
 
-        if self.zeroLengthSearch is True and elementIsZeroLength is True:
+        if self.zeroLengthSearch and elementIsZeroLength:
             # zero Length Searches -- include all zeroLengthElements
             return True
 
 
-        if self.mustFinishInSpan is True:
+        if self.mustFinishInSpan:
             if elementEnd > self.offsetEnd:
                 # environLocal.warn([elementEnd, offsetEnd, e])
                 return False
-            if self.includeEndBoundary is False:
+            if not self.includeEndBoundary:
                 # we include the end boundary if the search is zeroLength --
                 # otherwise nothing can be retrieved
                 if elementEnd == self.offsetEnd:
                     return False
 
-        if self.mustBeginInSpan is True:
+        if self.mustBeginInSpan:
             if offset < self.offsetStart:
                 return False
-            if self.includeEndBoundary is False and offset == self.offsetEnd:
+            if not self.includeEndBoundary and offset == self.offsetEnd:
                 return False
-        elif (elementIsZeroLength is False
+        elif (not elementIsZeroLength
                 and elementEnd == self.offsetEnd
-                and self.zeroLengthSearch is True):
+                and self.zeroLengthSearch):
             return False
 
-        if self.includeEndBoundary is False and offset == self.offsetEnd:
+        if not self.includeEndBoundary and offset == self.offsetEnd:
             return False
 
-        if self.includeElementsThatEndAtStart is False and elementEnd == self.offsetStart:
+        if not self.includeElementsThatEndAtStart and elementEnd == self.offsetStart:
             return False
 
         return True
@@ -473,7 +471,7 @@ class OffsetHierarchyFilter(OffsetFilter):
 
     Finds elements that match a given offset range in the hierarchy.
 
-    Do not call .stream() afterwards or unstable results can occur.
+    Do not call .stream() afterward or unstable results can occur.
     '''
     derivationStr = 'getElementsByOffsetInHierarchy'
 

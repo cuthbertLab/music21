@@ -100,7 +100,7 @@ class SubConverter:
         loading the file and putting the data into parseData then there is no need
         to implement this method.  Just set self.readBinary to True | False.
         '''
-        if self.readBinary is False:
+        if not self.readBinary:
             import locale
             with open(filePath, encoding=locale.getpreferredencoding()) as f:
                 dataStream = f.read()
@@ -289,7 +289,7 @@ class SubConverter:
         if fp is None:
             fp = self.getTemporaryFile()
 
-        if self.readBinary is False:
+        if not self.readBinary:
             writeFlags = 'w'
         else:
             writeFlags = 'wb'
@@ -330,7 +330,7 @@ class SubConverter:
         and return the object (str or bytes) returned.
         '''
         fp = self.write(obj, fmt=fmt, subformats=subformats, **keywords)
-        if self.readBinary is False:
+        if not self.readBinary:
             readFlags = 'r'
         else:
             readFlags = 'rb'
