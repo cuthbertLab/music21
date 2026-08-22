@@ -4005,7 +4005,7 @@ class Chord(ChordBase):
         c2 = self.closedPosition(forceOctave=forceOctave,
                                  inPlace=inPlace,
                                  leaveRedundantPitches=leaveRedundantPitches)
-        if inPlace is True:
+        if inPlace:
             c2 = self
 
         # closedPosition() only returns None when inPlace=True, in which case c2
@@ -4028,7 +4028,7 @@ class Chord(ChordBase):
         c2.clearCache()
         c2.sortAscending(inPlace=True)
 
-        if inPlace is False:
+        if not inPlace:
             return c2
 
     def semitonesFromChordStep(self, chordStep, testRoot=None):

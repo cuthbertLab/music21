@@ -773,7 +773,7 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
         raise VariantException(
             'These scores do not have the same number of parts and cannot be merged.')
 
-    if inPlace is True:
+    if inPlace:
         returnObj = aScore
     else:
         returnObj = aScore.coreCopyAsDerivation('mergeVariantScores')
@@ -781,7 +781,7 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
     for returnPart, vPart in zip(returnObj.parts, vScore.parts):
         mergeVariantMeasureStreams(returnPart, vPart, variantName, inPlace=True)
 
-    if inPlace is False:
+    if not inPlace:
         return returnObj
 
 
@@ -933,7 +933,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
     >>> parisStream[variant.Variant][2].replacementQuarterLength
     8.0
     '''
-    if inPlace is True:
+    if inPlace:
         returnObj = streamX
     else:
         returnObj = streamX.coreCopyAsDerivation('mergeVariantMeasureStreams')
@@ -972,7 +972,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
         addVariant(returnObj, startOffset, yRegion,
                    variantName=variantName, replacementQuarterLength=replacementQuarterLength)
 
-    if inPlace is True:
+    if inPlace:
         return
     else:
         return returnObj
@@ -1182,7 +1182,7 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
         which are of different lengths
     '''
 
-    if inPlace is True:
+    if inPlace:
         returnObj = streams[0]
     else:
         returnObj = streams[0].coreCopyAsDerivation('mergeVariantsEqualDuration')
@@ -1333,7 +1333,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
     ...
 
     '''
-    if inPlace is True:
+    if inPlace:
         returnObj = mainPart
     else:
         returnObj = mainPart.coreCopyAsDerivation('mergePartAsOssia')
@@ -1376,7 +1376,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
                                variantName=ossiaName, variantGroups=None,
                                replacementQuarterLength=None)
 
-    if inPlace is True:
+    if inPlace:
         return
     else:
         return returnObj
@@ -1598,7 +1598,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
     if sVariant not in s.getElementsByClass(Variant):
         raise VariantException(f'{sVariant} not found in stream {s}.')
 
-    if inPlace is True:
+    if inPlace:
         returnObject = s
         variantRegion = sVariant
     else:
@@ -1689,7 +1689,7 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
 
     '''
     # stream that will be returned
-    if inPlace is True:
+    if inPlace:
         returnObject = streamX
         variantObject = streamY
     else:
@@ -2057,7 +2057,7 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
             '_mergeVariants cannot merge streams which are of different lengths'
         )
 
-    if inPlace is True:
+    if inPlace:
         returnObj = streamA
     else:
         returnObj = copy.deepcopy(streamA)
@@ -2138,7 +2138,7 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
         inVariant = False
         noteBuffer = []
 
-    if inPlace is True:
+    if inPlace:
         return None
     else:
         return returnObj
@@ -2237,7 +2237,7 @@ def makeAllVariantsReplacements(streamWithVariants,
 
     '''
 
-    if inPlace is True:
+    if inPlace:
         returnStream = streamWithVariants
     else:
         returnStream = copy.deepcopy(streamWithVariants)
@@ -2249,7 +2249,7 @@ def makeAllVariantsReplacements(streamWithVariants,
         _doVariantFixingOnStream(returnStream, variantNames=variantNames)
 
 
-    if inPlace is True:
+    if inPlace:
         return
     else:
         return returnStream

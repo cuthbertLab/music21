@@ -210,7 +210,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         self.subStreamFreezers = {}  # this will keep track of sub freezers for spanners
 
-        if streamObj is not None and fastButUnsafe is False:
+        if streamObj is not None and not fastButUnsafe:
             # deepcopy necessary because we mangle sites in the objects
             # before serialization
             self.stream = copy.deepcopy(streamObj)
@@ -267,7 +267,7 @@ class StreamFreezer(StreamFreezeThawBase):
         # might not work when recurse yields
         allEls = list(streamObj.recurse(restoreActiveSites=False))
 
-        if self.topLevel is True:
+        if self.topLevel:
             self.findActiveStreamIdsInHierarchy(streamObj)
 
         for el in allEls:
@@ -297,7 +297,7 @@ class StreamFreezer(StreamFreezeThawBase):
         # removing seems to create problems for jsonPickle with Spanners
         self.setupStoredElementOffsetTuples(streamObj)
 
-        if self.topLevel is True:
+        if self.topLevel:
             self.recursiveClearSites(streamObj)
 
     def removeStreamStatusClient(self, streamObj):
@@ -578,11 +578,11 @@ class StreamFreezer(StreamFreezeThawBase):
                                                   includeSelf=True)
         streamIds = [id(s) for s in streamsFoundGenerator]
 
-        if getSpanners is True:
+        if getSpanners:
             spannerBundle = streamObj.spannerBundle
             streamIds += spannerBundle.getSpannerStorageIds()
 
-        if getVariants is True:
+        if getVariants:
             for el in streamObj.recurse(includeSelf=True).getElementsByClass(variant.Variant):
                 streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
@@ -853,7 +853,7 @@ class StreamThawer(StreamFreezeThawBase):
             streamObj.coreElementsChanged()
 
         for subElement in streamObj:
-            if subElement.isStream is True:
+            if subElement.isStream:
                 # note that the elements may have already been restored
                 # if the spanner stores a part or something in the Stream
                 # for instance in a StaffGroup object

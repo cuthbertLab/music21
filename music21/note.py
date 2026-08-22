@@ -542,13 +542,13 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             rawText = str(rawText)
 
         # check for hyphens
-        if applyRaw is False and rawText.startswith('-') and not rawText.endswith('-'):
+        if not applyRaw and rawText.startswith('-') and not rawText.endswith('-'):
             self.text = rawText[1:]
             self.syllabic = 'end'
-        elif applyRaw is False and not rawText.startswith('-') and rawText.endswith('-'):
+        elif not applyRaw and not rawText.startswith('-') and rawText.endswith('-'):
             self.text = rawText[:-1]
             self.syllabic = 'begin'
-        elif applyRaw is False and rawText.startswith('-') and rawText.endswith('-'):
+        elif not applyRaw and rawText.startswith('-') and rawText.endswith('-'):
             self.text = rawText[1:-1]
             self.syllabic = 'middle'
         else:  # assume single
@@ -823,7 +823,7 @@ class GeneralNote(base.Music21Object):
                     thisLyric.text = text
                     foundLyric = True
                     break
-            if foundLyric is False:
+            if not foundLyric:
                 self.lyrics.append(Lyric(text, lyricNumber,
                                          applyRaw=applyRaw, identifier=lyricIdentifier))
 

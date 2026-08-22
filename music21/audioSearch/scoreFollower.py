@@ -178,7 +178,7 @@ class ScoreFollower:
         # print('3')
         self.processing_time = time() - time_start
         environLocal.printDebug('and even to here.')
-        if END_OF_SCORE is True:
+        if END_OF_SCORE:
             exitType = 'endOfScore'  # 'endOfScore'
             return exitType
 
@@ -239,7 +239,7 @@ class ScoreFollower:
             if i.name != 'rest':
                 onlyRests = False
 
-        if onlyRests is True:
+        if onlyRests:
             self.silencePeriod = True
             self.notesCounter = 0
             self.silencePeriodCounter += 1

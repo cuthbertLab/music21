@@ -267,7 +267,7 @@ class StreamSearcher:
                         break
                 if result is False:
                     break
-                if result is True:
+                if result:
                     result = None
 
             if result is not False:

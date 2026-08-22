@@ -65,7 +65,7 @@ def unbundleInstruments(streamIn: stream.Stream,
     {1.0} <music21.instrument.Cowbell 'Cowbell'>
     {1.0} <music21.note.Unpitched 'Cowbell'>
     '''
-    if inPlace is True:
+    if inPlace:
         s = streamIn
     else:
         s = streamIn.coreCopyAsDerivation('unbundleInstruments')
@@ -78,7 +78,7 @@ def unbundleInstruments(streamIn: stream.Stream,
                 off = thisObj.offset
                 s.insert(off, i)
 
-    if inPlace is False:
+    if not inPlace:
         return s
 
 
@@ -106,7 +106,7 @@ def bundleInstruments(streamIn: stream.Stream,
     Cowbell
 
     '''
-    if inPlace is True:
+    if inPlace:
         s = streamIn
     else:
         s = streamIn.coreCopyAsDerivation('bundleInstruments')
@@ -120,7 +120,7 @@ def bundleInstruments(streamIn: stream.Stream,
         elif isinstance(thisObj, note.NotRest):
             thisObj.storedInstrument = lastInstrument
 
-    if inPlace is False:
+    if not inPlace:
         return s
 
 

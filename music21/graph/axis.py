@@ -317,7 +317,7 @@ class PitchAxis(Axis):
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
-        self.showOctaves = 'few'
+        self.showOctaves: bool|t.Literal['few'] = 'few'
         self.showEnharmonic = True
         self.blankLabelUnused = True
         self.hideUnused = True
@@ -425,7 +425,7 @@ class PitchAxis(Axis):
                     sub.append(accidentalLabelToUnicode(name))
                 label = '/'.join(sub)
 
-            if self.showOctaves is False:
+            if not self.showOctaves:
                 label = re.sub(r'\d', '', label)
             elif self.showOctaves == 'few':
                 matchOctave = re.search(r'\d', label)
@@ -451,7 +451,7 @@ class PitchClassAxis(PitchAxis):
     quantities: tuple[str, ...] = ('pitchClass', 'pitchclass', 'pc')
 
     def __init__(self, client=None, axisName='x'):
-        self.showOctaves = False
+        self.showOctaves: bool|t.Literal['few'] = False
         super().__init__(client, axisName)
         self.minValue = 0
         self.maxValue = 11
@@ -1129,7 +1129,7 @@ class QuarterLengthAxis(PositionAxis):
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
-        self.useLogScale = True
+        self.useLogScale: bool|int = True
         self.useDurationNames = False
 
     def extractOneElement(self, n, formatDict):
