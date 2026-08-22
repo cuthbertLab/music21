@@ -517,6 +517,8 @@ class NoteOrRestToken(Token):
         self.durationFound = True
         typeNum = int(search.group(1))
         if typeNum == 0:
+            # NOTE: using 0 to mean full-bar + fermata was never fully documented.
+            #    it is considered deprecated.
             if parent.stateDict['currentTimeSignature'] is not None:
                 element.duration = copy.deepcopy(
                     parent.stateDict['currentTimeSignature'].barDuration
@@ -1133,7 +1135,7 @@ class Converter:
         self.modifierSquare = None
         self.modifierUnderscore = LyricModifier
 
-        self.makeNotation = makeNotation
+        self.makeNotation: bool = makeNotation
         self.raiseExceptions = raiseExceptions
         # will be filled by self.setupRegularExpressions()
         self._tokenMapRe: list[tuple[typing.Pattern, type]] = []
@@ -1408,7 +1410,7 @@ class Converter:
 
         It currently runs `.makeMeasures()` on `.stream` unless `.makeNotation` is `False`.
         '''
-        if self.makeNotation is not False:
+        if self.makeNotation:
             self.stream.makeMeasures(inPlace=True)
 
 
