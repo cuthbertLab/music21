@@ -5063,6 +5063,32 @@ class Test(unittest.TestCase):
         with self.assertRaises(StreamException):
             s.storeAtEnd(b2)
 
+    def testIsAtEnd(self):
+        '''
+        https://github.com/cuthbertLab/music21/issues/1069
+
+        AI-assisted.
+        '''
+        s = Stream()
+        n = note.Note('C')
+        s.append(n)
+        b = bar.Barline()
+        s.storeAtEnd(b)
+        self.assertTrue(s.isAtEnd(b))
+        self.assertFalse(s.isAtEnd(n))
+
+        m = Measure()
+        nM = note.Note('D')
+        m.append(nM)
+        rb = bar.Barline('final')
+        m.storeAtEnd(rb)
+        self.assertTrue(m.isAtEnd(rb))
+        self.assertFalse(m.isAtEnd(nM))
+
+        outsider = note.Note('E')
+        with self.assertRaises(sites.SitesException):
+            s.isAtEnd(outsider)
+
     def testElementsHighestTimeB(self):
         '''
         Test adding elements at the highest time position

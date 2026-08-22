@@ -2699,6 +2699,29 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         # Streams cannot reside in end elements, thus do not update is flat
         self.coreElementsChanged(updateIsFlat=False)
 
+    def isAtEnd(self, element: base.Music21Object) -> bool:
+        '''
+        Return True if `element` is stored at the end of this Stream
+        (via :meth:`~music21.stream.base.Stream.storeAtEnd`).
+
+        >>> s = stream.Stream()
+        >>> n = note.Note('C')
+        >>> s.append(n)
+        >>> b = bar.Barline()
+        >>> s.storeAtEnd(b)
+        >>> s.isAtEnd(b)
+        True
+        >>> s.isAtEnd(n)
+        False
+
+        The element must already be in this Stream.
+
+        * New in v11.
+
+        AI-assisted.
+        '''
+        return self.elementOffset(element, returnSpecial=True) is OffsetSpecial.AT_END
+
     # --------------------------------------------------------------------------
     # all the following call either insert() or append()
 
