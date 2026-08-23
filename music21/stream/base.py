@@ -2714,7 +2714,13 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         >>> s.isAtEnd(n)
         False
 
-        The element must already be in this Stream.
+        If the element is not in this Stream, :exc:`~music21.sites.SitesException`
+        is raised:
+
+        >>> s.isAtEnd(note.Note('E'))
+        Traceback (most recent call last):
+        music21.sites.SitesException: an entry for this object 0x... is not stored in stream
+            <music21.stream.Stream 0x...>
 
         * New in v11.
 
