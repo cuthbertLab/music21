@@ -9529,7 +9529,10 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             # is unsorted originally, this "looking ahead" could become O(n^2).
             originallySorted = useStream.isSorted
             rests_lacking_durations: list[note.Rest] = []
-            for i, e in enumerate(useStream._elements):
+            for i, e in enumerate(useStream.elements):
+                if useStream.isAtEnd(e):
+                    # Elements stored at the end carry no quantizable offset.
+                    continue
                 if processOffsets:
                     o = useStream.elementOffset(e)
                     sign = 1
