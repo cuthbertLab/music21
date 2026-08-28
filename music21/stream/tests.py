@@ -5063,6 +5063,52 @@ class Test(unittest.TestCase):
         with self.assertRaises(StreamException):
             s.storeAtEnd(b2)
 
+    def testIsAtEnd(self):
+        '''
+        https://github.com/cuthbertLab/music21/issues/1069
+
+        AI-assisted.
+        '''
+        s = Stream()
+        n = note.Note('C')
+        s.append(n)
+        b = bar.Barline()
+        s.storeAtEnd(b)
+        self.assertTrue(s.isAtEnd(b))
+        self.assertFalse(s.isAtEnd(n))
+
+        m = Measure()
+        nM = note.Note('D')
+        m.append(nM)
+        rb = bar.Barline('final')
+        m.storeAtEnd(rb)
+        self.assertTrue(m.isAtEnd(rb))
+        self.assertFalse(m.isAtEnd(nM))
+
+        outsider = note.Note('E')
+        with self.assertRaises(sites.SitesException):
+            s.isAtEnd(outsider)
+
+    def testQuantizeKeepsElementsStoredAtEnd(self):
+        '''
+        quantize() iterates .elements and skips elements stored at the end, so a
+        barline keeps its AT_END position instead of being given a real offset.
+
+        AI-assisted.
+        '''
+        s = Stream()
+        n = note.Note()
+        n.quarterLength = 0.26
+        s.repeatInsert(n, [0.1, 0.49, 0.9])
+        b = bar.Barline()
+        s.storeAtEnd(b)
+
+        q = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
+
+        quantizedBarline = q._endElements[0]
+        self.assertTrue(q.isAtEnd(quantizedBarline))
+        self.assertEqual([q.elementOffset(e) for e in q._elements], [0.0, 0.5, 1.0])
+
     def testElementsHighestTimeB(self):
         '''
         Test adding elements at the highest time position

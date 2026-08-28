@@ -2699,6 +2699,35 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         # Streams cannot reside in end elements, thus do not update is flat
         self.coreElementsChanged(updateIsFlat=False)
 
+    def isAtEnd(self, element: base.Music21Object) -> bool:
+        '''
+        Return True if `element` is stored at the end of this Stream
+        (via :meth:`~music21.stream.base.Stream.storeAtEnd`).
+
+        >>> s = stream.Stream()
+        >>> n = note.Note('C')
+        >>> s.append(n)
+        >>> b = bar.Barline()
+        >>> s.storeAtEnd(b)
+        >>> s.isAtEnd(b)
+        True
+        >>> s.isAtEnd(n)
+        False
+
+        If the element is not in this Stream, :exc:`~music21.sites.SitesException`
+        is raised:
+
+        >>> s.isAtEnd(note.Note('E'))
+        Traceback (most recent call last):
+        music21.sites.SitesException: an entry for this object 0x... is not stored in stream
+            <music21.stream.Stream 0x...>
+
+        * New in v11.
+
+        AI-assisted.
+        '''
+        return self.elementOffset(element, returnSpecial=True) is OffsetSpecial.AT_END
+
     # --------------------------------------------------------------------------
     # all the following call either insert() or append()
 
@@ -9494,7 +9523,10 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             # is unsorted originally, this "looking ahead" could become O(n^2).
             originallySorted = useStream.isSorted
             rests_lacking_durations: list[note.Rest] = []
-            for i, e in enumerate(useStream._elements):
+            for i, e in enumerate(useStream.elements):
+                if useStream.isAtEnd(e):
+                    # Elements stored at the end carry no quantizable offset.
+                    continue
                 if processOffsets:
                     o = useStream.elementOffset(e)
                     sign = 1
