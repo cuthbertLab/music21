@@ -57,6 +57,50 @@ doctest. It goes in the commit message.
 See the `bump-version` skill for which digit to change and the odd/even
 convention.
 
+## Doctest mechanics
+
+In doctests, no need to run `from music21 import *` that happens automatically (In Jupyter notebooks for the user's guide, the first line should begin `>>> from music21 import *`, so readers remember they need it)
+
+Examples always qualify by module: `note.Note('C4')`, never a bare `Note`.
+
+`OMIT_FROM_DOCS`, alone on a line, hides everything after it: cases worth checking that
+no reader wants to meet.
+
+`#_DOCS_HIDE` at the end of a line runs it without showing it; `#_DOCS_SHOW` at the
+start of a line shows it without running it. Together they let a doctest look
+nondeterministic and still have a fixed answer:
+
+```
+>>> import random
+>>> randomNumber = 12  #_DOCS_HIDE
+>>> #_DOCS_SHOW randomNumber = random.randint(0, 127)
+>>> p = pitch.Pitch()
+>>> p.ps = randomNumber
+>>> p
+<music21.pitch.Pitch C1>
+```
+
+Link with ``:class:`~music21.note.Note` `` and ``:meth:`~music21.note.Note.addLyric` ``.
+
+## Examples
+
+Give steps that have meaningful intermediate output descriptive names instead of chaining — so readers can understand what the intermediate values are:
+
+```
+>>> bachScore = corpus.parse('bwv66.6')
+>>> excerpt = bachScore.measures(4, 6)
+>>> chordReduction = excerpt.chordify()
+```
+
+Pick examples musicians care about: semitones to frequency, not Celsius to Fahrenheit;
+scramble "Chaminade", not "puppy". If you cannot think of a reason a musician would call the method, it may not belong in music21.
+
+Describe what a parameter is and does in English if it is not obvious; type alone is not
+documentation.
+
+No dull repetition in docs. A bit of humor is welcome in docs; the docs are written
+for humans who will close the window if they are dull.  If seven methods do essentially the same thing, give extensive docs the first time and then later methods can refer back to the first method. Don't repeat the same docs over and over.
+
 ## Doctests are not regression tests
 
 Doctests are documentation that happens to be verified. Every example must earn

@@ -19,6 +19,26 @@
   quote for nested strings, e.g. `f'the value is {d["key"]}'`, not
   `f"the value is {d["key"]}"`. This is pinned in `pyproject.toml` via
   `[tool.ruff.format] nested-string-quote-style = "alternating"`.
+- Never `eval` or `global`, or a trick that does the same thing.
+- Imports: standard library first, then music21 modules, one per line, alphabetical.
+- New modules open with the `# Name: / # Purpose: / # Authors: / # Copyright: / # License:`
+  banner (copy a neighboring module's), then the module docstring, then imports.  Update the Copyright date end to current year when changing the module.
+- No `print()`. Use `environLocal = environment.Environment('moduleName')` and
+  `environLocal.printDebug(...)`, or `environLocal.warn(...)` when the user should hear
+  about it every time. `test/toggleDebug.py` switches debug output on and off.
+- New exceptions subclass `exceptions21.Music21Exception`.
+- Return named things — a small class, a `namedtuple`, a dict — never a positional tuple of more than 2 (maybe 3) elements
+  whose elements each mean something different and unrelated (x, y, z is okay for instance). Nobody should write `returned[3][0][7]`.
+- Don't reuse a variable name once the type of what it holds changes
+  (`onsetCount` (int) then `extractedOnsets` (list[int]), not `onsets` twice).
+- Don't add a property that only gets or sets a private attribute; expose the attribute.
+- Making a method `_private` is not a substitute for documenting and testing it
+- A private method should not normally be mentioned in public documentation.
+- A method past ~30 lines, or deeply nested, should probably be several methods.
+- `i`, `j`, `junk`, `counter` are exempt from unused-variable warnings; otherwise prefix with `unused_`.
+- Don't restyle code you aren't otherwise changing.
+- Text handling must survive non-ASCII input (ß, é, 中国). Comments should mostly remain ASCII; docs may use UTF-8 freely.
+- Never commit anything under copyright without a free (not GNU) license — code, scores, or someone else's encodings.
 
 # Established contributors
 
@@ -30,6 +50,10 @@
 
 - pytest works but to run the whole suite run music21/test/multiprocessTest.py (or testSingleCoreAll.py 
   if on a single core machine.)
+- Every function, method, and class needs documentation and at least one passing test.
+- Keep tests fast: aim for about 3 seconds per module, never more than 15. See the
+  `running-tests` skill for the speed budget and for `TestExternal`.
+- When making major changes, check the User's Guide to to make sure that docs still work there too.
 - Run `uv run ruff check music21` before making PRs or pushes to open PRs.
 - Run `uv run mypy music21` before making PRs or pushes to open PRs.
 - **Regression cases go in the module's `Test(unittest.TestCase)` class — never in a
@@ -81,6 +105,10 @@
   Not even the slightest bit of disrespect from an AI agent will be tolerated.
 - Mark changes in public interface with `* Changed in v[X]: One-line explanation.` Or new features with "New" instead of "Changed".
 - Changes to parsing formats (esp. musicxml) need to update the patch version of the version file.
+- That is the only reason an agent bumps: a parser change leaves stale pickles in
+  everyone's cache. A plain bug fix or a new feature elsewhere does not bump — the commit
+  is the record, and a `New in`/`Changed in` marker is documentation, not a bump. Major
+  and minor version changes are a human's call. See the `bump-version` skill.
 - Music21 uses even minor version numbers for alpha/beta and odd minor numbers for releases.
 - If the current version is MAJOR.0....  then mark `Changed in vMAJOR:` if it is `MAJOR.[even]` use the next odd number, like if it's 10.2 now use "Changed in 10.3".  If current version is odd that's likely a mistake or you caught it just before a new release. Use the following odd number instead.
 - Any PR not from an established contributor touching more than about 20-30 lines should have an issue that has been opened and had enough
