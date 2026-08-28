@@ -155,11 +155,11 @@ Regression cases for a bug fix belong in `Test`, never in a doctest. See the
 ```bash
 uv run ruff check music21
 uv run mypy music21
-uv run pylint -j4 music21 --rcfile=.pylintrc   # catches what the first two miss
+uv run pylint -j4 music21 --rcfile=.pylintrc   # optional: run only if major refactoring since it was last run.
 ```
 
 Coverage is expected to rise with each contribution
-(https://coveralls.io/github/cuthbertLab/music21). CI measures it on a single
-pinned Python -- the **middle** supported version, see
-`coverageM21.getCoverage`. `# pragma: no cover` exists for genuinely
-untriggerable code and is otherwise discouraged.
+(https://coveralls.io/github/cuthbertLab/music21). CI measures it on one pinned
+Python, a middle supported version, so failures on the newest and oldest return
+first. `# pragma: no cover` exists for genuinely untriggerable code and is
+otherwise discouraged.
