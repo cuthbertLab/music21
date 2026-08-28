@@ -2245,7 +2245,7 @@ class PartParser(XMLParserBase):
             # If the measure is overfull by a "round" amount, assume that it was intended
             # otherwise it was likely the result of malformed MusicXML.
             if (diff > 0.5
-                or nearestMultiple(diff, 0.0625)[1] < tol
+                    or nearestMultiple(diff, 0.0625)[1] < tol
                     or nearestMultiple(diff, 1 / 12)[1] < tol):
                 mOffsetShift = mHighestTime
             else:

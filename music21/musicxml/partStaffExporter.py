@@ -86,7 +86,7 @@ def addStaffTags(
             mxStaff.text = str(staffNumber)
             helpers.insertBeforeElements(tag, mxStaff,
                                          tagList=['beam', 'notations', 'lyric', 'play',
-                                                          'sound'])
+                                                  'sound'])
 
 
 class PartStaffExporterMixin:
@@ -423,7 +423,7 @@ class PartStaffExporterMixin:
 
             # Or, gap in measure numbers in the subsequent part: keep iterating through target
             if (sourceNumber is not None
-                and targetNumber is not None
+                    and targetNumber is not None
                     and helpers.measureNumberComesBefore(targetNumber, sourceNumber)):
                 continue  # sourceMeasure is not None!
 

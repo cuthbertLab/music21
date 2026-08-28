@@ -1736,7 +1736,7 @@ class DiatonicInterval(IntervalBase):
         # if self.direction != other.direction:
         #    return False
         if (self.generic == other.generic
-            and self.specifier == other.specifier
+                and self.specifier == other.specifier
                 and self.direction == other.direction):
             return True
         else:

@@ -5810,7 +5810,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             if searchActiveSite:
                 # if isinstance(self.activeSite, Stream) and self.activeSite != self:
                 if (self.activeSite is not None
-                    and self.activeSite.isStream
+                        and self.activeSite.isStream
                         and self.activeSite is not self):
                     # environLocal.printDebug(['searching activeSite Stream',
                     #    self, self.activeSite])
