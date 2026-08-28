@@ -825,13 +825,11 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
             lineNum = False
     elif len(xnStr) > 2:
         xnLower = xnStr.lower()
-        for className, objType in globals().items():
-            if 'Clef' not in className:
+        for className, classObj in globals().items():
+            if not isinstance(classObj, type) or not issubclass(classObj, Clef):
                 continue
-            if className.lower() not in (xnLower, xnLower + 'clef'):
-                continue
-            if isinstance(objType, type):
-                return objType()
+            if className.lower() in (xnLower, xnLower + 'clef'):
+                return classObj()
 
         raise ClefException('Could not find clef ' + xnStr)
     else:
