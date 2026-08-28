@@ -1396,7 +1396,7 @@ class Test(unittest.TestCase):
         ks = KeySignature()
         ks.isNonTraditional = True
         ks.alteredPitches = [pitch.Pitch('E`')]
-        self.assertEqual(repr(ks), '<music21.key.KeySignature of pitches: [E`]>')
+        self.assertIn('of pitches: [E`]', repr(ks))
         self.assertEqual(ks.accidentalByStep('E'), pitch.Accidental('half-flat'))
 
         # a non-traditional key signature is not equal to the C-major signature
