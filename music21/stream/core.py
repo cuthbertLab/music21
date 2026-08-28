@@ -104,9 +104,9 @@ class StreamCore(Music21Object):
         if not ignoreSort:
             # # if sorted and our insertion is > the highest time, then
             # # are still inserted
-            # if self.isSorted is True and self.highestTime <= offset:
+            # if self.isSorted and self.highestTime <= offset:
             #     storeSorted = True
-            if self.isSorted is True:
+            if self.isSorted:
                 ht = self.highestTime   # type: ignore
                 if ht < offset:
                     storeSorted = True

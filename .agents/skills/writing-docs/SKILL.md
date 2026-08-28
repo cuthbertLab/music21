@@ -84,3 +84,16 @@ unittest.
 Naming the guarded bug **is** appropriate in a unittest; that is what the test
 is for. The rule against narrating old bugs applies to docstrings and to
 comments in shipping code, not to tests.
+
+## Writing and Comment style
+- When writing comments in code, assume a strong code reader — anything inferable from the code is noise (docs that paraphrase names of functions or variable names esp.); focus on high level issues and gotchas that might bite again if not documented.
+- Say how to use code, not prior bugs or how code used to work or what was removed. That's for commit messages. Don't document where code is called from except for "keep in sync" lines across Py/TS.
+- Don't hijack a docstring for your addition. Original purpose line stays primary + one short line for the new bit. Prefer not documenting a small feature over making it seem like the primary reason for the code.
+- Examples of usage are usually better than long descriptions.
+- Avoid jargon not already found in the codebase; use plain descriptive English.
+- Rare paths should get little weight: in both code and docs. Use try/except over if/else when the except clause is rare. In docs, state the 90% path first and point exceptional cases to code that handle it.
+- When wording is dictated to the agent to substitute for original wording, use it. Do not add parentheticals. Only fix obvious typos.
+- No weapon-metaphors or overly militaristic language. Avoid "blast radius", "rearm", "landmine",
+     "detonate" in issues/PR/code.  Trigger or fire events is so commonly used that they're okay.
+
+
