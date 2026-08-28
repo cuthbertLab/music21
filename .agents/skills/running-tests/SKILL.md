@@ -1,15 +1,9 @@
 ---
 name: running-tests
 description: >-
-  How to correctly run music21's tests and doctests -- with pytest for a module,
-  and with the project's own runners for the whole suite. Use this whenever you
-  need to run, verify, or judge the pass/fail of tests or doctests in this repo:
-  confirming a change works, checking that doctests still pass, running a single
-  module's tests, or sanity-checking before a PR or push. Especially consult it
-  before concluding that a doctest "fails" (the repo's pytest plugin normalizes
-  object addresses and injects the doctest namespace, so raw doctest.testmod
-  produces FALSE failures), and before concluding that a green pytest run means
-  CI will be green.
+  How to run music21's tests and doctests and judge pass/fail: pytest for one
+  module, the project's own runners for the whole suite. Read it before running
+  tests, and before calling any doctest failure real.
 ---
 
 # Running music21 tests and doctests
