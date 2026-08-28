@@ -1,11 +1,9 @@
 ---
 name: writing-docs
 description: >-
-  House style for docstrings, code comments, and `Changed in`/`New in` version
-  markers in music21. Use whenever you write or edit a docstring or comment, add
-  a version marker, or decide where a bug fix's test belongs. Covers the length
-  target, the rule against narrating bugs you just fixed, and why regression
-  cases go in unittests rather than doctests.
+  House style for music21 prose: docstrings, comments, and `Changed in`/`New in`
+  markers. Read before writing any of them. Sets the length target, the voice,
+  and where a bug fix's test belongs.
 ---
 
 # Writing docs and comments
@@ -15,6 +13,29 @@ description: >-
 Aim for about 40% of the length an LLM writes by default. Cut qualifiers,
 restatements, and the sentence that explains the sentence before it. A comment
 earning its place says something the code cannot.
+
+## Prose
+
+Assume the reader is skimming and looking for an excuse to stop. Give them
+something to catch on.
+
+**Examples are music.** `key.KeySignature(-3)` is E-flat major, so say E-flat
+major. Reach into the corpus rather than inventing `foo`: `bwv66.6` and
+`luca/gloria` are in hundreds of docstrings because a reader can hear them.
+
+**Lead with the thing itself.** "Returns the pitches sounding at an offset," not
+"This method can be used to obtain the pitches that are sounding."
+
+**Vary sentence length.** Three medium declaratives in a row is where the eye
+slides off the page. A short one lands.
+
+**Cut throat-clearing.** "It is important to note that," "Note that in general,"
+"This allows the user to." Start at the verb.
+
+**Personality is house style, not a lapse.** `Cannot determine sharps for
+quarter-tone keys! silly!` and "it'd wig me out if I ever didn't see them in
+reverse alphabetical order" are both shipping music21. Dry, specific, short. A
+joke needing a second sentence to land is one sentence too long.
 
 ## Say what is, not what was or what not to do
 
