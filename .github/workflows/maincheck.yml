@@ -9,6 +9,11 @@ on:
         branches:
         - '*'
 
+env:
+    # We run coverage on a middle supported Python so that failures on newest and
+    # oldest versions return first.
+    PY_VERSION_WITH_COVERAGE: '3.13'
+
 jobs:
     run_tests:
         runs-on: ubuntu-latest
@@ -35,10 +40,14 @@ jobs:
         - name: Setup Lilypond
           run: uv run python -c 'from music21 import environment; environment.UserSettings()["lilypondPath"] = "/home/runner/bin/lilypond"'
         - name: Run Main Test script
+          if: ${{ matrix.python-version != env.PY_VERSION_WITH_COVERAGE }}
           run: uv run python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
+        - name: Run Main Test script with coverage
+          if: ${{ matrix.python-version == env.PY_VERSION_WITH_COVERAGE }}
+          run: uv run coverage run -m music21.test.testSingleCoreAll ci
         - name: Coveralls
-          if: ${{ matrix.python-version == '3.13' }}
-          env:  # when changing number above also change coverageM21.getCoverage
+          if: ${{ matrix.python-version == env.PY_VERSION_WITH_COVERAGE }}
+          env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               COVERALLS_SERVICE_NAME: github
           run: uv run coveralls

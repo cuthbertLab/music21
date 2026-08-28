@@ -1390,12 +1390,10 @@ class Test(unittest.TestCase):
         '''
         AI-assisted (Claude).
         '''
-        from music21 import key
-
-        ks = key.KeySignature(3)
+        ks = KeySignature(3)
         self.assertFalse(ks.isNonTraditional)
 
-        ks = key.KeySignature()
+        ks = KeySignature()
         ks.isNonTraditional = True
         ks.alteredPitches = [pitch.Pitch('E`')]
         self.assertEqual(repr(ks), '<music21.key.KeySignature of pitches: [E`]>')
@@ -1403,7 +1401,7 @@ class Test(unittest.TestCase):
 
         # a non-traditional key signature is not equal to the C-major signature
         # it shares a `sharps` count with.
-        self.assertNotEqual(ks, key.KeySignature())
+        self.assertNotEqual(ks, KeySignature())
 
     def testSharpsNoneDeprecated(self):
         '''
