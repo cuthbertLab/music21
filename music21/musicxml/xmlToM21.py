@@ -6,7 +6,7 @@
 #               Christopher Ariza
 #               Jacob Tyler Walls
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -1484,8 +1484,8 @@ class PartParser(XMLParserBase):
         self.staffReferenceList: list[StaffReferenceType] = []
 
         self.lastTimeSignature: meter.TimeSignature|None = None
-        self.lastMeasureWasShort = False
-        self.lastMeasureOffset = 0.0
+        self.lastMeasureWasShort: bool = False
+        self.lastMeasureOffset: OffsetQL = 0.0
 
         # a dict of clefs per staff number -- needed for converting rests w/ steps
         self.lastClefs: dict[int, clef.Clef|None] = {}
@@ -2282,7 +2282,7 @@ class PartParser(XMLParserBase):
                 mOffsetShift = mHighestTime
             else:
                 mOffsetShift = mHighestTime  # lastTimeSignatureQuarterLength
-                if self.lastMeasureWasShort is True:
+                if self.lastMeasureWasShort:
                     if m.barDurationProportion() < 1.0:
                         m.padAsAnacrusis()  # probably a pickup after a repeat or phrase boundary
                         # or something
@@ -5161,10 +5161,16 @@ class MeasureParser(XMLParserBase):
                 rb.addSpannedElements(m)
 
             if mxEndingObj.get('type') == 'start':
-                mxNumber = mxEndingObj.get('number')
+                mxNumberStr = mxEndingObj.get('number')
+                if mxNumberStr is None:
+                    warnings.warn(f'number is required on <ending> object, {mxEndingObj}',
+                                  MusicXMLWarning,
+                                  stacklevel=2)
+                    mxNumberStr = '1'
+
                 # RepeatBracket handles comma-separated values, such as "1,2"
                 try:
-                    rb.number = mxNumber if mxNumber is not None else 1
+                    rb.number = mxNumberStr
                 except spanner.SpannerException:
                     rb.number = 1
 
