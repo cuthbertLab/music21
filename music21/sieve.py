@@ -203,7 +203,7 @@ def rabinMiller(n):
 
     # primes up to 100;  2, 3 handled by mod 6
     primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
-               47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+              47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 
     if n <= 100:
         if n in primes:
@@ -253,7 +253,6 @@ def discreteBinaryPad(series: Iterable[int], fixRange=None) -> list[int]:
 
     >>> sieve.discreteBinaryPad([3, 4, 5])
     [1, 1, 1]
-
     '''
     # make sure these are ints
     for x in series:
@@ -293,7 +292,6 @@ def unitNormRange(series, fixRange=None):
 
     >>> sieve.unitNormRange([1, 3, 4])
     [0.0, 0.666..., 1.0]
-
     '''
     if fixRange is not None:
         fixRange.sort()
@@ -367,7 +365,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
     >>> post = sieve.unitNormStep(0.25, 0, 20, normalized=False)
     >>> len(post)
     81
-
     '''
     if a == b:
         return []  # no range, return boundary
@@ -487,7 +484,7 @@ class PrimeSegment:
             segNeg = [-x for x in segNeg]  # make negative
             if len(segNeg) < self.length:
                 segPos = self._fillRabinMiller(0, self.length - len(segNeg),
-                                                         None, 'up')
+                                               None, 'up')
                 self.seg = segNeg + segPos
             else:  # add positive values
                 self.seg = segNeg
@@ -869,7 +866,6 @@ class CompressionSegment:
     # --------------------------------------------------------------------------
     def __call__(self):
         '''
-
         >>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8])
         >>> b = a()
         >>> str(b[0])

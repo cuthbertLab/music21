@@ -114,7 +114,6 @@ def thomassenMelodicAccent(streamIn: stream.Stream):
     ('E4', 0.5561)
     ('D4', 0.17)
     ('D4', 0.0)
-
     '''
     # we use .ps instead of Intervals for speed, since
     # we just need perceived contours

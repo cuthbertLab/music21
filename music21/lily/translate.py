@@ -360,7 +360,6 @@ class LilypondConverter:
 
     def loadObjectFromScore(self, scoreIn: stream.Score, makeNotation: bool = True) -> None:
         r'''
-
         creates a filled topLevelObject (lily.lilyObjects.LyLilypondTop)
         whose string representation accurately reflects this Score object.
 
@@ -1153,7 +1152,6 @@ class LilypondConverter:
         <BLANKLINE>
         fis' 4
         <BLANKLINE>
-
         '''
         # to be removed once grace notes are supported
         if noteOrRest.duration.isGrace:
@@ -1218,7 +1216,6 @@ class LilypondConverter:
         <BLANKLINE>
         < c'  f'  aes'  > 4
         <BLANKLINE>
-
         '''
         self.setContextForTupletStart(chordIn)
         self.appendBeamCode(chordIn)
@@ -1362,7 +1359,6 @@ class LilypondConverter:
         [<music21.lily.lilyObjects.LyEmbeddedScm \set stemL...>]
         >>> print(lpc.context)
         \set stemLeftBeamCount = #2
-
         '''
         leftBeams = 0
         rightBeams = 0
@@ -1421,7 +1417,6 @@ class LilypondConverter:
 
     def lySimpleMusicFromChord(self, chordObj: chord.Chord) -> lyo.LySimpleMusic:
         '''
-
         >>> conv = lily.translate.LilypondConverter()
         >>> c1 = chord.Chord(['C#2', 'E4', 'D#5'])
         >>> c1.quarterLength = 3.5
@@ -1614,7 +1609,6 @@ class LilypondConverter:
         >>> lpEmbeddedScm = conv.lyEmbeddedScmFromClef(t8c)
         >>> print(lpEmbeddedScm)
         \clef "treble_8"
-
         '''
         dictTranslate = OrderedDict([
             ('Treble8vbClef', 'treble_8'),
@@ -1661,7 +1655,6 @@ class LilypondConverter:
         >>> fSharp = key.KeySignature(6)
         >>> print(conv.lyEmbeddedScmFromKeySignature(fSharp))
         \key fis \major
-
         '''
         keyAsKey = keyObj if isinstance(keyObj, key.Key) else keyObj.asKey('major')
 
@@ -1896,7 +1889,6 @@ class LilypondConverter:
     ) -> tuple[lyo.LyPrefixCompositeMusic, stream.Stream]:
         # noinspection PyShadowingNames
         r'''
-
         >>> s1 = converter.parse('tinynotation: 4/4 a4 a a a  a1')
         >>> s2 = converter.parse('tinynotation: 4/4 b4 b b b')
         >>> s3 = converter.parse('tinynotation: 4/4 c4 c c c')
@@ -1988,7 +1980,6 @@ class LilypondConverter:
         <BLANKLINE>
            }
         <BLANKLINE>
-
         '''
 
         # Order List
@@ -2121,7 +2112,6 @@ class LilypondConverter:
     ) -> lyo.LyPrefixCompositeMusic:
         # noinspection PyShadowingNames
         r'''
-
         >>> pStream = converter.parse('tinynotation: 4/4 a4 b c d   e4 f g a')
         >>> pStream.makeMeasures(inPlace=True)
         >>> p = stream.Part(pStream.elements)
@@ -2156,7 +2146,6 @@ class LilypondConverter:
 
         >>> print(lpc.addedVariants)
         ['london']
-
         '''
         replacedElementsClef = replacedElements[0].getContextByClass(clef.Clef)
 
@@ -2458,7 +2447,6 @@ class LilypondConverter:
 
         The extension should be ly.  If fp is None then a named temporary
         file is created by environment.getTempFile.
-
         '''
         tloOut = str(self.topLevelObject)
         if fp is None:
@@ -2487,7 +2475,6 @@ class LilypondConverter:
 
         If skipWriting is True and a fileName is given then it will run
         that file through lilypond instead
-
         '''
         LILYEXEC = self.findLilyExec()
         if fileName is None:

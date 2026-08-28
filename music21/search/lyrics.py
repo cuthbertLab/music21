@@ -35,7 +35,6 @@ class IndexedLyric(namedtuple(
 )):
     '''
     A Lyric that has been indexed to its attached element and position in a Stream.
-
     '''
     __slots__ = ()
     _DOC_ATTR: dict[str, str] = {
@@ -207,7 +206,7 @@ class LyricSearcher:
         indexByIdentifier: OrderedDict[str|int, list[IndexedLyric]] = OrderedDict()
         iTextByIdentifier: OrderedDict[str|int, str] = OrderedDict()
         lastSyllabicByIdentifier: OrderedDict[str|int,
-                                                str|None] = OrderedDict()
+                                              str|None] = OrderedDict()
 
         for n in s.recurse().notes:
             ls: list[note.Lyric] = n.lyrics

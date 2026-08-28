@@ -211,16 +211,16 @@ class Segment:
 
         singlePossibRules = [
             (fbRules.forbidIncompletePossibilities,
-                 possibility.isIncomplete,
-                 False,
-                 [self.pitchNamesInChord]),
+             possibility.isIncomplete,
+             False,
+             [self.pitchNamesInChord]),
             (True,
-                 possibility.upperPartsWithinLimit,
-                 True,
-                 [fbRules.upperPartsMaxSemitoneSeparation]),
+             possibility.upperPartsWithinLimit,
+             True,
+             [fbRules.upperPartsMaxSemitoneSeparation]),
             (fbRules.forbidVoiceCrossing,
-                 possibility.voiceCrossing,
-                 False)
+             possibility.voiceCrossing,
+             False)
         ]
 
         return singlePossibRules
@@ -856,8 +856,8 @@ class Segment:
         correctB = segmentB.allCorrectSinglePossibilities()
         correctAB = itertools.product(correctA, correctB)
         return filter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA=possibAB[0],
-                                                                              possibB=possibAB[1]),
-                       correctAB)
+                                                                             possibB=possibAB[1]),
+                      correctAB)
 
     def _resolveSpecialSegment(
         self,

@@ -2505,13 +2505,15 @@ class ABCHandler:
                 # v is up bow; might be: "^Segno"v which also should be dropped
                 # H is fermata
                 # . dot may be staccato, but should be attached to pitch
-                if self.currentCollectStr in ('w', 'u', 'v', 'v.', 'h', 'H', 'vk',
-                               'uk', 'U', '~',
-                               '.', '=', 'V', 'v.', 'S', 's',
-                               'i', 'I', 'ui', 'u.', 'Q', 'Hy', 'Hx',
-                               'r', 'm', 'M', 'n', 'N', 'o', 'O', 'P',
-                               'l', 'L', 'R',
-                               'y', 'T', 't', 'x', 'Z'):
+                if self.currentCollectStr in (
+                    'w', 'u', 'v', 'v.', 'h', 'H', 'vk',
+                    'uk', 'U', '~',
+                    '.', '=', 'V', 'v.', 'S', 's',
+                    'i', 'I', 'ui', 'u.', 'Q', 'Hy', 'Hx',
+                    'r', 'm', 'M', 'n', 'N', 'o', 'O', 'P',
+                    'l', 'L', 'R',
+                    'y', 'T', 't', 'x', 'Z',
+                ):
                     pass
                 # these are bad chords, or other problematic notations like
                 # "D.C."x
@@ -2785,7 +2787,6 @@ class ABCHandler:
         True
         >>> ah3.tokens[3] == ah2.tokens[0]
         True
-
         '''
         ah = self.__class__()  # will get the same class type
         ah.tokens = self.tokens + other.tokens
@@ -3114,7 +3115,6 @@ class ABCHandler:
         [[0, 9], [10, 16], [16, 23], [23, 29], [29, 36], [36, 42], [42, 49], [49, 56], [56, 61],
          [62, 64], [64, 70], [70, 77], [77, 84], [84, 90], [90, 96],
          [96, 103], [103, 110], [110, 115]]
-
         '''
         # collect start and end pairs of split
         pairs = []

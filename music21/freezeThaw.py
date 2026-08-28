@@ -230,7 +230,6 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> sf = freezeThaw.StreamFreezer(s)
         >>> pprint(sf.packStream())
         {'m21Version': (...), 'stream': <music21.stream.Stream 0x1289212>}
-
         '''
         # do all things necessary to set up the stream
         if streamObj is None:
@@ -442,7 +441,6 @@ class StreamFreezer(StreamFreezeThawBase):
          (<music21.bar.Barline type=regular>, 'end')]
         >>> s2._storedElementOffsetTuples[2][0] is v1
         True
-
         '''
         if hasattr(streamObj, '_storedElementOffsetTuples'):
             # in the case of a spanner storing a Stream, like a StaffGroup
@@ -1208,9 +1206,9 @@ class Test(unittest.TestCase):
         from music21 import note
 
         a = str(common.getSourceFilePath()
-                         / 'midi'
-                         / 'testPrimitive'
-                         / 'test03.mid')
+                / 'midi'
+                / 'testPrimitive'
+                / 'test03.mid')
 
         # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
         c = converter.parse(a)

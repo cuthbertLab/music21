@@ -179,7 +179,6 @@ class RehearsalMark(Expression):
     >>> rm = expressions.RehearsalMark('B')
     >>> rm
     <music21.expressions.RehearsalMark 'B'>
-
     '''
     classSortOrder = -30
     _styleClass = style.TextStylePlacement
@@ -220,7 +219,6 @@ class RehearsalMark(Expression):
 
         >>> print(ex._getNumberingFromContent('*'))
         None
-
         '''
         if c is None:
             return None
@@ -584,8 +582,8 @@ class Ornament(Expression):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Subclassable method call that takes a sourceObject and optional keySig
         and returns a three-element tuple of a list of notes before the
@@ -704,7 +702,6 @@ class GeneralMordent(Ornament):
         >>> invertedMordent = expressions.InvertedMordent(accidental=sharp)
         >>> invertedMordent.name
         'inverted mordent (sharp)'
-
         '''
         theName: str = super().name
         if self.accidental is not None:
@@ -914,8 +911,8 @@ class GeneralMordent(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize a mordent.
 
@@ -1270,7 +1267,6 @@ class Trill(Ornament):
       The size property has been removed and replaced with `.getSize()` (which requires
       a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
       `.realize()` as well.
-
     '''
     _direction: str = 'up'
 
@@ -1299,7 +1295,6 @@ class Trill(Ornament):
         >>> doubleSharpedTrill = expressions.Trill(accidental=pitch.Accidental('double-sharp'))
         >>> doubleSharpedTrill.name
         'trill (double-sharp)'
-
         '''
         theName: str = super().name
         if self.accidental:
@@ -1581,8 +1576,8 @@ class Trill(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize a trill.
 
@@ -1992,7 +1987,6 @@ class Turn(Ornament):
         ...     delay=1.0, lowerAccidental=pitch.Accidental('double-flat'))
         >>> delayedBy1Turn.name
         'delayed(delayQL=1.0) turn (lower=double-flat)'
-
         '''
         theName: str = super().name
         if self.delay == OrnamentDelay.DEFAULT_DELAY:
@@ -2455,8 +2449,8 @@ class GeneralAppoggiatura(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize an appoggiatura.
 
@@ -2603,8 +2597,8 @@ class Tremolo(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize the ornament.
 

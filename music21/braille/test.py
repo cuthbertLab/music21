@@ -1848,7 +1848,7 @@ class Test(unittest.TestCase):
     def test_example05_4(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse('tinynotation: 4/4 E2 F2 G1 E2 D2 C1 D2 E2 F2 E2 D1 r1 '
-                                'C2 D2 E1 F2 G2 A1 G2 F2 E2 D2 C1 r1')
+                             'C2 D2 E1 F2 G2 A1 G2 F2 E2 D2 C1 r1')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.e = '''
@@ -3622,9 +3622,9 @@ class Test(unittest.TestCase):
             (-4, '4/4', 'Andante', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠲⠀⠼⠙⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀'),
             (3, '3/8', 'Con moto', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠉⠕⠝⠀⠍⠕⠞⠕⠲⠀⠩⠩⠩⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀'),
             (None, '4/4', 'Andante cantabile',
-                                   '⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠀⠉⠁⠝⠞⠁⠃⠊⠇⠑⠲⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀'),
+             '⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠀⠉⠁⠝⠞⠁⠃⠊⠇⠑⠲⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀'),
             (2, '7/8', 'Very brightly',
-                                   '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠧⠑⠗⠽⠀⠃⠗⠊⠛⠓⠞⠇⠽⠲⠀⠩⠩⠼⠛⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀')
+             '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠧⠑⠗⠽⠀⠃⠗⠊⠛⠓⠞⠇⠽⠲⠀⠩⠩⠼⠛⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀')
         ]
         for ks, ts, tt, r in results:
             if ks is not None:
@@ -3637,7 +3637,7 @@ class Test(unittest.TestCase):
         from music21.braille import basic
         self.assertEqual(basic.metronomeMarkToBraille(
             tempo.MetronomeMark(number=80,
-                                                referent=note.Note(type='half'))), '⠝⠶⠼⠓⠚')
+                                referent=note.Note(type='half'))), '⠝⠶⠼⠓⠚')
 
     def test_example08_9(self):
         from music21.braille.basic import transcribeHeading
@@ -3671,7 +3671,7 @@ class Test(unittest.TestCase):
         bm = converter.parse('''
             tinynotation: 4/4 a2 g8 f8 e4 d4 e4 f8 g8 a4 g4 c'8 b8 a4 g4 f4. e8 d2
             c4 e4 a4 e'4 e'4 d'4 c'8 b8 a4 a'4 g'8 f'8 e'4 d'4 c'4 a8 b8 c'2''',
-            makeNotation=False)
+                             makeNotation=False)
         bm.replace(bm.getElementsByClass(meter.TimeSignature).first(), meter.TimeSignature('c'))
         bm.insert(0, tempo.TempoText('Andante maestoso'))
         bm.insert(0, tempo.MetronomeMark(number=92, referent=note.Note(type='quarter')))

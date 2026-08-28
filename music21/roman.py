@@ -428,7 +428,6 @@ def correctSuffixForChordQuality(chordObj, inversionString):
     >>> c = chord.Chord('E3 C4 G-4')
     >>> roman.correctSuffixForChordQuality(c, '6')
     'o6'
-
     '''
     fifthType = chordObj.semitonesFromChordStep(5)
     if fifthType == 6:
@@ -1391,8 +1390,8 @@ def romanNumeralFromChord(
             and chordObj.isSeventhOfType((0, 3, 7, 10))):
         rnString = ft.prefix + stepRoman + minorSeventhSubs[inversionString]
     elif (not chordHasMajorThird
-              and inversionString in minorMajorSeventhSubs
-              and chordObj.isSeventhOfType((0, 3, 7, 11))):
+          and inversionString in minorMajorSeventhSubs
+          and chordObj.isSeventhOfType((0, 3, 7, 11))):
         rnString = ft.prefix + stepRoman + minorMajorSeventhSubs[inversionString]
 
     elif (not noKeyGiven
@@ -1435,8 +1434,9 @@ def romanNumeralFromChord(
 
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False,
-            # correctRNAlterationForMinor() adds cautionary
-            sixthMinor=Minor67Default.CAUTIONARY, seventhMinor=Minor67Default.CAUTIONARY)
+                          # correctRNAlterationForMinor() adds cautionary
+                          sixthMinor=Minor67Default.CAUTIONARY,
+                          seventhMinor=Minor67Default.CAUTIONARY)
     except fbNotation.ModifierException as strerror:  # pragma: no cover
         raise RomanNumeralException(
             'Could not parse '
@@ -2389,7 +2389,6 @@ class RomanNumeral(harmony.Harmony):
 
             >>> roman.RomanNumeral('II', 'C', caseMatters=False).impliedQuality
             ''
-
             ''',
         'impliedScale': '''
             If no key or scale is passed in as the second object, then
@@ -3021,7 +3020,6 @@ class RomanNumeral(harmony.Harmony):
         '13b3'
         >>> rn.omittedSteps
         [4, 2, 7]
-
         '''
         omittedSteps = []
         match = self._omittedStepsRegex.search(workingFigure)
@@ -3075,7 +3073,6 @@ class RomanNumeral(harmony.Harmony):
         '7'
         >>> rn.bracketedAlterations
         [('#', 5), ('b', 3)]
-
         '''
         matches = self._bracketedAlterationRegex.finditer(workingFigure)
         for m in matches:
@@ -3214,7 +3211,7 @@ class RomanNumeral(harmony.Harmony):
                   and aug6type != 'It'
                   and workingFigure[0] == '6'
                   and (len(workingFigure) < 2
-                        or not workingFigure[1].isdigit())):
+                       or not workingFigure[1].isdigit())):
                 # Fr6 => Fr43
                 workingFigure = self._aug6defaultInversions[aug6type] + workingFigure[1:]
 
@@ -3413,8 +3410,8 @@ class RomanNumeral(harmony.Harmony):
         for j in range(numberNotes):
             i = numberNotes - j - 1
             thisScaleDegree = (bassScaleDegree
-                                + t.cast(int, self.figuresNotationObj.numbers[i])
-                                - 1)
+                               + t.cast(int, self.figuresNotationObj.numbers[i])
+                               - 1)
             newPitch = t.cast(pitch.Pitch, useScale.pitchFromDegree(
                 thisScaleDegree, direction=scale.Direction.ASCENDING))
             pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(newPitch.name)
@@ -3965,7 +3962,6 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral('N53')
         >>> rn.isNeapolitan(require1stInversion=False)
         True
-
         '''
         if self.scaleDegree != 2:
             return False

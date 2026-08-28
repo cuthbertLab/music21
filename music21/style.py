@@ -61,7 +61,6 @@ class Style(ProtoM21Object):
     >>> st.absoluteX = 20.4
     >>> st.absoluteX
     20.4
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'hideObjectOnPrint': '''

@@ -84,7 +84,6 @@ def isNum(usrData: t.Any) -> t.TypeGuard[t.Union[float, int, Fraction]]:
     >>> from decimal import Decimal
     >>> common.isNum(Decimal('2.0'))
     True
-
     '''
     # noinspection PyBroadException
     try:

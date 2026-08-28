@@ -925,7 +925,6 @@ class Chord(ChordBase):
 
         >>> c1.formatVectorString([10, 11, 3, 5])
         '<AB35>'
-
         '''
         msg = ['<']
         for e in vectorList:  # should be numbers
@@ -1333,7 +1332,6 @@ class Chord(ChordBase):
         #
         # >>> cmin_inv.bass()
         # <music21.pitch.Pitch E-3>
-
         '''
         if newbass:
             newbassPitch: pitch.Pitch
@@ -1424,7 +1422,6 @@ class Chord(ChordBase):
         >>> a = chord.Chord(['g', 'b', 'd'])
         >>> a.canBeTonic()
         True
-
         '''
         if self.isMajorTriad() or self.isMinorTriad():
             return True
@@ -2152,7 +2149,6 @@ class Chord(ChordBase):
 
         >>> cChord.hasRepeatedChordStep(5)
         False
-
         '''
         if testRoot is None:
             testRoot = self.root()
@@ -2189,7 +2185,6 @@ class Chord(ChordBase):
 
         >>> print(cmaj.intervalFromChordStep(6))
         None
-
         '''
         if testRoot is None:
             try:
@@ -2544,7 +2539,6 @@ class Chord(ChordBase):
         True
 
         If `permitAnyInversion` is True then any inversion is allowed.
-
         '''
         # cardinality is just used to speed up the call to avoid checking multiple augmented
         # 6ths on a triad, etc.  The fact that Ab C F# Gb will have cardinality of 3
@@ -2692,7 +2686,6 @@ class Chord(ChordBase):
 
         >>> c13.isConsonant()
         False
-
         '''
         c2 = self.removeRedundantPitchNames(inPlace=False)
         if len(c2.pitches) == 1:
@@ -2939,7 +2932,6 @@ class Chord(ChordBase):
         >>> gr6d = chord.Chord(['A-3', 'C-4', 'E-4', 'F#4'])
         >>> gr6d.isGermanAugmentedSixth()
         False
-
         '''
         return self._isAugmentedSixthHelper(
             (4, 27, -1),
@@ -4000,7 +3992,6 @@ class Chord(ChordBase):
         ...     )
         >>> c1
         <music21.chord.Chord C2 E-2 G2 C3 E3 C#4 E#4>
-
         '''
         c2 = self.closedPosition(forceOctave=forceOctave,
                                  inPlace=inPlace,
@@ -4491,7 +4482,6 @@ class Chord(ChordBase):
         >>> a.transpose(aInterval, inPlace=True)
         >>> a
         <music21.chord.Chord C#4 E-3 G5>
-
         '''
         if hasattr(value, 'diatonic'):  # it is an Interval class
             intervalObj = value
@@ -4985,7 +4975,6 @@ class Chord(ChordBase):
 
         >>> chord.Chord(['d1', 'e4-', 'b3-'], quarterLength=2/3).fullName
         'Chord {D in octave 1 | E-flat in octave 4 | B-flat in octave 3} Quarter Triplet (2/3 QL)'
-
         '''
         msg = []
         sub = []
@@ -5823,7 +5812,6 @@ def fromForteClass(notation: str|Sequence[int]) -> Chord:
 
     >>> chord.fromForteClass((11, 1))
     <music21.chord.Chord C D- D E- E F G- G A- A B->
-
     '''
     card = None
     num = 1
@@ -5879,7 +5867,6 @@ def fromIntervalVector(notation: Sequence[int], getZRelation: bool = False) -> C
 
     >>> chord.fromIntervalVector((1, 1, 1, 1, 1, 1)).getZRelation()
     <music21.chord.Chord C D- E- G>
-
     '''
     addressList = None
     if common.isListLike(notation):

@@ -87,7 +87,6 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
     # for monophonic melodies
     # incomplete measures / pickups for monophonic melodies
-
     '''
     id = 'P22'
     name = 'Quality'
@@ -741,7 +740,6 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
      0.0, 0.0, 0.07..., 0.008...]
 
     Post 1990s music has a lot more semitone motion.
-
     '''
     id = 'CS12'
     name = 'Chord Bass Motion'
@@ -880,7 +878,6 @@ class LanguageFeature(featuresModule.FeatureExtractor):
     >>> fe = features.native.LanguageFeature(s)
     >>> fe.extract().vector
     [3]
-
     '''
     id = 'TX1'
     name = 'Language Feature'

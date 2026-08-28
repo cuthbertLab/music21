@@ -61,7 +61,6 @@ class SubConverter:
         codecWrite = True or False (default False) if encodings need to be used to write
         stringEncoding = string (default 'utf-8'). If codecWrite is True, this specifies what
             encoding to use
-
     '''
     readBinary: bool = False
     canBePickled: bool = True

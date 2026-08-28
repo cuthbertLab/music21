@@ -24,18 +24,18 @@ number of its own.
 '''
 
 shorthandNotation: dict[tuple[int|None, ...], tuple[int, ...]] = {
-                     (None,): (5, 3),
-                     (5,): (5, 3),
-                     (6,): (6, 3),
-                     (7,): (7, 5, 3),
-                     (9,): (9, 7, 5, 3),
-                     (11,): (11, 9, 7, 5, 3),
-                     (13,): (13, 11, 9, 7, 5, 3),
-                     (6, 5): (6, 5, 3),
-                     (4, 3): (6, 4, 3),
-                     (4, 2): (6, 4, 2),
-                     (2,): (6, 4, 2),
-                     }
+    (None,): (5, 3),
+    (5,): (5, 3),
+    (6,): (6, 3),
+    (7,): (7, 5, 3),
+    (9,): (9, 7, 5, 3),
+    (11,): (11, 9, 7, 5, 3),
+    (13,): (13, 11, 9, 7, 5, 3),
+    (6, 5): (6, 5, 3),
+    (4, 3): (6, 4, 3),
+    (4, 2): (6, 4, 2),
+    (2,): (6, 4, 2),
+}
 
 prefixes = ['+', '#', '++', '##']
 suffixes = ['\\']
@@ -641,7 +641,6 @@ class Modifier(prebase.ProtoM21Object):
 
     def _toAccidental(self) -> pitch.Accidental|None:
         '''
-
         >>> from music21.figuredBass import notation as n
         >>> m1 = n.Modifier('#')
         >>> m2 = n.Modifier('-')

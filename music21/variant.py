@@ -469,7 +469,9 @@ class Variant(base.Music21Object):
                 classes.append(e.classes[0])
             if classList is not None:
                 classes.extend(classList)
-            returnStream = contextStream.getElementsByOffset(vStart, vEnd,
+            returnStream = contextStream.getElementsByOffset(
+                vStart,
+                vEnd,
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
                 mustBeginInSpan=True,
@@ -483,12 +485,16 @@ class Variant(base.Music21Object):
                 classes.append(e.classes[0])
             if classList is not None:
                 classes.extend(classList)
-            returnPart1 = contextStream.getElementsByOffset(vStart, vMiddle,
+            returnPart1 = contextStream.getElementsByOffset(
+                vStart,
+                vMiddle,
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
                 mustBeginInSpan=True,
                 classList=classes).stream()
-            returnPart2 = contextStream.getElementsByOffset(vMiddle, vEnd,
+            returnPart2 = contextStream.getElementsByOffset(
+                vMiddle,
+                vEnd,
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
                 mustBeginInSpan=True).stream()
@@ -1327,7 +1333,6 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
         {0.0} <music21.note.Note F>
         {2.0} <music21.note.Note F>
     ...
-
     '''
     if inPlace:
         returnObj = mainPart
@@ -1588,7 +1593,6 @@ def refineVariant(s, sVariant, *, inPlace=False):
         {1.0} <music21.note.Note B>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note A>
-
     '''
     # stream that will be returned
     if sVariant not in s.getElementsByClass(Variant):
@@ -1682,7 +1686,6 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
     '''
     There seem to be some problems with this function, and it isn't well tested.
     It is not recommended to use it at this time.
-
     '''
     # stream that will be returned
     if inPlace:
@@ -1863,7 +1866,7 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
 
     # Check the added bar case:
     kList, kBadness = _getBestListAndScore(streamX, streamY, badnessDict, listDict,
-                            isNone=True, streamXIndex=streamXIndex, streamYIndex=streamYIndex + 1)
+                                           isNone=True, streamXIndex=streamXIndex, streamYIndex=streamYIndex + 1)
     if kList is None:
         kList = []
     if kList:
@@ -1922,7 +1925,6 @@ def _diffScore(measureX, measureY):
     >>> m2.append([note.Note('e'), note.Note('f'), note.Note('g#'), note.Note('a')])
     >>> variant._diffScore(m1, m2)
     0.4...
-
     '''
     hashes = getMeasureHashes([measureX, measureY])
     if hashes[0] == hashes[1]:
@@ -1957,7 +1959,6 @@ def _getRegionsFromStreams(streamX, streamY):
      ('replace', 1, 3, 1, 2),
      ('equal', 3, 6, 2, 5),
      ('insert', 6, 6, 5, 6)]
-
     '''
     hashesX = getMeasureHashes(streamX)
     hashesY = getMeasureHashes(streamY)
@@ -2170,7 +2171,6 @@ def _generateVariant(noteList, originStream, start, variantName=None):
 
     >>> v.groups
     ['paris']
-
     '''
     returnVariant = Variant()
     for n in noteList:
@@ -2230,7 +2230,6 @@ def makeAllVariantsReplacements(streamWithVariants,
     (4.0, 'replacement', 4.0, 4.0)
     (12.0, 'elongation', 4.0, 12.0)
     (20.0, 'deletion', 8.0, 4.0)
-
     '''
 
     if inPlace:
@@ -2433,23 +2432,25 @@ def _getNextElements(s, v, numberOfElements=1):
     # Get next element in s after v which is of type vClass
     if lengthType == 'elongation':
         variantOffset = v.getOffsetBySite(s)
-        potentialTargets = s.getElementsByOffset(variantOffset,
-                                                  offsetEnd=s.highestTime,
-                                                  includeEndBoundary=True,
-                                                  mustFinishInSpan=False,
-                                                  mustBeginInSpan=True,
-                                                  classList=[vClass])
+        potentialTargets = s.getElementsByOffset(
+            variantOffset,
+            offsetEnd=s.highestTime,
+            includeEndBoundary=True,
+            mustFinishInSpan=False,
+            mustBeginInSpan=True,
+            classList=[vClass])
         returnElement = potentialTargets.first()
 
     else:
         replacementDuration = v.replacementQuarterLength
         variantOffset = v.getOffsetBySite(s)
-        potentialTargets = s.getElementsByOffset(variantOffset + replacementDuration,
-                                                  offsetEnd=s.highestTime,
-                                                  includeEndBoundary=True,
-                                                  mustFinishInSpan=False,
-                                                  mustBeginInSpan=True,
-                                                  classList=[vClass])
+        potentialTargets = s.getElementsByOffset(
+            variantOffset + replacementDuration,
+            offsetEnd=s.highestTime,
+            includeEndBoundary=True,
+            mustFinishInSpan=False,
+            mustBeginInSpan=True,
+            classList=[vClass])
         returnElement = potentialTargets.first()
 
 
@@ -2535,12 +2536,13 @@ def makeVariantBlocks(s):
     for v in variantsToBeDone:
         startOffset = s.elementOffset(v)
         endOffset = v.replacementQuarterLength + startOffset
-        conflictingVariants = s.getElementsByOffset(offsetStart=startOffset,
-                                                    offsetEnd=endOffset,
-                                                    includeEndBoundary=False,
-                                                    mustFinishInSpan=False,
-                                                    mustBeginInSpan=True,
-                                                    classList=[Variant])
+        conflictingVariants = s.getElementsByOffset(
+            offsetStart=startOffset,
+            offsetEnd=endOffset,
+            includeEndBoundary=False,
+            mustFinishInSpan=False,
+            mustBeginInSpan=True,
+            classList=[Variant])
         for cV in conflictingVariants:
             oldReplacementDuration = cV.replacementQuarterLength
             if s.elementOffset(cV) == startOffset:
@@ -2650,19 +2652,19 @@ class Test(unittest.TestCase):
         # normal in-place variant functionality
         s.insert(5, v1)
         self.assertEqual(self.pitchOut(s.pitches),
-            '[G4, G4, G4, G4, G4, G4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sv = s.activateVariants(inPlace=False)
         self.assertEqual(self.pitchOut(sv.pitches),
-            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
         # test functionality on a deepcopy
         sCopy = copy.deepcopy(s)
         self.assertEqual(len(sCopy.getElementsByClass(Variant)), 1)
         self.assertEqual(self.pitchOut(sCopy.pitches),
-            '[G4, G4, G4, G4, G4, G4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)
         self.assertEqual(self.pitchOut(sCopy.pitches),
-            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
     def testDeepCopyVariantB(self):
         s = stream.Stream()
@@ -2678,11 +2680,11 @@ class Test(unittest.TestCase):
         sCopy = copy.deepcopy(s)
         sCopy.activateVariants(inPlace=True)
         self.assertEqual(self.pitchOut(sCopy.pitches),
-            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
         # can transpose the note in place
         sCopy.notes[5].transpose(12, inPlace=True)
         self.assertEqual(self.pitchOut(sCopy.pitches),
-            '[G4, G4, G4, G4, G4, F#5, A-4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, F#5, A-4, G4, G4]')
 
         # however, if the Variant deepcopy still references the original
         # notes it had, then when we try to activate the variant in the
@@ -2690,7 +2692,7 @@ class Test(unittest.TestCase):
 
         s.activateVariants(inPlace=True)
         self.assertEqual(self.pitchOut(s.pitches),
-            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 
 class TestExternal(unittest.TestCase):

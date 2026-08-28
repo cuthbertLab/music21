@@ -1761,7 +1761,6 @@ class Note(NotRest):
         {0.0} <music21.note.Note F#>
         {1.0} <music21.key.Key of b- minor>
         {1.0} <music21.note.Note G->
-
         '''
         from music21 import key
         if isinstance(value, interval.IntervalBase):

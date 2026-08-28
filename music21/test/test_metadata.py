@@ -430,7 +430,7 @@ class Test(unittest.TestCase):
                 # self.assertIsInstance isn't sufficient, apparently.
                 assert isinstance(itemNamespaceName, metadata.Contributor)
                 self.assertEqual(itemNamespaceName.role,
-                    contributorRole if contributorRole else uniqueName)
+                                 contributorRole if contributorRole else uniqueName)
 
     def testUniqueNameAccess(self):
         self.checkUniqueNamedItem('abstract', 'dcterms')

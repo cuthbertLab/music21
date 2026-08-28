@@ -266,7 +266,7 @@ class Test(unittest.TestCase):
         pList = [Pitch('f#3'), Pitch('f3'), Pitch('f#3'),
                  Pitch('g3'), Pitch('f#4'), Pitch('f#4')]
         result = [('sharp', False), ('natural', True), ('sharp', True),
-                   (None, None), ('sharp', True), ('sharp', False)]
+                  (None, None), ('sharp', True), ('sharp', False)]
         # no 4 is a dicey affair; could go either way
         ks = key.KeySignature(1)
         proc(pList, [], ks.alteredPitches)

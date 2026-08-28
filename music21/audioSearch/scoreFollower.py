@@ -120,7 +120,6 @@ class ScoreFollower:
         False
         >>> print(ScF.lastNotePosition)
         10
-
         '''
         from music21 import audioSearch
 
@@ -382,7 +381,6 @@ class ScoreFollower:
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
         >>> print(exitType)
         countdownExceeded
-
         '''
         exitType = False
 
@@ -462,7 +460,6 @@ class ScoreFollower:
         ...     totalLengthPeriod, totalSeconds)
         >>> print(predictedStartPosition)
         18
-
         '''
         extraLength = totalLengthPeriod * totalSeconds / self.seconds_recording
         middleRhythm = 0

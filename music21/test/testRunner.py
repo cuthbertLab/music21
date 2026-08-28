@@ -253,8 +253,8 @@ def mainTest(*testClasses, **keywords):
                 # search all names for case-insensitive match
                 for name in dir(tObj):
                     if (name.lower() == runThisTest.lower()
-                           or name.lower() == ('test' + runThisTest.lower())
-                           or name.lower() == ('xtest' + runThisTest.lower())):
+                            or name.lower() == ('test' + runThisTest.lower())
+                            or name.lower() == ('xtest' + runThisTest.lower())):
                         runThisTest = name
                         break
                 if hasattr(tObj, runThisTest):

@@ -316,7 +316,6 @@ def _getEqualityAttributes(cls) -> frozenset[str]:
     True
     >>> 'pitch' in base._getEqualityAttributes(bar.Barline)
     False
-
     '''
     equalityAttributes = set()
     # equalityAttributesIgnore works, but not yet needed.
@@ -2161,7 +2160,7 @@ class Music21Object(prebase.ProtoM21Object):
                     offsetAdjustedCsTuple = ContextSortTuple(
                         derivedCsTuple.site,
                         derivedCsTuple.offset.modify(offset=derivedCsTuple[1].offset
-                                                            + offsetAppend),
+                                                     + offsetAppend),
                         derivedCsTuple.recurseType)
                     if returnSortTuples:
                         yield offsetAdjustedCsTuple
@@ -2192,7 +2191,6 @@ class Music21Object(prebase.ProtoM21Object):
 
         TODO: make it so that it does not skip over multiple matching classes
         at the same offset. with sortTuple
-
         '''
         el = self.getContextByClass(className)
         while el is not None:
@@ -2771,7 +2769,7 @@ class Music21Object(prebase.ProtoM21Object):
             insertIndex = 0
 
         return SortTuple(atEnd, offset, self.priority,
-                          self.classSortOrder, isNotGrace, insertIndex)
+                         self.classSortOrder, isNotGrace, insertIndex)
 
     # -----------------------------------------------------------------
     @property
@@ -3505,7 +3503,6 @@ class Music21Object(prebase.ProtoM21Object):
         ('64th', 0, (<music21.duration.Tuplet 3/2/64th>,))
 
         TODO: unite this and other functions into a "split" function -- document obscure uses.
-
         '''
         atm = self.duration.aggregateTupletMultiplier()
         quarterLengthList = [opFrac(c.quarterLength * atm) for c in self.duration.components]

@@ -522,7 +522,6 @@ class TsvHandler:
     >>> out_stream = handler.toM21Stream()
     >>> out_stream.parts[0].measure(1)[roman.RomanNumeral][0].figure
     'I'
-
     '''
     def __init__(self, tsvFile: str|pathlib.Path, dcml_version: int = 1) -> None:
         if dcml_version == 1:
@@ -1135,7 +1134,6 @@ def getLocalKey(local_key: str, global_key: str, convertDCMLToM21: bool = False)
 
     >>> romanText.tsvConverter.getLocalKey('vii', 'a', convertDCMLToM21=True)
     'g'
-
     '''
     if convertDCMLToM21:
         local_key = characterSwaps(local_key, minor=isMinor(global_key[0]), direction='DCML-m21')

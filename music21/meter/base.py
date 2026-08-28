@@ -497,7 +497,6 @@ class TimeSignature(TimeSignatureBase):
     >>> another44 = meter.TimeSignature()  # '4/4' by default
     >>> one44 == another44
     True
-
     '''
     _styleClass = style.TextStyle
     classSortOrder = 4
@@ -1261,7 +1260,6 @@ class TimeSignature(TimeSignatureBase):
         >>> ts2._setDefaultAccentWeights(3)  # lower depth
         >>> [mt.weight for mt in ts2.accentSequence]
         [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]
-
         '''
         # NOTE: this is a performance critical method
         firstPartitionForm: MeterSequence|int|None

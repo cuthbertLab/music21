@@ -72,7 +72,6 @@ class Editorial(prebase.ProtoM21Object, dict):
 
     .. image:: images/noteEditorialFictaSharp.*
         :width: 103
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'comments': '''

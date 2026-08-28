@@ -1044,9 +1044,9 @@ w:first second third
         score = harmony.realizeChordSymbolDurations(score)
 
         self.assertEqual(8, score.getElementsByClass(harmony.ChordSymbol)
-                            .last().quarterLength)
+                         .last().quarterLength)
         self.assertEqual(4, score.getElementsByClass(harmony.ChordSymbol)
-                            .first().quarterLength)
+                         .first().quarterLength)
 
     def testAbcKeyImport(self):
         from music21 import abcFormat

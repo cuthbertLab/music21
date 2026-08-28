@@ -154,7 +154,6 @@ def removeDuplicates(thisStream: stream.Stream,
     >>> t = stream.tools.removeDuplicates(s, inPlace=False)
     >>> s.parts[0] == testInPlace
     True
-
     '''
 
     supportedClasses = (meter.TimeSignature, key.KeySignature, clef.Clef)

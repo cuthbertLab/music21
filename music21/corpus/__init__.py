@@ -109,7 +109,6 @@ def getCorePaths(
     >>> abcFilePaths = corpus.getCorePaths(fileExtensions=('abc',))
     >>> len(abcFilePaths) >= 100
     True
-
     '''
     return corpora.CoreCorpus().getPaths(
         fileExtensions=fileExtensions,
@@ -267,7 +266,6 @@ def noCorpus():
 
     >>> corpus.noCorpus()
     False
-
     '''
     return corpora.CoreCorpus().noCorpus
 

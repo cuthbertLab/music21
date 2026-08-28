@@ -985,7 +985,6 @@ class Metadata(base.Music21Object):
         >>> md[3] = ['180 minutes']
         Traceback (most recent call last):
         KeyError: 'metadata key must be str'
-
         '''
         if not isinstance(key, str):
             raise KeyError('metadata key must be str')
@@ -1990,7 +1989,6 @@ class Metadata(base.Music21Object):
 
         >>> md._isStandardUniqueName('ambitus')
         False
-
         '''
         return uniqueName in properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION
 
@@ -2498,7 +2496,6 @@ class RichMetadata(Metadata):
        Because RichMetadata is a Music21Object, `quarterLength` is a property that must
        return the length of the RichMetadata object itself and should not have been
        ovewritten
-
     '''
 
     # CLASS VARIABLES #
@@ -2566,7 +2563,6 @@ class RichMetadata(Metadata):
         >>> richMetadata.merge(md)
         >>> richMetadata.title
         'Concerto in F'
-
         '''
         # specifically name attributes to copy, as do not want to get all
         # Metadata is a m21 object

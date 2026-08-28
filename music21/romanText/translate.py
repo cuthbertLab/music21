@@ -548,7 +548,7 @@ class PartTranslator:
         '''
         p = self.p
         skipsPriorMeasures = ((measureLineToken.number[0] > self.lastMeasureNumber + 1)
-                               and (self.previousRn is not None))
+                              and (self.previousRn is not None))
         isSingleMeasureCopy = (len(measureLineToken.number) == 1
                                and measureLineToken.isCopyDefinition)
         isMultipleMeasureCopy = (len(measureLineToken.number) > 1)

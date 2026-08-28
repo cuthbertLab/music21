@@ -291,7 +291,6 @@ class TextBox(base.Music21Object):
 
     .. image:: images/textBoxes-01.*
         :width: 600
-
     '''
     _styleClass = style.TextStyle
     classSortOrder = -31  # text expressions are -30
@@ -417,7 +416,7 @@ class LanguageDetector:
         '''
         for languageCode in cls.languageCodes:
             thisExcerpt = (common.getSourceFilePath() / 'languageExcerpts'
-                            / 'trainingData' / (languageCode + '.txt'))
+                           / 'trainingData' / (languageCode + '.txt'))
 
             with thisExcerpt.open(encoding='utf-8') as f:
                 excerptWords = f.read().split()

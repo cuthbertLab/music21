@@ -739,7 +739,6 @@ class GraphColorGridLegend(Graph):
 
     .. image:: images/GraphColorGridLegend.*
         :width: 600
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
@@ -914,7 +913,6 @@ class GraphHorizontalBar(Graph):
     To make an equally spaced plot, like in a Pitch Space plot, leave empty data in the form:
 
         `('', [], {})`
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'barSpace': 'Amount of vertical space each bar takes; default 8',
@@ -1190,7 +1188,6 @@ class GraphScatterWeighted(Graph):
 
     .. image:: images/GraphScatterWeighted.*
         :width: 600
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'maxDiameter': 'the maximum diameter of any ellipse, default 1.25',

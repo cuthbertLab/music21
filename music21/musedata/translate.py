@@ -43,7 +43,6 @@ def _musedataBeamToBeams(beamSymbol):
 
     >>> translate._musedataBeamToBeams(r']/')  # must escape backslash
     <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>
-
     '''
     from music21 import beam
 
@@ -367,7 +366,7 @@ class Test(unittest.TestCase):
         from music21 import common
 
         fp1 = (common.getSourceFilePath()
-                           / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
+               / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
         mdw = musedata.MuseDataWork()
         mdw.addFile(fp1)
 

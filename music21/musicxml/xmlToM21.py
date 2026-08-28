@@ -899,7 +899,6 @@ class MusicXMLImporter(XMLParserBase):
         <score-part> entries into self.mxScorePartDict[partId]
         and adds them to any open <part-group> entries,
         stored as PartGroup objects in self.partGroupList
-
         '''
         mxPartList = mxScore.find('part-list')
         if mxPartList is None:
@@ -2246,8 +2245,8 @@ class PartParser(XMLParserBase):
             # If the measure is overfull by a "round" amount, assume that it was intended
             # otherwise it was likely the result of malformed MusicXML.
             if (diff > 0.5
-                  or nearestMultiple(diff, 0.0625)[1] < tol
-                  or nearestMultiple(diff, 1 / 12)[1] < tol):
+                    or nearestMultiple(diff, 0.0625)[1] < tol
+                    or nearestMultiple(diff, 1 / 12)[1] < tol):
                 mOffsetShift = mHighestTime
             else:
                 mOffsetShift = lastTimeSignatureQuarterLength
@@ -2336,7 +2335,6 @@ class PartParser(XMLParserBase):
         >>> pp.applyMultiMeasureRest(r3)
         >>> pp.stream.show('text')
         {0.0} <music21.spanner.MultiMeasureRest 2 measures>
-
         '''
         if self.activeMultiMeasureRestSpanner is None:
             return
@@ -5096,8 +5094,8 @@ class MeasureParser(XMLParserBase):
             useVoice = self.lastVoice
             if useVoice is None:  # pragma: no cover
                 warnings.warn('Cannot put in an element with a missing voice tag when '
-                    + 'no previous voice tag was given.  Assuming voice 1... ',
-                    MusicXMLWarning, stacklevel=2)
+                              + 'no previous voice tag was given.  Assuming voice 1... ',
+                              MusicXMLWarning, stacklevel=2)
                 useVoice = 1
 
         thisVoice: stream.Voice|None = None

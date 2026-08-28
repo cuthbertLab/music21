@@ -107,7 +107,6 @@ def convertTempoByReferent(
 
     >>> tempo.convertTempoByReferent(60, 1.5, common.opFrac(1/3))
     270.0
-
     '''
     # find duration in seconds of quarter length
     srcDurPerBeat = 60 / numberSrc
@@ -754,7 +753,6 @@ class MetronomeMark(TempoIndication):
 
         >>> mm1.getEquivalentByReferent('longa')
         <music21.tempo.MetronomeMark larghetto Imperfect Longa=3.75>
-
         '''
         if common.isNum(referent):  # assume quarter length
             quarterLength = referent
@@ -1157,7 +1155,6 @@ class MetricModulation(TempoIndication):
         <music21.tempo.MetricModulation
              <music21.tempo.MetronomeMark larghetto
                    Half=30>=<music21.tempo.MetronomeMark larghetto Quarter=60>>
-
         '''
         if side is None:
             if self._oldMetronome is None:

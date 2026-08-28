@@ -877,7 +877,6 @@ class CapellaImporter:
         >>> repeatTag = ci.domElementFromText('<barline type="repEndBegin"/>')
         >>> ci.barlineListFromBarline(repeatTag)
         [<music21.bar.Repeat direction=end>, <music21.bar.Repeat direction=start>]
-
         '''
         barlineList: list[bar.Barline] = []
         hasRepeatEnd = False

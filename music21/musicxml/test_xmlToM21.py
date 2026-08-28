@@ -813,7 +813,8 @@ class Test(unittest.TestCase):
     def testChordSymbolException(self):
         MP = MeasureParser()
         mxHarmony = self.EL('<harmony><root><root-step>A</root-step></root>'
-        '<degree><degree-value></degree-value><degree-type>add</degree-type></degree></harmony>')
+                            '<degree><degree-value></degree-value>'
+                            '<degree-type>add</degree-type></degree></harmony>')
         with self.assertRaisesRegex(MusicXMLImportException, 'degree-value missing'):
             MP.xmlToChordSymbol(mxHarmony)
 
@@ -1548,7 +1549,7 @@ class Test(unittest.TestCase):
         # TextExpression
         s = converter.parse(testPrimitive.textExpressions)
         positionedEls = [el for el in s.recurse() if el.hasStyleInformation
-            and el.style.relativeX is not None]
+                         and el.style.relativeX is not None]
         self.assertEqual(len(positionedEls), 3)
         self.assertEqual(
             list(set(type(el) for el in positionedEls)),
@@ -1558,7 +1559,7 @@ class Test(unittest.TestCase):
         # Wedge
         s = corpus.parse('beach')
         positionedEls = [el for el in s.recurse() if el.hasStyleInformation
-            and el.style.relativeX is not None]
+                         and el.style.relativeX is not None]
         self.assertEqual(len(positionedEls), 40)
         self.assertEqual(
             sorted(set(type(el) for el in positionedEls), key=repr),
@@ -1617,7 +1618,7 @@ class Test(unittest.TestCase):
         d = duration.Duration(2 / 3)
         self.assertEqual(len(d.tuplets), 1)
         mxNoteNoType = EL('<note><pitch><step>D</step><octave>6</octave></pitch>'
-                            '<duration>3</duration></note>')
+                          '<duration>3</duration></note>')
         MP.xmlToDuration(mxNoteNoType, inputM21=d)
         self.assertEqual(len(d.tuplets), 0)
         self.assertEqual(d.linked, True)

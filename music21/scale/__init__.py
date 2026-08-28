@@ -629,13 +629,13 @@ class AbstractScale(Scale):
         '''
         net = t.cast('intervalNetwork.IntervalNetwork', self._net)
         post = net.nextPitch(pitchReference=pitchReference,
-                                   nodeName=nodeName,
-                                   pitchOrigin=pitchOrigin,
-                                   direction=direction,
-                                   stepSize=stepSize,
-                                   alteredDegrees=self._alteredDegrees,
-                                   getNeighbor=getNeighbor
-                                   )
+                             nodeName=nodeName,
+                             pitchOrigin=pitchOrigin,
+                             direction=direction,
+                             stepSize=stepSize,
+                             alteredDegrees=self._alteredDegrees,
+                             getNeighbor=getNeighbor
+                             )
         return copy.deepcopy(post)
 
     def getNewTonicPitch(self,
@@ -1061,54 +1061,54 @@ class AbstractRagAsawari(AbstractScale):
         edges = (
             # ascending
             {'interval': 'M2',
-                 'connections': (
-                     [Terminus.LOW, 0, Direction.ASCENDING],  # c to d
-                 )},
+             'connections': (
+                 [Terminus.LOW, 0, Direction.ASCENDING],  # c to d
+             )},
             {'interval': 'm3',
-                 'connections': (
-                     [0, 1, Direction.ASCENDING],  # d to f
-                 )},
+             'connections': (
+                 [0, 1, Direction.ASCENDING],  # d to f
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [1, 2, Direction.ASCENDING],  # f to g
-                 )},
+             'connections': (
+                 [1, 2, Direction.ASCENDING],  # f to g
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [2, 3, Direction.ASCENDING],  # g to a-
-                 )},
+             'connections': (
+                 [2, 3, Direction.ASCENDING],  # g to a-
+             )},
             {'interval': 'M3',
-                 'connections': (
-                     [3, Terminus.HIGH, Direction.ASCENDING],  # a- to c
-                 )},
+             'connections': (
+                 [3, Terminus.HIGH, Direction.ASCENDING],  # a- to c
+             )},
             # descending
             {'interval': 'M2',
-                 'connections': (
-                     [Terminus.HIGH, 4, Direction.DESCENDING],  # c to b-
-                 )},
+             'connections': (
+                 [Terminus.HIGH, 4, Direction.DESCENDING],  # c to b-
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [4, 5, Direction.DESCENDING],  # b- to a-
-                 )},
+             'connections': (
+                 [4, 5, Direction.DESCENDING],  # b- to a-
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [5, 6, Direction.DESCENDING],  # a- to g
-                 )},
+             'connections': (
+                 [5, 6, Direction.DESCENDING],  # a- to g
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [6, 7, Direction.DESCENDING],  # g to f
-                 )},
+             'connections': (
+                 [6, 7, Direction.DESCENDING],  # g to f
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [7, 8, Direction.DESCENDING],  # f to e-
-                 )},
+             'connections': (
+                 [7, 8, Direction.DESCENDING],  # f to e-
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [8, 9, Direction.DESCENDING],  # e- to d
-                 )},
+             'connections': (
+                 [8, 9, Direction.DESCENDING],  # e- to d
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [9, Terminus.LOW, Direction.DESCENDING],  # d to c
-                 )},
+             'connections': (
+                 [9, Terminus.LOW, Direction.DESCENDING],  # d to c
+             )},
         )
 
         self._net = intervalNetwork.IntervalNetwork(
@@ -1231,33 +1231,33 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
         edges = (
             # all bidirectional
             {'interval': 'm3',
-                 'connections': (
-                     [Terminus.LOW, 0, Direction.BI],  # c to e-
-                 )},
+             'connections': (
+                 [Terminus.LOW, 0, Direction.BI],  # c to e-
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [0, 1, Direction.BI],  # e- to f
-                 )},
+             'connections': (
+                 [0, 1, Direction.BI],  # e- to f
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [1, 3, Direction.BI],  # f to g
-                 )},
+             'connections': (
+                 [1, 3, Direction.BI],  # f to g
+             )},
             {'interval': 'a1',
-                 'connections': (
-                     [1, 2, Direction.BI],  # f to f#
-                 )},
+             'connections': (
+                 [1, 2, Direction.BI],  # f to f#
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [2, 3, Direction.BI],  # f# to g
-                 )},
+             'connections': (
+                 [2, 3, Direction.BI],  # f# to g
+             )},
             {'interval': 'm3',
-                 'connections': (
-                     [3, 4, Direction.BI],  # g to b-
-                 )},
+             'connections': (
+                 [3, 4, Direction.BI],  # g to b-
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [4, Terminus.HIGH, Direction.BI],  # b- to c
-                 )},
+             'connections': (
+                 [4, Terminus.HIGH, Direction.BI],  # b- to c
+             )},
         )
 
         self._net = intervalNetwork.IntervalNetwork(
@@ -1992,45 +1992,45 @@ class ConcreteScale(Scale):
     # noinspection SpellCheckingInspection
     _solfegSyllables = {1: {-2: 'def',
                             -1: 'de',
-                             0: 'do',
-                             1: 'di',
-                             2: 'dis',
+                            0: 'do',
+                            1: 'di',
+                            2: 'dis',
                             },
                         2: {-2: 'raf',
                             -1: 'ra',
-                             0: 're',
-                             1: 'ri',
-                             2: 'ris',
+                            0: 're',
+                            1: 'ri',
+                            2: 'ris',
                             },
                         3: {-2: 'mef',
                             -1: 'me',
-                             0: 'mi',
-                             1: 'mis',
-                             2: 'mish',
+                            0: 'mi',
+                            1: 'mis',
+                            2: 'mish',
                             },
                         4: {-2: 'fef',
                             -1: 'fe',
-                             0: 'fa',
-                             1: 'fi',
-                             2: 'fis',
+                            0: 'fa',
+                            1: 'fi',
+                            2: 'fis',
                             },
                         5: {-2: 'sef',
                             -1: 'se',
-                             0: 'sol',
-                             1: 'si',
-                             2: 'sis',
+                            0: 'sol',
+                            1: 'si',
+                            2: 'sis',
                             },
                         6: {-2: 'lef',
                             -1: 'le',
-                             0: 'la',
-                             1: 'li',
-                             2: 'lis',
+                            0: 'la',
+                            1: 'li',
+                            2: 'lis',
                             },
                         7: {-2: 'tef',
                             -1: 'te',
-                             0: 'ti',
-                             1: 'tis',
-                             2: 'tish',
+                            0: 'ti',
+                            1: 'tis',
+                            2: 'tish',
                             },
                         }
     # TOO SLOW!
@@ -2042,45 +2042,45 @@ class ConcreteScale(Scale):
     _humdrumSolfegSyllables = {
         1: {-2: 'def',
             -1: 'de',
-             0: 'do',
-             1: 'di',
-             2: 'dis',
+            0: 'do',
+            1: 'di',
+            2: 'dis',
             },
         2: {-2: 'raf',
             -1: 'ra',
-             0: 're',
-             1: 'ri',
-             2: 'ris',
+            0: 're',
+            1: 'ri',
+            2: 'ris',
             },
         3: {-2: 'mef',
             -1: 'me',
-             0: 'mi',
-             1: 'my',
-             2: 'mish',
+            0: 'mi',
+            1: 'my',
+            2: 'mish',
             },
         4: {-2: 'fef',
             -1: 'fe',
-             0: 'fa',
-             1: 'fi',
-             2: 'fis',
+            0: 'fa',
+            1: 'fi',
+            2: 'fis',
             },
         5: {-2: 'sef',
             -1: 'se',
-             0: 'so',
-             1: 'si',
-             2: 'sis',
+            0: 'so',
+            1: 'si',
+            2: 'sis',
             },
         6: {-2: 'lef',
             -1: 'le',
-             0: 'la',
-             1: 'li',
-             2: 'lis',
+            0: 'la',
+            1: 'li',
+            2: 'lis',
             },
         7: {-2: 'tef',
             -1: 'te',
-             0: 'ti',
-             1: 'ty',
-             2: 'tish',
+            0: 'ti',
+            1: 'ty',
+            2: 'tish',
             },
     }
 

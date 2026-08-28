@@ -543,7 +543,7 @@ class Test(unittest.TestCase):
         t3Notes = stream.Stream()  # C B C B C D E F
         t3Notes.append(
             [t3n1, t3n2, deepcopy(t3n1), deepcopy(t3n2), deepcopy(t3n1),
-            nachschlagN1, nachschlagN2, nachschlagN3]
+             nachschlagN1, nachschlagN2, nachschlagN3]
         )
 
         testConditions.append(

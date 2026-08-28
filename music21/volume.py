@@ -231,7 +231,6 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> s.notes[7].volume.velocityIsRelative = False
         >>> s.notes[7].volume.getRealized()
         0.1574803...
-
         '''
         # velocityIsRelative might be best set at import. e.g., from MIDI,
         # velocityIsRelative is False, but in other applications, it may not

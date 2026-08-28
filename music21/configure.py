@@ -318,7 +318,6 @@ class Dialog:
 
     def appendPromptHeader(self, msg):
         '''
-
         >>> d = configure.Dialog()
         >>> d.appendPromptHeader('test')
         >>> d._promptHeader

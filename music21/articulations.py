@@ -219,7 +219,6 @@ class TimbreArticulation(Articulation):
 # ------------------------------------------------------------------------------
 class Accent(DynamicArticulation):
     '''
-
     >>> a = articulations.Accent()
     '''
     def __init__(self, **keywords):
@@ -246,7 +245,6 @@ class StrongAccent(Accent):
 
 class Staccato(LengthArticulation):
     '''
-
     >>> a = articulations.Staccato()
     '''
     def __init__(self, **keywords):

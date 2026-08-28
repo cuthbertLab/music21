@@ -392,8 +392,8 @@ def fromStream(s, *, layoutToBreaks=False):
                 continue
 
             if n.notehead == 'x' or (n.hasEditorialInformation
-                                      and 'liquescence' in n.editorial
-                                      and n.editorial.liquescence):
+                                     and 'liquescence' in n.editorial
+                                     and n.editorial.liquescence):
                 tokenName = liquescentPitches[indexInPitchString]
             else:
                 tokenName = normalPitches[indexInPitchString]

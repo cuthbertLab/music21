@@ -894,9 +894,9 @@ class Test(unittest.TestCase):
         e = d.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
         self.assertEqual(str(e),
                          ''.join(['[(3, <music21.scale.ConcreteScale F Concrete>), ',
-                                   '(3, <music21.scale.ConcreteScale E Concrete>), ',
-                                   '(2, <music21.scale.ConcreteScale B Concrete>), ',
-                                   '(2, <music21.scale.ConcreteScale A Concrete>)]']),
+                                  '(3, <music21.scale.ConcreteScale E Concrete>), ',
+                                  '(2, <music21.scale.ConcreteScale B Concrete>), ',
+                                  '(2, <music21.scale.ConcreteScale A Concrete>)]']),
                          str(e)
                          )
 

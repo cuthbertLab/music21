@@ -281,7 +281,6 @@ class Sites(common.SlottedObjectMixin):
         >>> aContexts.add(aObj)
         >>> len(aContexts)
         2
-
         '''
         return len(self.siteDict)
 
@@ -585,7 +584,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> aSites.getAttrByName('blah') is None
         True
-
         '''
         post = None
         for obj in self.yieldSites(sortByCreationTime='reverse'):
@@ -951,7 +949,6 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites.remove(aSite)
         >>> len(aSites)
         3
-
         '''
         # must clear
         self._lastID = -1  # cannot be None

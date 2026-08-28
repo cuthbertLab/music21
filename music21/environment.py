@@ -941,7 +941,6 @@ class Environment:
         'musicxmlPath'
         'pdfPath'
         'vectorPath'
-
         '''
         return envSingleton().getKeysToPaths()
 
