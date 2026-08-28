@@ -14,22 +14,6 @@ Aim for about 40% of the length an LLM writes by default. Cut qualifiers,
 restatements, and the sentence that explains the sentence before it. A comment
 earning its place says something the code cannot.
 
-## Prose
-
-**Lead with the thing itself.** "Returns the pitches sounding at an offset," not
-"This method can be used to obtain the pitches that are sounding."
-
-**Vary sentence length.** Three medium declaratives in a row is where the eye
-slides off the page. A short one lands.
-
-**Cut throat-clearing.** "It is important to note that," "Note that in general,"
-"This allows the user to." Start at the verb.
-
-**Humor is house style, not a lapse.** `Cannot determine sharps for quarter-tone
-keys! silly!` and "it'd wig me out if I ever didn't see them in reverse
-alphabetical order" are both shipping music21. A joke needing a second sentence
-to land is one sentence too long.
-
 ## Say what is, not what was or what not to do
 
 Describe current behavior. Do not narrate the bug you just fixed, the old
@@ -112,6 +96,9 @@ scramble "Chaminade", not "puppy". If you cannot think of a reason a musician wo
 Describe what a parameter is and does in English if it is not obvious; type alone is not
 documentation.
 
+Lead with the thing itself: "Returns the pitches sounding at an offset," not "This method
+can be used to obtain the pitches that are sounding."
+
 No dull repetition in docs. A bit of humor is welcome in docs; the docs are written
 for humans who will close the window if they are dull.  If seven methods do essentially the same thing, give extensive docs the first time and then later methods can refer back to the first method. Don't repeat the same docs over and over.
 
@@ -153,5 +140,7 @@ comments in shipping code, not to tests.
 - When wording is dictated to the agent to substitute for original wording, use it. Do not add parentheticals. Only fix obvious typos.
 - No weapon-metaphors or overly militaristic language. Avoid "blast radius", "rearm", "landmine",
      "detonate" in issues/PR/code.  Trigger or fire events is so commonly used that they're okay.
+- Vary sentence length; three medium declaratives in a row is where the eye slides off the page. Cut throat-clearing — "It is important to note that", "Note that in general" — and start at the verb.
+- A joke needing a second sentence to land is one sentence too long. `Cannot determine sharps for quarter-tone keys! silly!` is the register.
 
 
