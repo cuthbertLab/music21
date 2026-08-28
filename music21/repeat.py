@@ -2214,7 +2214,7 @@ class RepeatFinder:
             # we have a repeated section at least 2 measures in length;
             # check to see how far it goes
             nextOne = self._getSimilarMeasuresHelper(measures, source + 1, compare + 1,
-                                                      resDict, useDict)
+                                                     resDict, useDict)
             # make sure we don't have overlap
             res = ([source], [compare])
             res[0].extend(nextOne[0])

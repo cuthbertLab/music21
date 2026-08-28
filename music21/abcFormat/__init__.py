@@ -2505,13 +2505,15 @@ class ABCHandler:
                 # v is up bow; might be: "^Segno"v which also should be dropped
                 # H is fermata
                 # . dot may be staccato, but should be attached to pitch
-                if self.currentCollectStr in ('w', 'u', 'v', 'v.', 'h', 'H', 'vk',
-                                              'uk', 'U', '~',
-                                              '.', '=', 'V', 'v.', 'S', 's',
-                                              'i', 'I', 'ui', 'u.', 'Q', 'Hy', 'Hx',
-                                              'r', 'm', 'M', 'n', 'N', 'o', 'O', 'P',
-                                              'l', 'L', 'R',
-                                              'y', 'T', 't', 'x', 'Z'):
+                if self.currentCollectStr in (
+                    'w', 'u', 'v', 'v.', 'h', 'H', 'vk',
+                    'uk', 'U', '~',
+                    '.', '=', 'V', 'v.', 'S', 's',
+                    'i', 'I', 'ui', 'u.', 'Q', 'Hy', 'Hx',
+                    'r', 'm', 'M', 'n', 'N', 'o', 'O', 'P',
+                    'l', 'L', 'R',
+                    'y', 'T', 't', 'x', 'Z',
+                ):
                     pass
                 # these are bad chords, or other problematic notations like
                 # "D.C."x
