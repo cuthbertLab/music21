@@ -1047,7 +1047,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].measure(7).notes), 6)
 
     def x_testSimplePickle(self):
-        from music21 import freezeThaw
         from music21 import corpus
 
         c = corpus.parse('bwv66.6').parts[0].measure(0).notes
@@ -1061,7 +1060,7 @@ class Test(unittest.TestCase):
 
         n1 = c[0]
         n2 = c[1]
-        sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
+        sf = StreamFreezer(c, fastButUnsafe=True)
         sf.setupSerializationScaffold()
         for dummy in n1.sites.siteDict:
             pass
@@ -1088,17 +1087,16 @@ class Test(unittest.TestCase):
         # s.show('t')
 
     def x_testFreezeThawPickle(self):
-        from music21 import freezeThaw
         from music21 import corpus
 
         c = corpus.parse('luca/gloria')
         # c.show('t')
 
-        sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
+        sf = StreamFreezer(c, fastButUnsafe=True)
         d = sf.writeStr()
         # print(d)
 
-        st = freezeThaw.StreamThawer()
+        st = StreamThawer()
         st.openStr(d)
         s = st.stream
 
@@ -1107,7 +1105,6 @@ class Test(unittest.TestCase):
             pass
 
     def testFreezeThawSimpleVariant(self):
-        from music21 import freezeThaw
         from music21 import stream
         from music21 import note
 
@@ -1126,15 +1123,14 @@ class Test(unittest.TestCase):
 
         s.insert(0, v)
 
-        sf = freezeThaw.StreamFreezer(s)
+        sf = StreamFreezer(s)
         d = sf.writeStr()
 
-        st = freezeThaw.StreamThawer()
+        st = StreamThawer()
         st.openStr(d)
         s = st.stream
 
     def testFreezeThawVariant(self):
-        from music21 import freezeThaw
         from music21 import corpus
         from music21 import stream
         from music21 import note
@@ -1156,14 +1152,14 @@ class Test(unittest.TestCase):
         # test Variant is in stream
         unused_v1 = c.parts.first().getElementsByClass(variant.Variant).first()
 
-        sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
+        sf = StreamFreezer(c, fastButUnsafe=True)
         # sf.v = v
         d = sf.writeStr()
         # print(d)
 
         # print('thawing.')
 
-        st = freezeThaw.StreamThawer()
+        st = StreamThawer()
         st.openStr(d)
         s = st.stream
         # s.show('lily.pdf')
@@ -1176,7 +1172,6 @@ class Test(unittest.TestCase):
     def testSerializationScaffoldA(self):
         from music21 import note
         from music21 import stream
-        from music21 import freezeThaw
 
         n1 = note.Note()
 
@@ -1186,7 +1181,7 @@ class Test(unittest.TestCase):
         s1.append(n1)
         s2.append(n1)
 
-        sf = freezeThaw.StreamFreezer(s2, fastButUnsafe=False)
+        sf = StreamFreezer(s2, fastButUnsafe=False)
         sf.setupSerializationScaffold()
 
         # test safety

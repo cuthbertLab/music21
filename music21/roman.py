@@ -4332,9 +4332,8 @@ class Test(unittest.TestCase):
                     c.remove(e)
 
     def testScaleDegreesA(self):
-        from music21 import roman
         k = key.Key('f#')  # 3-sharps minor
-        rn = roman.RomanNumeral('V', k)
+        rn = RomanNumeral('V', k)
         self.assertEqual(str(rn.key), 'f# minor')
         self.assertEqual(
             str(rn.pitches),
@@ -4348,8 +4347,7 @@ class Test(unittest.TestCase):
         )
 
     def testNeapolitanAndHalfDiminished(self):
-        from music21 import roman
-        alteredChordHalfDim3rdInv = roman.RomanNumeral(
+        alteredChordHalfDim3rdInv = RomanNumeral(
             'bii/o42', scale.MajorScale('F'))
         self.assertEqual(
             [str(p) for p in alteredChordHalfDim3rdInv.pitches],
@@ -4361,162 +4359,157 @@ class Test(unittest.TestCase):
         self.assertEqual(cn, 'half-diminished seventh chord')
 
     def testOmittedFifth(self):
-        from music21 import roman
         c = chord.Chord('A3 E-4 G-4')
         k = key.Key('b-')
-        rnDim7 = roman.romanNumeralFromChord(c, k)
+        rnDim7 = romanNumeralFromChord(c, k)
         self.assertEqual(rnDim7.figure, 'viio7')
 
     def testAllFormsOfVII(self):
-        from music21 import roman
-
         def p(c):
             return ' '.join([x.nameWithOctave for x in c.pitches])
 
         k = key.Key('c')
-        rn = roman.RomanNumeral('viio', k)
+        rn = RomanNumeral('viio', k)
         self.assertEqual(p(rn), 'B4 D5 F5')
-        rn = roman.RomanNumeral('viio6', k)
+        rn = RomanNumeral('viio6', k)
         self.assertEqual(p(rn), 'D4 F4 B4')
-        rn = roman.RomanNumeral('viio64', k)
+        rn = RomanNumeral('viio64', k)
         self.assertEqual(p(rn), 'F4 B4 D5')
 
-        rn = roman.RomanNumeral('vii', k)
+        rn = RomanNumeral('vii', k)
         self.assertEqual(p(rn), 'B4 D5 F#5')
-        rn = roman.RomanNumeral('vii6', k)
+        rn = RomanNumeral('vii6', k)
         self.assertEqual(p(rn), 'D4 F#4 B4')
-        rn = roman.RomanNumeral('vii64', k)
+        rn = RomanNumeral('vii64', k)
         self.assertEqual(p(rn), 'F#4 B4 D5')
 
-        rn = roman.RomanNumeral('viio7', k)
+        rn = RomanNumeral('viio7', k)
         self.assertEqual(p(rn), 'B4 D5 F5 A-5')
-        rn = roman.RomanNumeral('viio65', k)
+        rn = RomanNumeral('viio65', k)
         self.assertEqual(p(rn), 'D4 F4 A-4 B4')
-        rn = roman.RomanNumeral('viio43', k)
+        rn = RomanNumeral('viio43', k)
         self.assertEqual(p(rn), 'F4 A-4 B4 D5')
-        rn = roman.RomanNumeral('viio42', k)
+        rn = RomanNumeral('viio42', k)
         self.assertEqual(p(rn), 'A-4 B4 D5 F5')
 
-        rn = roman.RomanNumeral('vii/o7', k)
+        rn = RomanNumeral('vii/o7', k)
         self.assertEqual(p(rn), 'B4 D5 F5 A5')
         # noinspection SpellCheckingInspection
-        rn = roman.RomanNumeral('viiø65', k)
+        rn = RomanNumeral('viiø65', k)
         self.assertEqual(p(rn), 'D4 F4 A4 B4')
         # noinspection SpellCheckingInspection
-        rn = roman.RomanNumeral('viiø43', k)
+        rn = RomanNumeral('viiø43', k)
         self.assertEqual(p(rn), 'F4 A4 B4 D5')
-        rn = roman.RomanNumeral('vii/o42', k)
+        rn = RomanNumeral('vii/o42', k)
         self.assertEqual(p(rn), 'A4 B4 D5 F5')
 
-        rn = roman.RomanNumeral('VII', k)
+        rn = RomanNumeral('VII', k)
         self.assertEqual(p(rn), 'B-4 D5 F5')
-        rn = roman.RomanNumeral('VII6', k)
+        rn = RomanNumeral('VII6', k)
         self.assertEqual(p(rn), 'D4 F4 B-4')
-        rn = roman.RomanNumeral('VII64', k)
+        rn = RomanNumeral('VII64', k)
         self.assertEqual(p(rn), 'F4 B-4 D5')
 
-        rn = roman.RomanNumeral('bVII', k)
+        rn = RomanNumeral('bVII', k)
         self.assertEqual(p(rn), 'B--4 D-5 F-5')
-        rn = roman.RomanNumeral('bVII6', k)
+        rn = RomanNumeral('bVII6', k)
         self.assertEqual(p(rn), 'D-4 F-4 B--4')
-        rn = roman.RomanNumeral('bVII64', k)
+        rn = RomanNumeral('bVII64', k)
         self.assertEqual(p(rn), 'F-4 B--4 D-5')
 
-        rn = roman.RomanNumeral('bvii', k)
+        rn = RomanNumeral('bvii', k)
         self.assertEqual(p(rn), 'B-4 D-5 F5')
-        rn = roman.RomanNumeral('bvii6', k)
+        rn = RomanNumeral('bvii6', k)
         self.assertEqual(p(rn), 'D-4 F4 B-4')
-        rn = roman.RomanNumeral('bvii64', k)
+        rn = RomanNumeral('bvii64', k)
         self.assertEqual(p(rn), 'F4 B-4 D-5')
 
-        rn = roman.RomanNumeral('bviio', k)
+        rn = RomanNumeral('bviio', k)
         self.assertEqual(p(rn), 'B-4 D-5 F-5')
-        rn = roman.RomanNumeral('bviio6', k)
+        rn = RomanNumeral('bviio6', k)
         self.assertEqual(p(rn), 'D-4 F-4 B-4')
-        rn = roman.RomanNumeral('bviio64', k)
+        rn = RomanNumeral('bviio64', k)
         self.assertEqual(p(rn), 'F-4 B-4 D-5')
 
-        rn = roman.RomanNumeral('#VII', k)
+        rn = RomanNumeral('#VII', k)
         self.assertEqual(p(rn), 'B4 D#5 F#5')
-        rn = roman.RomanNumeral('#vii', k)
+        rn = RomanNumeral('#vii', k)
         self.assertEqual(p(rn), 'B#4 D#5 F##5')
 
-        rn = roman.RomanNumeral('VII+', k)
+        rn = RomanNumeral('VII+', k)
         self.assertEqual(p(rn), 'B-4 D5 F#5')
 
     def testAllFormsOfVI(self):
-        from music21 import roman
-
         def p(c):
             return ' '.join([x.nameWithOctave for x in c.pitches])
 
         k = key.Key('c')
-        rn = roman.RomanNumeral('vio', k)
+        rn = RomanNumeral('vio', k)
         self.assertEqual(p(rn), 'A4 C5 E-5')
-        rn = roman.RomanNumeral('vio6', k)
+        rn = RomanNumeral('vio6', k)
         self.assertEqual(p(rn), 'C4 E-4 A4')
-        rn = roman.RomanNumeral('vio64', k)
+        rn = RomanNumeral('vio64', k)
         self.assertEqual(p(rn), 'E-4 A4 C5')
 
-        rn = roman.RomanNumeral('vi', k)
+        rn = RomanNumeral('vi', k)
         self.assertEqual(p(rn), 'A4 C5 E5')
-        rn = roman.RomanNumeral('vi6', k)
+        rn = RomanNumeral('vi6', k)
         self.assertEqual(p(rn), 'C4 E4 A4')
-        rn = roman.RomanNumeral('vi64', k)
+        rn = RomanNumeral('vi64', k)
         self.assertEqual(p(rn), 'E4 A4 C5')
 
-        rn = roman.RomanNumeral('vio7', k)
+        rn = RomanNumeral('vio7', k)
         self.assertEqual(p(rn), 'A4 C5 E-5 G-5')
-        rn = roman.RomanNumeral('vio65', k)
+        rn = RomanNumeral('vio65', k)
         self.assertEqual(p(rn), 'C4 E-4 G-4 A4')
-        rn = roman.RomanNumeral('vio43', k)
+        rn = RomanNumeral('vio43', k)
         self.assertEqual(p(rn), 'E-4 G-4 A4 C5')
-        rn = roman.RomanNumeral('vio42', k)
+        rn = RomanNumeral('vio42', k)
         self.assertEqual(p(rn), 'G-4 A4 C5 E-5')
 
-        rn = roman.RomanNumeral('viø7', k)
+        rn = RomanNumeral('viø7', k)
         self.assertEqual(p(rn), 'A4 C5 E-5 G5')
-        rn = roman.RomanNumeral('vi/o65', k)
+        rn = RomanNumeral('vi/o65', k)
         self.assertEqual(p(rn), 'C4 E-4 G4 A4')
-        rn = roman.RomanNumeral('vi/o43', k)
+        rn = RomanNumeral('vi/o43', k)
         self.assertEqual(p(rn), 'E-4 G4 A4 C5')
-        rn = roman.RomanNumeral('viø42', k)
+        rn = RomanNumeral('viø42', k)
         self.assertEqual(p(rn), 'G4 A4 C5 E-5')
 
-        rn = roman.RomanNumeral('VI', k)
+        rn = RomanNumeral('VI', k)
         self.assertEqual(p(rn), 'A-4 C5 E-5')
-        rn = roman.RomanNumeral('VI6', k)
+        rn = RomanNumeral('VI6', k)
         self.assertEqual(p(rn), 'C4 E-4 A-4')
-        rn = roman.RomanNumeral('VI64', k)
+        rn = RomanNumeral('VI64', k)
         self.assertEqual(p(rn), 'E-4 A-4 C5')
 
-        rn = roman.RomanNumeral('bVI', k)
+        rn = RomanNumeral('bVI', k)
         self.assertEqual(p(rn), 'A--4 C-5 E--5')
-        rn = roman.RomanNumeral('bVI6', k)
+        rn = RomanNumeral('bVI6', k)
         self.assertEqual(p(rn), 'C-4 E--4 A--4')
-        rn = roman.RomanNumeral('bVI64', k)
+        rn = RomanNumeral('bVI64', k)
         self.assertEqual(p(rn), 'E--4 A--4 C-5')
 
-        rn = roman.RomanNumeral('bvi', k)
+        rn = RomanNumeral('bvi', k)
         self.assertEqual(p(rn), 'A-4 C-5 E-5')
-        rn = roman.RomanNumeral('bvi6', k)
+        rn = RomanNumeral('bvi6', k)
         self.assertEqual(p(rn), 'C-4 E-4 A-4')
-        rn = roman.RomanNumeral('bvi64', k)
+        rn = RomanNumeral('bvi64', k)
         self.assertEqual(p(rn), 'E-4 A-4 C-5')
 
-        rn = roman.RomanNumeral('bvio', k)
+        rn = RomanNumeral('bvio', k)
         self.assertEqual(p(rn), 'A-4 C-5 E--5')
-        rn = roman.RomanNumeral('bvio6', k)
+        rn = RomanNumeral('bvio6', k)
         self.assertEqual(p(rn), 'C-4 E--4 A-4')
-        rn = roman.RomanNumeral('bvio64', k)
+        rn = RomanNumeral('bvio64', k)
         self.assertEqual(p(rn), 'E--4 A-4 C-5')
 
-        rn = roman.RomanNumeral('#VI', k)
+        rn = RomanNumeral('#VI', k)
         self.assertEqual(p(rn), 'A4 C#5 E5')
-        rn = roman.RomanNumeral('#vi', k)
+        rn = RomanNumeral('#vi', k)
         self.assertEqual(p(rn), 'A#4 C#5 E#5')
 
-        rn = roman.RomanNumeral('VI+', k)
+        rn = RomanNumeral('VI+', k)
         self.assertEqual(p(rn), 'A-4 C5 E5')
 
     def testRomanNumeralFromChordRaised67(self):
@@ -4529,8 +4522,6 @@ class Test(unittest.TestCase):
 
         This test was AI-assisted (Claude).
         '''
-        from music21 import roman
-
         k = key.Key('c')
         for pitchNames, expectedFigure, expectedRN in [
             (('A-4', 'C5', 'E-5'), 'bVI', 'VI'),
@@ -4545,16 +4536,16 @@ class Test(unittest.TestCase):
         ]:
             with self.subTest(pitches=pitchNames):
                 c = chord.Chord(pitchNames)
-                rn = roman.romanNumeralFromChord(c, k)
+                rn = romanNumeralFromChord(c, k)
                 self.assertEqual(rn.figure, expectedFigure)
                 self.assertEqual(rn.romanNumeral, expectedRN)
                 # the figure must round-trip to the same pitch names under
                 # the convention that romanNumeralFromChord itself uses.
-                roundTrip = roman.RomanNumeral(
+                roundTrip = RomanNumeral(
                     rn.figure,
                     k,
-                    sixthMinor=roman.Minor67Default.CAUTIONARY,
-                    seventhMinor=roman.Minor67Default.CAUTIONARY,
+                    sixthMinor=Minor67Default.CAUTIONARY,
+                    seventhMinor=Minor67Default.CAUTIONARY,
                 )
                 self.assertEqual(
                     [p_.name for p_ in roundTrip.pitches],
@@ -4562,8 +4553,6 @@ class Test(unittest.TestCase):
                 )
 
     def testAugmented(self):
-        from music21 import roman
-
         def p(c):
             return ' '.join([x.nameWithOctave for x in c.pitches])
 
@@ -4573,7 +4562,7 @@ class Test(unittest.TestCase):
                     for kStr in (key_in, key_in.upper()):
                         key_obj = key.Key(kStr)
                         rn_str = country + with_plus + figure
-                        rn = roman.RomanNumeral(rn_str, key_obj)
+                        rn = RomanNumeral(rn_str, key_obj)
                         self.assertEqual(p(rn), result)
 
 
@@ -4640,14 +4629,13 @@ class Test(unittest.TestCase):
         self.assertEqual(sharp_four.pitches, pitches_before)
 
     def testZeroForDiminished(self):
-        from music21 import roman
-        rn = roman.RomanNumeral('vii07', 'c')
+        rn = RomanNumeral('vii07', 'c')
         self.assertEqual([p.name for p in rn.pitches], ['B', 'D', 'F', 'A-'])
-        rn = roman.RomanNumeral('vii/07', 'c')
+        rn = RomanNumeral('vii/07', 'c')
         self.assertEqual([p.name for p in rn.pitches], ['B', 'D', 'F', 'A'])
         # However, when there is a '10' somewhere in the figure, don't replace
         #   the 0 (this occurs in DCML corpora)
-        rn = roman.RomanNumeral('V7[add10]', 'c')
+        rn = RomanNumeral('V7[add10]', 'c')
         self.assertEqual([p.name for p in rn.pitches], ['G', 'B-', 'B', 'D', 'F'])
 
     def testIII7(self):

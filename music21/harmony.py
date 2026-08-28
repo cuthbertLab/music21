@@ -2634,8 +2634,7 @@ def realizeChordSymbolDurations(piece):
 class Test(unittest.TestCase):
 
     def testChordAttributes(self):
-        from music21 import harmony
-        cs = harmony.ChordSymbol('Cm')
+        cs = ChordSymbol('Cm')
         self.assertEqual(str(cs), '<music21.harmony.ChordSymbol Cm>')
         self.assertEqual(
             str(cs.pitches),
@@ -2644,15 +2643,13 @@ class Test(unittest.TestCase):
         self.assertTrue(cs.isConsonant())
 
     def testBasic(self):
-        from music21 import harmony
-        h = harmony.Harmony()
-        hd = harmony.ChordStepModification('add', 4)
+        h = Harmony()
+        hd = ChordStepModification('add', 4)
         h.addChordStepModification(hd)
         self.assertEqual(len(h.chordStepModifications), 1)
 
     def testChordKindSetting(self):
-        from music21 import harmony
-        cs = harmony.ChordSymbol()
+        cs = ChordSymbol()
         cs.root('E-')
         cs.bass('B-', allow_add=True)
         cs.inversion(2, transposeOnSet=False)
@@ -2717,38 +2714,37 @@ class Test(unittest.TestCase):
         self.assertIs(n.getContextByClass('ChordSymbol'), cs)
 
     def testNoChord(self):
-        from music21 import harmony
-        nc = harmony.NoChord()
+        nc = NoChord()
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('N.C.', nc.chordKindStr)
         self.assertEqual('N.C.', nc.figure)
 
-        nc = harmony.NoChord('NC')
+        nc = NoChord('NC')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('NC', nc.chordKindStr)
         self.assertEqual('NC', nc.figure)
 
-        nc = harmony.NoChord('None')
+        nc = NoChord('None')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('None', nc.chordKindStr)
         self.assertEqual('None', nc.figure)
 
-        nc = harmony.NoChord(kind='none')
+        nc = NoChord(kind='none')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('N.C.', nc.chordKindStr)
         self.assertEqual('N.C.', nc.figure)
 
-        nc = harmony.NoChord(kindStr='No Chord')
+        nc = NoChord(kindStr='No Chord')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('No Chord', nc.chordKindStr)
         self.assertEqual('No Chord', nc.figure)
 
-        nc = harmony.NoChord('NC', kindStr='No Chord')
+        nc = NoChord('NC', kindStr='No Chord')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('No Chord', nc.chordKindStr)
         self.assertEqual('NC', nc.figure)
 
-        nc = harmony.NoChord(root='C', bass='E', kind='none')
+        nc = NoChord(root='C', bass='E', kind='none')
         self.assertEqual('N.C.', nc.chordKindStr)
         self.assertEqual('N.C.', nc.figure)
 
@@ -2761,9 +2757,8 @@ class Test(unittest.TestCase):
         self.assertEqual(0, len(nc.pitches))
 
     def testInvalidRoots(self):
-        from music21 import harmony
         with self.assertRaises(ValueError) as context:
-            harmony.ChordSymbol('H-7')
+            ChordSymbol('H-7')
 
         self.assertEqual(
             str(context.exception),
@@ -2772,7 +2767,7 @@ class Test(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             # noinspection SpellCheckingInspection
-            harmony.ChordSymbol('Garg7')
+            ChordSymbol('Garg7')
 
         self.assertEqual(
             str(context.exception),
@@ -2782,9 +2777,8 @@ class Test(unittest.TestCase):
         )
 
     def testInvalidSymbol(self):
-        from music21 import harmony
         c = chord.Chord(('A#', 'C', 'E'))
-        cs = harmony.chordSymbolFromChord(c)
+        cs = chordSymbolFromChord(c)
         self.assertEqual(cs.figure, 'Chord Symbol Cannot Be Identified')
 
     def testRegexEdgeCases(self):
@@ -3257,15 +3251,14 @@ class Test(unittest.TestCase):
 class TestExternal(unittest.TestCase):
 
     def testReadInXML(self):
-        from music21 import harmony
         from music21 import corpus
         from music21 import stream
         testFile = corpus.parse('leadSheet/fosterBrownHair.xml')
 
         # testFile.show('text')
-        testFile = harmony.realizeChordSymbolDurations(testFile)
+        testFile = realizeChordSymbolDurations(testFile)
         # testFile.show()
-        chordSymbols = testFile.flatten().getElementsByClass(harmony.ChordSymbol)
+        chordSymbols = testFile.flatten().getElementsByClass(ChordSymbol)
         s = stream.Stream()
 
         for cS in chordSymbols:
@@ -3277,7 +3270,6 @@ class TestExternal(unittest.TestCase):
         # self.assertEqual(len(csChords), 40)
 
     def testChordRealization(self):
-        from music21 import harmony
         from music21 import corpus
         from music21 import note
         from music21 import stream
@@ -3288,8 +3280,8 @@ class TestExternal(unittest.TestCase):
         # tests, and adjust 57 accordingly
         testFile = corpus.parse('demos/ComprehensiveChordSymbolsTestFile.xml')
 
-        testFile = harmony.realizeChordSymbolDurations(testFile)
-        chords = testFile.flatten().getElementsByClass(harmony.ChordSymbol)
+        testFile = realizeChordSymbolDurations(testFile)
+        chords = testFile.flatten().getElementsByClass(ChordSymbol)
         # testFile.show()
         s = stream.Stream()
         # i = 0

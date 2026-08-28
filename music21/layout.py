@@ -1660,9 +1660,8 @@ class Test(unittest.TestCase):
         We have had problems with attributes disappearing.
         '''
         from music21 import corpus
-        from music21 import layout
         lt = corpus.parse('demos/layoutTest.xml')
-        ls = layout.divideByPages(lt, fastMeasures=True)
+        ls = divideByPages(lt, fastMeasures=True)
 
         hiddenStaff = ls.pages[0].systems[3].staves[1]
         self.assertTrue(repr(hiddenStaff).endswith('Staff 11: p.1, sys.4, st.2>'),

@@ -1141,8 +1141,7 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testB(self) -> None:
-        from music21.romanText import clercqTemperley
-        s = clercqTemperley.CTSong(BlitzkriegBopCT)
+        s = CTSong(BlitzkriegBopCT)
         partObj = s.toPart()
         if self.show:
             partObj.show()

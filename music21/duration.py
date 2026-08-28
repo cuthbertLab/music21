@@ -3915,16 +3915,14 @@ class Test(unittest.TestCase):
                          "DurationTuple(type='16th', dots=0, quarterLength=0.25)")
 
     def testUnlinkedTypeA(self):
-        from music21 import duration
-
-        du = duration.Duration()
+        du = Duration()
         du.linked = False
         du.quarterLength = 5.0
         du.type = 'quarter'
         self.assertEqual(du.quarterLength, 5.0)
         self.assertEqual(du.type, 'quarter')
 
-        d = duration.Duration()
+        d = Duration()
         self.assertTrue(d.linked)  # note set
         d.linked = False
         d.type = 'quarter'

@@ -2530,8 +2530,7 @@ def makeVariantBlocks(s):
     '''
     Unknown and undocumented.  Used only in lily/translate -- for musicdiff.
     '''
-    from music21 import variant
-    variantsToBeDone = s.getElementsByClass(variant.Variant)
+    variantsToBeDone = s.getElementsByClass(Variant)
 
     for v in variantsToBeDone:
         startOffset = s.elementOffset(v)
@@ -2541,7 +2540,7 @@ def makeVariantBlocks(s):
                                                     includeEndBoundary=False,
                                                     mustFinishInSpan=False,
                                                     mustBeginInSpan=True,
-                                                    classList=[variant.Variant])
+                                                    classList=[Variant])
         for cV in conflictingVariants:
             oldReplacementDuration = cV.replacementQuarterLength
             if s.elementOffset(cV) == startOffset:
@@ -2633,14 +2632,12 @@ class Test(unittest.TestCase):
         self.assertTrue(v1.getElementsByClass(stream.Measure))
 
     def testDeepCopyVariantA(self):
-        from music21 import variant
-
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
 
-        v1 = variant.Variant()
+        v1 = Variant()
         v1.insert(0, vn1)
         v1.insert(0, vn2)
         v1Copy = copy.deepcopy(v1)
@@ -2660,7 +2657,7 @@ class Test(unittest.TestCase):
 
         # test functionality on a deepcopy
         sCopy = copy.deepcopy(s)
-        self.assertEqual(len(sCopy.getElementsByClass(variant.Variant)), 1)
+        self.assertEqual(len(sCopy.getElementsByClass(Variant)), 1)
         self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)
@@ -2668,13 +2665,11 @@ class Test(unittest.TestCase):
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
     def testDeepCopyVariantB(self):
-        from music21 import variant
-
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
-        v1 = variant.Variant()
+        v1 = Variant()
         v1.insert(0, vn1)
         v1.insert(0, vn2)
         s.insert(5, v1)
