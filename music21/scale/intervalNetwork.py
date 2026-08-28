@@ -1401,10 +1401,11 @@ class IntervalNetwork:
                 p = self.transposePitchAndApplySimplification(intervalObj, p)
             else:
                 p = self.transposePitchAndApplySimplification(intervalObj.reverse(), p)
-            pCollect = self.processAlteredNodes(alteredDegrees=alteredDegrees,
-                                                n=n,
-                                                p=p,
-                                                direction=direction)
+            pCollect = self.processAlteredNodes(
+                alteredDegrees=alteredDegrees,
+                n=n,
+                p=p,
+                direction=direction)
 
         return pCollect
 
@@ -1587,10 +1588,11 @@ class IntervalNetwork:
 
             p = self.transposePitchAndApplySimplification(intervalObj, p)
             pCollect = p
-            pCollect = self.processAlteredNodes(alteredDegrees=alteredDegrees,
-                                                n=n,
-                                                p=p,
-                                                direction=Direction.ASCENDING)
+            pCollect = self.processAlteredNodes(
+                alteredDegrees=alteredDegrees,
+                n=n,
+                p=p,
+                direction=Direction.ASCENDING)
 
         if attempts >= maxAttempts:
             raise IntervalNetworkException(

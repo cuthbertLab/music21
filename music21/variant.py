@@ -469,11 +469,13 @@ class Variant(base.Music21Object):
                 classes.append(e.classes[0])
             if classList is not None:
                 classes.extend(classList)
-            returnStream = contextStream.getElementsByOffset(vStart, vEnd,
-                                                             includeEndBoundary=False,
-                                                             mustFinishInSpan=False,
-                                                             mustBeginInSpan=True,
-                                                             classList=classes).stream()
+            returnStream = contextStream.getElementsByOffset(
+                vStart,
+                vEnd,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True,
+                classList=classes).stream()
 
         elif self.lengthType == 'deletion':
             vMiddle = vStart + self.containedHighestTime
@@ -483,15 +485,19 @@ class Variant(base.Music21Object):
                 classes.append(e.classes[0])
             if classList is not None:
                 classes.extend(classList)
-            returnPart1 = contextStream.getElementsByOffset(vStart, vMiddle,
-                                                            includeEndBoundary=False,
-                                                            mustFinishInSpan=False,
-                                                            mustBeginInSpan=True,
-                                                            classList=classes).stream()
-            returnPart2 = contextStream.getElementsByOffset(vMiddle, vEnd,
-                                                            includeEndBoundary=False,
-                                                            mustFinishInSpan=False,
-                                                            mustBeginInSpan=True).stream()
+            returnPart1 = contextStream.getElementsByOffset(
+                vStart,
+                vMiddle,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True,
+                classList=classes).stream()
+            returnPart2 = contextStream.getElementsByOffset(
+                vMiddle,
+                vEnd,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True).stream()
 
             returnStream = returnPart1
             for e in returnPart2.elements:
@@ -2426,23 +2432,25 @@ def _getNextElements(s, v, numberOfElements=1):
     # Get next element in s after v which is of type vClass
     if lengthType == 'elongation':
         variantOffset = v.getOffsetBySite(s)
-        potentialTargets = s.getElementsByOffset(variantOffset,
-                                                 offsetEnd=s.highestTime,
-                                                 includeEndBoundary=True,
-                                                 mustFinishInSpan=False,
-                                                 mustBeginInSpan=True,
-                                                 classList=[vClass])
+        potentialTargets = s.getElementsByOffset(
+            variantOffset,
+            offsetEnd=s.highestTime,
+            includeEndBoundary=True,
+            mustFinishInSpan=False,
+            mustBeginInSpan=True,
+            classList=[vClass])
         returnElement = potentialTargets.first()
 
     else:
         replacementDuration = v.replacementQuarterLength
         variantOffset = v.getOffsetBySite(s)
-        potentialTargets = s.getElementsByOffset(variantOffset + replacementDuration,
-                                                 offsetEnd=s.highestTime,
-                                                 includeEndBoundary=True,
-                                                 mustFinishInSpan=False,
-                                                 mustBeginInSpan=True,
-                                                 classList=[vClass])
+        potentialTargets = s.getElementsByOffset(
+            variantOffset + replacementDuration,
+            offsetEnd=s.highestTime,
+            includeEndBoundary=True,
+            mustFinishInSpan=False,
+            mustBeginInSpan=True,
+            classList=[vClass])
         returnElement = potentialTargets.first()
 
 
@@ -2528,12 +2536,13 @@ def makeVariantBlocks(s):
     for v in variantsToBeDone:
         startOffset = s.elementOffset(v)
         endOffset = v.replacementQuarterLength + startOffset
-        conflictingVariants = s.getElementsByOffset(offsetStart=startOffset,
-                                                    offsetEnd=endOffset,
-                                                    includeEndBoundary=False,
-                                                    mustFinishInSpan=False,
-                                                    mustBeginInSpan=True,
-                                                    classList=[Variant])
+        conflictingVariants = s.getElementsByOffset(
+            offsetStart=startOffset,
+            offsetEnd=endOffset,
+            includeEndBoundary=False,
+            mustFinishInSpan=False,
+            mustBeginInSpan=True,
+            classList=[Variant])
         for cV in conflictingVariants:
             oldReplacementDuration = cV.replacementQuarterLength
             if s.elementOffset(cV) == startOffset:

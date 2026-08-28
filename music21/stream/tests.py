@@ -1045,18 +1045,19 @@ class Test(unittest.TestCase):
 
         consec = m.findConsecutiveNotes()
 
-        self.assertEqual([repr(x) for x in consec],
-                         ['<music21.note.Note C>',
-                          '<music21.note.Note C#>',
-                          '<music21.note.Note D>',
-                          '<music21.note.Note E->',
-                          'None',
-                          '<music21.note.Note E>',
-                          '<music21.note.Note F>',
-                          '<music21.note.Note F#>',
-                          '<music21.note.Note G>',
-                          ]
-                         )
+        self.assertEqual(
+            [repr(x) for x in consec],
+            ['<music21.note.Note C>',
+             '<music21.note.Note C#>',
+             '<music21.note.Note D>',
+             '<music21.note.Note E->',
+             'None',
+             '<music21.note.Note E>',
+             '<music21.note.Note F>',
+             '<music21.note.Note F#>',
+             '<music21.note.Note G>',
+             ]
+        )
 
         # with voices in each of two measures
         m.insert(meter.TimeSignature('2/4'))
@@ -1355,14 +1356,15 @@ class Test(unittest.TestCase):
         self.assertEqual(p.streamStatus.beams, False)
         p = p.splitAtDurations(recurse=True)[0]
         p.makeBeams(inPlace=True)
-        self.assertEqual([repr(el.beams) for el in p[note.Note]],
-                         ['<music21.beam.Beams>',
-                          '<music21.beam.Beams <music21.beam.Beam 1/start>>',
-                          '<music21.beam.Beams <music21.beam.Beam 1/stop>>',
-                          '<music21.beam.Beams <music21.beam.Beam 1/start>>',
-                          '<music21.beam.Beams <music21.beam.Beam 1/stop>>'
-                          ]
-                         )
+        self.assertEqual(
+            [repr(el.beams) for el in p[note.Note]],
+            ['<music21.beam.Beams>',
+             '<music21.beam.Beams <music21.beam.Beam 1/start>>',
+             '<music21.beam.Beams <music21.beam.Beam 1/stop>>',
+             '<music21.beam.Beams <music21.beam.Beam 1/start>>',
+             '<music21.beam.Beams <music21.beam.Beam 1/stop>>'
+             ]
+        )
 
     def testStripTiesStopTieChordFollowsRest(self):
         '''
@@ -2219,7 +2221,8 @@ class Test(unittest.TestCase):
         # m2.show()
 
         match = str(list(s.flatten().notesAndRests))
-        self.assertEqual(match, '[<music21.note.Rest half>, <music21.note.Note C>, '
+        self.assertEqual(match,
+                         '[<music21.note.Rest half>, <music21.note.Note C>, '
                          + '<music21.note.Rest quarter>, <music21.note.Rest quarter>, '
                          + '<music21.note.Note C>, <music21.note.Rest half>]')
         match = str([(n, n.duration) for n in s.flatten().notesAndRests])
