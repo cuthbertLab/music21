@@ -23,6 +23,8 @@
 - Imports: standard library first, then music21 modules, one per line, alphabetical.
 - New modules open with the `# Name: / # Purpose: / # Authors: / # Copyright: / # License:`
   banner (copy a neighboring module's), then the module docstring, then imports.  Update the Copyright date end to current year when changing the module.
+  When a file is edited only incidentally, as one of many touched by a sweep, leave its
+  Copyright alone; bump only the files the change is really about.
 - No `print()`. Use `environLocal = environment.Environment('moduleName')` and
   `environLocal.printDebug(...)`, or `environLocal.warn(...)` when the user should hear
   about it every time. `test/toggleDebug.py` switches debug output on and off.
