@@ -82,7 +82,7 @@
 - `music21` supports at least the last two released versions of Python and up to whatever
   Python version Google Colab runs (unless it gets EOL). Policy can change as features are added.
 - The coverage CI run is intentionally pinned to the **middle** supported
-  Python version. See `coverageM21.getCoverage`.
+  Python version. See `PY_VERSION_WITH_COVERAGE` in `.github/workflows/maincheck.yml`.
 
 # PRs and Issues
 
