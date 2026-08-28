@@ -739,8 +739,8 @@ def noteToBraille(
                         f'transcriber-added {symbols["transcriber-added_sign"]}')
                 tupletTrans = symbols['tuplet_prefix']  # dots 4,5,6
                 tupletTrans += numberToBraille(allTuplets[0].numberNotesActual,
-                                                 withNumberSign=False,
-                                                 lower=True)
+                                               withNumberSign=False,
+                                               lower=True)
                 tupletTrans += symbols['dot']
                 noteTrans.append(tupletTrans)
             music21Note.editorial.brailleEnglish.append(

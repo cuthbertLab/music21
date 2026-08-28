@@ -177,7 +177,7 @@ class OmrGroundTruthPair:
                 distance[i][j] = min(distance[i - 1][j] + 1,
                                      distance[i][j - 1] + 1,
                                      distance[i - 1][j - 1]
-                                        + self.substCost(source[j - 1], target[i - 1]))
+                                     + self.substCost(source[j - 1], target[i - 1]))
         return distance[n][m]
 
     def getDifferences(self):

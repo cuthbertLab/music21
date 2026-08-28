@@ -2652,7 +2652,7 @@ class Test(unittest.TestCase):
         '''
         # 1.) prepare
         elem = ETree.Element(f'{MEI_NS}staffDef', attrib={'meter.count': '1',
-                                                                  'meter.unit': '3'})
+                                                          'meter.unit': '3'})
         mockTime.return_value = 'mockTime return'
         mockFromString.side_effect = instrument.InstrumentException
         # otherwise staffDefFromElement() thinks it got a real Instrument
@@ -2670,7 +2670,7 @@ class Test(unittest.TestCase):
         '''
         # 1.) prepare
         elem = ETree.Element(f'{MEI_NS}staffDef', attrib={'meter.count': '1',
-                                                                  'meter.unit': '3'})
+                                                          'meter.unit': '3'})
 
         # 2.) run
         actual = base.staffDefFromElement(elem)
@@ -2686,7 +2686,7 @@ class Test(unittest.TestCase):
         '''
         elem = ETree.Element('staffGrp')
         innerElems = [ETree.Element(f'{MEI_NS}staffDef', attrib={'n': str(n)})
-                                                                    for n in range(4)]
+                      for n in range(4)]
         for eachElem in innerElems:
             elem.append(eachElem)
         mockStaffDefFE.side_effect = lambda x, unused_y: f"processed {x.get('n')}"

@@ -85,7 +85,7 @@ def addStaffTags(
             mxStaff = Element('staff')
             mxStaff.text = str(staffNumber)
             helpers.insertBeforeElements(tag, mxStaff,
-                                                 tagList=['beam', 'notations', 'lyric', 'play',
+                                         tagList=['beam', 'notations', 'lyric', 'play',
                                                           'sound'])
 
 
@@ -423,8 +423,8 @@ class PartStaffExporterMixin:
 
             # Or, gap in measure numbers in the subsequent part: keep iterating through target
             if (sourceNumber is not None
-                   and targetNumber is not None
-                   and helpers.measureNumberComesBefore(targetNumber, sourceNumber)):
+                and targetNumber is not None
+                    and helpers.measureNumberComesBefore(targetNumber, sourceNumber)):
                 continue  # sourceMeasure is not None!
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
@@ -587,7 +587,7 @@ class PartStaffExporterMixin:
                     mxAttributes,
                     mxStaves,
                     tagList=['part-symbol', 'instruments', 'clef', 'staff-details',
-                                'transpose', 'directive', 'measure-style']
+                             'transpose', 'directive', 'measure-style']
                 )
 
                 if multiKey and mxAttributes is not None:

@@ -367,16 +367,16 @@ class FiguredBassLine:
         previousBassNote = bassNotes[bassNoteIndex]
         bassNote = t.cast(note.Note, currentMapping[allKeys[0]][-1])
         previousSegment = segment.OverlaidSegment(bassNote, bassNote.editorial.notationString,
-                                                   self._fbScale,
-                                                   fbRules, numParts, maxPitch)
+                                                  self._fbScale,
+                                                  fbRules, numParts, maxPitch)
         previousSegment.quarterLength = previousBassNote.quarterLength
         segmentList.append(previousSegment)
         for k in allKeys[1:]:
             (startTime, unused_endTime) = k
             bassNote = t.cast(note.Note, currentMapping[k][-1])
             currentSegment = segment.OverlaidSegment(bassNote, bassNote.editorial.notationString,
-                                                      self._fbScale,
-                                                      fbRules, numParts, maxPitch)
+                                                     self._fbScale,
+                                                     fbRules, numParts, maxPitch)
             for partNumber in range(1, len(currentMapping[k])):
                 upperPitch = t.cast(note.Note, currentMapping[k][partNumber - 1])
                 currentSegment.fbRules._partPitchLimits.append((partNumber, upperPitch))

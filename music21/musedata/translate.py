@@ -366,7 +366,7 @@ class Test(unittest.TestCase):
         from music21 import common
 
         fp1 = (common.getSourceFilePath()
-                           / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
+               / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
         mdw = musedata.MuseDataWork()
         mdw.addFile(fp1)
 

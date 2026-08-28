@@ -24,7 +24,7 @@ number of its own.
 '''
 
 shorthandNotation: dict[tuple[int|None, ...], tuple[int, ...]] = {
-                     (None,): (5, 3),
+    (None,): (5, 3),
                      (5,): (5, 3),
                      (6,): (6, 3),
                      (7,): (7, 5, 3),
@@ -35,7 +35,7 @@ shorthandNotation: dict[tuple[int|None, ...], tuple[int, ...]] = {
                      (4, 3): (6, 4, 3),
                      (4, 2): (6, 4, 2),
                      (2,): (6, 4, 2),
-                     }
+}
 
 prefixes = ['+', '#', '++', '##']
 suffixes = ['\\']

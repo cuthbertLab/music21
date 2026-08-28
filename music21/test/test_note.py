@@ -246,7 +246,7 @@ class Test(unittest.TestCase):
               articulations.StrongAccent()]
 
         for a, b, c, d, match in [(n1, n4, a1, a1, True),
-                                      (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
+                                  (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
                                   # same pitch different orderings
                                   (n1, n4, a2, a3, True), (n1, n4, a4, a5, True),
                                   # different pitch same orderings

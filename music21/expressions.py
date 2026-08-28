@@ -582,8 +582,8 @@ class Ornament(Expression):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Subclassable method call that takes a sourceObject and optional keySig
         and returns a three-element tuple of a list of notes before the
@@ -911,8 +911,8 @@ class GeneralMordent(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize a mordent.
 
@@ -1576,8 +1576,8 @@ class Trill(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize a trill.
 
@@ -2449,8 +2449,8 @@ class GeneralAppoggiatura(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize an appoggiatura.
 
@@ -2597,8 +2597,8 @@ class Tremolo(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize the ornament.
 

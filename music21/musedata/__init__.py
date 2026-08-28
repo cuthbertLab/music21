@@ -536,8 +536,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
             return post
         # find targets from largest to smallest
         targets = ('ppp', 'fff',
-                    'pp', 'ff', 'fp', 'mp', 'mf',
-                    'p', 'f', 'm', 'Z', 'Zp', 'R')
+                   'pp', 'ff', 'fp', 'mp', 'mf',
+                   'p', 'f', 'm', 'Z', 'Zp', 'R')
         for target in targets:
             pos = data.find(target)
             if pos < 0:

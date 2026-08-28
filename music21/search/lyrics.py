@@ -206,7 +206,7 @@ class LyricSearcher:
         indexByIdentifier: OrderedDict[str|int, list[IndexedLyric]] = OrderedDict()
         iTextByIdentifier: OrderedDict[str|int, str] = OrderedDict()
         lastSyllabicByIdentifier: OrderedDict[str|int,
-                                                str|None] = OrderedDict()
+                                              str|None] = OrderedDict()
 
         for n in s.recurse().notes:
             ls: list[note.Lyric] = n.lyrics

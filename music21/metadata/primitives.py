@@ -497,9 +497,9 @@ class DatePrimitive(prebase.ProtoM21Object):
         False
         '''
         return (type(self) is type(other)
-                    and self._data == other._data
-                    and self._dataUncertainty == other._dataUncertainty
-                    and self.relevance == other.relevance)
+                and self._data == other._data
+                and self._dataUncertainty == other._dataUncertainty
+                and self.relevance == other.relevance)
 
     def _reprInternal(self) -> str:
         return str(self)

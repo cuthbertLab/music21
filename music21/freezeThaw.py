@@ -1206,9 +1206,9 @@ class Test(unittest.TestCase):
         from music21 import note
 
         a = str(common.getSourceFilePath()
-                         / 'midi'
-                         / 'testPrimitive'
-                         / 'test03.mid')
+                / 'midi'
+                / 'testPrimitive'
+                / 'test03.mid')
 
         # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
         c = converter.parse(a)

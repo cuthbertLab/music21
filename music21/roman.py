@@ -1390,8 +1390,8 @@ def romanNumeralFromChord(
             and chordObj.isSeventhOfType((0, 3, 7, 10))):
         rnString = ft.prefix + stepRoman + minorSeventhSubs[inversionString]
     elif (not chordHasMajorThird
-              and inversionString in minorMajorSeventhSubs
-              and chordObj.isSeventhOfType((0, 3, 7, 11))):
+          and inversionString in minorMajorSeventhSubs
+          and chordObj.isSeventhOfType((0, 3, 7, 11))):
         rnString = ft.prefix + stepRoman + minorMajorSeventhSubs[inversionString]
 
     elif (not noKeyGiven
@@ -1434,8 +1434,9 @@ def romanNumeralFromChord(
 
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False,
-            # correctRNAlterationForMinor() adds cautionary
-            sixthMinor=Minor67Default.CAUTIONARY, seventhMinor=Minor67Default.CAUTIONARY)
+                          # correctRNAlterationForMinor() adds cautionary
+                          sixthMinor=Minor67Default.CAUTIONARY,
+                          seventhMinor=Minor67Default.CAUTIONARY)
     except fbNotation.ModifierException as strerror:  # pragma: no cover
         raise RomanNumeralException(
             'Could not parse '
@@ -3210,7 +3211,7 @@ class RomanNumeral(harmony.Harmony):
                   and aug6type != 'It'
                   and workingFigure[0] == '6'
                   and (len(workingFigure) < 2
-                        or not workingFigure[1].isdigit())):
+                       or not workingFigure[1].isdigit())):
                 # Fr6 => Fr43
                 workingFigure = self._aug6defaultInversions[aug6type] + workingFigure[1:]
 
@@ -3409,8 +3410,8 @@ class RomanNumeral(harmony.Harmony):
         for j in range(numberNotes):
             i = numberNotes - j - 1
             thisScaleDegree = (bassScaleDegree
-                                + t.cast(int, self.figuresNotationObj.numbers[i])
-                                - 1)
+                               + t.cast(int, self.figuresNotationObj.numbers[i])
+                               - 1)
             newPitch = t.cast(pitch.Pitch, useScale.pitchFromDegree(
                 thisScaleDegree, direction=scale.Direction.ASCENDING))
             pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(newPitch.name)

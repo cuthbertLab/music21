@@ -307,9 +307,9 @@ def _convertPsToOct(ps: int|float) -> int:
 def _convertPsToStep(
     ps: int|float
 ) -> tuple[StepName,
-             Accidental,
-             Microtone,
-             int]:
+           Accidental,
+           Microtone,
+           int]:
     '''
     Utility conversion; does not process internal representations.
 
@@ -5044,7 +5044,7 @@ class Pitch(prebase.ProtoM21Object):
             otherSimultaneousPitches
             and cautionaryPitchClass
             and any(pSimult.step == self.step and pSimult.pitchClass != self.pitchClass
-                for pSimult in otherSimultaneousPitches)
+                    for pSimult in otherSimultaneousPitches)
         ):
             set_displayStatus(True)
             return
@@ -5279,9 +5279,9 @@ class Pitch(prebase.ProtoM21Object):
             # if An or A to A#: need to make sure display is set
             elif ((pPast.accidental is None
                    or pPast.accidental.name == 'natural')
-                   and acc is not None  # redundant.  for mypy
-                   and pSelf.accidental is not None
-                   and pSelf.accidental.name != 'natural'):
+                  and acc is not None  # redundant.  for mypy
+                  and pSelf.accidental is not None
+                  and pSelf.accidental.name != 'natural'):
                 acc.displayStatus = True
                 setFromPitchPast = True
                 break

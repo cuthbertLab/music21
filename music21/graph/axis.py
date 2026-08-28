@@ -314,7 +314,7 @@ class PitchAxis(Axis):
     labelDefault = 'Pitch'
     quantities: tuple[str, ...] = ('pitchGeneric', )
 
-    def __init__(self, client=None, axisName='x'):
+    def __init__(self, client=None, axisName='x') -> None:
         super().__init__(client, axisName)
         self.showOctaves: bool|t.Literal['few'] = 'few'
         self.showEnharmonic = True
@@ -449,7 +449,7 @@ class PitchClassAxis(PitchAxis):
     labelDefault = 'Pitch Class'
     quantities: tuple[str, ...] = ('pitchClass', 'pitchclass', 'pc')
 
-    def __init__(self, client=None, axisName='x'):
+    def __init__(self, client=None, axisName='x') -> None:
         self.showOctaves: bool|t.Literal['few'] = False
         super().__init__(client, axisName)
         self.minValue = 0
@@ -1125,7 +1125,7 @@ class QuarterLengthAxis(PositionAxis):
                                    'duration',
                                    )
 
-    def __init__(self, client=None, axisName='x'):
+    def __init__(self, client=None, axisName='x') -> None:
         super().__init__(client, axisName)
         self.useLogScale: bool|int = True
         self.useDurationNames = False

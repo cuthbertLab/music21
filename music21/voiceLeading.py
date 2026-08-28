@@ -577,15 +577,15 @@ class VoiceLeadingQuartet(base.Music21Object):
             if isinstance(requiredInterval, str):
                 requiredInterval = interval.Interval(requiredInterval)
                 intervalsAreValid = (vInt0.semiSimpleName
-                                        == requiredInterval.semiSimpleName
+                                     == requiredInterval.semiSimpleName
                                      and vInt1.semiSimpleName
-                                        == requiredInterval.semiSimpleName)
+                                     == requiredInterval.semiSimpleName)
 
             elif isinstance(requiredInterval, (interval.Interval, interval.DiatonicInterval)):
                 intervalsAreValid = (vInt0.semiSimpleName
-                                        == requiredInterval.semiSimpleName
+                                     == requiredInterval.semiSimpleName
                                      and vInt1.semiSimpleName
-                                        == requiredInterval.semiSimpleName)
+                                     == requiredInterval.semiSimpleName)
 
             return intervalsAreValid
 
@@ -1161,7 +1161,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             if keyScale and n2degree != 3:
                 return False
             return (self.outwardContraryMotion()
-                        and secondHarmony == 6)
+                    and secondHarmony == 6)
 
         elif firstHarmony == 'd5':
             if keyScale and n1degree != 7:
@@ -1169,7 +1169,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             if keyScale and n2degree != 1:
                 return False
             return (self.inwardContraryMotion()
-                        and secondHarmony == 3)
+                    and secondHarmony == 3)
 
         elif firstHarmony == 'm7':
             if keyScale and n1degree != 5:
@@ -1291,9 +1291,9 @@ class VoiceLeadingQuartet(base.Music21Object):
         openingIntervals = ('P1', 'P5')
         openingFunctions = ('I', 'V')
         return ((v0.simpleName in openingIntervals
-                    or v1.simpleName in openingIntervals)
-                  and (r1[0].upper() in openingFunctions if r1 is not False else False
-                       or r2[0].upper() in openingFunctions if r2 is not False else False))
+                 or v1.simpleName in openingIntervals)
+                and (r1[0].upper() in openingFunctions if r1 is not False else False
+                     or r2[0].upper() in openingFunctions if r2 is not False else False))
 
     @common.decorators.deprecated(
         'June 2026', 'v12', 'Use `not vlq.modalOpening()` instead.'
@@ -1367,10 +1367,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         tonicName = self.key.tonic.name
         hIntervalNames = {self.hIntervals[0].name, self.hIntervals[1].name}
         return (hIntervalNames == {'m2', 'M2'}
-                 and self.contraryMotion()
-                 and self.vIntervals[1].name in ('P1', 'P8')
-                 and self.v1n2.name == tonicName
-                 and self.v2n2.name == tonicName)
+                and self.contraryMotion()
+                and self.vIntervals[1].name in ('P1', 'P8')
+                and self.v1n2.name == tonicName
+                and self.v2n2.name == tonicName)
 
     @common.decorators.deprecated(
         'June 2026', 'v12', 'Use `not vlq.clausulaVera()` instead.'
@@ -1882,8 +1882,8 @@ class VerticalityTriplet(VerticalityNTuplet):
         Calculates the three note linear segments if only three Verticalities provided.
         '''
         for partNum in range(min(len(self.verticalities[0].getObjectsByClass(note.Note)),
-                                    len(self.verticalities[1].getObjectsByClass(note.Note)),
-                                    len(self.verticalities[2].getObjectsByClass(note.Note)))
+                                 len(self.verticalities[1].getObjectsByClass(note.Note)),
+                                 len(self.verticalities[2].getObjectsByClass(note.Note)))
                              ):
             self.tnlsDict[partNum] = ThreeNoteLinearSegment(
                 [
@@ -2339,10 +2339,10 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         '''
 
         return (self._isComplete()
-            and self.n1.nameWithOctave == self.n3.nameWithOctave
-            and self.iLeft.chromatic.undirected == 2
-            and self.iRight.chromatic.undirected == 2
-            and self.iLeft.direction * self.iRight.direction == -1)
+                and self.n1.nameWithOctave == self.n3.nameWithOctave
+                and self.iLeft.chromatic.undirected == 2
+                and self.iRight.chromatic.undirected == 2
+                and self.iLeft.direction * self.iRight.direction == -1)
 
 
     def couldBeChromaticNeighborTone(self) -> bool:
@@ -2360,10 +2360,10 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         False
         '''
         return (self._isComplete()
-            and (self.n1.nameWithOctave == self.n3.nameWithOctave
-                 and self.iLeft.isChromaticStep
-                 and self.iRight.isChromaticStep
-                 and (self.iLeft.direction * self.iRight.direction == -1)))
+                and (self.n1.nameWithOctave == self.n3.nameWithOctave
+                     and self.iLeft.isChromaticStep
+                     and self.iRight.isChromaticStep
+                     and (self.iLeft.direction * self.iRight.direction == -1)))
 
 
 # Below: beginnings of an implementation for any object segments,

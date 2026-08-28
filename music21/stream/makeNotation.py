@@ -1701,9 +1701,11 @@ def makeAccidentalsInMeasureStream(
                 # just get the chromatic pitches from previous measure
                 # G-naturals in C major following G-flats in F major need cautionary
                 # G-naturals in C major following G-flats in Db major don't
-                pitchPastMeasure = [p for p in
-                    measuresOnly[i - 1].pitches + ornamentalPitches(measuresOnly[i - 1])
-                    if p.name not in ksLastDiatonic]
+                previousMeasure = measuresOnly[i - 1]
+                pitchPastMeasure = [
+                    p for p in previousMeasure.pitches + ornamentalPitches(previousMeasure)
+                    if p.name not in ksLastDiatonic
+                ]
             # Get tiePitchSet from previous measure
             try:
                 previousNoteOrChord = measuresOnly[i - 1][note.NotRest][-1]
@@ -2319,7 +2321,7 @@ class Test(unittest.TestCase):
         with self.assertRaises(stream.StreamException) as cm:
             p.makeMeasures(meterStream=duration.Duration())
         self.assertEqual(str(cm.exception),
-            'meterStream is neither a Stream nor a TimeSignature!')
+                         'meterStream is neither a Stream nor a TimeSignature!')
 
     def testMakeTiesChangingTimeSignatures(self):
         '''

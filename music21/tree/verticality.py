@@ -1064,7 +1064,7 @@ class Verticality(prebase.ProtoM21Object):
                     if ((verticalityStreamParts[pp[0]] == thisQuartetTopPart
                             or verticalityStreamParts[pp[0]] == thisQuartetBottomPart)
                         and (verticalityStreamParts[pp[1]] == thisQuartetTopPart
-                            or verticalityStreamParts[pp[1]] == thisQuartetBottomPart)):
+                             or verticalityStreamParts[pp[1]] == thisQuartetBottomPart)):
                         isAppropriate = True
                         break
                 if not isAppropriate:

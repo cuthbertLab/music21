@@ -733,9 +733,14 @@ class PartReduction:
                     offsetEnd = offsetStart + ds['span']
                     # get all targets within the contiguous region
                     # e.g., Dynamics objects
-                    match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
-                        includeEndBoundary=True, mustFinishInSpan=False,
-                        mustBeginInSpan=True).getElementsByClass(target).stream()
+                    inRegion = flatRef.getElementsByOffset(
+                        offsetStart,
+                        offsetEnd,
+                        includeEndBoundary=True,
+                        mustFinishInSpan=False,
+                        mustBeginInSpan=True,
+                    )
+                    match = inRegion.getElementsByClass(target).stream()
                     # environLocal.printDebug(['matched elements', target, match])
                     # extend duration of all found dynamics
                     match.extendDuration(target, inPlace=True)
@@ -1251,7 +1256,7 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
         # s.show()
         pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
-                    segmentByTarget=False, normalize=False)
+                                              segmentByTarget=False, normalize=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         match = [(0, [[0.0, 4.0, 0.178571428571, '#666666'],
@@ -1264,7 +1269,7 @@ class Test(unittest.TestCase):
         self._matchWeightedData(match, target)
 
         pr = analysis.reduction.PartReduction(s, fillByMeasure=False,
-                    segmentByTarget=True, normalize=False)
+                                              segmentByTarget=True, normalize=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         match = [(0, [[0.0, 2.0, 0.05, '#666666'],
@@ -1281,7 +1286,7 @@ class Test(unittest.TestCase):
 
 
         pr = analysis.reduction.PartReduction(s, fillByMeasure=False,
-                    segmentByTarget=False)
+                                              segmentByTarget=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         # print(target)
@@ -1295,7 +1300,7 @@ class Test(unittest.TestCase):
 
 
         pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
-                    segmentByTarget=True)
+                                              segmentByTarget=True)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         match = [(0, [[0.0, 2.0, 0.3888888888888, '#666666'],

@@ -1402,9 +1402,9 @@ class IntervalNetwork:
             else:
                 p = self.transposePitchAndApplySimplification(intervalObj.reverse(), p)
             pCollect = self.processAlteredNodes(alteredDegrees=alteredDegrees,
-                                                 n=n,
-                                                 p=p,
-                                                 direction=direction)
+                                                n=n,
+                                                p=p,
+                                                direction=direction)
 
         return pCollect
 
@@ -1588,9 +1588,9 @@ class IntervalNetwork:
             p = self.transposePitchAndApplySimplification(intervalObj, p)
             pCollect = p
             pCollect = self.processAlteredNodes(alteredDegrees=alteredDegrees,
-                                                 n=n,
-                                                 p=p,
-                                                 direction=Direction.ASCENDING)
+                                                n=n,
+                                                p=p,
+                                                direction=Direction.ASCENDING)
 
         if attempts >= maxAttempts:
             raise IntervalNetworkException(
@@ -2716,7 +2716,7 @@ class IntervalNetwork:
                 # only match this generously if we are equating termini
                 if equateTermini:
                     if ((realizedNId in (Terminus.HIGH, Terminus.LOW))
-                         and (nodeTargetId.id in (Terminus.HIGH, Terminus.LOW))):
+                            and (nodeTargetId.id in (Terminus.HIGH, Terminus.LOW))):
                         return realizedPitch[i]
 
             # environLocal.printDebug(['getPitchFromNodeDegree() on trial', trial, ',

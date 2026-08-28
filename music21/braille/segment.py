@@ -826,8 +826,8 @@ class BrailleSegment(text.BrailleText):
                 # hence -- let us split this noteGrouping into two noteGroupings.
                 try:
                     bngA, bngB = self.splitNoteGroupingAndTranscribe(noteGrouping,
-                                                                 showLeadingOctave,
-                                                                 addSpace)
+                                                                     showLeadingOctave,
+                                                                     addSpace)
                     self.currentLine.append(bngA, addSpace=addSpace)
                     self.addToNewLine(bngB)
                 except BrailleSegmentException:
@@ -1072,8 +1072,8 @@ class BrailleSegment(text.BrailleText):
 
         newSegment = self.consolidate()
         noteGroupings = [newSegment[gpKey]
-                             for gpKey in newSegment.keys()
-                                if gpKey.affinity == Affinity.NOTEGROUP]
+                         for gpKey in newSegment.keys()
+                         if gpKey.affinity == Affinity.NOTEGROUP]
         for noteGrouping in noteGroupings:
             allNotes_outer = [n for n in noteGrouping if isinstance(n, note.Note)]
             for noteIndexStart_outer in range(len(allNotes_outer)):

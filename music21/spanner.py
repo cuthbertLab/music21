@@ -698,16 +698,16 @@ class Spanner(base.Music21Object):
             endOffsetInHierarchy = opFrac(startOffsetInHierarchy + startElement.quarterLength)
 
         matchIterator = (searchStream
-            .recurse()
-            .getElementsByOffsetInHierarchy(
-                startOffsetInHierarchy,
-                endOffsetInHierarchy,
-                includeEndBoundary=includeEndBoundary,
-                mustFinishInSpan=mustFinishInSpan,
-                mustBeginInSpan=mustBeginInSpan,
-                includeElementsThatEndAtStart=includeElementsThatEndAtStart)
-            .getElementsByClass(self.fillElementTypes)
-        )
+                         .recurse()
+                         .getElementsByOffsetInHierarchy(
+                             startOffsetInHierarchy,
+                             endOffsetInHierarchy,
+                             includeEndBoundary=includeEndBoundary,
+                             mustFinishInSpan=mustFinishInSpan,
+                             mustBeginInSpan=mustBeginInSpan,
+                             includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+                         .getElementsByClass(self.fillElementTypes)
+                         )
 
         for foundElement in matchIterator:
             if foundElement is startElement:
@@ -2965,7 +2965,7 @@ class Test(unittest.TestCase):
         n3 = s.notes[-1]
         sp1 = Line(n1, n2, startTick='up', lineType='dotted')
         sp2 = Line(n2, n3, startTick='down', lineType='dashed',
-                                    endHeight=40)
+                   endHeight=40)
         s.append(sp1)
         s.append(sp2)
         # s.show('t')

@@ -27,27 +27,27 @@ environLocal = environment.Environment('dynamics')
 
 
 shortNames = ['pppppp', 'ppppp', 'pppp', 'ppp', 'pp', 'p', 'mp',
-                  'mf', 'f', 'fp', 'sf', 'ff', 'fff', 'ffff', 'fffff', 'ffffff']
+              'mf', 'f', 'fp', 'sf', 'ff', 'fff', 'ffff', 'fffff', 'ffffff']
 longNames = {'ppp': 'pianississimo',
-              'pp': 'pianissimo',
-              'p': 'piano',
-              'mp': 'mezzopiano',
-              'mf': 'mezzoforte',
-              'f': 'forte',
-              'fp': 'fortepiano',
-              'sf': 'sforzando',
-              'ff': 'fortissimo',
-              'fff': 'fortississimo'}
+             'pp': 'pianissimo',
+             'p': 'piano',
+             'mp': 'mezzopiano',
+             'mf': 'mezzoforte',
+             'f': 'forte',
+             'fp': 'fortepiano',
+             'sf': 'sforzando',
+             'ff': 'fortissimo',
+             'fff': 'fortississimo'}
 
 # could be really useful for automatic description of musical events
 englishNames = {'ppp': 'extremely soft',
-                 'pp': 'very soft',
-                 'p': 'soft',
-                 'mp': 'moderately soft',
-                 'mf': 'moderately loud',
-                 'f': 'loud',
-                 'ff': 'very loud',
-                 'fff': 'extremely loud'}
+                'pp': 'very soft',
+                'p': 'soft',
+                'mp': 'moderately soft',
+                'mf': 'moderately loud',
+                'f': 'loud',
+                'ff': 'very loud',
+                'fff': 'extremely loud'}
 
 
 def dynamicStrFromDecimal(n):

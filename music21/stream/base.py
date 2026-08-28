@@ -4409,13 +4409,13 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                 matches = [m for m in mStreamIter if m.number in matchingMeasureNumbers]
             else:
                 matches = [m for i, m in enumerate(mStreamIter)
-                                if i + 1 in matchingMeasureNumbers]
+                           if i + 1 in matchingMeasureNumbers]
         else:
             if hasUniqueMeasureNumbers:
                 matches = [m for m in mStreamIter if m.number >= numberStart]
             else:
                 matches = [m for i, m in enumerate(mStreamIter)
-                                    if i + 1 >= numberStart]
+                           if i + 1 >= numberStart]
 
         if startSuffix is not None:
             oldMatches = matches
@@ -6253,7 +6253,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             endTimes = set()
         else:
             endTimes = {opFrac(v[0] + v[1].duration.quarterLength)
-                            for v in offsetDictValues}
+                        for v in offsetDictValues}
         return sorted(offsets.union(endTimes))
 
     def chordify(
@@ -11559,7 +11559,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                         mEmpty.mergeAttributes(m)
                         # Propagate bar, meter, key elements to lower parts
                         mEmpty.mergeElements(m, classFilterList=('Barline',
-                                            'TimeSignature', 'KeySignature'))
+                                                                 'TimeSignature', 'KeySignature'))
                         s.parts[i].insert(self.elementOffset(m), mEmpty)
         # if part has no measures but has voices, contents of each voice go into the part
         elif self.hasVoices():

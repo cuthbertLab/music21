@@ -1596,7 +1596,7 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
 
         a = corpus.parse('bach/bwv57.8')
         b = HorizontalBarPitchClassOffset(a.parts[0].measures(3, 6),
-                                              title='Bach (soprano voice, mm 3-6)')
+                                          title='Bach (soprano voice, mm 3-6)')
         b.run()
 
     def testScatterWeightedPitchSpaceQuarterLength(self):
@@ -1792,19 +1792,19 @@ class Test(unittest.TestCase):
                         doneAction=doneAction, dpi=300)
         b.run()
         self.assertEqual(b.graphLegend.data,
-            [
-                ['Major',
-                    [('C#', '#f0727a'), ('D', '#ffd752'), ('E', '#eeff9a'),
-                     ('F#', '#b9f0ff'), ('A', '#bb9aff'), ('B', '#ffb5ff')
-                     ]
-                 ],
-                ['Minor',
-                    [('c#', '#8c0e16'), ('', '#ffffff'), ('', '#ffffff'),
-                     ('f#', '#558caa'), ('', '#ffffff'), ('b', '#9b519b')
-                     ]
-                 ]
-            ]
-        )
+                         [
+                             ['Major',
+                              [('C#', '#f0727a'), ('D', '#ffd752'), ('E', '#eeff9a'),
+                               ('F#', '#b9f0ff'), ('A', '#bb9aff'), ('B', '#ffb5ff')
+                               ]
+                              ],
+                             ['Minor',
+                              [('c#', '#8c0e16'), ('', '#ffffff'), ('', '#ffffff'),
+                               ('f#', '#558caa'), ('', '#ffffff'), ('b', '#9b519b')
+                               ]
+                              ]
+                         ]
+                         )
 
     def testFeatures(self):
         streamList = ['bach/bwv66.6', 'schoenberg/opus19/movement2', 'corelli/opus3no1/1grave']

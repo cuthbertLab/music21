@@ -2160,7 +2160,7 @@ class Music21Object(prebase.ProtoM21Object):
                     offsetAdjustedCsTuple = ContextSortTuple(
                         derivedCsTuple.site,
                         derivedCsTuple.offset.modify(offset=derivedCsTuple[1].offset
-                                                            + offsetAppend),
+                                                     + offsetAppend),
                         derivedCsTuple.recurseType)
                     if returnSortTuples:
                         yield offsetAdjustedCsTuple
@@ -2769,7 +2769,7 @@ class Music21Object(prebase.ProtoM21Object):
             insertIndex = 0
 
         return SortTuple(atEnd, offset, self.priority,
-                          self.classSortOrder, isNotGrace, insertIndex)
+                         self.classSortOrder, isNotGrace, insertIndex)
 
     # -----------------------------------------------------------------
     @property
