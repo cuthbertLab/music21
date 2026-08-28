@@ -117,17 +117,38 @@ the wrong flavor. Under pytest's alphabetical order `duration` runs before
 When a test fails only in a full run, re-run it alone. If it then passes,
 suspect state left behind by an earlier module rather than the test itself.
 
+## Speed budget
+
+Aim for about 3 seconds for a module's tests, and never add more than 15 — that is time
+every contributor waits on every full run. `corpus.parse()` is nearly always the culprit:
+build a small stream by hand instead, or parse `bwv66.6`, which is short and still full
+of interesting cases (pickup measures, and so on).
+
+## Tests that open windows
+
+Nothing in `Test` or in a doctest may open a window, play audio, or launch another
+program. Those go in a sibling class, run only when named explicitly:
+
+```python
+class TestExternal(unittest.TestCase):
+    ...
+
+if __name__ == '__main__':
+    import music21
+    music21.mainTest(Test, TestExternal)
+```
+
+Because they have those side effects, skip `TestExternal` when running a file directly.
+
 ## What tests may do
 
-- Exactly one `Test(unittest.TestCase)` class per module, methods named
-  `test...`. It must produce no output, open no windows, play nothing, and not
-  require packages outside the music21 ecosystem.
-- Anything that produces external output goes in `TestExternal`; anything slow
-  goes in `TestSlow`. Both are excluded from the normal run.
-- Tests should be fast: a major new module may add a few seconds, a small
-  addition should add milliseconds.
-- Regression cases for a bug fix belong in `Test`, never in a doctest. See the
-  `writing-docs` skill.
+Exactly one `Test(unittest.TestCase)` class per module, methods named `test...`.
+It must produce no output and require nothing outside the music21 ecosystem.
+Anything slow goes in a `TestSlow` sibling, excluded from the normal run like
+`TestExternal`.
+
+Regression cases for a bug fix belong in `Test`, never in a doctest. See the
+`writing-docs` skill.
 
 ## The other gates before a PR or a push
 

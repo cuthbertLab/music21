@@ -14,7 +14,6 @@ from fractions import Fraction
 from functools import cache
 import math
 from math import isclose, gcd
-import numbers
 import random
 from typing import overload, TYPE_CHECKING
 import unittest
@@ -358,7 +357,7 @@ def opFrac(num: OffsetQLIn) -> OffsetQL:
         raise TypeError(f'Cannot convert num: {num}')
 
 
-def mixedNumeral(expr: numbers.Real,
+def mixedNumeral(expr: int|float|Fraction,
                  limitDenominator: int = defaults.limitOffsetDenominator) -> str:
     '''
     Returns a string representing a mixedNumeral form of a number

@@ -364,12 +364,19 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             hdc = HumdrumDataCollection(dc)
             sc = hdc.parse()
             sc.id = 'section_' + str(i + 1)
-            sc.metadata.number = i + 1
+            scoreMetadata = sc.metadata
+            if scoreMetadata is None:
+                scoreMetadata = metadata.Metadata()
+                sc.insert(0, scoreMetadata)
+            scoreMetadata.number = str(i + 1)
             opus.append(sc)
 
         if dataCollections:
-            opus.metadata = copy.deepcopy(opus.scores[0].metadata)
-            opus.metadata.number = 0
+            opusMetadata = copy.deepcopy(opus.scores[0].metadata)
+            if opusMetadata is None:
+                opusMetadata = metadata.Metadata()
+            opusMetadata.number = '0'
+            opus.metadata = opusMetadata
 
         self.stream = opus
         return opus
@@ -1198,7 +1205,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
             return ''
         return parentSpine.spineType
 
-    def _getSpineType(self) -> str:
+    @property
+    def spineType(self) -> str:
         '''
         Searches the current and parent spineType.
         '''
@@ -1215,10 +1223,9 @@ class HumdrumSpine(prebase.ProtoM21Object):
         raise HumdrumException('Could not determine spineType '
                                + 'for spine with id ' + str(self.id))
 
-    def _setSpineType(self, newSpineType: str = '') -> None:
+    @spineType.setter
+    def spineType(self, newSpineType: str = '') -> None:
         self._spineType = newSpineType
-
-    spineType = property(_getSpineType, _setSpineType)
 
     def moveElementsIntoMeasures(self, streamIn: stream.Stream) -> stream.Stream:
         # noinspection PyShadowingNames

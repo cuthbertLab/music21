@@ -1456,7 +1456,7 @@ class Metadata(base.Music21Object):
         return self._getSingularAttribute('fileNumber')
 
     @fileNumber.setter
-    def fileNumber(self, value: str) -> None:
+    def fileNumber(self, value: str|int|None) -> None:
         '''
         For type checking only. Does not run.
         '''

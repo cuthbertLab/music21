@@ -453,7 +453,7 @@ def keySigToBraille(music21KeySignature, outgoingKeySig=None):
             f'Incoming Key Signature {music21KeySignature} cannot be transcribed to braille.'
         )
         music21KeySignature.editorial.brailleEnglish.append(
-            f'Key Signature {music21KeySignature} sharps None'
+            f'Key Signature {music21KeySignature} cannot be transcribed'
         )
         return symbols['basic_exception']
 

@@ -113,15 +113,16 @@ class SubConverter:
 
         return self.stream
 
-    def _getStream(self):
+    @property
+    def stream(self):
+        '''
+        Returns or sets the stream in the converter.  Must be defined for subConverter to work.
+        '''
         return self._stream
 
-    def _setStream(self, newStream):
+    @stream.setter
+    def stream(self, newStream):
         self._stream = newStream
-
-    stream = property(_getStream, _setStream, doc='''
-        Returns or sets the stream in the converter.  Must be defined for subConverter to work.
-        ''')
 
     def checkShowAbility(self, **keywords) -> bool:
         '''

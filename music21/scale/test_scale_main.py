@@ -585,8 +585,10 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
         self.assertEqual(str(sc.nextPitch('c4', Direction.ASCENDING)), 'E-4')
 
-        # degree 4 is always the blues note in this model
-        self.assertEqual(str(sc.pitchFromDegree(4)), 'F#4')
+        # degree 4 is always the blue note in this model, even though only half of
+        # the realizations pass through it
+        for dummy in range(20):
+            self.assertEqual(str(sc.pitchFromDegree(4)), 'F#4')
 
         # This never worked consistently and was not an important enough part of the project tp
         # continue to debug.

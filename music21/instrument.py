@@ -500,7 +500,32 @@ class StringInstrument(Instrument):
 
         self.midiProgram = 48
 
-    def _getStringPitches(self):
+    @property
+    def stringPitches(self):
+        '''
+        stringPitches is a property that stores a list of Pitches (or pitch names,
+        such as "C4") that represent the pitch of the open strings from lowest to
+        highest.[*]
+
+        >>> vln1 = instrument.Violin()
+        >>> [str(p) for p in vln1.stringPitches]
+        ['G3', 'D4', 'A4', 'E5']
+
+        instrument.stringPitches are full pitch objects, not just names:
+
+        >>> [x.octave for x in vln1.stringPitches]
+        [3, 4, 4, 5]
+
+        Scordatura for Scelsi's violin concerto *Anahit*.
+        (N.B. that string to pitch conversion is happening automatically)
+
+        >>> vln1.stringPitches = ['G3', 'G4', 'B4', 'D4']
+
+        (`[*]In some tuning methods such as reentrant tuning on the ukulele,
+        lute, or five-string banjo the order might not strictly be from lowest to
+        highest.  The same would hold true for certain violin scordatura pieces, such
+        as some of Biber's *Mystery Sonatas*`)
+        '''
         if hasattr(self, '_cachedPitches') and self._cachedPitches is not None:
             return self._cachedPitches
         elif not hasattr(self, '_stringPitches'):
@@ -509,7 +534,8 @@ class StringInstrument(Instrument):
             self._cachedPitches = [pitch.Pitch(x) for x in self._stringPitches]
             return self._cachedPitches
 
-    def _setStringPitches(self, newPitches):
+    @stringPitches.setter
+    def stringPitches(self, newPitches):
         if newPitches and (hasattr(newPitches[0], 'step') or newPitches[0] is None):
             # newPitches is pitchObjects or something
             self._stringPitches = newPitches
@@ -517,31 +543,6 @@ class StringInstrument(Instrument):
         else:
             self._cachedPitches = None
             self._stringPitches = newPitches
-
-    stringPitches = property(_getStringPitches, _setStringPitches, doc='''
-            stringPitches is a property that stores a list of Pitches (or pitch names,
-            such as "C4") that represent the pitch of the open strings from lowest to
-            highest.[*]
-
-            >>> vln1 = instrument.Violin()
-            >>> [str(p) for p in vln1.stringPitches]
-            ['G3', 'D4', 'A4', 'E5']
-
-            instrument.stringPitches are full pitch objects, not just names:
-
-            >>> [x.octave for x in vln1.stringPitches]
-            [3, 4, 4, 5]
-
-            Scordatura for Scelsi's violin concerto *Anahit*.
-            (N.B. that string to pitch conversion is happening automatically)
-
-            >>> vln1.stringPitches = ['G3', 'G4', 'B4', 'D4']
-
-            (`[*]In some tuning methods such as reentrant tuning on the ukulele,
-            lute, or five-string banjo the order might not strictly be from lowest to
-            highest.  The same would hold true for certain violin scordatura pieces, such
-            as some of Biber's *Mystery Sonatas*`)
-            ''')
 
 
 class Violin(StringInstrument):
@@ -1125,10 +1126,40 @@ class UnpitchedPercussion(Percussion):
         self._percMapPitchToModifier = {}
         self.midiChannel = 9  # 0-indexed, i.e. MIDI channel 10
 
-    def _getModifier(self):
+    @property
+    def modifier(self):
+        '''
+        Returns or sets the modifier for this instrument.  A modifier could
+        be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
+
+        If the modifier is in the object's ._modifierToPercMapPitch dictionary
+        then changing the modifier also changes the .percMapPitch for the object
+
+        >>> bd = instrument.BongoDrums()
+        >>> bd.modifier
+        'high'
+
+        >>> bd.percMapPitch
+        60
+        >>> bd.modifier = 'low'
+        >>> bd.percMapPitch
+        61
+
+        Variations on modifiers can also be used and they get normalized:
+
+        >>> wb1 = instrument.Woodblock()
+        >>> wb1.percMapPitch
+        76
+        >>> wb1.modifier = 'LO'
+        >>> wb1.percMapPitch
+        77
+        >>> wb1.modifier  # n.b. -- not LO
+        'low'
+        '''
         return self._modifier
 
-    def _setModifier(self, modifier):
+    @modifier.setter
+    def modifier(self, modifier):
         modifier = modifier.lower().strip()
         # BEN: to-do, pull out hyphens, spaces, etc.
 
@@ -1140,36 +1171,6 @@ class UnpitchedPercussion(Percussion):
                 modifier = self._percMapPitchToModifier[self.percMapPitch]
 
         self._modifier = modifier
-
-    modifier = property(_getModifier, _setModifier, doc='''
-    Returns or sets the modifier for this instrument.  A modifier could
-    be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
-
-    If the modifier is in the object's ._modifierToPercMapPitch dictionary
-    then changing the modifier also changes the .percMapPitch for the object
-
-
-    >>> bd = instrument.BongoDrums()
-    >>> bd.modifier
-    'high'
-
-    >>> bd.percMapPitch
-    60
-    >>> bd.modifier = 'low'
-    >>> bd.percMapPitch
-    61
-
-    Variations on modifiers can also be used and they get normalized:
-
-    >>> wb1 = instrument.Woodblock()
-    >>> wb1.percMapPitch
-    76
-    >>> wb1.modifier = 'LO'
-    >>> wb1.percMapPitch
-    77
-    >>> wb1.modifier  # n.b. -- not LO
-    'low'
-    ''')
 
 
 class Vibraphone(PitchedPercussion):
