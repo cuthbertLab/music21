@@ -150,14 +150,9 @@ class Barline(base.Music21Object):
         return f'type={self.type}'
 
 
-    def _getType(self):
-        return self._type
-
-    def _setType(self, value):
-        self._type = standardizeBarType(value)
-
-    type = property(_getType, _setType,
-        doc='''
+    @property
+    def type(self):
+        '''
         Get and set the Barline type property.
 
         >>> b = bar.Barline()
@@ -171,7 +166,12 @@ class Barline(base.Music21Object):
         >>> b.type = 'light-light'
         >>> b.type
         'double'
-        ''')
+        '''
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = standardizeBarType(value)
 
     def musicXMLBarStyle(self):
         '''

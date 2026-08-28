@@ -442,22 +442,9 @@ class StaffGroup(spanner.Spanner):
 
     # --------------------------------------------------------------------------
 
-    def _getBarTogether(self) -> t.Literal[True, False, None, 'Mensurstrich']:
-        return self._barTogether
-
-    def _setBarTogether(self, value: t.Literal[True, False, None, 'Mensurstrich', 'yes', 'no']):
-        if value is None:
-            pass  # do nothing for now; could set a default
-        elif value in ['yes', True]:
-            self._barTogether = True
-        elif value in ['no', False]:
-            self._barTogether = False
-        elif isinstance(value, str) and value.lower() == 'mensurstrich':
-            self._barTogether = 'Mensurstrich'
-        else:
-            raise StaffGroupException(f'the bar together value {value} is not acceptable')
-
-    barTogether = property(_getBarTogether, _setBarTogether, doc='''
+    @property
+    def barTogether(self) -> t.Literal[True, False, None, 'Mensurstrich']:
+        '''
         Get or set the barTogether value, with either Boolean values
         or yes or no strings.  Or the string 'Mensurstrich' which
         indicates barring between staves but not in staves.
@@ -471,27 +458,42 @@ class StaffGroup(spanner.Spanner):
         >>> sg.barTogether = 'Mensurstrich'
         >>> sg.barTogether
         'Mensurstrich'
-        ''')
+        '''
+        return self._barTogether
 
-    def _getSymbol(self) -> t.Literal['bracket', 'line', 'brace', 'square']|None:
-        return self._symbol
-
-    def _setSymbol(self, value: t.Literal['bracket', 'line', 'brace', 'square']|None):
-        if value is None or str(value).lower() == 'none':
-            self._symbol = None
-        elif value.lower() in ['brace', 'line', 'bracket', 'square']:
-            self._symbol = t.cast(t.Literal['bracket', 'line', 'brace', 'square'], value.lower())
+    @barTogether.setter
+    def barTogether(self, value: t.Literal[True, False, None, 'Mensurstrich', 'yes', 'no']):
+        if value is None:
+            pass  # do nothing for now; could set a default
+        elif value in ['yes', True]:
+            self._barTogether = True
+        elif value in ['no', False]:
+            self._barTogether = False
+        elif isinstance(value, str) and value.lower() == 'mensurstrich':
+            self._barTogether = 'Mensurstrich'
         else:
-            raise StaffGroupException(f'the symbol value {value} is not acceptable')
+            raise StaffGroupException(f'the bar together value {value} is not acceptable')
 
-    symbol = property(_getSymbol, _setSymbol, doc='''
+    @property
+    def symbol(self) -> t.Literal['bracket', 'line', 'brace', 'square']|None:
+        '''
         Get or set the symbol value, with either Boolean values or yes or no strings.
 
         >>> sg = layout.StaffGroup()
         >>> sg.symbol = 'Brace'
         >>> sg.symbol
         'brace'
-        ''')
+        '''
+        return self._symbol
+
+    @symbol.setter
+    def symbol(self, value: t.Literal['bracket', 'line', 'brace', 'square']|None):
+        if value is None or str(value).lower() == 'none':
+            self._symbol = None
+        elif value.lower() in ['brace', 'line', 'bracket', 'square']:
+            self._symbol = t.cast(t.Literal['bracket', 'line', 'brace', 'square'], value.lower())
+        else:
+            raise StaffGroupException(f'the symbol value {value} is not acceptable')
 
 
 # ---------------------------------------------------------------

@@ -1772,10 +1772,21 @@ class RepeatBracket(Spanner):
         return common.contiguousList(self.numberRange)
 
     # property to enforce numerical numbers
-    def _getNumber(self) -> str:
+    @property
+    def number(self) -> str:
         '''
-        This must return a string, as we may have single numbers or lists.
-        For a raw numerical list, look at `.numberRange`.
+        Get or set the number -- returning a string always, as we may have
+        single numbers or lists.  For a raw numerical list, look at `.numberRange`.
+
+        >>> rb = spanner.RepeatBracket()
+        >>> rb.number
+        ''
+        >>> rb.number = '5-7'
+        >>> rb.number
+        '5-7'
+        >>> rb.numberRange
+        [5, 6, 7]
+        >>> rb.number = 1
         '''
         if len(self.numberRange) == 1:
             if self.numberRange[0] == 0:
@@ -1789,10 +1800,9 @@ class RepeatBracket(Spanner):
             else:  # range of values
                 return f'{self.numberRange[0]}-{self.numberRange[-1]}'
 
-    def _setNumber(self, value: int|str|Iterable[int]):
-        '''
-        Set the bracket number. There may be a range of values provided.
-        '''
+    @number.setter
+    def number(self, value: int|str|Iterable[int]):
+        # There may be a range of values provided.
         if value == '':
             # undefined.
             self.numberRange = [0]
@@ -1821,20 +1831,6 @@ class RepeatBracket(Spanner):
                 self.numberRange.append(value)
         else:
             raise SpannerException(f'number for RepeatBracket must be a number, not {value!r}')
-
-    number = property(_getNumber, _setNumber, doc='''
-            Get or set the number -- returning a string always.
-
-            >>> rb = spanner.RepeatBracket()
-            >>> rb.number
-            ''
-            >>> rb.number = '5-7'
-            >>> rb.number
-            '5-7'
-            >>> rb.numberRange
-            [5, 6, 7]
-            >>> rb.number = 1
-        ''')
 
     def _reprInternal(self):
         if self.overrideDisplay is not None:
@@ -1929,10 +1925,24 @@ class Ottava(Spanner):
         self.placement = placement  # can above or below, after musicxml
         self.transposing = transposing
 
-    def _getType(self):
+    @property
+    def type(self):
+        '''
+        Get or set Ottava type. This can be set by as complete string
+        (such as 8va or 15mb) or with a pair specifying size and direction.
+
+        >>> os = spanner.Ottava()
+        >>> os.type = '8vb'
+        >>> os.type
+        '8vb'
+        >>> os.type = 15, 'down'
+        >>> os.type
+        '15mb'
+        '''
         return self._type
 
-    def _setType(self, newType):
+    @type.setter
+    def type(self, newType):
         if common.isNum(newType) and newType in (8, 15):
             if newType == 8:
                 self._type = '8va'
@@ -1958,19 +1968,6 @@ class Ottava(Spanner):
                 raise SpannerException(
                     f'cannot create Ottava of type: {newType}')
             self._type = newType.lower()
-
-    type = property(_getType, _setType, doc='''
-        Get or set Ottava type. This can be set by as complete string
-        (such as 8va or 15mb) or with a pair specifying size and direction.
-
-        >>> os = spanner.Ottava()
-        >>> os.type = '8vb'
-        >>> os.type
-        '8vb'
-        >>> os.type = 15, 'down'
-        >>> os.type
-        '15mb'
-        ''')
 
     def _reprInternal(self):
         transposing = 'transposing'
@@ -2155,42 +2152,36 @@ class Line(Spanner):
         if startHeight is not None:
             self.startHeight = startHeight  # use property
 
-    def _getEndTick(self):
+    @property
+    def endTick(self):
+        '''
+        Get or set the endTick property.
+        '''
         return self._endTick
 
-    def _setEndTick(self, value):
+    @endTick.setter
+    def endTick(self, value):
         if value.lower() not in self.validTickTypes:
             raise SpannerException(f'not a valid value: {value}')
         self._endTick = value.lower()
 
-    endTick = property(_getEndTick, _setEndTick, doc='''
-        Get or set the endTick property.
-        ''')
-
-    def _getStartTick(self):
+    @property
+    def startTick(self):
+        '''
+        Get or set the startTick property.
+        '''
         return self._startTick
 
-    def _setStartTick(self, value):
+    @startTick.setter
+    def startTick(self, value):
         if value.lower() not in self.validTickTypes:
             raise SpannerException(f'not a valid value: {value}')
         self._startTick = value.lower()
 
-    startTick = property(_getStartTick, _setStartTick, doc='''
-        Get or set the startTick property.
-        ''')
-
-    def _getTick(self):
-        return self._startTick  # just returning start
-
-    def _setTick(self, value):
-        if value.lower() not in self.validTickTypes:
-            raise SpannerException(f'not a valid value: {value}')
-        self._startTick = value.lower()
-        self._endTick = value.lower()
-
-    tick = property(_getTick, _setTick, doc='''
+    @property
+    def tick(self):
+        '''
         Set the start and end tick to the same value
-
 
         >>> b = spanner.Line()
         >>> b.tick = 'arrow'
@@ -2198,19 +2189,19 @@ class Line(Spanner):
         'arrow'
         >>> b.endTick
         'arrow'
-        ''')
+        '''
+        return self._startTick  # just returning start
 
-    def _getLineType(self):
-        return self._lineType
-
-    def _setLineType(self, value):
-        if value is not None and value.lower() not in self.validLineTypes:
+    @tick.setter
+    def tick(self, value):
+        if value.lower() not in self.validTickTypes:
             raise SpannerException(f'not a valid value: {value}')
-        # not sure if we should permit setting as None
-        if value is not None:
-            self._lineType = value.lower()
+        self._startTick = value.lower()
+        self._endTick = value.lower()
 
-    lineType = property(_getLineType, _setLineType, doc='''
+    @property
+    def lineType(self):
+        '''
         Get or set the lineType property. Valid line types are listed in .validLineTypes.
 
         >>> b = spanner.Line()
@@ -2221,41 +2212,52 @@ class Line(Spanner):
 
         >>> b.validLineTypes
         ('solid', 'dashed', 'dotted', 'wavy')
-        ''')
+        '''
+        return self._lineType
 
-    def _getEndHeight(self):
-        return self._endHeight
-
-    def _setEndHeight(self, value):
-        if not (common.isNum(value) and value >= 0):
+    @lineType.setter
+    def lineType(self, value):
+        if value is not None and value.lower() not in self.validLineTypes:
             raise SpannerException(f'not a valid value: {value}')
-        self._endHeight = value
+        # not sure if we should permit setting as None
+        if value is not None:
+            self._lineType = value.lower()
 
-    endHeight = property(_getEndHeight, _setEndHeight, doc='''
+    @property
+    def endHeight(self):
+        '''
         Get or set the endHeight property.
 
         >>> b = spanner.Line()
         >>> b.endHeight = -20
         Traceback (most recent call last):
         music21.spanner.SpannerException: not a valid value: -20
-        ''')
+        '''
+        return self._endHeight
 
-    def _getStartHeight(self):
-        return self._startHeight
-
-    def _setStartHeight(self, value):
+    @endHeight.setter
+    def endHeight(self, value):
         if not (common.isNum(value) and value >= 0):
             raise SpannerException(f'not a valid value: {value}')
-        self._startHeight = value
+        self._endHeight = value
 
-    startHeight = property(_getStartHeight, _setStartHeight, doc='''
+    @property
+    def startHeight(self):
+        '''
         Get or set the startHeight property.
 
         >>> b = spanner.Line()
         >>> b.startHeight = None
         Traceback (most recent call last):
         music21.spanner.SpannerException: not a valid value: None
-        ''')
+        '''
+        return self._startHeight
+
+    @startHeight.setter
+    def startHeight(self, value):
+        if not (common.isNum(value) and value >= 0):
+            raise SpannerException(f'not a valid value: {value}')
+        self._startHeight = value
 
 
 class Glissando(Spanner):
@@ -2299,17 +2301,18 @@ class Glissando(Spanner):
         if label is not None:
             self.label = label  # use property
 
-    def _getLineType(self):
+    @property
+    def lineType(self):
+        '''
+        Get or set the lineType property. See Line for valid line types.
+        '''
         return self._lineType
 
-    def _setLineType(self, value):
+    @lineType.setter
+    def lineType(self, value):
         if value.lower() not in self.validLineTypes:
             raise SpannerException(f'not a valid value: {value}')
         self._lineType = value.lower()
-
-    lineType = property(_getLineType, _setLineType, doc='''
-        Get or set the lineType property. See Line for valid line types.
-        ''')
 
     @property
     def slideType(self):

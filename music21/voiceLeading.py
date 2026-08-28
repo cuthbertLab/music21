@@ -1801,42 +1801,44 @@ class Verticality(base.Music21Object):
         else:
             return sorted(self.objects, key=lambda m21Obj: m21Obj.offset)[-1].offset
 
-    def _setLyric(self, value):
-        newList = sorted(self.objects, key=lambda x: x.offset, reverse=True)
-        newList[0].lyric = value
-
-    def _getLyric(self):
-        newList = sorted(self.objects, key=lambda x: x.offset, reverse=True)
-        return newList[0].lyric
-
-    lyric = property(_getLyric, _setLyric, doc='''
+    @property
+    def lyric(self):
+        '''
         Sets each object on the Verticality to have the passed in lyric.
 
         >>> h = voiceLeading.Verticality({1: note.Note('C'), 2: harmony.ChordSymbol('C')})
         >>> h.lyric = 'Verticality 1'
         >>> h.getStream().flatten().getElementsByClass(note.Note).first().lyric
         'Verticality 1'
-        ''')
+        '''
+        newList = sorted(self.objects, key=lambda x: x.offset, reverse=True)
+        return newList[0].lyric
+
+    @lyric.setter
+    def lyric(self, value):
+        newList = sorted(self.objects, key=lambda x: x.offset, reverse=True)
+        newList[0].lyric = value
 
     def _reprInternal(self):
         return f'contentDict={self.contentDict}'
 
-    def _setColor(self, color):
-        self.style.color = color
-        for obj in self.objects:
-            obj.style.color = color
-
-    def _getColor(self):
-        return self.style.color
-
-    color = property(_getColor, _setColor, doc='''
+    @property
+    def color(self):
+        '''
         Sets the color of each element in the Verticality.
 
         >>> vs1 = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('D')})
         >>> vs1.color = 'blue'
         >>> [(x, x.style.color) for x in vs1.objects]
         [(<music21.note.Note C>, 'blue'), (<music21.harmony.ChordSymbol D>, 'blue')]
-    ''')
+        '''
+        return self.style.color
+
+    @color.setter
+    def color(self, color):
+        self.style.color = color
+        for obj in self.objects:
+            obj.style.color = color
 
 
 class VerticalityNTuplet(base.Music21Object):
@@ -2010,18 +2012,9 @@ class NNoteLinearSegment(base.Music21Object):
         return self._noteList[:]
 
 
-    def _getMelodicIntervals(self):
-        tempListOne = self.noteList[:-1]
-        tempListTwo = self.noteList[1:]
-        melodicIntervalList = []
-        for n1, n2 in zip(tempListOne, tempListTwo, strict=True):
-            if n1 and n2:
-                melodicIntervalList.append(interval.Interval(n1, n2))
-            else:
-                melodicIntervalList.append(None)
-        return melodicIntervalList
-
-    melodicIntervals = property(_getMelodicIntervals, doc='''
+    @property
+    def melodicIntervals(self):
+        '''
         Calculates the melodic intervals and returns them as a list,
         with the interval at 0 being the interval between the first and second note.
 
@@ -2031,7 +2024,16 @@ class NNoteLinearSegment(base.Music21Object):
         [<music21.interval.Interval M2>,
          <music21.interval.Interval M-7>,
          <music21.interval.Interval M2>]
-        ''')
+        '''
+        tempListOne = self.noteList[:-1]
+        tempListTwo = self.noteList[1:]
+        melodicIntervalList = []
+        for n1, n2 in zip(tempListOne, tempListTwo, strict=True):
+            if n1 and n2:
+                melodicIntervalList.append(interval.Interval(n1, n2))
+            else:
+                melodicIntervalList.append(None)
+        return melodicIntervalList
 
 
 class ThreeNoteLinearSegmentException(exceptions21.Music21Exception):
@@ -2095,22 +2097,37 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         else:
             super().__init__([noteListOrN1, n2, n3], **keywords)
 
-    def _getN1(self):
+    @property
+    def n1(self):
+        '''
+        Get or set the first note (left-most) in the segment.
+        '''
         return self.noteList[0]
 
-    def _setN1(self, value):
+    @n1.setter
+    def n1(self, value):
         self.noteList[0] = self._correctNoteInput(value)
 
-    def _getN2(self):
+    @property
+    def n2(self):
+        '''
+        Get or set the middle note in the segment.
+        '''
         return self.noteList[1]
 
-    def _setN2(self, value):
+    @n2.setter
+    def n2(self, value):
         self.noteList[1] = self._correctNoteInput(value)
 
-    def _getN3(self):
+    @property
+    def n3(self):
+        '''
+        Get or set the last note (right-most) in the segment.
+        '''
         return self.noteList[2]
 
-    def _setN3(self, value):
+    @n3.setter
+    def n3(self, value):
         self.noteList[2] = self._correctNoteInput(value)
 
     def _correctNoteInput(self, value):
@@ -2130,53 +2147,44 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
                 ) from e
 
 
-    n1 = property(_getN1, _setN1, doc='''
-        Get or set the first note (left-most) in the segment.
-        ''')
-    n2 = property(_getN2, _setN2, doc='''
-        Get or set the middle note in the segment.
-        ''')
-    n3 = property(_getN3, _setN3, doc='''
-        Get or set the last note (right-most) in the segment.
-        ''')
-
-    def _getILeftToRight(self):
-        if self.n1 and self.n3:
-            return interval.Interval(self.n1, self.n3)
-        else:
-            return None
-
-    def _getILeft(self):
-        return self.melodicIntervals[0]
-
-    def _getIRight(self):
-        return self.melodicIntervals[1]
-
-    iLeftToRight = property(_getILeftToRight, doc='''
+    @property
+    def iLeftToRight(self):
+        '''
         Get the interval between the left-most note and the right-most note
         (read-only property).
 
         >>> tnls = voiceLeading.ThreeNoteLinearSegment('C', 'E', 'G')
         >>> tnls.iLeftToRight
         <music21.interval.Interval P5>
-        ''')
+        '''
+        if self.n1 and self.n3:
+            return interval.Interval(self.n1, self.n3)
+        else:
+            return None
 
-    iLeft = property(_getILeft, doc='''
+    @property
+    def iLeft(self):
+        '''
         Get the interval between the left-most note and the middle note
         (read-only property).
 
         >>> tnls = voiceLeading.ThreeNoteLinearSegment('A', 'B', 'G')
         >>> tnls.iLeft
         <music21.interval.Interval M2>
-        ''')
-    iRight = property(_getIRight, doc='''
+        '''
+        return self.melodicIntervals[0]
+
+    @property
+    def iRight(self):
+        '''
         Get the interval between the middle note and the right-most note
         (read-only property).
 
         >>> tnls = voiceLeading.ThreeNoteLinearSegment('A', 'B', 'G')
         >>> tnls.iRight
         <music21.interval.Interval M-3>
-        ''')
+        '''
+        return self.melodicIntervals[1]
 
     def _reprInternal(self):
         return f'n1={self.n1} n2={self.n2} n3={self.n3}'

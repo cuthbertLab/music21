@@ -660,21 +660,22 @@ class TsvHandler:
         if self.dcml_version == 1:
             # This sort of metadata seems to have been removed altogether from the
             # v2 files
-            s.insert(0, metadata.Metadata())
+            md = metadata.Metadata()
+            s.insert(0, md)
 
             firstEntry = self.chordList[0]  # Any entry will do
             title = []
             if 'op' in firstEntry.extra:
-                s.metadata.opusNumber = firstEntry.extra['op']
-                title.append('Op' + s.metadata.opusNumber)
+                md.opusNumber = firstEntry.extra['op']
+                title.append('Op' + firstEntry.extra['op'])
             if 'no' in firstEntry.extra:
-                s.metadata.number = firstEntry.extra['no']
-                title.append('No' + s.metadata.number)
+                md.number = firstEntry.extra['no']
+                title.append('No' + firstEntry.extra['no'])
             if 'mov' in firstEntry.extra:
-                s.metadata.movementNumber = firstEntry.extra['mov']
-                title.append('Mov' + s.metadata.movementNumber)
+                md.movementNumber = firstEntry.extra['mov']
+                title.append('Mov' + firstEntry.extra['mov'])
             if title:
-                s.metadata.title = '_'.join(title)
+                md.title = '_'.join(title)
 
         startingKeySig = str(self.chordList[0].global_key)
         ks = key.Key(startingKeySig)
@@ -816,9 +817,10 @@ class M21toTSV:
                 thisEntry.timesig = ''
             else:
                 thisEntry.timesig = ts.ratioString
-            thisEntry.extra['op'] = self.m21Stream.metadata.opusNumber or ''
-            thisEntry.extra['no'] = self.m21Stream.metadata.number or ''
-            thisEntry.extra['mov'] = self.m21Stream.metadata.movementNumber or ''
+            md = self.m21Stream.metadata
+            thisEntry.extra['op'] = (md.opusNumber or '') if md is not None else ''
+            thisEntry.extra['no'] = (md.number or '') if md is not None else ''
+            thisEntry.extra['mov'] = (md.movementNumber or '') if md is not None else ''
             thisEntry.length = thisRN.quarterLength
             thisEntry.global_key = global_key
             thisEntry.local_key = thisRN.key.tonicPitchNameWithCase
