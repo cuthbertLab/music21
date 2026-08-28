@@ -2097,22 +2097,18 @@ class Test(unittest.TestCase):
                          '{-{13@3|13@5|13@7|13@9}&11@2}|{-{11@4|11@8}&13@9}|{13@0|13@1|13@6}')
 
     def testPitchSieveA(self):
-        from music21 import sieve
-
-        s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6')
+        s1 = PitchSieve('3@0|7@0', 'c2', 'c6')
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, E-2, F#2, G2, A2, C3, D3, E-3, F#3, A3, C4, E-4, '
                          'E4, F#4, A4, B4, C5, E-5, F#5, A5, C6]')
 
-        s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6', eld=2)
+        s1 = PitchSieve('3@0|7@0', 'c2', 'c6', eld=2)
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, D2, F#2, C3, E3, F#3, C4, F#4, C5, F#5, G#5, C6]')
 
     def testPitchSieveB(self):
-        from music21 import sieve
-
         # microtonal elds
-        s1 = sieve.PitchSieve('1@0', 'c2', 'c6', eld=0.5)
+        s1 = PitchSieve('1@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, C~2, C#2, C#~2, D2, D~2, E-2, E`2, E2, E~2, F2, F~2, F#2, '
                          'F#~2, G2, G~2, G#2, G#~2, A2, A~2, B-2, B`2, B2, B~2, C3, C~3, C#3, '
@@ -2122,7 +2118,7 @@ class Test(unittest.TestCase):
                          'B`4, B4, B~4, C5, C~5, C#5, C#~5, D5, D~5, E-5, E`5, E5, E~5, F5, F~5, '
                          'F#5, F#~5, G5, G~5, G#5, G#~5, A5, A~5, B-5, B`5, B5, B~5, C6]')
 
-        s1 = sieve.PitchSieve('3@0', 'c2', 'c6', eld=0.5)
+        s1 = PitchSieve('3@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, '
                          'A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, '

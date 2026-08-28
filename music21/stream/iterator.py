@@ -2132,8 +2132,6 @@ class Test(unittest.TestCase):
 
     def testAddingFiltersMidRecursiveIteration(self):
         from music21 import stream
-        # noinspection PyUnresolvedReferences
-        from music21.stream.iterator import RecursiveIterator as ImportedRecursiveIterator
         m = stream.Measure()
         r = note.Rest()
         n = note.Note()
@@ -2149,7 +2147,7 @@ class Test(unittest.TestCase):
         self.assertIs(p0, p)
 
         child = sIter.childRecursiveIterator
-        self.assertIsInstance(child, ImportedRecursiveIterator)
+        self.assertIsInstance(child, RecursiveIterator)
 
 
 

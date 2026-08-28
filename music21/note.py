@@ -2077,14 +2077,12 @@ class TestExternal(unittest.TestCase):
         '''
         Need to test direct note creation w/o stream
         '''
-        from music21 import note
-        a = note.Note('D-3')
+        a = Note('D-3')
         a.quarterLength = 2.25
         if self.show:
             a.show()
 
     def testBasic(self):
-        from music21 import note
         from music21 import stream
         a = stream.Stream()
 
@@ -2093,7 +2091,7 @@ class TestExternal(unittest.TestCase):
                                 ('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
                                 ('f#2', 1.75), ('g-3', (4 / 3)), ('d#6', (2 / 3))
                                 ]:
-            b = note.Note()
+            b = Note()
             b.quarterLength = qLen
             b.name = pitchName
             # Pylint going crazy here

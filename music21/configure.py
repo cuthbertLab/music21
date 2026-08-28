@@ -1545,9 +1545,8 @@ class TestUserInput(unittest.TestCase):  # pragma: no cover
 class Test(unittest.TestCase):
 
     def testYesOrNo(self):
-        from music21 import configure
-        d = configure.YesOrNo(default=True, tryAgain=False,
-                              promptHeader='Are you ready to continue?')
+        d = YesOrNo(default=True, tryAgain=False,
+                    promptHeader='Are you ready to continue?')
         d.askUser('n')
         self.assertEqual(str(d.getResult()), 'False')
         d.askUser('y')
@@ -1557,8 +1556,8 @@ class Test(unittest.TestCase):
         d.askUser('blah')  # gets default
         self.assertEqual(str(d.getResult()), '<music21.configure.IncompleteInput: blah>')
 
-        d = configure.YesOrNo(default=None, tryAgain=False,
-                              promptHeader='Are you ready to continue?')
+        d = YesOrNo(default=None, tryAgain=False,
+                    promptHeader='Are you ready to continue?')
         d.askUser('n')
         self.assertEqual(str(d.getResult()), 'False')
         d.askUser('y')
@@ -1569,13 +1568,11 @@ class Test(unittest.TestCase):
         self.assertEqual(str(d.getResult()), '<music21.configure.IncompleteInput: blah>')
 
     def testSelectFromList(self):
-        from music21 import configure
-        d = configure.SelectFromList(default=1)
+        d = SelectFromList(default=1)
         self.assertEqual(d._default, 1)
 
     def testSelectMusicXMLReaders(self):
-        from music21 import configure
-        d = configure.SelectMusicXMLReader()
+        d = SelectMusicXMLReader()
         # force request to user by returning no valid results
 
         def getValidResults(force=None):
@@ -1585,7 +1582,7 @@ class Test(unittest.TestCase):
         d.askUser(force='n', skipIntro=True)  # reject option to open in a browser
         post = d.getResult()
         # returns a bad condition b/c there are no options and user entered 'n'
-        self.assertIsInstance(post, configure.BadConditions)
+        self.assertIsInstance(post, BadConditions)
 
     def testMuseScoreNameRe(self):
         '''

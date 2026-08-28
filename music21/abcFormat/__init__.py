@@ -3935,8 +3935,7 @@ class Test(unittest.TestCase):
 
     def testAcc(self):
         from music21.abcFormat import testFiles
-        from music21 import abcFormat
-        ah = abcFormat.ABCHandler()
+        ah = ABCHandler()
         ah.process(testFiles.accTest)
         # noinspection SpellCheckingInspection
         tokensCorrect = '''<music21.abcFormat.ABCMetadata 'X: 979'>
@@ -4035,11 +4034,11 @@ class Test(unittest.TestCase):
         j = 0
         k = 0
         for token in tokens:
-            if isinstance(token, abcFormat.ABCAccent):
+            if isinstance(token, ABCAccent):
                 i += 1
-            elif isinstance(token, abcFormat.ABCStraccent):
+            elif isinstance(token, ABCStraccent):
                 j += 1
-            elif isinstance(token, abcFormat.ABCTenuto):
+            elif isinstance(token, ABCTenuto):
                 k += 1
         self.assertEqual(i, 2)
         self.assertEqual(j, 2)

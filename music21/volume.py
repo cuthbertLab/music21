@@ -508,10 +508,9 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         import gc
-        from music21 import volume
 
         n1 = note.Note('G#4')
-        v = volume.Volume(client=n1)
+        v = Volume(client=n1)
         self.assertEqual(v.client, n1)
         del n1
         gc.collect()
@@ -521,7 +520,6 @@ class Test(unittest.TestCase):
 
     def testGetContextSearchA(self):
         from music21 import stream
-        from music21 import volume
 
         s = stream.Stream()
         d1 = dynamics.Dynamic('mf')
@@ -530,7 +528,7 @@ class Test(unittest.TestCase):
         s.insert(2, d2)
 
         n1 = note.Note('g')
-        v1 = volume.Volume(client=n1)
+        v1 = Volume(client=n1)
         s.insert(4, n1)
 
         # can get dynamics from volume object
@@ -556,10 +554,9 @@ class Test(unittest.TestCase):
 
     def testDeepCopyA(self):
         import copy
-        from music21 import volume
         n1 = note.Note()
 
-        v1 = volume.Volume()
+        v1 = Volume()
         v1.velocity = 111
         v1.client = n1
 
@@ -572,9 +569,7 @@ class Test(unittest.TestCase):
 
 
     def testGetRealizedA(self):
-        from music21 import volume
-
-        v1 = volume.Volume(velocity=64)
+        v1 = Volume(velocity=64)
         self.assertEqual(v1.getRealizedStr(), '0.5')
 
         d1 = dynamics.Dynamic('p')
@@ -589,7 +584,7 @@ class Test(unittest.TestCase):
 
 
         # if vel is at max, can scale down with a dynamic
-        v1 = volume.Volume(velocity=127)
+        v1 = Volume(velocity=127)
         d1 = dynamics.Dynamic('fff')
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '1.0')
 
@@ -620,7 +615,6 @@ class Test(unittest.TestCase):
 
     def testRealizeVolumeA(self):
         from music21 import stream
-        from music21 import volume
 
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)
@@ -637,7 +631,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['0.71'] * 16)
 
         # calling realize will set all to new cached values
-        volume.realizeVolume(s)
+        realizeVolume(s)
         match = [n.volume.cachedRealizedStr for n in s.notes]
         self.assertEqual(match, ['0.35', '0.35', '0.5', '0.5',
                                  '0.64', '0.64', '0.99', '0.99',
@@ -666,7 +660,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [None] * 16)
 
         # can set velocity with realized values
-        volume.realizeVolume(s, setAbsoluteVelocity=True)
+        realizeVolume(s, setAbsoluteVelocity=True)
         match = [n.volume.velocity for n in s.notes]
         self.assertEqual(match, [45, 45, 63, 63, 81, 81, 126, 126, 99, 99,
                                  127, 127, 27, 27, 99, 99])

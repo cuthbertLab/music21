@@ -363,8 +363,7 @@ class Test(unittest.TestCase):
         self.assertEqual(FretNote().string, None)
 
     def testFretNoteWeirdRepr(self):
-        from music21 import tablature
-        weirdFretNote = tablature.FretNote(6, 133)
+        weirdFretNote = FretNote(6, 133)
 
         expectedRepr = '<music21.tablature.FretNote 6th string, 133rd fret>'
 

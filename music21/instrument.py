@@ -2600,82 +2600,79 @@ class Test(unittest.TestCase):
         # s3.show()
 
     def testPartitionByInstrumentA(self):
-        from music21 import instrument
         from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
         p1 = stream.Part()
-        p1.append(instrument.Piano())
+        p1.append(Piano())
 
         p2 = stream.Part()
-        p2.append(instrument.Piccolo())
+        p2.append(Piccolo())
         s.insert(0, p1)
         s.insert(0, p2)
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass(instrument.Instrument)), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(Instrument)), 2)
 
         # post.show('t')
 
         # one Stream with multiple instruments
         s = stream.Stream()
-        s.insert(0, instrument.PanFlute())
-        s.insert(20, instrument.ReedOrgan())
+        s.insert(0, PanFlute())
+        s.insert(20, ReedOrgan())
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post[instrument.Instrument]), 2)
+        self.assertEqual(len(post[Instrument]), 2)
         # post.show('t')
 
     def testPartitionByInstrumentB(self):
-        from music21 import instrument
         from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
         p1 = stream.Part()
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note(), 6)
 
         p2 = stream.Part()
-        p2.append(instrument.Piccolo())
+        p2.append(Piccolo())
         p2.repeatAppend(note.Note(), 12)
         s.insert(0, p1)
         s.insert(0, p2)
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post[instrument.Instrument]), 2)
+        self.assertEqual(len(post[Instrument]), 2)
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(len(post.parts[1].notes), 12)
 
     def testPartitionByInstrumentC(self):
-        from music21 import instrument
         from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
         p1 = stream.Part()
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('a'), 6)
         # will go in next available offset
-        p1.append(instrument.AcousticGuitar())
+        p1.append(AcousticGuitar())
         p1.repeatAppend(note.Note('b'), 3)
 
         p2 = stream.Part()
-        p2.append(instrument.Piccolo())
+        p2.append(Piccolo())
         p2.repeatAppend(note.Note('c'), 2)
-        p2.append(instrument.Flute())
+        p2.append(Flute())
         p2.repeatAppend(note.Note('d'), 4)
 
         s.insert(0, p1)
         s.insert(0, p2)
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post[instrument.Instrument]), 4)
+        self.assertEqual(len(post[Instrument]), 4)
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(post.parts[1].getInstrument().instrumentName, 'Acoustic Guitar')
@@ -2689,34 +2686,33 @@ class Test(unittest.TestCase):
         # post.show('t')
 
     def testPartitionByInstrumentD(self):
-        from music21 import instrument
         from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
         p1 = stream.Part()
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('a'), 6)
         # will go in next available offset
-        p1.append(instrument.AcousticGuitar())
+        p1.append(AcousticGuitar())
         p1.repeatAppend(note.Note('b'), 3)
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('e'), 5)
 
         p2 = stream.Part()
-        p2.append(instrument.Piccolo())
+        p2.append(Piccolo())
         p2.repeatAppend(note.Note('c'), 2)
-        p2.append(instrument.Flute())
+        p2.append(Flute())
         p2.repeatAppend(note.Note('d'), 4)
-        p2.append(instrument.Piano())
+        p2.append(Piano())
         p2.repeatAppend(note.Note('f'), 1)
 
         s.insert(0, p1)
         s.insert(0, p2)
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post[instrument.Instrument]), 4)
+        self.assertEqual(len(post[Instrument]), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 12)
@@ -2728,32 +2724,31 @@ class Test(unittest.TestCase):
         # post.show('t')
 
     def testPartitionByInstrumentE(self):
-        from music21 import instrument
         from music21 import stream
 
         # basic case of instruments in Parts
         # s = stream.Score()
         p1 = stream.Part()
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('a'), 6)
         # will go in next available offset
-        p1.append(instrument.AcousticGuitar())
+        p1.append(AcousticGuitar())
         p1.repeatAppend(note.Note('b'), 3)
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('e'), 5)
 
-        p1.append(instrument.Piccolo())
+        p1.append(Piccolo())
         p1.repeatAppend(note.Note('c'), 2)
-        p1.append(instrument.Flute())
+        p1.append(Flute())
         p1.repeatAppend(note.Note('d'), 4)
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('f'), 1)
 
         s = p1
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post[instrument.Instrument]), 4)
+        self.assertEqual(len(post[Instrument]), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
 
@@ -2767,16 +2762,15 @@ class Test(unittest.TestCase):
                          [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
 
     def testPartitionByInstrumentF(self):
-        from music21 import instrument
         from music21 import stream
 
         s1 = stream.Stream()
-        s1.append(instrument.AcousticGuitar())
+        s1.append(AcousticGuitar())
         s1.append(note.Note())
-        s1.append(instrument.Tuba())
+        s1.append(Tuba())
         s1.append(note.Note())
 
-        post = instrument.partitionByInstrument(s1)
+        post = partitionByInstrument(s1)
         self.assertEqual(len(post), 2)  # 4 instruments
 
     # def testPartitionByInstrumentDocTest(self):
@@ -2803,14 +2797,12 @@ class Test(unittest.TestCase):
     #         p.makeRests(fillGaps=True, inPlace=True)
 
     def testLanguageChoice(self):
-        from music21 import instrument
-
         # fromString
 
         testString = 'Klarinette'  # German name
 
         # Works when language not specified
-        self.assertEqual(instrument.fromString(testString).instrumentName,
+        self.assertEqual(fromString(testString).instrumentName,
                          testString)
 
         workingExamples = ['german',  # Works with correct language for the term
@@ -2818,7 +2810,7 @@ class Test(unittest.TestCase):
                            ]
 
         for langStr in workingExamples:
-            instrName = instrument.fromString(testString, language=langStr).instrumentName
+            instrName = fromString(testString, language=langStr).instrumentName
             self.assertEqual(instrName, testString)
 
         failingExamples = ['french',  # Error when the language doesn't match the term
@@ -2827,20 +2819,20 @@ class Test(unittest.TestCase):
 
         for langStr in failingExamples:
             self.assertRaises(InstrumentException,
-                              instrument.fromString,
+                              fromString,
                               testString,
                               language=langStr)
 
         # getAllNamesForInstrument
 
-        inst = instrument.Flute()
+        inst = Flute()
         # Working example
-        self.assertEqual(instrument.getAllNamesForInstrument(inst,
-                                                             language=SearchLanguage.ABBREVIATION),
+        self.assertEqual(getAllNamesForInstrument(inst,
+                                                  language=SearchLanguage.ABBREVIATION),
                          {'abbreviation': ['fl']})
         # Error for unsupported language
         self.assertRaises(InstrumentException,
-                          instrument.getAllNamesForInstrument,
+                          getAllNamesForInstrument,
                           inst,
                           language='finnish')
 
