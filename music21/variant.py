@@ -271,19 +271,9 @@ class Variant(base.Music21Object):
         '''
         return self._stream
 
-    def _getReplacementQuarterLength(self):
-        if self._replacementQuarterLength is None:
-            return self._stream.duration.quarterLength
-        else:
-            return self._replacementQuarterLength
-
-    def _setReplacementQuarterLength(self, value):
-        self._replacementQuarterLength = value
-
-    replacementQuarterLength = property(
-        _getReplacementQuarterLength,
-        _setReplacementQuarterLength,
-        doc='''
+    @property
+    def replacementQuarterLength(self):
+        '''
         Set or Return the quarterLength in the main stream which this variant
         object replaces in the variant version of the stream. If replacementQuarterLength is
         not set, it is assumed to be the same length as the variant. If it is set to 0,
@@ -292,23 +282,19 @@ class Variant(base.Music21Object):
         itself.
 
         * New in v10.3: renamed from ``replacementDuration``.
-        ''')
+        '''
+        if self._replacementQuarterLength is None:
+            return self._stream.duration.quarterLength
+        else:
+            return self._replacementQuarterLength
 
-    def _getReplacementDuration(self):
-        return self.replacementQuarterLength
+    @replacementQuarterLength.setter
+    def replacementQuarterLength(self, value):
+        self._replacementQuarterLength = value
 
-    def _setReplacementDuration(self, value):
-        warnings.warn(
-            "'replacementDuration' is deprecated as of v11 and will be removed in v12; "
-            + 'use the synonym replacementQuarterLength instead.',
-            exceptions21.Music21DeprecationWarning,
-            stacklevel=2)
-        self.replacementQuarterLength = value
-
-    replacementDuration = property(
-        _getReplacementDuration,
-        _setReplacementDuration,
-        doc='''
+    @property
+    def replacementDuration(self):
+        '''
         Synonym for :attr:`replacementQuarterLength`.
 
         .. note::
@@ -317,7 +303,17 @@ class Variant(base.Music21Object):
             avoids referring to an offset/quarterLength value as a "Duration").
             Setting it raises a deprecation warning, and it will be removed in v12.  Use
             :attr:`replacementQuarterLength` instead.
-        ''')
+        '''
+        return self.replacementQuarterLength
+
+    @replacementDuration.setter
+    def replacementDuration(self, value):
+        warnings.warn(
+            "'replacementDuration' is deprecated as of v11 and will be removed in v12; "
+            + 'use the synonym replacementQuarterLength instead.',
+            exceptions21.Music21DeprecationWarning,
+            stacklevel=2)
+        self.replacementQuarterLength = value
 
     @property
     def lengthType(self):

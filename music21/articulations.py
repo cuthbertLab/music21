@@ -170,26 +170,26 @@ class Articulation(base.Music21Object):
         className = self.__class__.__name__
         return common.camelCaseToHyphen(className, replacement=' ')
 
-    def _getVolumeShift(self):
+    @property
+    def volumeShift(self):
+        '''
+        Get or set the volumeShift of this Articulation. This value, between -1 and 1,
+        that is used to shift the final Volume of the object it is attached to.
+
+        >>> at1 = articulations.StrongAccent()
+        >>> at1.volumeShift > 0.1
+        True
+        '''
         return self._volumeShift
 
-    def _setVolumeShift(self, value):
+    @volumeShift.setter
+    def volumeShift(self, value):
         # value should be between 0 and 1
         if value > 1:
             value = 1
         elif value < -1:
             value = -1
         self._volumeShift = value
-
-    volumeShift = property(_getVolumeShift, _setVolumeShift, doc='''
-        Get or set the volumeShift of this Articulation. This value, between -1 and 1,
-        that is used to shift the final Volume of the object it is attached to.
-
-
-        >>> at1 = articulations.StrongAccent()
-        >>> at1.volumeShift > 0.1
-        True
-        ''')
 
 # ------------------------------------------------------------------------------
 class LengthArticulation(Articulation):

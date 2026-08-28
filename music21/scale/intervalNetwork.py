@@ -2688,7 +2688,13 @@ class IntervalNetwork:
         # TODO: BUG: Does not work with bidirectional scales.
 
         # TODO: possibly cache results
-        for unused_counter in range(10):
+
+        # A non-deterministic realization can skip the target node entirely, so try
+        # again; a deterministic one realizes the same way every time, so once is enough.
+        # 40 tries on Weighed Hexatonic or other scales where each node exists
+        # = 1 fail in 1.1 trillion tries, but still only about 25ms in case the node actually
+        # does not exist in the scale.
+        for unused_counter in range(1 if self.deterministic else 40):
             realizedPitch, realizedNode = self.realize(
                 pitchReference=pitchReference,
                 nodeId=nodeListForNames[0],

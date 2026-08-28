@@ -114,7 +114,8 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
 
         return f'{self.siteIndex}/{self.globalSiteIndex} to {siteRepr}'
 
-    def _getAndUnwrapSite(self):
+    @property
+    def site(self):
         if WEAKREF_ACTIVE:
             ret = common.unwrapWeakref(self.siteWeakref)
         else:
@@ -125,14 +126,13 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
 
         return ret
 
-    def _setAndWrapSite(self, site):
+    @site.setter
+    def site(self, site):
         if WEAKREF_ACTIVE:
             self.siteWeakref = common.wrapWeakref(site)
         else:
             self.siteWeakref = site
         self.isDead = False
-
-    site = property(_getAndUnwrapSite, _setAndWrapSite)
 
     # called before pickling.
     def __getstate__(self):

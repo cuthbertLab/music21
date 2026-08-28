@@ -7340,7 +7340,7 @@ class MeasureExporter(XMLExporterBase):
         self.setPrintObject(mxTime, ts)
         return mxTime
 
-    def keySignatureToXml(self, keyOrKeySignature):
+    def keySignatureToXml(self, keyOrKeySignature: key.KeySignature) -> Element:
         # noinspection PyShadowingNames
         '''
         returns a key tag from a music21
@@ -7365,7 +7365,8 @@ class MeasureExporter(XMLExporterBase):
           <mode>major</mode>
         </key>
 
-        >>> ksNonTrad = key.KeySignature(sharps=None)
+        >>> ksNonTrad = key.KeySignature()
+        >>> ksNonTrad.isNonTraditional = True
         >>> ksNonTrad.alteredPitches = ['C#', 'E-4']
         >>> ksNonTrad
         <music21.key.KeySignature of pitches: [C#, E-4]>

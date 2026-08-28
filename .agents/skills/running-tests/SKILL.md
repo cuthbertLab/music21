@@ -71,6 +71,29 @@ unittest classes. When a module's tests live in a `tests.py` file (much of
 music21's house style), the directory form already picks those up — the gotcha
 is specifically modules that keep `Test` inside a non-`tests.py` file.
 
+## Speed budget
+
+Aim for about 3 seconds for a module's tests, and never add more than 15 — that is time
+every contributor waits on every full run. `corpus.parse()` is nearly always the culprit:
+build a small stream by hand instead, or parse `bwv66.6`, which is short and still full
+of interesting cases (pickup measures, and so on).
+
+## Tests that open windows
+
+Nothing in `Test` or in a doctest may open a window, play audio, or launch another
+program. Those go in a sibling class, run only when named explicitly:
+
+```python
+class TestExternal(unittest.TestCase):
+    ...
+
+if __name__ == '__main__':
+    import music21
+    music21.mainTest(Test, TestExternal)
+```
+
+Because they have those side effects, skip `TestExternal` when running a file directly.
+
 ## Whole suite and the other gates
 
 - Full suite: `python music21/test/multiprocessTest.py` (or
