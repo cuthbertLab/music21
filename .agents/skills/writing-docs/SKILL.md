@@ -16,13 +16,6 @@ earning its place says something the code cannot.
 
 ## Prose
 
-Assume the reader is skimming and looking for an excuse to stop. Give them
-something to catch on.
-
-**Examples are music.** `key.KeySignature(-3)` is E-flat major, so say E-flat
-major. Reach into the corpus rather than inventing `foo`: `bwv66.6` and
-`luca/gloria` are in hundreds of docstrings because a reader can hear them.
-
 **Lead with the thing itself.** "Returns the pitches sounding at an offset," not
 "This method can be used to obtain the pitches that are sounding."
 
@@ -32,10 +25,10 @@ slides off the page. A short one lands.
 **Cut throat-clearing.** "It is important to note that," "Note that in general,"
 "This allows the user to." Start at the verb.
 
-**Personality is house style, not a lapse.** `Cannot determine sharps for
-quarter-tone keys! silly!` and "it'd wig me out if I ever didn't see them in
-reverse alphabetical order" are both shipping music21. Dry, specific, short. A
-joke needing a second sentence to land is one sentence too long.
+**Humor is house style, not a lapse.** `Cannot determine sharps for quarter-tone
+keys! silly!` and "it'd wig me out if I ever didn't see them in reverse
+alphabetical order" are both shipping music21. A joke needing a second sentence
+to land is one sentence too long.
 
 ## Say what is, not what was or what not to do
 
