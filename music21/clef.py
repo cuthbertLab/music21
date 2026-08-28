@@ -824,14 +824,12 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
         else:
             lineNum = False
     elif len(xnStr) > 2:
-        from music21 import clef as myself
         xnLower = xnStr.lower()
-        for x in dir(myself):
-            if 'Clef' not in x:
+        for className, objType in globals().items():
+            if 'Clef' not in className:
                 continue
-            if xnLower != x.lower() and xnLower + 'clef' != x.lower():
+            if className.lower() not in (xnLower, xnLower + 'clef'):
                 continue
-            objType = getattr(myself, x)
             if isinstance(objType, type):
                 return objType()
 

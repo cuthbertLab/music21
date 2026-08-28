@@ -181,8 +181,10 @@ class TempoIndication(base.Music21Object):
 # ------------------------------------------------------------------------------
 class TempoText(TempoIndication):
     '''
-    >>> import music21
-    >>> tm = music21.tempo.TempoText('adagio')
+    TempoText is a TempoIndication that uses words (not metronome numbers)
+    to indicate tempo.
+
+    >>> tm = tempo.TempoText('adagio')
     >>> tm
     <music21.tempo.TempoText 'adagio'>
     >>> print(tm.text)
@@ -206,8 +208,7 @@ class TempoText(TempoIndication):
         Get or set the text as a string.  Setting is also the primary way that
         the stored TextExpression object is created.
 
-        >>> import music21
-        >>> tm = music21.tempo.TempoText('adagio')
+        >>> tm = tempo.TempoText('adagio')
         >>> tm.text
         'adagio'
         >>> tm.getTextExpression()

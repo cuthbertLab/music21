@@ -364,7 +364,6 @@ class Dialog:
         '''
         Prepare the header, given a string.
 
-        >>> from music21 import configure
         >>> d = configure.Dialog()
         >>> d._rawQueryPrepareHeader('test')
         'test'
