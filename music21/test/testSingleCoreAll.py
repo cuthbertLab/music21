@@ -135,10 +135,10 @@ def ciMain():
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
     # 'ci' runs what GitHub Actions runs; other arguments are test group names.
-    if sys.argv[1:2] == ['ci']:
+    if len(sys.argv) < 2:
+        main()
+    elif sys.argv[1] == 'ci':
         ciMain()
-    elif len(sys.argv) >= 2:
-        unused_returnCode = main(sys.argv[1:])
     else:
-        unused_returnCode = main()
+        main(sys.argv[1:])
 
