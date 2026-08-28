@@ -75,17 +75,25 @@ pytest is for a module. For the whole suite use the runners, and note that a
 green pytest run does not mean CI will be green -- they gather and order modules
 differently.
 
-```bash
-# everyday full run, on n-1 cores
-uv run python music21/test/multiprocessTest.py
+Use `multiprocessTest` -- it runs on n-1 cores and finishes in about 10 seconds,
+against roughly 45 for the single-core runner:
 
-# exactly what GitHub Actions runs (~1 minute); use before pushing to a PR
+```bash
+uv run python music21/test/multiprocessTest.py
+```
+
+That gap is the whole story when someone is waiting on the answer. Reach for
+`testSingleCoreAll` only for what `multiprocessTest` cannot tell you: it is what
+GitHub Actions runs, so it is the one to check before a release, when chasing a
+CI failure that will not reproduce, or on a single-core machine.
+
+```bash
 uv run python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
 ```
 
 The two runners see slightly different sets of modules -- `multiprocessTest`
 walks the package tree for modules reachable from `import music21`, while
-`testSingleCoreAll` gathers module files from disk. Run both before a release.
+`testSingleCoreAll` gathers module files from disk.
 
 Module **order** differs between the two runners and again from pytest.
 `multiprocessTest` goes in reverse-alphabetical order (with the known-slow
