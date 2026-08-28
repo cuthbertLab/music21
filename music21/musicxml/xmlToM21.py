@@ -6250,7 +6250,7 @@ class MeasureParser(XMLParserBase):
 
         ks.alteredPitches = alteredPitches
 
-    def nonTraditionalKeySignature(self, mxKey):
+    def nonTraditionalKeySignature(self, mxKey: ET.Element) -> key.KeySignature:
         # noinspection PyShadowingNames
         '''
         Returns a KeySignature object that represents a nonTraditional Key Signature
@@ -6279,17 +6279,17 @@ class MeasureParser(XMLParserBase):
         children = list(mxKey)
 
         lastTag = None
-        steps = []
-        alters = []
-        accidentals = []
+        steps: list[str] = []
+        alters: list[float] = []
+        accidentals: list[str|None] = []
 
         for c in children:
             tag = c.tag
             if lastTag == 'key-alter' and tag == 'key-step':
                 accidentals.append(None)
-            if tag == 'key-step':
+            if tag == 'key-step' and c.text:
                 steps.append(c.text)
-            elif tag == 'key-alter':
+            elif tag == 'key-alter' and c.text:
                 alters.append(float(c.text))
             elif tag == 'key-accidental':
                 accidentals.append(c.text)
@@ -6301,9 +6301,10 @@ class MeasureParser(XMLParserBase):
             raise MusicXMLImportException(
                 'For non traditional signatures each step must have an alter')
 
-        ks = key.KeySignature(sharps=None)
+        ks = key.KeySignature()
+        ks.isNonTraditional = True
 
-        alteredPitches = []
+        alteredPitches: list[pitch.Pitch] = []
         for step, alter, accidental in zip(steps, alters, accidentals):
             p = pitch.Pitch(step)
             if accidental is not None:

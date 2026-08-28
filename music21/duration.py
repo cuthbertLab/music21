@@ -3452,6 +3452,7 @@ class TupletFixer:
         There is a side format of humdrum that the Josquin Research Project uses
         for long notes like the 3%2.
 
+        >>> saved_JRP_flavor = humdrum.spineParser.flavors['JRP']  #_DOCS_HIDE
         >>> humdrum.spineParser.flavors['JRP'] = True
 
         Since Humdrum parsing is going to apply TupletFixer, we will temporarily
@@ -3475,6 +3476,7 @@ class TupletFixer:
         {10.6667 - 12.0} <music21.note.Note F#>
 
         >>> duration.TupletFixer.fixBrokenTupletDuration = saved_fixed_broken
+        >>> humdrum.spineParser.flavors['JRP'] = saved_JRP_flavor  #_DOCS_HIDE
         >>> tf = duration.TupletFixer(m1)
         >>> tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
         >>> tupletGroups

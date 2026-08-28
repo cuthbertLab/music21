@@ -85,7 +85,7 @@ def convertKeyStringToMusic21KeyString(textString):
     return textString
 
 
-def sharpsToPitch(sharpCount):
+def sharpsToPitch(sharpCount: int) -> pitch.Pitch:
     '''
     Given a positive/negative number of sharps, return a Pitch
     object set to the appropriate major key value.
@@ -122,9 +122,6 @@ def sharpsToPitch(sharpCount):
     >>> key._sharpsToPitchCache[1]
     <music21.pitch.Pitch G>
     '''
-    if sharpCount is None:
-        sharpCount = 0  # fix for C major
-
     if sharpCount in _sharpsToPitchCache:
         # return a deepcopy of the pitch
         return copy.deepcopy(_sharpsToPitchCache[sharpCount])
@@ -302,28 +299,16 @@ class KeySignature(base.Music21Object):
     >>> legal
     <music21.key.Key of c# minor>
 
-    To set a non-traditional Key Signature, create a KeySignature object
-    with `sharps=None`, and then set the `alteredPitches` list:
+    To set a non-traditional Key Signature, set `isNonTraditional` to True and
+    give the `alteredPitches` list.  A pitch with an octave is displayed in that
+    octave; set `accidentalsApplyOnlyToOctave` to True if it should affect only
+    that octave:
 
-    >>> unusual = key.KeySignature(sharps=None)
-    >>> unusual.alteredPitches = ['E-', 'G#']
+    >>> unusual = key.KeySignature()
+    >>> unusual.isNonTraditional = True
+    >>> unusual.alteredPitches = ['E-', 'G#4']
     >>> unusual
-    <music21.key.KeySignature of pitches: [E-, G#]>
-    >>> unusual.isNonTraditional
-    True
-
-    To set a pitch as displayed in a particular octave, create a non-traditional
-    KeySignature and then set pitches with octaves:
-
-    >>> unusual = key.KeySignature(sharps=None)
-    >>> unusual.alteredPitches = ['F#4']
-    >>> unusual
-    <music21.key.KeySignature of pitches: [F#4]>
-
-    If the accidental applies to all octaves but is being displayed differently
-    then you are done, but if you want them to apply only to the octave displayed
-    in then set `.accidentalsApplyOnlyToOctave` to `True`:
-
+    <music21.key.KeySignature of pitches: [E-, G#4]>
     >>> unusual.accidentalsApplyOnlyToOctave
     False
     >>> unusual.accidentalsApplyOnlyToOctave = True
@@ -343,9 +328,11 @@ class KeySignature(base.Music21Object):
 
     * Changed in v7: `sharps` defaults to 0 (key of no flats/sharps)
       rather than `None` for nontraditional keys.
+    * Changed in v11: `sharps` is always an int; `isNonTraditional` is a
+      settable attribute.  Passing `sharps=None` is deprecated.
     '''
     _styleClass = style.TextStyle
-    equalityAttributes = ('sharps',)
+    equalityAttributes = ('sharps', 'isNonTraditional')
 
     # note that musicxml permits non-traditional keys by specifying
     # one or more altered tones; these are given as pairs of
@@ -353,12 +340,20 @@ class KeySignature(base.Music21Object):
 
     classSortOrder = 2
 
-    def __init__(self, sharps: int|None = 0, **keywords):
+    def __init__(self, sharps: int = 0, **keywords):
         super().__init__(**keywords)
-        # position on the circle of fifths, where 1 is one sharp, -1 is one flat
+        self.isNonTraditional: bool = False
+
+        if sharps is None:
+            warnings.warn(
+                'sharps=None is deprecated: set isNonTraditional to True instead.',
+                exceptions21.Music21DeprecationWarning,
+                stacklevel=2)
+            sharps = 0
+            self.isNonTraditional = True
 
         try:
-            if sharps is not None and (sharps != int(sharps)):
+            if sharps != int(sharps):
                 raise KeySignatureException(
                     f'Cannot get a KeySignature from this "number" of sharps: {sharps!r}; '
                     + 'did you mean to use a key.Key() object instead?')
@@ -368,6 +363,7 @@ class KeySignature(base.Music21Object):
                 + 'did you mean to use a key.Key() object instead?'
             ) from ve
 
+        # position on the circle of fifths, where 1 is one sharp, -1 is one flat
         self._sharps = sharps
         # need to store a list of pitch objects, used for creating a
         # non-traditional key
@@ -379,7 +375,7 @@ class KeySignature(base.Music21Object):
     def _strDescription(self):
         output = ''
         ns = self.sharps
-        if ns is None:
+        if self.isNonTraditional:
             output = 'pitches: [' + ', '.join([str(p) for p in self.alteredPitches]) + ']'
         elif ns > 1:
             output = f'{ns} sharps'
@@ -396,7 +392,7 @@ class KeySignature(base.Music21Object):
     def _reprInternal(self):
         return 'of ' + self._strDescription()
 
-    def asKey(self, mode: str|None = None, tonic: str|None = None):
+    def asKey(self, mode: str|None = None, tonic: str|None = None) -> Key:
         '''
         Return a `key.Key` object representing this KeySignature object as a key in the
         given mode or in the given tonic. If `mode` is None, and `tonic` is not provided,
@@ -429,7 +425,6 @@ class KeySignature(base.Music21Object):
 
         * New in v7: `tonic` argument to solve for mode.
         '''
-        our_sharps = self.sharps or 0  # || 0 in case of None -- non-standard key-signature
         if mode is not None and tonic is not None:
             warnings.warn(f'ignoring provided tonic: {tonic}', KeyWarning, stacklevel=2)
         if mode is None and tonic is None:
@@ -438,7 +433,7 @@ class KeySignature(base.Music21Object):
             majorSharpsToMode = {v: k for k, v in modeSharpsAlter.items()}
             majorSharps = pitchToSharps(tonic)
             try:
-                mode = majorSharpsToMode[our_sharps - majorSharps]
+                mode = majorSharpsToMode[self.sharps - majorSharps]
             except KeyError as ke:
                 raise KeyException(
                     f'Could not solve for mode from sharps={self.sharps}, tonic={tonic}') from ke
@@ -448,7 +443,7 @@ class KeySignature(base.Music21Object):
             raise KeyException(f'Mode {mode} is unknown')
         sharpAlterationFromMajor = modeSharpsAlter[mode]
 
-        pitchObj = sharpsToPitch(our_sharps - sharpAlterationFromMajor)
+        pitchObj = sharpsToPitch(self.sharps - sharpAlterationFromMajor)
 
         return Key(pitchObj.name, mode)
 
@@ -491,7 +486,8 @@ class KeySignature(base.Music21Object):
         Non-standard, non-traditional key signatures can set their own
         altered pitches cache.
 
-        >>> nonTrad = key.KeySignature(sharps=None)
+        >>> nonTrad = key.KeySignature()
+        >>> nonTrad.isNonTraditional = True
         >>> nonTrad.alteredPitches = ['B-', 'F#', 'E-', 'G#']
         >>> nonTrad.alteredPitches
         [<music21.pitch.Pitch B->,
@@ -503,7 +499,8 @@ class KeySignature(base.Music21Object):
 
         Ensure at least something is provided when the user hasn't provided enough info:
 
-        >>> nonTrad2 = key.KeySignature(sharps=None)
+        >>> nonTrad2 = key.KeySignature()
+        >>> nonTrad2.isNonTraditional = True
         >>> nonTrad2.alteredPitches
         []
 
@@ -512,7 +509,7 @@ class KeySignature(base.Music21Object):
             return self._alteredPitches
 
         post: list[pitch.Pitch] = []
-        if self.sharps is None:
+        if self.isNonTraditional:
             return post
 
         if self.sharps > 0:
@@ -536,7 +533,7 @@ class KeySignature(base.Music21Object):
         return post
 
     @alteredPitches.setter
-    def alteredPitches(self, newAlteredPitches: list[str|pitch.Pitch|note.Note]
+    def alteredPitches(self, newAlteredPitches: t.Iterable[str|pitch.Pitch|note.Note]
                        ) -> None:
         self.clearCache()
         newList: list[pitch.Pitch] = []
@@ -548,31 +545,6 @@ class KeySignature(base.Music21Object):
             elif isinstance(p, note.Note):
                 newList.append(copy.deepcopy(p.pitch))
         self._alteredPitches = newList
-
-    @property
-    def isNonTraditional(self) -> bool:
-        '''
-        Returns bool if this is a non-traditional KeySignature:
-
-        >>> g = key.KeySignature(3)
-        >>> g.isNonTraditional
-        False
-
-        >>> g = key.KeySignature(sharps=None)
-        >>> g.alteredPitches = [pitch.Pitch('E`')]
-        >>> g.isNonTraditional
-        True
-
-        >>> g
-        <music21.key.KeySignature of pitches: [E`]>
-
-        >>> g.accidentalByStep('E')
-        <music21.pitch.Accidental half-flat>
-        '''
-        if self.sharps is None and self.alteredPitches:
-            return True
-        else:
-            return False
 
     def accidentalByStep(self, step: StepName) -> pitch.Accidental|None:
         '''
@@ -844,16 +816,9 @@ class KeySignature(base.Music21Object):
     # --------------------------------------------------------------------------
     # properties
 
-    def _getSharps(self) -> int|None:
-        return self._sharps
-
-    def _setSharps(self, value: int|None):
-        if value != self._sharps:
-            self._sharps = value
-            self.clearCache()
-
-    sharps = property(_getSharps, _setSharps,
-                      doc='''
+    @property
+    def sharps(self) -> int:
+        '''
         Get or set the number of sharps.  If the number is negative
         then it sets the number of flats.  Equivalent to musicxml's 'fifths'
         attribute.
@@ -864,9 +829,14 @@ class KeySignature(base.Music21Object):
         >>> ks1.sharps = -4
         >>> ks1
         <music21.key.KeySignature of 4 flats>
+        '''
+        return self._sharps
 
-        Can be set to None for a non-traditional key signature
-        ''')
+    @sharps.setter
+    def sharps(self, value: int) -> None:
+        if value != self._sharps:
+            self._sharps = value
+            self.clearCache()
 
 
 class Key(KeySignature, scale.DiatonicScale):
@@ -1415,6 +1385,32 @@ class Test(unittest.TestCase):
             k = ks.asKey(mode=None, tonic='A-')
         # test exception chained from KeyError
         self.assertIsInstance(cm.exception.__cause__, KeyError)
+
+    def testNonTraditional(self):
+        '''
+        AI-assisted (Claude).
+        '''
+        ks = KeySignature(3)
+        self.assertFalse(ks.isNonTraditional)
+
+        ks = KeySignature()
+        ks.isNonTraditional = True
+        ks.alteredPitches = [pitch.Pitch('E`')]
+        self.assertEqual(repr(ks), '<music21.key.KeySignature of pitches: [E`]>')
+        self.assertEqual(ks.accidentalByStep('E'), pitch.Accidental('half-flat'))
+
+        # a non-traditional key signature is not equal to the C-major signature
+        # it shares a `sharps` count with.
+        self.assertNotEqual(ks, KeySignature())
+
+    def testSharpsNoneDeprecated(self):
+        '''
+        AI-assisted (Claude).
+        '''
+        with self.assertWarns(exceptions21.Music21DeprecationWarning):
+            ks = KeySignature(sharps=None)
+        self.assertEqual(ks.sharps, 0)
+        self.assertTrue(ks.isNonTraditional)
 
 
 # ------------------------------------------------------------------------------
