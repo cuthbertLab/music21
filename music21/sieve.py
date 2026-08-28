@@ -253,7 +253,6 @@ def discreteBinaryPad(series: Iterable[int], fixRange=None) -> list[int]:
 
     >>> sieve.discreteBinaryPad([3, 4, 5])
     [1, 1, 1]
-
     '''
     # make sure these are ints
     for x in series:
@@ -293,7 +292,6 @@ def unitNormRange(series, fixRange=None):
 
     >>> sieve.unitNormRange([1, 3, 4])
     [0.0, 0.666..., 1.0]
-
     '''
     if fixRange is not None:
         fixRange.sort()
@@ -367,7 +365,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
     >>> post = sieve.unitNormStep(0.25, 0, 20, normalized=False)
     >>> len(post)
     81
-
     '''
     if a == b:
         return []  # no range, return boundary
@@ -869,7 +866,6 @@ class CompressionSegment:
     # --------------------------------------------------------------------------
     def __call__(self):
         '''
-
         >>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8])
         >>> b = a()
         >>> str(b[0])

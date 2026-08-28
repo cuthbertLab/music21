@@ -466,7 +466,6 @@ class StreamIterator[M21ObjType: base.Music21Object](prebase.ProtoM21Object, Seq
         0
         >>> bool(iterator.getElementsByClass(chord.Chord))
         False
-
         '''
         if self._len is not None:
             return bool(self._len)

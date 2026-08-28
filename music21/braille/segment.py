@@ -697,7 +697,6 @@ class BrailleSegment(text.BrailleText):
         True
         >>> bs1.showLeadingOctaveFromNoteGrouping(beg1)
         True
-
         '''
         currentKey = self.currentGroupingKey
         previousKey = self.previousGroupingKey

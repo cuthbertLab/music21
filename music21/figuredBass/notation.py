@@ -641,7 +641,6 @@ class Modifier(prebase.ProtoM21Object):
 
     def _toAccidental(self) -> pitch.Accidental|None:
         '''
-
         >>> from music21.figuredBass import notation as n
         >>> m1 = n.Modifier('#')
         >>> m2 = n.Modifier('-')

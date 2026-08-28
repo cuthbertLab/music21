@@ -503,7 +503,6 @@ class KeySignature(base.Music21Object):
         >>> nonTrad2.isNonTraditional = True
         >>> nonTrad2.alteredPitches
         []
-
         '''
         if self._alteredPitches is not None:
             return self._alteredPitches

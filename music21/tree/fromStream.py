@@ -207,7 +207,6 @@ def asTree(
     >>> etFlatNotes = tree.fromStream.asTree(score, flatten=True, classList=(note.Note,))
     >>> etFlatNotes
     <ElementTree {12} (0.0 <0.20...> to 8.0) <music21.stream.Score exampleScore>>
-
     '''
     def recurseGetTreeByClass(
             innerStream,

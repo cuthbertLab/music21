@@ -154,7 +154,6 @@ class ChordReducer:
 
     def computeMeasureChordWeights(self, measureObj, weightAlgorithm=None):
         '''
-
         >>> s = analysis.reduceChordsOld.testMeasureStream1().notes
         >>> cr = analysis.reduceChordsOld.ChordReducer()
         >>> cws = cr.computeMeasureChordWeights(s)

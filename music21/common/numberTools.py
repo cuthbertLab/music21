@@ -931,7 +931,6 @@ def groupContiguousIntegers(src: list[int]) -> list[list[int]]:
 # noinspection SpellCheckingInspection
 def fromRoman(num: str, *, strictModern: bool = False) -> int:
     '''
-
     Convert a Roman numeral (upper or lower) to an int
 
     https://code.activestate.com/recipes/81611-roman-numerals/

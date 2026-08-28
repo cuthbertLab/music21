@@ -144,7 +144,6 @@ class PercussionMapper:
         <music21.instrument.BassDrum 'Bass Drum'>
         >>> oneBDInstrument.modifier
         '1'
-
         '''
 
         if isinstance(midiPitch, int):

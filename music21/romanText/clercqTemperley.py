@@ -323,7 +323,6 @@ class CTSong(prebase.ProtoM21Object):
         Fadeout: I . . V | I . . V | I . . V |
         Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
         S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
-
     """
     _DOC_ORDER = ['text', 'toPart', 'title', 'homeTimeSig', 'homeKey', 'comments', 'rules']
     _DOC_ATTR: dict[str, str] = {
@@ -997,7 +996,6 @@ class CTRule(prebase.ProtoM21Object):
         'vii/o7'
         >>> s.fixupChordAtom('iia')
         'ii+'
-
         '''
         if 'x' in atom:
             atom = atom.replace('x', 'o')

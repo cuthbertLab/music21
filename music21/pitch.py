@@ -791,7 +791,6 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
 
     >>> m.alter
     0.3333...
-
     '''
 
     # CLASS VARIABLES #
@@ -2517,7 +2516,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.convertMicrotonesToQuarterTones(inPlace=True)
         >>> str(p)
         'F~2(+12c)'
-
         '''
         if inPlace:
             returnObj = self
@@ -4622,7 +4620,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> dPitch.transpose(intv, inPlace=True)
         >>> dPitch
         <music21.pitch.Pitch D#2(+50c)>
-
         '''
         # environLocal.printDebug(['Pitch.transpose()', value])
         if isinstance(value, interval.IntervalBase):
@@ -4905,7 +4902,6 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> b._stepInKeySignature(ks.alteredPitches)
         False
-
         '''
         for p in alteredPitches:  # all are altered tones, must have acc
             if p.step == self.step:  # A# to A or A# to A-, etc
@@ -5390,7 +5386,6 @@ class Pitch(prebase.ProtoM21Object):
         (<music21.pitch.Pitch D3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch D5>)
 
         otherwise returns False
-
         '''
         # Takes in a chord, finds the interval between the notes
         from music21 import note

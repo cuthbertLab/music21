@@ -107,7 +107,6 @@ class Clef(base.Music21Object):
             True
             >>> clef.NoClef().sign
             'none'
-
             ''',
         'line': '''
             The line, counting from the bottom up, that the clef resides on.
@@ -602,7 +601,6 @@ class TenorClef(CClef):
     'C'
     >>> a.line
     4
-
     '''
 
     def __init__(self, **keywords):

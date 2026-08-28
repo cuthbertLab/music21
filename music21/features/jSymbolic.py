@@ -102,7 +102,6 @@ class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
 
 class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
-
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MostCommonMelodicIntervalFeature(s)
     >>> f = fe.extract()
@@ -129,7 +128,6 @@ class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
 class DistanceBetweenMostCommonMelodicIntervalsFeature(
         featuresModule.FeatureExtractor):
     '''
-
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.DistanceBetweenMostCommonMelodicIntervalsFeature(s)
     >>> f = fe.extract()
@@ -192,7 +190,6 @@ class MostCommonMelodicIntervalPrevalenceFeature(
 class RelativeStrengthOfMostCommonIntervalsFeature(
         featuresModule.FeatureExtractor):
     '''
-
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RelativeStrengthOfMostCommonIntervalsFeature(s)
     >>> f = fe.extract()
@@ -856,7 +853,6 @@ class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
 
 class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
     '''
-
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RelativeStrengthOfTopPitchClassesFeature(s)
     >>> fe.extract().vector
@@ -924,7 +920,6 @@ class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
 class IntervalBetweenStrongestPitchClassesFeature(
         featuresModule.FeatureExtractor):
     '''
-
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.IntervalBetweenStrongestPitchClassesFeature(s)
     >>> fe.extract().vector
@@ -1495,7 +1490,6 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
 
     Number of notes for which Pitch Bend messages change direction at least twice divided by
     total number of notes that have Pitch Bend messages associated with them.
-
     '''
     id = 'P25'
     name = 'Vibrato Prevalence'
@@ -1516,7 +1510,6 @@ class PrevalenceOfMicrotonesFeature(featuresModule.FeatureExtractor):
 
     Number of Note Ons that are preceded by isolated MIDI Pitch Bend
     messages as a fraction of the total number of Note Ons.'
-
     '''
     id = 'P26'
     name = 'Prevalence Of Microtones'
@@ -1580,7 +1573,6 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     >>> f = fe.extract()
     >>> f.vector
     [192]
-
     '''
     id = 'R2'
     name = 'Second Strongest Rhythmic Pulse'
@@ -1616,7 +1608,6 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
     >>> f = fe.extract()
     >>> f.vector
     [0.5]
-
     '''
     id = 'R3'
     name = 'Harmonicity of Two Strongest Rhythmic Pulses'
@@ -1699,7 +1690,6 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
     >>> fe = features.jSymbolic.StrengthRatioOfTwoStrongestRhythmicPulsesFeature(sch)
     >>> fe.extract().vector[0]
     7.0
-
     '''
     id = 'R6'
     name = 'Strength Ratio of Two Strongest Rhythmic Pulses'
@@ -1756,7 +1746,6 @@ class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
     Not yet implemented.
 
     Number of beat peaks with normalized frequencies over 0.1.
-
     '''
     id = 'R8'
     name = 'Number of Strong Pulses'
@@ -1874,7 +1863,6 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
 
     A feature extractor that finds a feature array with entries corresponding to the frequency
     values of each of the bins of the beat histogram (except the first 40 empty ones).
-
     '''
     id = 'R14'
     name = 'Beat Histogram'
@@ -2608,7 +2596,6 @@ class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
     Standard deviation of loudness levels of all notes.
 
     TODO: implement
-
     '''
     id = 'D2'
     name = 'Variation of Dynamics'
@@ -2623,7 +2610,6 @@ class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
     channel that contains at least one note.
 
     TODO: implement
-
     '''
     id = 'D3'
     name = 'Variation of Dynamics In Each Voice'
@@ -2639,7 +2625,6 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
     same channel (in MIDI velocity units).
 
     TODO: implement
-
     '''
 
     id = 'D4'
@@ -2789,7 +2774,6 @@ class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
     Not implemented.
 
     TODO: implement
-
     '''
     id = 'T5'
     name = 'Voice Equality - Note Duration'
@@ -2802,7 +2786,6 @@ class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
     Not implemented.
 
     TODO: implement
-
     '''
     id = 'T6'
     name = 'Voice Equality - Dynamics'
@@ -2815,7 +2798,6 @@ class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
     Not implemented.
 
     TODO: implement
-
     '''
     id = 'T7'
     name = 'Voice Equality - Melodic Leaps'
@@ -2886,7 +2868,6 @@ class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
     Not implemented.
 
     TODO: implement
-
     '''
     id = 'T13'
     name = 'Relative Note Density of Highest Line'
@@ -3027,7 +3008,6 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
 class NotePrevalenceOfPitchedInstrumentsFeature(
         featuresModule.FeatureExtractor):
     '''
-
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.AcousticGuitar())
     >>> s1.repeatAppend(note.Note(), 4)
@@ -3089,7 +3069,6 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
     Not implemented.
 
     TODO: implement
-
     '''
     id = 'I4'
     name = 'Note Prevalence of Unpitched Instruments'
@@ -3118,7 +3097,6 @@ class TimePrevalenceOfPitchedInstrumentsFeature(
     in seconds of the piece.'
 
     TODO: implement
-
     '''
     id = 'I5'
     name = 'Time Prevalence of Pitched Instruments'
@@ -3146,7 +3124,6 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
     >>> fe = features.jSymbolic.VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(s1)
     >>> fe.extract().vector
     [0.33333...]
-
     '''
     id = 'I6'
     name = 'Variability of Note Prevalence of Pitched Instruments'
@@ -3190,7 +3167,6 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
     official standard.
 
     TODO: implement
-
     '''
     id = 'I7'
     name = 'Variability of Note Prevalence of Unpitched Instruments'
@@ -3213,7 +3189,6 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.NumberOfPitchedInstrumentsFeature(s1)
     >>> fe.extract().vector
     [2]
-
     '''
     id = 'I8'
     name = 'Number of Pitched Instruments'

@@ -428,7 +428,6 @@ def correctSuffixForChordQuality(chordObj, inversionString):
     >>> c = chord.Chord('E3 C4 G-4')
     >>> roman.correctSuffixForChordQuality(c, '6')
     'o6'
-
     '''
     fifthType = chordObj.semitonesFromChordStep(5)
     if fifthType == 6:
@@ -2389,7 +2388,6 @@ class RomanNumeral(harmony.Harmony):
 
             >>> roman.RomanNumeral('II', 'C', caseMatters=False).impliedQuality
             ''
-
             ''',
         'impliedScale': '''
             If no key or scale is passed in as the second object, then
@@ -3021,7 +3019,6 @@ class RomanNumeral(harmony.Harmony):
         '13b3'
         >>> rn.omittedSteps
         [4, 2, 7]
-
         '''
         omittedSteps = []
         match = self._omittedStepsRegex.search(workingFigure)
@@ -3075,7 +3072,6 @@ class RomanNumeral(harmony.Harmony):
         '7'
         >>> rn.bracketedAlterations
         [('#', 5), ('b', 3)]
-
         '''
         matches = self._bracketedAlterationRegex.finditer(workingFigure)
         for m in matches:
@@ -3965,7 +3961,6 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral('N53')
         >>> rn.isNeapolitan(require1stInversion=False)
         True
-
         '''
         if self.scaleDegree != 2:
             return False

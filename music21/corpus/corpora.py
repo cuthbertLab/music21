@@ -292,7 +292,6 @@ class Corpus(prebase.ProtoM21Object):
 
         >>> len(coreCorpus.getWorkList('verdi'))
         1
-
         '''
         if str(workName).startswith('schumann/'):  # pragma: no cover
             # no default schumanns, but older examples showed this.
@@ -396,7 +395,6 @@ class Corpus(prebase.ProtoM21Object):
         ...     field='noteCount',
         ...     )
         <music21.metadata.bundles.MetadataBundle {134 entries}>
-
         '''
         return self.metadataBundle.search(
             query,
@@ -660,7 +658,6 @@ class CoreCorpus(Corpus):
         >>> #_DOCS_SHOW coreCorpus.manualCoreCorpusPath is None
         >>> True  #_DOCS_HIDE
         True
-
         '''
         userSettings = environment.UserSettings()
         if 'manualCoreCorpusPath' in userSettings.keys():
@@ -967,7 +964,6 @@ class LocalCorpus(Corpus):
 
         >>> corpus.corpora.LocalCorpus('funkCorpus').name
         'funkCorpus'
-
         '''
         if self._name is None:
             return 'local'

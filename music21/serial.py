@@ -427,7 +427,6 @@ class ToneRow(stream.Stream):
 
     def getIntervalsAsString(self):
         '''
-
         Returns the string of intervals between consecutive pitch classes of
         a :class:`~music21.serial.ToneRow`.
         'T' = 10, 'E' = 11.

@@ -1177,7 +1177,6 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     OMIT_FROM_DOCS
 
     >>> harmony.changeAbbreviationFor('major', '')
-
     '''
     if not inChord.pitches:
         return ''
@@ -1212,7 +1211,6 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
 
         The corresponding semitones are compared, and if they do not match it is determined
         whether this is a permitted omission, etc.
-
         '''
         m = len(givenChordNums)
         if m > len(inChordNums):
@@ -1393,7 +1391,6 @@ def getAbbreviationListGivenChordType(chordType):
 
     >>> harmony.getAbbreviationListGivenChordType('minor-major-13th')
     ['mM13', 'minmaj13']
-
     '''
     return CHORD_TYPES[chordType][1]
 
@@ -1405,7 +1402,6 @@ def getCurrentAbbreviationFor(chordType):
 
     >>> harmony.getCurrentAbbreviationFor('dominant-seventh')
     '7'
-
     '''
     return getAbbreviationListGivenChordType(chordType)[0]
 
@@ -1417,7 +1413,6 @@ def getNotationStringGivenChordType(chordType):
 
     >>> harmony.getNotationStringGivenChordType('German')
     '1,-3,#4,-6'
-
     '''
     return CHORD_TYPES[chordType][0]
 

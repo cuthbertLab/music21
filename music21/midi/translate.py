@@ -177,7 +177,6 @@ def ticksToDuration(
     '64th'
     >>> d2.components[2].dots
     1
-
     '''
     if inputM21DurationObject is None:
         d = duration.Duration()
@@ -984,7 +983,6 @@ def midiEventsToTimeSignature(
     >>> ts = midi.translate.midiEventsToTimeSignature(me2)
     >>> ts
     <music21.meter.TimeSignature 3/16>
-
     '''
     # http://www.sonicspot.com/guide/midifiles.html
     # The time signature defined with 4 bytes, a numerator, a denominator,

@@ -35,7 +35,6 @@ class IndexedLyric(namedtuple(
 )):
     '''
     A Lyric that has been indexed to its attached element and position in a Stream.
-
     '''
     __slots__ = ()
     _DOC_ATTR: dict[str, str] = {

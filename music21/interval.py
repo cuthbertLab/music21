@@ -1853,7 +1853,6 @@ class DiatonicInterval(IntervalBase):
 
         >>> interval.DiatonicInterval('A', 1).generic.direction
         <Direction.OBLIQUE: 0>
-
         '''
         if self.generic.undirected != 1:
             return self.generic.direction
@@ -2777,7 +2776,6 @@ def intervalFromGenericAndChromatic(
 
     >>> interval.intervalFromGenericAndChromatic(1, 0.5)
     <music21.interval.Interval A1 (-50c)>
-
     '''
     gIntV: GenericInterval
     if not isinstance(gInt, GenericInterval):
@@ -4096,7 +4094,6 @@ def subtract(intervalList):
     'Descending Diminished Unison'
     >>> a.chromatic.semitones
     -1
-
     '''
     from music21 import pitch
     if not intervalList:

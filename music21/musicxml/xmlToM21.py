@@ -899,7 +899,6 @@ class MusicXMLImporter(XMLParserBase):
         <score-part> entries into self.mxScorePartDict[partId]
         and adds them to any open <part-group> entries,
         stored as PartGroup objects in self.partGroupList
-
         '''
         mxPartList = mxScore.find('part-list')
         if mxPartList is None:
@@ -2336,7 +2335,6 @@ class PartParser(XMLParserBase):
         >>> pp.applyMultiMeasureRest(r3)
         >>> pp.stream.show('text')
         {0.0} <music21.spanner.MultiMeasureRest 2 measures>
-
         '''
         if self.activeMultiMeasureRestSpanner is None:
             return

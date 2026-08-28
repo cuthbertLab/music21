@@ -121,7 +121,6 @@ class Axis(prebase.ProtoM21Object):
         >>> axStream = graph.axis.DynamicsAxis(s, axisName='y')
         >>> axStream
         <music21.graph.axis.DynamicsAxis: y axis for Part>
-
         '''
         c = self.client
         if c is not None:
@@ -1034,7 +1033,6 @@ class OffsetAxis(PositionAxis):
         >>> om3 = ax.getOffsetMap()
         >>> om3
         {}
-
         '''
         s = self.stream
         if s is None:
@@ -1322,7 +1320,6 @@ class DynamicsAxis(Axis):
         >>> ax.maxValue = 6
         >>> ax.ticks()
         [(3, '$ppp$'), (4, '$pp$'), (5, '$p$'), (6, '$mp$')]
-
         '''
         ticks = []
         if self.minValue is None:

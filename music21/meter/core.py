@@ -682,7 +682,6 @@ class MeterSequence(MeterTerminal):
         >>> a.partitionByCount(11, loadDefault=False)
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by 11 (5/8)
-
         '''
         opts = self.getPartitionOptions()
         optMatch = None
@@ -962,7 +961,6 @@ class MeterSequence(MeterTerminal):
         >>> ms.subdividePartitionsEqual(5)
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by 5 (3/8)
-
         '''
         divisionsLocal: int = 1
         for i in range(len(self)):
@@ -1024,7 +1022,6 @@ class MeterSequence(MeterTerminal):
         False
         >>> post2[0] is ms[0][0]
         True
-
         '''
         for obj in processObjList:
             obj.subdividePartitionsEqual(divisions)
@@ -1957,7 +1954,6 @@ class MeterSequence(MeterTerminal):
 
         >>> a.offsetToSpan(4.33333336, permitMeterModulus=True)
         (1.0, 2.0)
-
         '''
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
@@ -1997,7 +1993,6 @@ class MeterSequence(MeterTerminal):
         Fraction(1, 3)
         >>> a.offsetToWeight(1.5)
         Fraction(1, 3)
-
         '''
         # Not sure what this does!
         qLenPos = opFrac(qLenPos)

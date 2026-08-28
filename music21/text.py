@@ -291,7 +291,6 @@ class TextBox(base.Music21Object):
 
     .. image:: images/textBoxes-01.*
         :width: 600
-
     '''
     _styleClass = style.TextStyle
     classSortOrder = -31  # text expressions are -30

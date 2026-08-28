@@ -662,7 +662,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
           still works until v9.  This is an attempt to unify __getitem__ behavior in
           StreamIterators and Streams.
           - allowed iterables of qualified class names, e.g. `[note.Note, note.Rest]`
-
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -1557,7 +1556,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         >>> tuple(s).index(n3)
         0
-
         '''
         if not self.isSorted and self.autoSort:
             self.sort()  # will set isSorted to True
@@ -4317,7 +4315,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         Traceback (most recent call last):
         music21.exceptions21.StreamException:
             cannot find object (<music21.note.Note C#>) in Stream
-
         '''
         if classList is not None:
             classSet = set(classList)
@@ -6181,7 +6178,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         NOTE: RENAME: this probably should be renamed, as we use Context in a special way.
         Perhaps better is extractNeighbors?
-
         '''
         display = self.cloneEmpty('extractContext')
 
@@ -6246,7 +6242,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         >>> s.flatten()._uniqueOffsetsAndEndTimes(offsetsOnly=True, endTimesOnly=True)
         []
-
         '''
         offsetDictValues = self._offsetDict.values()
         if endTimesOnly:
@@ -9631,7 +9626,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         If `target` is None, the entire Stream is processed. Otherwise, only the element
         specified is manipulated.
-
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('sliceByQuarterLengths')
@@ -10837,7 +10831,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         >>> d = a.getOverlaps()
         >>> len(d[0])
         7
-
         '''
         overlapMap = self._findLayering()
         # environLocal.printDebug(['overlapMap', overlapMap])
@@ -11151,7 +11144,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         is list, it is used like
         classList in elsewhere in stream to provide a list of classes that the
         el must be a part of.
-
         '''
         if elStream is not None:  # a bit of safety
             elOffset = el.getOffsetBySite(elStream)
@@ -11734,7 +11726,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         >>> list(scr.lyrics(ignoreBarlines=True, recurse=False).keys())
         []
-
         '''
         returnLists: dict[int, list[RecursiveLyricList]] = {}
         numNotes = 0
@@ -12316,7 +12307,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
             {3.0} <music21.note.Note E>
-
         '''
         from music21 import variant
 
@@ -12452,7 +12442,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             {1.0} <music21.note.Note B>
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note A>
-
         '''
         from music21 import variant
 
@@ -12734,7 +12723,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         ...    fixedNumbers.append( m.number )
         >>> fixedNumbers
         [1, 2, 3, 4, 5]
-
         '''
         deletedMeasures.extend(insertedMeasures)
         allMeasures = deletedMeasures
@@ -12857,7 +12845,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         >>> streamWithOssia = s.showVariantAsOssialikePart(sPart,
         ...          ['variant1', 'variant2', 'variant3'], inPlace=False)
         >>> #_DOCS_SHOW streamWithOssia.show()
-
         '''
         from music21 import variant
 
@@ -13460,7 +13447,6 @@ class Measure(Stream):
 
         For further details about complex time signatures, etc.
         see `meter.bestTimeSignature()`
-
         '''
         return meter.bestTimeSignature(self)
 
@@ -14193,7 +14179,6 @@ class Score(Stream):
         4
         >>> len(post.flatten().notes)
         165
-
         '''
         from music21 import spanner
 

@@ -43,7 +43,6 @@ def _musedataBeamToBeams(beamSymbol):
 
     >>> translate._musedataBeamToBeams(r']/')  # must escape backslash
     <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>
-
     '''
     from music21 import beam
 

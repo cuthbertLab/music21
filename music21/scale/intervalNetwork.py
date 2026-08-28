@@ -488,7 +488,6 @@ class IntervalNetwork:
 
     def __eq__(self, other) -> bool:
         '''
-
         >>> edgeList1 = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> edgeList2 = ['M2', 'M2', 'm2', 'M2', 'A3', 'm2']
 
@@ -2054,7 +2053,6 @@ class IntervalNetwork:
         ['C1', 'G1', 'D2', 'A2', 'E3', 'B3', 'F#4', 'D-5', 'A-5', 'E-6', 'B-6', 'F7', 'C8']
         >>> [str(p) for p in net5ths.realizePitch(pitch.Pitch('C2'))]
         ['C2', 'G2', 'D3', 'A3', 'E4', 'B4', 'F#5', 'D-6', 'A-6', 'E-7', 'B-7', 'F8', 'C9']
-
         '''
         components = self.realize(
             pitchReference=pitchReference,
@@ -2578,7 +2576,6 @@ class IntervalNetwork:
         2
         >>> net.getRelativeNodeDegree('f6', 1, 'b3')
         1
-
         '''
         nId = self.getRelativeNodeId(
             pitchReference=pitchReference,
@@ -2821,7 +2818,6 @@ class IntervalNetwork:
         ['B-2', 'C3', 'E-3', 'E#3', 'F2', 'E--2']
         >>> unmatched
         [<music21.pitch.Pitch B2>]
-
         '''
         # these return a Node, not a nodeId
         # TODO: just getting first

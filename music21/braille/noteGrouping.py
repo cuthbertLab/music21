@@ -118,7 +118,6 @@ class NoteGroupingTranscriber:
         transcribe a group of notes, possibly excluding certain attributes.
 
         Returns a (unicode) string of brailleElementGrouping transcribed.
-
         '''
         self.reset()
         if brailleElementGrouping is not None:

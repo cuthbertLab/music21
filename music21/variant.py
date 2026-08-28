@@ -1327,7 +1327,6 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
         {0.0} <music21.note.Note F>
         {2.0} <music21.note.Note F>
     ...
-
     '''
     if inPlace:
         returnObj = mainPart
@@ -1588,7 +1587,6 @@ def refineVariant(s, sVariant, *, inPlace=False):
         {1.0} <music21.note.Note B>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note A>
-
     '''
     # stream that will be returned
     if sVariant not in s.getElementsByClass(Variant):
@@ -1682,7 +1680,6 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
     '''
     There seem to be some problems with this function, and it isn't well tested.
     It is not recommended to use it at this time.
-
     '''
     # stream that will be returned
     if inPlace:
@@ -1922,7 +1919,6 @@ def _diffScore(measureX, measureY):
     >>> m2.append([note.Note('e'), note.Note('f'), note.Note('g#'), note.Note('a')])
     >>> variant._diffScore(m1, m2)
     0.4...
-
     '''
     hashes = getMeasureHashes([measureX, measureY])
     if hashes[0] == hashes[1]:
@@ -1957,7 +1953,6 @@ def _getRegionsFromStreams(streamX, streamY):
      ('replace', 1, 3, 1, 2),
      ('equal', 3, 6, 2, 5),
      ('insert', 6, 6, 5, 6)]
-
     '''
     hashesX = getMeasureHashes(streamX)
     hashesY = getMeasureHashes(streamY)
@@ -2170,7 +2165,6 @@ def _generateVariant(noteList, originStream, start, variantName=None):
 
     >>> v.groups
     ['paris']
-
     '''
     returnVariant = Variant()
     for n in noteList:
@@ -2230,7 +2224,6 @@ def makeAllVariantsReplacements(streamWithVariants,
     (4.0, 'replacement', 4.0, 4.0)
     (12.0, 'elongation', 4.0, 12.0)
     (20.0, 'deletion', 8.0, 4.0)
-
     '''
 
     if inPlace:

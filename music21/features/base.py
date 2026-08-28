@@ -213,7 +213,6 @@ class FeatureExtractor:
          'Fifths_Pitch_Histogram_3', 'Fifths_Pitch_Histogram_4', 'Fifths_Pitch_Histogram_5',
          'Fifths_Pitch_Histogram_6', 'Fifths_Pitch_Histogram_7', 'Fifths_Pitch_Histogram_8',
          'Fifths_Pitch_Histogram_9', 'Fifths_Pitch_Histogram_10', 'Fifths_Pitch_Histogram_11']
-
         '''
         post: list[str] = []
         if self.dimensions == 1:
@@ -1224,7 +1223,6 @@ def extractorsById(idOrList: str|Iterable[str],
     >>> y = [x.id for x in features.extractorsById('all')]
     >>> y[0:3], y[-3:-1]
     (['M1', 'M2', 'M3'], ['CS12', 'MC1'])
-
     '''
     from music21.features import jSymbolic
     from music21.features import native
@@ -1268,7 +1266,6 @@ def extractorById(idOrList: str|Iterable[str],
     >>> fe = features.extractorById('p20')(s)  # call class
     >>> fe.extract().vector
     [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
     '''
     ebi = extractorsById(idOrList=idOrList, library=library)
     if ebi:

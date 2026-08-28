@@ -77,7 +77,6 @@ class VirtualWork:
 
 class BachBWV1007Prelude(VirtualWork):
     '''
-
     >>> a = corpus.virtual.BachBWV1007Prelude()
     >>> a.getUrlByExt('.xml')
     ['https://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']

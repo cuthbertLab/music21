@@ -597,7 +597,6 @@ def measureToBraille(music21Measure,
     ⠼⠁⠀⠐⠽⠣⠅
     >>> print(braille.translate.measureToBraille(p.measure(1)))
     ⠼⠙⠲⠀⠐⠽⠣⠅
-
     '''
     measureToTranscribe = music21Measure
     if not inPlace:

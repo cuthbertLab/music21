@@ -28,7 +28,6 @@ class OmrGroundTruthPair:
     (or a pair of music21.stream.Score objects).
 
     See below for examples.
-
     '''
 
     def __init__(self, omr=None, ground=None):
@@ -335,7 +334,6 @@ def autoCorrelationBestMeasure(inputScore):
     (18, 6)
     >>> print( float(totalUnflaggedWithMatches) / totalUnflagged )
     0.333...
-
     '''
     ss = correctors.ScoreCorrector(inputScore)
     allHashes = ss.getAllHashes()

@@ -2785,7 +2785,6 @@ class ABCHandler:
         True
         >>> ah3.tokens[3] == ah2.tokens[0]
         True
-
         '''
         ah = self.__class__()  # will get the same class type
         ah.tokens = self.tokens + other.tokens
@@ -3114,7 +3113,6 @@ class ABCHandler:
         [[0, 9], [10, 16], [16, 23], [23, 29], [29, 36], [36, 42], [42, 49], [49, 56], [56, 61],
          [62, 64], [64, 70], [70, 77], [77, 84], [84, 90], [90, 96],
          [96, 103], [103, 110], [110, 115]]
-
         '''
         # collect start and end pairs of split
         pairs = []

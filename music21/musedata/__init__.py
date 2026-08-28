@@ -159,7 +159,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
 
     def _getPitchParameters(self):
         '''
-
         >>> mdr = musedata.MuseDataRecord('Ef4    1        s     d  ==')
         >>> mdr.isNote()
         True
@@ -397,7 +396,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('E2     4        q     u')
         >>> mdr.getBeams() is None
         True
-
         '''
         if self.stage == 1:
             return None
@@ -458,7 +456,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p>')
         >>> mdr.getArticulationObjects()
         [<music21.articulations.Staccato>, <music21.articulations.Accent>]
-
         '''
         from music21 import articulations
         post = []
@@ -498,7 +495,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p>F')
         >>> mdr.getExpressionObjects()
         [<music21.expressions.Fermata>]
-
         '''
         from music21 import expressions
         post = []
@@ -574,7 +570,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [')
         >>> mdr.hasCautionaryAccidental()
         False
-
         '''
         data = self._getAdditionalNotations()
         if data is None:
@@ -833,7 +828,6 @@ class MuseDataPart(prebase.ProtoM21Object):
 
     def _getDigitsFollowingTag(self, line, tag):
         '''
-
         >>> mdp = musedata.MuseDataPart()
         >>> mdp._getDigitsFollowingTag('junk WK#:2345', 'WK#:')
         '2345'
@@ -864,7 +858,6 @@ class MuseDataPart(prebase.ProtoM21Object):
     def _getAlphasFollowingTag(self, line, tag, keepSpace=False,
                                keepCase=False):
         '''
-
         >>> mdp = musedata.MuseDataPart()
         >>> mdp._getAlphasFollowingTag('Group memberships: sound, score', 'Group memberships:')
         'sound,score'
@@ -1386,7 +1379,6 @@ class MuseDataPart(prebase.ProtoM21Object):
 
     def _getMeasureBoundaryIndices(self, src=None):
         '''
-
         >>> mdp = musedata.MuseDataPart()
         >>> mdp.stage is None
         True

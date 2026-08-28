@@ -453,7 +453,6 @@ class Date(prebase.ProtoM21Object):
         ...     )
         >>> b.hasError
         False
-
         '''
         for attr in self.attrNames:
             if getattr(self, attr + 'Error') is not None:

@@ -186,7 +186,6 @@ class Hasher:
         >>> r = note.Rest()
         >>> h._hashMIDIPitchName(r, thisChord=c)
         0
-
         '''
         if thisChord and self.hashChordsAsChords:
             return 1

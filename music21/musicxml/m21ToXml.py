@@ -218,7 +218,6 @@ def _setTagTextFromAttribute(
     >>> subEl = seta(acc, e, 'alter', transform=int)
     >>> subEl.text
     '-2'
-
     '''
     if attributeName is None:
         attributeName = common.hyphenToCamelCase(tag)
@@ -543,7 +542,6 @@ class GeneralObjectExporter:
         '''
         Provide a complete MusicXML string from a single dynamic by
         putting it into a Stream first.
-
         '''
         dCopy = copy.deepcopy(dynamicObject)
         out = stream.Stream()
@@ -1233,7 +1231,6 @@ class XMLExporterBase:
         <staff-layout number="1">
           <staff-distance>40.0</staff-distance>
         </staff-layout>
-
         '''
         if mxStaffLayoutIn is None:
             mxStaffLayout = Element('staff-layout')
@@ -1494,7 +1491,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         0
         >>> emptySX.spannerBundle
         <music21.spanner.SpannerBundle of size 0>
-
         '''
         self.setScoreLayouts()
         self.setMeterStream()
@@ -2482,7 +2478,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> SX.stream.definesExplicitPageBreaks = True
         >>> SX.dump(SX.getSupports()[-1])
         <supports attribute="new-page" element="print" type="yes" value="yes" />
-
         '''
         def getSupport(element: str, supports_type: bool,
                        attribute: str|None = None, value: str|None = None):
@@ -3193,7 +3188,6 @@ class MeasureExporter(XMLExporterBase):
         </measure>
         >>> len(MEX.xmlRoot)
         1
-
         '''
         amountToMoveForward: int = int(round(byOffset * self.currentDivisions))
         if amountToMoveForward:
@@ -4785,7 +4779,6 @@ class MeasureExporter(XMLExporterBase):
           <normal-dot />
           <normal-dot />
         </time-modification>
-
         '''
         mxTimeModification = Element('time-modification')
         _setTagTextFromAttribute(tup, mxTimeModification, 'actual-notes', 'numberNotesActual')
@@ -6235,7 +6228,6 @@ class MeasureExporter(XMLExporterBase):
           <offset sound="yes">10080</offset>
           <sound dynamics="19" />
         </direction>
-
         '''
         mxDynamics = Element('dynamics')
         synchronizeIds(mxDynamics, d)
@@ -6295,7 +6287,6 @@ class MeasureExporter(XMLExporterBase):
             <segno default-y="20" halign="left" id="segno0" />
           </direction-type>
         </direction>
-
         '''
         mxSegno = Element('segno')
         synchronizeIds(mxSegno, segno)
@@ -6448,7 +6439,6 @@ class MeasureExporter(XMLExporterBase):
             <words default-y="45" font-weight="bold">Andante</words>
           </direction-type>
         </direction>
-
         '''
         # if writing just a sound tag, place an empty words tag in a
         # direction type and then follow with sound declaration
@@ -7516,7 +7506,6 @@ class MeasureExporter(XMLExporterBase):
           <chromatic>-2</chromatic>
           <octave-change>-1</octave-change>
         </transpose>
-
         '''
         # TODO: number attribute (staff number)
         # TODO: double empty attribute

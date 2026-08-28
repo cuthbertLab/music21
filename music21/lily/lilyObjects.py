@@ -487,7 +487,6 @@ class LyAssignment(LyObject):
 
 class LyIdentifierInit(LyObject):
     r'''
-
     >>> lyIdInit = lily.lilyObjects.LyIdentifierInit(string='hello')
     >>> print(lyIdInit)
     "hello"
@@ -856,7 +855,6 @@ class LyOutputDefHead(LyObject):
 
 class LyOutputDefBody(LyObject):
     r'''
-
     output_def_body: output_def_head_with_mode_switch '{'
                     | output_def_head_with_mode_switch
                          '{'
@@ -1956,7 +1954,6 @@ class LyScriptAbbreviation(LyObject):
     Holds a script abbreviation (for articulations etc.), one of::
 
         ^ + - | > . _
-
     '''
     def __init__(self, value: str = '') -> None:
         super().__init__()
@@ -1971,7 +1968,6 @@ class LyScriptDir(LyObject):
     Holds a script direction abbreviation (above, below etc.), one of::
 
         _ ^ -
-
     '''
     def __init__(self, value: str = '') -> None:
         super().__init__()

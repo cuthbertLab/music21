@@ -63,7 +63,6 @@ class StreamFilter(prebase.ProtoM21Object):
     True
     >>> sf.classes
     ('StreamFilter', 'ProtoM21Object', 'object')
-
     '''
     derivationStr = 'streamFilter'
 
@@ -115,7 +114,6 @@ class IsFilter(StreamFilter):
     ...     print(el)
     <music21.note.Note C#>
     <music21.note.Rest quarter>
-
     '''
     derivationStr = 'is'
 
@@ -193,7 +191,6 @@ class IdFilter(StreamFilter):
     No corresponding iterator call.
 
     Only a single ID can be passed in.  Always returns a single item.
-
     '''
     derivationStr = 'getElementById'
 
@@ -241,7 +238,6 @@ class ClassFilter(StreamFilter):
     ...     print(x)
     <music21.note.Note C>
     <music21.note.Note D>
-
     '''
     derivationStr = 'getElementsByClass'
 

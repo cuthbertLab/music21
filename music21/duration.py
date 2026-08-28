@@ -331,7 +331,6 @@ def dottedMatch(qLen: OffsetQLIn,
 
     >>> duration.dottedMatch(0.00001, 2)
     (False, False)
-
     '''
     for dots in range(maxDots + 1):
         # assume qLen has n dots, so find its non-dotted length
@@ -1268,7 +1267,6 @@ class Tuplet(prebase.ProtoM21Object):
         >>> a.setDurationType(4.0)
         >>> a.totalTupletLength()
         8.0
-
         '''
         self._checkFrozen()
         if not isinstance(durType, str):

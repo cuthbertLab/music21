@@ -463,7 +463,6 @@ class PartReduction:
     of all parts. The default is True.
 
     If the `normalize` parameter is False, no normalization will take place. The default is True.
-
     '''
     def __init__(self,
                  srcScore=None,

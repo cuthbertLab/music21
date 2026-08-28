@@ -97,7 +97,6 @@ def translateMonophonicPartToSegments(
 
     >>> measureLists[0:2]
     [(1, 12), (7, 18)]
-
     '''
     from music21 import search
     if algorithm is None:

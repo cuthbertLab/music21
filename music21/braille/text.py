@@ -147,7 +147,6 @@ class BrailleText(prebase.ProtoM21Object):
         >>> print(str(bt))
         hi
         ⠨⠜⠄⠹⠹⠹
-
         '''
         self.makeNewLine()
         if self.rightHandSymbol or self.leftHandSymbol:

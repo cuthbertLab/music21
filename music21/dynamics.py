@@ -172,7 +172,6 @@ class Dynamic(base.Music21Object):
 
     .. image:: images/dynamics_simple.*
         :width: 344
-
     '''
     classSortOrder = 10
     _styleClass = style.TextStyle

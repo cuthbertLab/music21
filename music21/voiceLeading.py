@@ -1684,7 +1684,6 @@ class Verticality(base.Music21Object):
          <music21.note.Note B>, <music21.note.Note F#>]
         >>> vs1.getObjectsByClass('Note', [1, 2])
         [<music21.note.Note C>, <music21.note.Note B>, <music21.note.Note F#>]
-
         '''
         if not common.isIterable(classFilterList):
             classFilterList = [classFilterList]
@@ -1916,7 +1915,6 @@ class VerticalityTriplet(VerticalityNTuplet):
         True
         >>> vt.hasPassingTone(1)
         False
-
         '''
         if partNumToIdentify in self.tnlsDict:
             ret = self.tnlsDict[partNumToIdentify].couldBePassingTone()
@@ -2082,7 +2080,6 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     <music21.note.Note A>
     >>> defaults.pitchOctave
     4
-
     '''
     _DOC_ORDER = ['couldBePassingTone',
                   'couldBeDiatonicPassingTone',

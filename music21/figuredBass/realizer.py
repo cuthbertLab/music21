@@ -456,7 +456,6 @@ class FiguredBassLine:
         >>> r4 = fbLine4.realize()
         >>> r4.getNumSolutions()
         13
-
         '''
         if fbRules is None:
             fbRules = rules.Rules()

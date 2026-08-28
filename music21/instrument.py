@@ -104,7 +104,6 @@ def bundleInstruments(streamIn: stream.Stream,
     Bass Drum
     Bass Drum
     Cowbell
-
     '''
     if inPlace:
         s = streamIn
@@ -332,7 +331,6 @@ class KeyboardInstrument(Instrument):
 
 class Piano(KeyboardInstrument):
     '''
-
     >>> p = instrument.Piano()
     >>> p.instrumentName
     'Piano'
@@ -398,7 +396,6 @@ class Sampler(KeyboardInstrument):
 
 class ElectricPiano(Piano):
     '''
-
     >>> p = instrument.ElectricPiano()
     >>> p.instrumentName
     'Electric Piano'
@@ -2545,7 +2542,6 @@ def getAllNamesForInstrument(instrumentClass: Instrument,
     'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
 
     Note that the language string is not case-sensitive, so 'German' is also fine.
-
     '''
 
     language = language.lower()

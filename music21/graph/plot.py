@@ -671,7 +671,6 @@ class HistogramPitchClass(Histogram):
 
     .. image:: images/HistogramPitchClass.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **Histogram.axesClasses,
@@ -699,7 +698,6 @@ class HistogramQuarterLength(Histogram):
 
     .. image:: images/HistogramQuarterLength.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **Histogram.axesClasses,
@@ -779,7 +777,6 @@ class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
 
     .. image:: images/ScatterWeightedPitchClassQuarterLength.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **ScatterWeighted.axesClasses,
@@ -814,7 +811,6 @@ class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
 
     .. image:: images/ScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **ScatterWeighted.axesClasses,
@@ -1009,7 +1005,6 @@ class WindowedKey(WindowedAnalysis):
     >>> p.processorClass = analysis.discrete.TemperleyKostkaPayne
     >>> p.doneAction = None #_DOCS_HIDE
     >>> p.run()
-
     '''
     processorClassDefault = discrete.KrumhanslSchmuckler
 
@@ -1027,7 +1022,6 @@ class WindowedAmbitus(WindowedAnalysis):
         :width: 600
 
     .. image:: images/legend-WindowedAmbitus.*
-
     '''
     processorClassDefault = discrete.Ambitus
 
@@ -1174,7 +1168,6 @@ class HorizontalBarPitchClassOffset(HorizontalBar):
 
     .. image:: images/HorizontalBarPitchClassOffset.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **HorizontalBar.axesClasses,
@@ -1305,7 +1298,6 @@ class Dolan(HorizontalBarWeighted):
 
     .. image:: images/Dolan.*
         :width: 600
-
     '''
 
     def __init__(self, streamObj=None, **keywords):

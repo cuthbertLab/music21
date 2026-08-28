@@ -403,7 +403,6 @@ class StreamCore(Music21Object):
         music21.exceptions21.StreamException: The object you tried to add to
         the Stream, 3.14159, is not a Music21Object.  Use an ElementWrapper
         object if this is what you intend.
-
         '''
         if element is self:  # cannot add this Stream into itself
             raise StreamException('this Stream cannot be contained within itself')

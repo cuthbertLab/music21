@@ -349,7 +349,6 @@ class Spanner(base.Music21Object):
     # --------------------------------------------------------------------------
     def __getitem__(self, key):
         '''
-
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.BassClef()
@@ -399,7 +398,6 @@ class Spanner(base.Music21Object):
 
     def getSpannedElementsByClass(self, classFilterList):
         '''
-
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.AltoClef()
