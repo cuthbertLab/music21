@@ -697,17 +697,18 @@ class Spanner(base.Music21Object):
         else:
             endOffsetInHierarchy = opFrac(startOffsetInHierarchy + startElement.quarterLength)
 
-        matchIterator = (searchStream
-                         .recurse()
-                         .getElementsByOffsetInHierarchy(
-                             startOffsetInHierarchy,
-                             endOffsetInHierarchy,
-                             includeEndBoundary=includeEndBoundary,
-                             mustFinishInSpan=mustFinishInSpan,
-                             mustBeginInSpan=mustBeginInSpan,
-                             includeElementsThatEndAtStart=includeElementsThatEndAtStart)
-                         .getElementsByClass(self.fillElementTypes)
-                         )
+        matchIterator = (
+            searchStream
+            .recurse()
+            .getElementsByOffsetInHierarchy(
+                startOffsetInHierarchy,
+                endOffsetInHierarchy,
+                includeEndBoundary=includeEndBoundary,
+                mustFinishInSpan=mustFinishInSpan,
+                mustBeginInSpan=mustBeginInSpan,
+                includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+            .getElementsByClass(self.fillElementTypes)
+        )
 
         for foundElement in matchIterator:
             if foundElement is startElement:
