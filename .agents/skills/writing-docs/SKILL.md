@@ -78,6 +78,50 @@ doctest. It goes in the commit message.
 See the `bump-version` skill for which digit to change and the odd/even
 convention.
 
+## Doctest mechanics
+
+In doctests, no need to run `from music21 import *` that happens automatically (In Jupyter notebooks for the user's guide, the first line should begin `>>> from music21 import *`, so readers remember they need it)
+
+Examples always qualify by module: `note.Note('C4')`, never a bare `Note`.
+
+`OMIT_FROM_DOCS`, alone on a line, hides everything after it: cases worth checking that
+no reader wants to meet.
+
+`#_DOCS_HIDE` at the end of a line runs it without showing it; `#_DOCS_SHOW` at the
+start of a line shows it without running it. Together they let a doctest look
+nondeterministic and still have a fixed answer:
+
+```
+>>> import random
+>>> randomNumber = 12  #_DOCS_HIDE
+>>> #_DOCS_SHOW randomNumber = random.randint(0, 127)
+>>> p = pitch.Pitch()
+>>> p.ps = randomNumber
+>>> p
+<music21.pitch.Pitch C1>
+```
+
+Link with ``:class:`~music21.note.Note` `` and ``:meth:`~music21.note.Note.addLyric` ``.
+
+## Examples
+
+Give steps that have meaningful intermediate output descriptive names instead of chaining — so readers can understand what the intermediate values are:
+
+```
+>>> bachScore = corpus.parse('bwv66.6')
+>>> excerpt = bachScore.measures(4, 6)
+>>> chordReduction = excerpt.chordify()
+```
+
+Pick examples musicians care about: semitones to frequency, not Celsius to Fahrenheit;
+scramble "Chaminade", not "puppy". If you cannot think of a reason a musician would call the method, it may not belong in music21.
+
+Describe what a parameter is and does in English if it is not obvious; type alone is not
+documentation.
+
+No dull repetition in docs. A bit of humor is welcome in docs; the docs are written
+for humans who will close the window if they are dull.  If seven methods do essentially the same thing, give extensive docs the first time and then later methods can refer back to the first method. Don't repeat the same docs over and over.
+
 ## Doctests are not regression tests
 
 Doctests are documentation that happens to be verified. Every example must earn
@@ -105,3 +149,16 @@ unittest.
 Naming the guarded bug **is** appropriate in a unittest; that is what the test
 is for. The rule against narrating old bugs applies to docstrings and to
 comments in shipping code, not to tests.
+
+## Writing and Comment style
+- When writing comments in code, assume a strong code reader — anything inferable from the code is noise (docs that paraphrase names of functions or variable names esp.); focus on high level issues and gotchas that might bite again if not documented.
+- Say how to use code, not prior bugs or how code used to work or what was removed. That's for commit messages. Don't document where code is called from except for "keep in sync" lines across Py/TS.
+- Don't hijack a docstring for your addition. Original purpose line stays primary + one short line for the new bit. Prefer not documenting a small feature over making it seem like the primary reason for the code.
+- Examples of usage are usually better than long descriptions.
+- Avoid jargon not already found in the codebase; use plain descriptive English.
+- Rare paths should get little weight: in both code and docs. Use try/except over if/else when the except clause is rare. In docs, state the 90% path first and point exceptional cases to code that handle it.
+- When wording is dictated to the agent to substitute for original wording, use it. Do not add parentheticals. Only fix obvious typos.
+- No weapon-metaphors or overly militaristic language. Avoid "blast radius", "rearm", "landmine",
+     "detonate" in issues/PR/code.  Trigger or fire events is so commonly used that they're okay.
+
+

@@ -1394,12 +1394,25 @@ class Iterator:
 
     # ---Properties
     # - Numbering System
-    def _getNumberingSystem(self):
+    @property
+    def numberingSystem(self):
+        '''
+        This property determines which numbering
+        system to iterate through chorales with.
+        It can be set to 'bwv', 'kalmus', 'baerenreiter',
+        'budapest', or 'riemenschneider'.
+        It can also be set to 'title' in which case the
+        iterator needs to be given a list
+        of chorale titles in .titleList. At this time,
+        the titles need to be exactly as they
+        appear in the dictionary it queries.
+        '''
         if self._numberingSystem is None:
             raise BachException('Numbering System not set.')
         return self._numberingSystem
 
-    def _setNumberingSystem(self, value):
+    @numberingSystem.setter
+    def numberingSystem(self, value):
         if value in ['bwv', 'kalmus', 'baerenreiter', 'budapest', 'riemenschneider']:
             self._numberingSystem = value
             # initializes the number list and sets current and highest numbers / indices
@@ -1409,18 +1422,6 @@ class Iterator:
             self.titleList = []
         else:
             raise BachException(f'{value} is not a valid numbering system for Bach Chorales.')
-
-    numberingSystem = property(_getNumberingSystem, _setNumberingSystem,
-                               doc='''
-                                    This property determines which numbering
-                                    system to iterate through chorales with.
-                                    It can be set to 'bwv', 'kalmus', 'baerenreiter',
-                                    'budapest', or 'riemenschneider'.
-                                    It can also be set to 'title' in which case the
-                                    iterator needs to be given a list
-                                    of chorale titles in .titleList. At this time,
-                                    the titles need to be exactly as they
-                                    appear in the dictionary it queries.''')
 
     # - Title List
 

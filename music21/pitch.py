@@ -88,6 +88,8 @@ PITCH_SPACE_SIG_DIGITS = 6
 MICROTONE_OPEN = '('
 MICROTONE_CLOSE = ')'
 
+
+# do not change this -- consider it fixed.
 accidentalNameToModifier = {
     'natural': '',
     'sharp': '#',
@@ -98,9 +100,13 @@ accidentalNameToModifier = {
     'double-flat': '--',
     'triple-flat': '---',
     'quadruple-flat': '----',
-    'half-sharp': '~',
+    'half-sharp': '~',   # Might remove soon; use 'half-sharp'
+    # Might remove soon; use 'one-and-a-half-sharp'
+    # or 'three-quarter-sharp'
     'one-and-a-half-sharp': '#~',
-    'half-flat': '`',
+    'half-flat': '`',  # might remove soon; use 'half-flat'
+    # Might remove soon; use 'one-and-a-half-flat'
+    # or 'three-quarter-flat'
     'one-and-a-half-flat': '-`',
 }
 
@@ -1072,7 +1078,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> b = pitch.Accidental('flat')
         >>> a >= b
         True
-
         '''
         return self.__gt__(other) or self.__eq__(other)
 
@@ -1227,7 +1232,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         if name in ('natural', 'n', 0):
             self._name = 'natural'
             self._alter = 0.0
-        elif name in ('sharp', accidentalNameToModifier['sharp'], 'is', 1):
+        elif name in ('sharp', '#', 'is', 1):
+            # accidentalNameToModifier['sharp'] will always be #!
             self._name = 'sharp'
             self._alter = 1.0
         elif name in ('double-sharp', accidentalNameToModifier['double-sharp'],
