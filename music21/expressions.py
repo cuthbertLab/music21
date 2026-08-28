@@ -2724,16 +2724,9 @@ class TrillExtension(spanner.Spanner):
 
         self._placement = None  # can above or below or None, after musicxml
 
-    def _getPlacement(self):
-        return self._placement
-
-    def _setPlacement(self, value):
-        if value is not None and value.lower() not in ['above', 'below']:
-            raise TrillExtensionException(f'incorrect placement value: {value}')
-        if value is not None:
-            self._placement = value.lower()
-
-    placement = property(_getPlacement, _setPlacement, doc='''
+    @property
+    def placement(self):
+        '''
         Get or set the placement as either above, below, or None.
 
         >>> s = stream.Stream()
@@ -2745,7 +2738,15 @@ class TrillExtension(spanner.Spanner):
 
         A setting of None implies that the placement will be determined
         by notation software and no particular placement is demanded.
-        ''')
+        '''
+        return self._placement
+
+    @placement.setter
+    def placement(self, value):
+        if value is not None and value.lower() not in ['above', 'below']:
+            raise TrillExtensionException(f'incorrect placement value: {value}')
+        if value is not None:
+            self._placement = value.lower()
 
 
 class TremoloSpanner(spanner.Spanner):

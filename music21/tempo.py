@@ -200,17 +200,23 @@ class TempoText(TempoIndication):
     def _reprInternal(self):
         return repr(self.text)
 
-    def _getText(self):
+    @property
+    def text(self):
         '''
-        Get the text used for this expression.
+        Get or set the text as a string.  Setting is also the primary way that
+        the stored TextExpression object is created.
+
+        >>> import music21
+        >>> tm = music21.tempo.TempoText('adagio')
+        >>> tm.text
+        'adagio'
+        >>> tm.getTextExpression()
+        <music21.expressions.TextExpression 'adagio'>
         '''
         return self._textExpression.content
 
-    def _setText(self, value):
-        '''
-        Set the text of this repeat expression. This is also the primary way
-        that the stored TextExpression object is created.
-        '''
+    @text.setter
+    def text(self, value):
         if self._textExpression is None:
             self._textExpression = expressions.TextExpression(value)
             if self.hasStyleInformation:
@@ -221,17 +227,6 @@ class TempoText(TempoIndication):
                 self.applyTextFormatting()
         else:
             self._textExpression.content = value
-
-    text = property(_getText, _setText, doc='''
-        Get or set the text as a string.
-
-        >>> import music21
-        >>> tm = music21.tempo.TempoText('adagio')
-        >>> tm.text
-        'adagio'
-        >>> tm.getTextExpression()
-        <music21.expressions.TextExpression 'adagio'>
-        ''')
 
     def getMetronomeMark(self):
         # noinspection PyShadowingNames
@@ -486,10 +481,16 @@ class MetronomeMark(TempoIndication):
                 self.numberImplicit = True
 
     # -------------------------------------------------------------------------
-    def _getReferent(self):
+    @property
+    def referent(self):
+        '''
+        Get or set the referent, or the Duration object that is the
+        reference for the tempo value in BPM.
+        '''
         return self._referent
 
-    def _setReferent(self, value):
+    @referent.setter
+    def referent(self, value):
         if value is None:  # this may be better not here
             # if referent is None, set a default quarter note duration
             self._referent = duration.Duration(type='quarter')
@@ -505,11 +506,6 @@ class MetronomeMark(TempoIndication):
             # Music21Object with a duration or None
         else:
             raise TempoException(f'Cannot get a Duration from the supplied object: {value}')
-
-    referent = property(_getReferent, _setReferent, doc='''
-        Get or set the referent, or the Duration object that is the
-        reference for the tempo value in BPM.
-        ''')
 
     # properties and conversions
     def _getText(self):
@@ -576,15 +572,9 @@ class MetronomeMark(TempoIndication):
         False
         ''')
 
-    def _getNumberSounding(self):
-        return self._numberSounding  # may be None
-
-    def _setNumberSounding(self, value):
-        if not common.isNum(value) and value is not None:
-            raise TempoException('cannot set numberSounding to a string')
-        self._numberSounding = value
-
-    numberSounding = property(_getNumberSounding, _setNumberSounding, doc='''
+    @property
+    def numberSounding(self):
+        '''
         Get and set the numberSounding, or the numerical value of the Metronome that
         is used for playback independent of display. If numberSounding is None, number is
         assumed to be numberSounding.
@@ -599,7 +589,14 @@ class MetronomeMark(TempoIndication):
         >>> mm.numberSounding = 120
         >>> mm.numberSounding
         120
-        ''')
+        '''
+        return self._numberSounding  # may be None
+
+    @numberSounding.setter
+    def numberSounding(self, value):
+        if not common.isNum(value) and value is not None:
+            raise TempoException('cannot set numberSounding to a string')
+        self._numberSounding = value
 
     # -------------------------------------------------------------------------
     def getQuarterBPM(self, useNumberSounding=True) -> float|None:
@@ -949,21 +946,9 @@ class MetricModulation(TempoIndication):
 
     # --------------------------------------------------------------------------
     # core properties
-    def _setOldMetronome(self, value):
-        if value is None:
-            pass  # allow setting as None
-        elif not hasattr(value, 'classes') or 'MetronomeMark' not in value.classes:
-            raise MetricModulationException(
-                'oldMetronome property must be set with a MetronomeMark instance')
-        self._oldMetronome = value
-
-    def _getOldMetronome(self):
-        if self._oldMetronome is not None:
-            if self._oldMetronome.number is None:
-                self.updateByContext()
-        return self._oldMetronome
-
-    oldMetronome = property(_getOldMetronome, _setOldMetronome, doc='''
+    @property
+    def oldMetronome(self):
+        '''
         Get or set the left :class:`~music21.tempo.MetronomeMark` object
         for the old, or previous value.
 
@@ -979,9 +964,40 @@ class MetricModulation(TempoIndication):
         Traceback (most recent call last):
         music21.tempo.MetricModulationException: oldMetronome property
             must be set with a MetronomeMark instance
-        ''')
+        '''
+        if self._oldMetronome is not None:
+            if self._oldMetronome.number is None:
+                self.updateByContext()
+        return self._oldMetronome
 
-    def _setOldReferent(self, value):
+    @oldMetronome.setter
+    def oldMetronome(self, value):
+        if value is None:
+            pass  # allow setting as None
+        elif not hasattr(value, 'classes') or 'MetronomeMark' not in value.classes:
+            raise MetricModulationException(
+                'oldMetronome property must be set with a MetronomeMark instance')
+        self._oldMetronome = value
+
+    @property
+    def oldReferent(self):
+        '''
+        Get or set the referent of the old MetronomeMark.
+
+        >>> mm1 = tempo.MetronomeMark(number=60, referent=1)
+        >>> mmod1 = tempo.MetricModulation()
+        >>> mmod1.oldMetronome = mm1
+        >>> mmod1.oldMetronome
+        <music21.tempo.MetronomeMark larghetto Quarter=60>
+        >>> mmod1.oldReferent = 0.25
+        >>> mmod1.oldMetronome
+        <music21.tempo.MetronomeMark larghetto 16th=240>
+        '''
+        if self._oldMetronome is not None:
+            return self._oldMetronome.referent
+
+    @oldReferent.setter
+    def oldReferent(self, value):
         if value is None:
             raise MetricModulationException('cannot set old referent to None')
         # try to get and reassign equivalent
@@ -1000,40 +1016,9 @@ class MetricModulation(TempoIndication):
             self._oldMetronome = MetronomeMark(referent=value)
             # raise MetricModulationException('cannot set old MetronomeMark from provided value.')
 
-    def _getOldReferent(self):
-        if self._oldMetronome is not None:
-            return self._oldMetronome.referent
-
-    oldReferent = property(_getOldReferent, _setOldReferent, doc='''
-        Get or set the referent of the old MetronomeMark.
-
-        >>> mm1 = tempo.MetronomeMark(number=60, referent=1)
-        >>> mmod1 = tempo.MetricModulation()
-        >>> mmod1.oldMetronome = mm1
-        >>> mmod1.oldMetronome
-        <music21.tempo.MetronomeMark larghetto Quarter=60>
-        >>> mmod1.oldReferent = 0.25
-        >>> mmod1.oldMetronome
-        <music21.tempo.MetronomeMark larghetto 16th=240>
-
-        ''')
-
-    def _setNewMetronome(self, value):
-        if value is None:
-            pass  # allow setting as None
-        elif not hasattr(value, 'classes') or 'MetronomeMark' not in value.classes:
-            raise MetricModulationException(
-                'newMetronome property must be set with a MetronomeMark instance')
-        self._newMetronome = value
-
-    def _getNewMetronome(self):
-        # before returning the referent, see if we can update the number
-        if self._newMetronome is not None:
-            if self._newMetronome.number is None:
-                self.updateByContext()
-        return self._newMetronome
-
-    newMetronome = property(_getNewMetronome, _setNewMetronome, doc='''
+    @property
+    def newMetronome(self):
+        '''
         Get or set the right :class:`~music21.tempo.MetronomeMark`
         object for the new, or following value.
 
@@ -1046,9 +1031,41 @@ class MetricModulation(TempoIndication):
         Traceback (most recent call last):
         music21.tempo.MetricModulationException: newMetronome property must be
             set with a MetronomeMark instance
-        ''')
+        '''
+        # before returning the referent, see if we can update the number
+        if self._newMetronome is not None:
+            if self._newMetronome.number is None:
+                self.updateByContext()
+        return self._newMetronome
 
-    def _setNewReferent(self, value):
+    @newMetronome.setter
+    def newMetronome(self, value):
+        if value is None:
+            pass  # allow setting as None
+        elif not hasattr(value, 'classes') or 'MetronomeMark' not in value.classes:
+            raise MetricModulationException(
+                'newMetronome property must be set with a MetronomeMark instance')
+        self._newMetronome = value
+
+    @property
+    def newReferent(self):
+        '''
+        Get or set the referent of the new MetronomeMark.
+
+        >>> mm1 = tempo.MetronomeMark(number=60, referent=1)
+        >>> mmod1 = tempo.MetricModulation()
+        >>> mmod1.newMetronome = mm1
+        >>> mmod1.newMetronome
+        <music21.tempo.MetronomeMark larghetto Quarter=60>
+        >>> mmod1.newReferent = 0.25
+        >>> mmod1.newMetronome
+        <music21.tempo.MetronomeMark larghetto 16th=240>
+        '''
+        if self._newMetronome is not None:
+            return self._newMetronome.referent
+
+    @newReferent.setter
+    def newReferent(self, value):
         if value is None:
             raise MetricModulationException('cannot set new referent to None')
         # if oldMetronome is defined, get new metronome from old
@@ -1064,23 +1081,6 @@ class MetricModulation(TempoIndication):
             mm = MetronomeMark(referent=value)
             # raise MetricModulationException('cannot set old MetronomeMark from provided value.')
         self._newMetronome = mm
-
-    def _getNewReferent(self):
-        if self._newMetronome is not None:
-            return self._newMetronome.referent
-
-    newReferent = property(_getNewReferent, _setNewReferent, doc='''
-        Get or set the referent of the new MetronomeMark.
-
-        >>> mm1 = tempo.MetronomeMark(number=60, referent=1)
-        >>> mmod1 = tempo.MetricModulation()
-        >>> mmod1.newMetronome = mm1
-        >>> mmod1.newMetronome
-        <music21.tempo.MetronomeMark larghetto Quarter=60>
-        >>> mmod1.newReferent = 0.25
-        >>> mmod1.newMetronome
-        <music21.tempo.MetronomeMark larghetto 16th=240>
-        ''')
 
     @property
     def number(self):

@@ -1841,7 +1841,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         self._componentsNeedUpdating = False
 
     # PUBLIC METHODS #
-    def _getLinked(self) -> bool:
+    @property
+    def linked(self) -> bool:
         '''
         Gets or sets the `.linked` property -- if linked (default) then type, dots, tuplets are
         always coherent with quarterLength.  If not, then they are separate.
@@ -1865,7 +1866,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         return self._linked
 
-    def _setLinked(self, value: bool):
+    @linked.setter
+    def linked(self, value: bool):
         if value not in (True, False):
             raise TypeError(f'Linked can only be True or False, not {value}')
         if self._quarterLengthNeedsUpdating:
@@ -1877,8 +1879,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self._componentsNeedUpdating = True
 
         self._linked = value
-
-    linked = property(_getLinked, _setLinked)
 
     def addDurationTuple(self,
                          dur: DurationTuple|Duration|str|OffsetQLIn,
@@ -2915,33 +2915,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             tot += c.quarterLength
         return tot
 
-    def _getQuarterLength(self) -> OffsetQL:
-        if self._quarterLengthNeedsUpdating:
-            self._updateQuarterLength()
-        return self._qtrLength
-
-    def _setQuarterLength(self, value: OffsetQLIn):
-        if not self.linked:
-            # linked durations get this check for free from opFrac below.
-            if not isfinite(value):
-                raise ValueError(
-                    f'quarterLength must be a finite number, not {value!r}'
-                )
-            self._qtrLength = value
-        elif (self._qtrLength != value
-                or self._componentsNeedUpdating  # skip a type update for next type check
-                or self.type == 'inexpressible'):
-            value = opFrac(value)
-            if value == 0.0 and self.linked:
-                self.clear()
-            self._qtrLength = value
-            self.expressionIsInferred = True
-            self._componentsNeedUpdating = True
-            self._quarterLengthNeedsUpdating = False
-
-            self.informClient()
-
-    quarterLength = property(_getQuarterLength, _setQuarterLength, doc='''
+    @property
+    def quarterLength(self) -> OffsetQL:
+        '''
         Returns the quarter note length or Sets the quarter note length to
         the specified value. May be expressed as a float or Fraction.
 
@@ -2990,7 +2966,32 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> d.quarterLength = 1/3
         >>> d.quarterLength
         Fraction(1, 3)
-        ''')
+        '''
+        if self._quarterLengthNeedsUpdating:
+            self._updateQuarterLength()
+        return self._qtrLength
+
+    @quarterLength.setter
+    def quarterLength(self, value: OffsetQLIn):
+        if not self.linked:
+            # linked durations get this check for free from opFrac below.
+            if not isfinite(value):
+                raise ValueError(
+                    f'quarterLength must be a finite number, not {value!r}'
+                )
+            self._qtrLength = value
+        elif (self._qtrLength != value
+                or self._componentsNeedUpdating  # skip a type update for next type check
+                or self.type == 'inexpressible'):
+            value = opFrac(value)
+            if value == 0.0 and self.linked:
+                self.clear()
+            self._qtrLength = value
+            self.expressionIsInferred = True
+            self._componentsNeedUpdating = True
+            self._quarterLengthNeedsUpdating = False
+
+            self.informClient()
 
     @property
     def tuplets(self) -> tuple[Tuplet, ...]:
@@ -3517,7 +3518,7 @@ class TupletFixer:
             return
         firstTup = tupletGroup[0].duration.tuplets[0]
         totalTupletDuration = opFrac(firstTup.totalTupletLength())
-        currentTupletDuration = 0.0
+        currentTupletDuration: OffsetQL = 0.0
         smallestTupletTypeOrdinal: int = SMALL_SENTINEL
         largestTupletTypeOrdinal: int = LARGE_SENTINEL
 

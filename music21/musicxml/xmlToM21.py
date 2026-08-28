@@ -5164,7 +5164,7 @@ class MeasureParser(XMLParserBase):
                 mxNumber = mxEndingObj.get('number')
                 # RepeatBracket handles comma-separated values, such as "1,2"
                 try:
-                    rb.number = mxNumber
+                    rb.number = mxNumber if mxNumber is not None else 1
                 except spanner.SpannerException:
                     rb.number = 1
 

@@ -211,7 +211,20 @@ class ScoreReduction:
         self._chordReduction = None  # store a chordal reduction of available
 
 
-    def _setScore(self, value):
+    @property
+    def score(self):
+        '''
+        Get or set the Score. Setting the score set a deepcopy of the score; the score
+        set here will not be altered.
+
+        >>> s = corpus.parse('bwv66.6')
+        >>> sr = analysis.reduction.ScoreReduction()
+        >>> sr.score = s
+        '''
+        return self._score
+
+    @score.setter
+    def score(self, value):
         if not isinstance(value, stream.Stream):
             raise ScoreReductionException('cannot set a non Stream')
         if value.hasPartLikeStreams:
@@ -223,20 +236,16 @@ class ScoreReduction:
             self._score = s
         self._score.setDerivationMethod('ScoreReduction', recurse=True)
 
-    def _getScore(self):
-        return self._score
+    @property
+    def chordReduction(self):
+        '''
+        Get or set a Chord reduction as a Stream or Score. Setting the this values
+        set a deepcopy of the reduction; the reduction set here will not be altered.
+        '''
+        return self._chordReduction
 
-    score = property(_getScore, _setScore, doc='''
-        Get or set the Score. Setting the score set a deepcopy of the score; the score
-        set here will not be altered.
-
-        >>> s = corpus.parse('bwv66.6')
-        >>> sr = analysis.reduction.ScoreReduction()
-        >>> sr.score = s
-        ''')
-
-
-    def _setChordReduction(self, value):
+    @chordReduction.setter
+    def chordReduction(self, value):
         if not isinstance(value, stream.Stream):
             raise ScoreReductionException('cannot set a non Stream')
         if value.hasPartLikeStreams():
@@ -246,14 +255,6 @@ class ScoreReduction:
             s = stream.Score()
             s.insert(0, copy.deepcopy(value))
             self._chordReduction = s
-
-    def _getChordReduction(self):
-        return self._chordReduction
-
-    chordReduction = property(_getChordReduction, _setChordReduction, doc='''
-        Get or set a Chord reduction as a Stream or Score. Setting the this values
-        set a deepcopy of the reduction; the reduction set here will not be altered.
-        ''')
 
 
 
