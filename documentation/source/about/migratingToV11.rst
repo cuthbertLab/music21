@@ -66,7 +66,7 @@ on the note's pitch, ``n.pitch.octaveIsImplicit``.
    * - ``if p.octave is None:``
      - ``if p.octaveIsImplicit:``
    * - ``p.octave = None``
-     - ``p.octaveIsImplicit = True``  (the old spelling works until v13; it warns from v12)
+     - ``p.octaveIsImplicit = True``  (the old spelling is deprecated; removed in v13)
    * - ``p.implicitOctave``
      - ``p.octave``
    * - ``if p.octave is None: p.octave = p.implicitOctave``

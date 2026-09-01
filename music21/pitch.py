@@ -3182,8 +3182,7 @@ class Pitch(prebase.ProtoM21Object):
         187.0
 
         To forget the octave again, set `.octaveIsImplicit = True`.  Setting
-        `.octave = None` still does the same, but that path will be deprecated
-        in v12 and removed in v13.
+        `.octave = None` is deprecated and will be removed in v13.
 
         * Changed in v11: always an int; `.octaveIsImplicit` says whether it was given.
         '''
@@ -3196,7 +3195,7 @@ class Pitch(prebase.ProtoM21Object):
         if value is not None:
             self._octave = int(value)
         else:
-            # None: to be deprecated in v12 and removed in v13; use octaveIsImplicit = True
+            # None is deprecated, removed in v13. Add real deprecation message here in v12
             self._octave = None
         self.informClient()
 
