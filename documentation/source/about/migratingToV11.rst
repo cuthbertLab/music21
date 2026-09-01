@@ -226,9 +226,9 @@ Removed and deprecated
      - ``midiEventToInstrument``
    * - ``Stream.hasElement(el)``
      - ``el in s``
-   * - ``MeasureParser.identificationToMetadata``
+   * - ``musicxml.xmlToM21.MeasureParser.identificationToMetadata``
      - ``addIdentificationToMetadata``
-   * - a string for ``MeasureParser.getStaffNumber``
+   * - a string for ``musicxml.xmlToM21.MeasureParser.getStaffNumber``
      - an ``int``
    * - ``VoiceLeadingQuartet.unison`` / ``.fifth`` / ``.octave``
      - ``interval.Interval('P1')`` and friends
