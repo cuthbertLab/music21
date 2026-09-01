@@ -1554,7 +1554,6 @@ class Chord(ChordBase):
                 while pBass.octave != forceOctave:
                     # shift octave of all pitches
                     for p in returnObj.pitches:
-                        p.octaveIsImplicit = False
                         p.octave += dif
 
         # can change these pitches in place
