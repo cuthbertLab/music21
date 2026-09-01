@@ -930,7 +930,7 @@ def getPitches(pitchNames: Iterable[str] = ('C', 'E', 'G'),
 
     >>> segment.getPitches(maxPitch=pitch.Pitch('E'))
     Traceback (most recent call last):
-    ValueError: maxPitch must be given an octave
+    ValueError: maxPitch must not have an implicit octave
     '''
     if isinstance(bassPitch, str):
         bassPitch = pitch.Pitch(bassPitch)

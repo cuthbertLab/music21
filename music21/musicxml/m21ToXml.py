@@ -4580,7 +4580,7 @@ class MeasureExporter(XMLExporterBase):
         if p.accidental is not None:
             mxAlter = SubElement(mxPitch, 'alter')
             mxAlter.text = str(common.numToIntOrFloat(p.accidental.alter))
-        _setTagTextFromAttribute(p, mxPitch, 'octave', 'octave')
+        _setTagTextFromAttribute(p, mxPitch, 'octave')
         return mxPitch
 
     def unpitchedToXml(self,
