@@ -226,7 +226,7 @@ Removed and deprecated
      - ``midiEventToInstrument``
    * - ``Stream.hasElement(el)``
      - ``el in s``
-   * - ``musicxml.xmlToM21.MeasureParser.identificationToMetadata``
+   * - ``musicxml.xmlToM21.MusicXMLImporter.identificationToMetadata``
      - ``addIdentificationToMetadata``
    * - a string for ``musicxml.xmlToM21.MeasureParser.getStaffNumber``
      - an ``int``
