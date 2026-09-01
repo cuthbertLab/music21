@@ -1370,13 +1370,14 @@ class IntervalNetwork:
         if alteredDegrees and degree in alteredDegrees:
             alterSemitones = alteredDegrees[degree]['interval'].semitones
         alterSemitonesInt = t.cast('int', alterSemitones)
-        if ((usedNeighbor and getNeighbor == Direction.DESCENDING)
-                or (not usedNeighbor and direction == Direction.ASCENDING)):
-            while not p.octaveIsImplicit and p.transpose(alterSemitonesInt) > pitchOriginObj:
-                p.octave -= 1
-        else:
-            while not p.octaveIsImplicit and p.transpose(alterSemitonesInt) < pitchOriginObj:
-                p.octave += 1
+        if not p.octaveIsImplicit:
+            if ((usedNeighbor and getNeighbor == Direction.DESCENDING)
+                    or (not usedNeighbor and direction == Direction.ASCENDING)):
+                while p.transpose(alterSemitonesInt) > pitchOriginObj:
+                    p.octave -= 1
+            else:
+                while p.transpose(alterSemitonesInt) < pitchOriginObj:
+                    p.octave += 1
 
         # pitchObj = p
         n = self.nodes[foundNodeId]
