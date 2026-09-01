@@ -1370,13 +1370,14 @@ class IntervalNetwork:
         if alteredDegrees and degree in alteredDegrees:
             alterSemitones = alteredDegrees[degree]['interval'].semitones
         alterSemitonesInt = t.cast('int', alterSemitones)
-        if ((usedNeighbor and getNeighbor == Direction.DESCENDING)
-                or (not usedNeighbor and direction == Direction.ASCENDING)):
-            while p.octave is not None and p.transpose(alterSemitonesInt) > pitchOriginObj:
-                p.octave -= 1
-        else:
-            while p.octave is not None and p.transpose(alterSemitonesInt) < pitchOriginObj:
-                p.octave += 1
+        if not p.octaveIsImplicit:
+            if ((usedNeighbor and getNeighbor == Direction.DESCENDING)
+                    or (not usedNeighbor and direction == Direction.ASCENDING)):
+                while p.transpose(alterSemitonesInt) > pitchOriginObj:
+                    p.octave -= 1
+            else:
+                while p.transpose(alterSemitonesInt) < pitchOriginObj:
+                    p.octave += 1
 
         # pitchObj = p
         n = self.nodes[foundNodeId]
@@ -1487,8 +1488,7 @@ class IntervalNetwork:
             nodeObj = t.cast(list[Node], self.nodeNameToNodes(nodeId))[0]
 
         # must set an octave for pitch reference, even if not given
-        if pitchReference.octave is None:
-            pitchReference.octave = pitchReference.implicitOctave
+        pitchReference.octaveIsImplicit = False
 
         if isinstance(minPitch, str):
             minPitch = pitch.Pitch(minPitch)
@@ -1675,8 +1675,7 @@ class IntervalNetwork:
             pitchRef = copy.deepcopy(pitchReference)
 
         # must set an octave for pitch reference, even if not given
-        if pitchRef.octave is None:
-            pitchRef.octave = 4
+        pitchRef.octaveIsImplicit = False
 
         # get first node if no node is provided
         if isinstance(nodeId, Node):
@@ -1861,8 +1860,7 @@ class IntervalNetwork:
             pitchRef = copy.deepcopy(pitchReference)
 
         # must set an octave for pitch reference, even if not given
-        if pitchRef.octave is None:
-            pitchRef.octave = pitchRef.implicitOctave
+        pitchRef.octaveIsImplicit = False
 
         minPitchObj: pitch.Pitch|None
         if isinstance(minPitch, str):
@@ -2383,9 +2381,8 @@ class IntervalNetwork:
         else:
             pitchTargetObj = pitchTarget
 
-        saveOctave = pitchTargetObj.octave
-        if saveOctave is None:
-            pitchTargetObj.octave = pitchTargetObj.implicitOctave
+        octaveWasImplicit = pitchTargetObj.octaveIsImplicit
+        pitchTargetObj.octaveIsImplicit = False
 
         # try an octave spread first
         # if a scale degree is larger than an octave this will fail
@@ -2413,8 +2410,8 @@ class IntervalNetwork:
                 if realizedNode not in post:  # may be more than one match
                     post.append(realizedNode)
 
-        if saveOctave is None:
-            pitchTargetObj.octave = None
+        if octaveWasImplicit:
+            pitchTargetObj.octaveIsImplicit = True
 
         if not post:
             return None
@@ -2459,10 +2456,9 @@ class IntervalNetwork:
         else:
             pitchTargetObj = pitchTarget
 
-        savedOctave = pitchTargetObj.octave
-        if savedOctave is None:
-            # don't alter permanently, in case a Pitch object was passed in.
-            pitchTargetObj.octave = pitchTargetObj.implicitOctave
+        # don't alter permanently, in case a Pitch object was passed in.
+        octaveWasImplicit = pitchTargetObj.octaveIsImplicit
+        pitchTargetObj.octaveIsImplicit = False
         # try an octave spread first
         # if a scale degree is larger than an octave this will fail
         minPitch = pitchTargetObj.transpose(-12, inPlace=False)
@@ -2484,8 +2480,8 @@ class IntervalNetwork:
                 return lowNeighbor, highNeighbor
             lowNeighbor = realizedNode
 
-        if savedOctave is None:
-            pitchTargetObj.octave = savedOctave
+        if octaveWasImplicit:
+            pitchTargetObj.octaveIsImplicit = True
         return None
 
     def getRelativeNodeDegree(

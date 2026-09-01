@@ -29,6 +29,10 @@
   `environLocal.printDebug(...)`, or `environLocal.warn(...)` when the user should hear
   about it every time. `test/toggleDebug.py` switches debug output on and off.
 - New exceptions subclass `exceptions21.Music21Exception`.
+- Deprecate a function or method with `@common.deprecated(...)`. Never put it on a
+  property: IDEs read every property while inspecting an object, so the warning would
+  fire on people who never used it. For a property, write `* Deprecated in vX: use Y.`
+  in the docstring and leave `# Add real deprecation message here in vY` in the body.
 - Return named things — a small class, a `namedtuple`, a dict — never a positional tuple of more than 2 (maybe 3) elements
   whose elements each mean something different and unrelated (x, y, z is okay for instance). Nobody should write `returned[3][0][7]`.
 - Don't reuse a variable name once the type of what it holds changes
@@ -128,6 +132,12 @@
   after addressing the problem.  (A blind close or close with "not accepted" etc. generally means that the issue/PR
   has too many problems to easily solve and has become a burden for the maintainer).
 - Do not include a "Tests run" section unless the testing procedure was unusual (like it affects part of the system without standard tests, like the testing system itself.)
+- While someone is reviewing a PR or a pushed branch, "do X" is not "commit and push X":
+  make the change and leave it unstaged. When the list looks finished (or you hear "done!"
+  or "push it"), offer to commit, or to commit and push. Batch a round's small fixes into
+  one commit; no micro-commit trains. Prefer new commits to amend + force-push, since the
+  reviewer may have pulled the branch; if asked to fold a fix into the commit it changes,
+  amend, force-push with `--force-with-lease` against an explicit SHA, and say so.
 
 # Writing style
 

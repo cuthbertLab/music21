@@ -4580,7 +4580,7 @@ class MeasureExporter(XMLExporterBase):
         if p.accidental is not None:
             mxAlter = SubElement(mxPitch, 'alter')
             mxAlter.text = str(common.numToIntOrFloat(p.accidental.alter))
-        _setTagTextFromAttribute(p, mxPitch, 'octave', 'implicitOctave')
+        _setTagTextFromAttribute(p, mxPitch, 'octave')
         return mxPitch
 
     def unpitchedToXml(self,
@@ -7397,7 +7397,7 @@ class MeasureExporter(XMLExporterBase):
                 # TODO: key-accidental
 
         for i, p in enumerate(keyOrKeySignature.alteredPitches):
-            if p.octave is not None:
+            if not p.octaveIsImplicit:
                 mxKeyOctave = SubElement(mxKey, 'key-octave')
                 mxKeyOctave.text = str(p.octave)
                 mxKeyOctave.set('number', str(i + 1))

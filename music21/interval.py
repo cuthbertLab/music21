@@ -1409,10 +1409,7 @@ class GenericInterval(IntervalBase):
         >>> gSharp
         <music21.pitch.Pitch D#5>
         '''
-        if p.octave is None:
-            useImplicitOctave = True
-        else:
-            useImplicitOctave = False
+        useImplicitOctave = p.octaveIsImplicit
         pitchDNN = p.diatonicNoteNum
 
         if inPlace:
@@ -1422,7 +1419,7 @@ class GenericInterval(IntervalBase):
 
         newPitch.diatonicNoteNum = pitchDNN + self.staffDistance
         if useImplicitOctave:
-            newPitch.octave = None
+            newPitch.octaveIsImplicit = True
 
         if not inPlace:
             return newPitch
@@ -2500,10 +2497,7 @@ class ChromaticInterval(IntervalBase):
 
         * Changed in v6: added inPlace.
         '''
-        if p.octave is None:
-            useImplicitOctave = True
-        else:
-            useImplicitOctave = False
+        useImplicitOctave = p.octaveIsImplicit
         pps = p.ps
 
         if not inPlace:
@@ -2512,8 +2506,8 @@ class ChromaticInterval(IntervalBase):
             newPitch = p
 
         newPitch.ps = pps + self.semitones
-        if useImplicitOctave is True:
-            newPitch.octave = None
+        if useImplicitOctave:
+            newPitch.octaveIsImplicit = True
 
         if not inPlace:
             return newPitch
@@ -3426,8 +3420,8 @@ class Interval(IntervalBase):
                 maxAccidental=maxAccidental,
             )
 
-            if p.fundamental.octave is None:
-                pOut.fundamental.octave = None
+            if p.fundamental.octaveIsImplicit:
+                pOut.fundamental.octaveIsImplicit = True
 
         if not inPlace:
             return pOut
@@ -3450,10 +3444,7 @@ class Interval(IntervalBase):
             # true unison and any multiple of true octave
             inheritAccidentalDisplayStatus = True
 
-        if p.octave is None:
-            useImplicitOctave = True
-        else:
-            useImplicitOctave = False
+        useImplicitOctave = p.octaveIsImplicit
 
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
@@ -3543,7 +3534,7 @@ class Interval(IntervalBase):
             pitch2.microtone = pitch2.microtone.cents + centsOrigin
 
         if useImplicitOctave:
-            pitch2.octave = None
+            pitch2.octaveIsImplicit = True
 
         if not inPlace:
             return pitch2

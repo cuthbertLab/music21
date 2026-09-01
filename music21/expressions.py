@@ -760,8 +760,7 @@ class GeneralMordent(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
 
         if self._direction == 'up':
             ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
@@ -828,8 +827,7 @@ class GeneralMordent(Ornament):
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
         ornamentalPitch.transpose(transposeInterval, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if ornamentalPitch.microtone.cents != 0:
@@ -1375,8 +1373,7 @@ class Trill(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
 
         if self._direction == 'up':
             ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
@@ -1424,8 +1421,7 @@ class Trill(Ornament):
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
         ornamentalPitch.transpose(transposeInterval, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if ornamentalPitch.microtone.cents != 0:
@@ -2043,8 +2039,7 @@ class Turn(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
 
         accidental: pitch.Accidental|None = None
         if which == 'upper':
@@ -2119,16 +2114,14 @@ class Turn(Ornament):
             srcObj, 'lower', keySig=keySig)
 
         upperPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if upperPitch.octave is None:
-            upperPitch.octave = upperPitch.implicitOctave
+        upperPitch.octaveIsImplicit = False
         upperPitch.transpose(transposeIntervalUp, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if upperPitch.microtone.cents != 0:
             upperPitch.convertMicrotonesToQuarterTones(inPlace=True)
 
         lowerPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if lowerPitch.octave is None:
-            lowerPitch.octave = lowerPitch.implicitOctave
+        lowerPitch.octaveIsImplicit = False
         lowerPitch.transpose(transposeIntervalDown, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if lowerPitch.microtone.cents != 0:

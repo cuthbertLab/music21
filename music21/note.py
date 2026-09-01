@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2006-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1446,10 +1446,10 @@ class Note(NotRest):
     >>> n = note.Note('B-')
     >>> n.name
     'B-'
-    >>> n.octave is None
-    True
-    >>> n.pitch.implicitOctave
+    >>> n.octave
     4
+    >>> n.pitch.octaveIsImplicit
+    True
 
     >>> n = note.Note(name='D#')
     >>> n.name
@@ -1657,15 +1657,17 @@ class Note(NotRest):
         self.pitch.step = value
 
     @property
-    def octave(self) -> int|None:
+    def octave(self) -> int:
         '''
         Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.octave`.
+
+        * Changed in v11: always an int; see :attr:`~music21.pitch.Pitch.octaveIsImplicit`.
         '''
         return self.pitch.octave
 
     @octave.setter
-    def octave(self, value: int|None):
+    def octave(self, value: int|float|None):
         self.pitch.octave = value
 
     @property
@@ -1886,7 +1888,7 @@ class Unpitched(NotRest):
         if displayName:
             display_pitch = Pitch(displayName)
             self.displayStep = display_pitch.step
-            self.displayOctave = display_pitch.implicitOctave
+            self.displayOctave = display_pitch.octave
 
     def _reprInternal(self):
         if not self.storedInstrument:

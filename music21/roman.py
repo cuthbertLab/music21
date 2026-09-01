@@ -21,7 +21,6 @@ import unittest
 
 from music21 import chord
 from music21 import common
-from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21.figuredBass import notation as fbNotation
@@ -3416,12 +3415,9 @@ class RomanNumeral(harmony.Harmony):
                 thisScaleDegree, direction=scale.Direction.ASCENDING))
             pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(newPitch.name)
             newNewPitch = pitch.Pitch(pitchName)
-            if newPitch.octave is not None:
-                newNewPitch.octave = newPitch.octave
-            else:
-                newNewPitch.octave = defaults.pitchOctave
+            newNewPitch.octave = newPitch.octave
             if newNewPitch.ps < lastPitch.ps:
-                newNewPitch.octave += 1  # type: ignore
+                newNewPitch.octave += 1
             pitches.append(newNewPitch)
             lastPitch = newNewPitch
 
@@ -3480,13 +3476,13 @@ class RomanNumeral(harmony.Harmony):
                     addedPitch.accidental = pitch.Accidental(alteration)
 
                 while addedPitch.ps < bassPitch.ps:
-                    addedPitch.octave = addedPitch.implicitOctave + 1
+                    addedPitch.octave += 1
 
                 if (addedPitch.ps == bassPitch.ps
                         and addedPitch.diatonicNoteNum < bassPitch.diatonicNoteNum):
                     # RN('IV[add#7]', 'C') would otherwise result
                     # in E#4 as bass, not E#5 as highest note.
-                    addedPitch.octave = addedPitch.implicitOctave + 1
+                    addedPitch.octave += 1
 
                 if addedPitch not in self.pitches:
                     self.add(addedPitch)

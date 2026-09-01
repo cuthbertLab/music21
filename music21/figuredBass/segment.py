@@ -930,15 +930,15 @@ def getPitches(pitchNames: Iterable[str] = ('C', 'E', 'G'),
 
     >>> segment.getPitches(maxPitch=pitch.Pitch('E'))
     Traceback (most recent call last):
-    ValueError: maxPitch must be given an octave
+    ValueError: maxPitch must not have an implicit octave
     '''
     if isinstance(bassPitch, str):
         bassPitch = pitch.Pitch(bassPitch)
     if isinstance(maxPitch, str):
         maxPitch = pitch.Pitch(maxPitch)
 
-    if maxPitch.octave is None:
-        raise ValueError('maxPitch must be given an octave')
+    if maxPitch.octaveIsImplicit:
+        raise ValueError('maxPitch must not have an implicit octave')
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
     iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
     iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)

@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -16,6 +16,7 @@ import unittest
 from music21 import common
 from music21 import converter
 from music21 import corpus
+from music21 import defaults
 from music21 import key
 from music21 import note
 from music21 import pitch
@@ -40,6 +41,79 @@ class Test(unittest.TestCase):
     def testOctave(self):
         b = Pitch('B#3')
         self.assertEqual(b.octave, 3)
+
+    def testOctaveIsImplicit(self):
+        anyFSharp = Pitch('F#')
+        self.assertTrue(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.octave, 4)
+        self.assertEqual(anyFSharp.implicitOctave, 4)
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#')
+        self.assertEqual(anyFSharp.ps, 66.0)
+
+        anyFSharp.octave = 5
+        self.assertFalse(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.octave, 5)
+        self.assertEqual(anyFSharp.implicitOctave, 5)
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#5')
+
+        anyFSharp.octaveIsImplicit = True
+        self.assertEqual(anyFSharp.octave, 4)
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#')
+        self.assertEqual(anyFSharp.ps, 66.0)
+
+        # False gives the default octave explicitly
+        anyFSharp.octaveIsImplicit = False
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#4')
+
+        # octave = None still forgets the octave
+        anyFSharp.octave = None
+        self.assertTrue(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.octave, 4)
+
+        # Notes proxy the int
+        self.assertEqual(note.Note('B-').octave, 4)
+        self.assertEqual(note.Note('B-3').octave, 3)
+
+        # the default is read live from defaults.pitchOctave
+        savedDefaultOctave = defaults.pitchOctave
+        try:
+            defaults.pitchOctave = 3
+            self.assertEqual(Pitch('C').octave, 3)
+            self.assertEqual(Pitch('C').ps, 48.0)
+            self.assertEqual(Pitch('C5').octave, 5)
+        finally:
+            defaults.pitchOctave = savedDefaultOctave
+
+        # creation paths
+        self.assertTrue(Pitch().octaveIsImplicit)
+        self.assertTrue(Pitch(3).octaveIsImplicit)  # pitch class
+        self.assertFalse(Pitch(65).octaveIsImplicit)  # midi
+        self.assertFalse(Pitch('C4').octaveIsImplicit)
+        self.assertFalse(Pitch('C', octave=4).octaveIsImplicit)
+        self.assertTrue(Pitch(step='D', accidental='#').octaveIsImplicit)
+        self.assertTrue(note.Note('B-').pitch.octaveIsImplicit)
+        self.assertFalse(note.Note().pitch.octaveIsImplicit)
+
+        # implicitness survives copying and transposition
+        anyD = Pitch('D')
+        self.assertTrue(copy.deepcopy(anyD).octaveIsImplicit)
+        self.assertTrue(anyD.transpose('M2').octaveIsImplicit)
+        self.assertTrue(anyD.transpose(3).octaveIsImplicit)
+        self.assertTrue(anyD.getEnharmonic().octaveIsImplicit)
+        self.assertFalse(Pitch('D4').transpose('M2').octaveIsImplicit)
+
+        # an implicit octave is not the same as an explicit default octave
+        self.assertNotEqual(Pitch('C'), Pitch('C4'))
+        self.assertEqual(Pitch('C'), Pitch('C'))
+        self.assertNotEqual(hash(Pitch('C')), hash(Pitch('C4')))
+
+        # the setter informs a Note client only when something changed
+        n = note.Note('C4')
+        n._cache['junk'] = 1
+        n.pitch.octaveIsImplicit = False
+        self.assertEqual(n._cache, {'junk': 1})
+        n.pitch.octaveIsImplicit = True
+        self.assertEqual(n._cache, {})
 
     def testNameSetting(self):
         with self.assertRaisesRegex(ValueError,
