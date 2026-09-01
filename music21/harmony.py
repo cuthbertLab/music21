@@ -2676,10 +2676,6 @@ class Test(unittest.TestCase):
         self.assertEqual(explicitFm6.root(find=False).name, 'F')
         fm6bassOctave = explicitFm6.bass(find=False).octave
         fm6rootOctave = explicitFm6.root(find=False).octave
-        self.assertIsNotNone(fm6bassOctave)
-        self.assertIsNotNone(fm6rootOctave)
-        assert fm6bassOctave is not None
-        assert fm6rootOctave is not None
         self.assertLess(fm6bassOctave, fm6rootOctave)
 
     def testClassSortOrderHarmony(self):

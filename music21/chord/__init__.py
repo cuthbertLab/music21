@@ -1544,9 +1544,6 @@ class Chord(ChordBase):
         pBass = returnObj.bass()  # returns a reference, not a copy
         if forceOctave is not None:
             pBassOctave = pBass.octave
-            if pBassOctave is None:
-                pBassOctave = pBass.implicitOctave
-
             if pBassOctave > forceOctave:
                 dif = -1
             elif pBassOctave < forceOctave:
@@ -2392,10 +2389,7 @@ class Chord(ChordBase):
             currentMaxMidi = max(self.pitches).ps
             tempBassPitch = self.bass()
             while tempBassPitch.ps < currentMaxMidi:
-                if tempBassPitch.octave is not None:
-                    tempBassPitch.octave += 1
-                else:
-                    tempBassPitch.octave = tempBassPitch.implicitOctave + 1
+                tempBassPitch.octave += 1
 
             # housekeeping for next loop tests
             self.clearCache()
@@ -4010,7 +4004,7 @@ class Chord(ChordBase):
                 if p.step not in usedSteps:
                     usedSteps.append(p.step)
                 else:
-                    p.octave = p.implicitOctave + 1
+                    p.octave += 1
                     newRemainingPitches.append(p)
             remainingPitches = newRemainingPitches
 

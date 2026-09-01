@@ -423,10 +423,10 @@ class AbstractScale(Scale):
         >>> pitchListStrs = 'a b c d e f g a'.split()
         >>> pitchList = [pitch.Pitch(p) for p in pitchListStrs]
 
-        Here's the problem, between `pitchList[1]` and `pitchList[2]` the `.implicitOctave`
+        Here's the problem, between `pitchList[1]` and `pitchList[2]` the `.octave`
         stays the same, so the `.ps` drops:
 
-        >>> (pitchList[1].implicitOctave, pitchList[2].implicitOctave)
+        >>> (pitchList[1].octave, pitchList[2].octave)
         (4, 4)
         >>> (pitchList[1].ps, pitchList[2].ps)
         (71.0, 60.0)
@@ -435,7 +435,7 @@ class AbstractScale(Scale):
         one has a .ps above the previous:
 
         >>> pl2 = scale.AbstractScale.fixDefaultOctaveForPitchList(pitchList)
-        >>> (pl2[1].implicitOctave, pl2[2].implicitOctave, pl2[3].implicitOctave)
+        >>> (pl2[1].octave, pl2[2].octave, pl2[3].octave)
         (4, 5, 5)
         >>> (pl2[1].ps, pl2[2].ps)
         (71.0, 72.0)
@@ -449,7 +449,7 @@ class AbstractScale(Scale):
         '''
         # fix defaultOctave for pitchList
         lastPs: float = 0
-        lastOctave = pitchList[0].implicitOctave
+        lastOctave = pitchList[0].octave
         for p in pitchList:
             if p.octaveIsImplicit:
                 if lastPs > p.ps:
@@ -459,7 +459,7 @@ class AbstractScale(Scale):
                     p.octave = lastOctave
 
             lastPs = p.ps
-            lastOctave = p.implicitOctave
+            lastOctave = p.octave
 
         return pitchList
 

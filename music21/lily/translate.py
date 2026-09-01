@@ -1514,12 +1514,12 @@ class LilypondConverter:
         returns a string of single-quotes or commas or '' representing
         the octave of a :class:`~music21.pitch.Pitch` object
         '''
-        implicitOctave = pitchObj.implicitOctave
-        if implicitOctave < 3:
-            correctedOctave = 3 - implicitOctave
+        octave = pitchObj.octave
+        if octave < 3:
+            correctedOctave = 3 - octave
             octaveModChars = ',' * correctedOctave  # C2 = c,  C1 = c,,
         else:
-            correctedOctave = implicitOctave - 3
+            correctedOctave = octave - 3
             octaveModChars = "'" * correctedOctave  # C4 = c', C5 = c''  etc.
         return octaveModChars
 

@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2019 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1681,31 +1681,29 @@ class Pitch(prebase.ProtoM21Object):
         >>> alters
         [1.0, -1.0]
 
-    If a `Pitch` doesn't have an associated octave, then its
-    `.octave` value is None.  This means that it represents
-    any G#, regardless of octave.  Transposing this note up
-    an octave doesn't change anything.
+    A `Pitch` created without an octave represents any G#, regardless
+    of octave: it prints without an octave number, and transposing it
+    up an octave changes nothing.
 
     >>> anyGSharp = pitch.Pitch('G#')
-    >>> anyGSharp.octave is None
-    True
+    >>> anyGSharp
+    <music21.pitch.Pitch G#>
     >>> print(anyGSharp.transpose('P8'))
     G#
 
-    Sometimes we need an octave for a `Pitch` even if it's not
-    specified.  For instance, we can't play an octave-less `Pitch`
-    in MIDI or display it on a staff.  So there is an `.implicitOctave`
-    tag to deal with these situations; by default it's always 4 (unless
-    defaults.pitchOctave is changed)
+    Yet an octave is often needed anyhow, to play the `Pitch` in MIDI or
+    put it on a staff, so `.octave` is always an integer: the default octave,
+    4 (`defaults.pitchOctave`), when none was given.  `.octaveIsImplicit`
+    tells the two cases apart.
 
-    >>> anyGSharp.implicitOctave
+    >>> anyGSharp.octave
     4
-
-    If a `Pitch` has its `.octave` explicitly set, then `.implicitOctave`
-    always equals `.octave`.
-
-    >>> highEflat.implicitOctave
+    >>> anyGSharp.octaveIsImplicit
+    True
+    >>> highEflat.octave
     6
+    >>> highEflat.octaveIsImplicit
+    False
 
     If an integer or float >= 12 is passed to the constructor then it is
     used as the `.ps` attribute, which is for most common piano notes, the
@@ -1724,7 +1722,7 @@ class Pitch(prebase.ProtoM21Object):
     >>> p2 = pitch.Pitch(3)
     >>> p2
     <music21.pitch.Pitch E->
-    >>> p2.octave is None
+    >>> p2.octaveIsImplicit
     True
 
     Since in instantiating pitches from numbers,
@@ -1846,8 +1844,8 @@ class Pitch(prebase.ProtoM21Object):
     and cannot be put into Streams
     '''
     # define order for presenting names in documentation; use strings
-    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'german',
-                  'french', 'spanish', 'italian', 'dutch']
+    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'octaveIsImplicit',
+                  'midi', 'german', 'french', 'spanish', 'italian', 'dutch']
     # documentation for all attributes (not properties or methods)
     # _DOC_ATTR: dict[str, str] = {
     # }
@@ -1940,6 +1938,7 @@ class Pitch(prebase.ProtoM21Object):
         # #        MSC 12 years later: maybe Chris was right!
         # self.defaultOctave: int = defaults.pitchOctave
         # # MSC: even later: Chris Ariza was right
+        # None means implicit: .octave then reports defaults.pitchOctave
         self._octave: int|None = None
 
         # if True, accidental is not known; is determined algorithmically
@@ -2046,7 +2045,7 @@ class Pitch(prebase.ProtoM21Object):
         '''
         if not isinstance(other, Pitch):
             return NotImplemented
-        if (self.octave == other.octave
+        if (self._octave == other._octave
                 and self.step == other.step
                 and self.accidental == other.accidental
                 and self.microtone == other.microtone):
@@ -2085,7 +2084,7 @@ class Pitch(prebase.ProtoM21Object):
             self.fundamental,
             self.spellingIsInferred,
             self.microtone,
-            self.octave,
+            self._octave,
             self.step,
             type(self),
         )
@@ -2592,13 +2591,11 @@ class Pitch(prebase.ProtoM21Object):
         >>> print(f'{p.ps:.1f}')
         60.2
 
-        Octaveless pitches use their .implicitOctave attributes:
+        A pitch without an octave of its own uses the default octave, 4:
 
         >>> d = pitch.Pitch('D#')
-        >>> d.octave is None
+        >>> d.octaveIsImplicit
         True
-        >>> d.implicitOctave
-        4
         >>> d.ps
         63.0
 
@@ -2628,7 +2625,7 @@ class Pitch(prebase.ProtoM21Object):
         or self.accidental are changed.
         '''
         step = self._step
-        ps = float(((self.implicitOctave + 1) * 12) + STEPREF[step])
+        ps = float(((self.octave + 1) * 12) + STEPREF[step])
         if self.accidental is not None:
             ps = ps + self.accidental.alter
         if self._microtone is not None:
@@ -3166,31 +3163,41 @@ class Pitch(prebase.ProtoM21Object):
 
 
     @property
-    def octave(self) -> int|None:
+    def octave(self) -> int:
         '''
-        Returns or sets the octave of the note.
-        Setting the octave updates the pitchSpace attribute.
+        Returns or sets the octave of the note.  Always an int: a Pitch
+        created without an octave reports the default octave, 4
+        (`defaults.pitchOctave`), and has `.octaveIsImplicit` True.
 
-        >>> a = pitch.Pitch('g')
-        >>> a.octave is None
-        True
-        >>> a.implicitOctave
+        >>> g = pitch.Pitch('g')
+        >>> g.octave
         4
-        >>> a.ps  ## will use implicitOctave
+        >>> g.octaveIsImplicit
+        True
+        >>> g.ps
         67.0
-        >>> a.name
-        'G'
 
-        >>> a.octave = 14
-        >>> a.octave
+        Setting the octave updates `.ps` and makes the octave explicit:
+
+        >>> g.octave = 14
+        >>> g.octave
         14
-        >>> a.implicitOctave
-        14
-        >>> a.name
-        'G'
-        >>> a.ps
+        >>> g.octaveIsImplicit
+        False
+        >>> g.ps
         187.0
+
+        Setting `.octave = None` forgets the octave again, the same as
+        setting `.octaveIsImplicit = True`:
+
+        >>> g.octave = None
+        >>> g
+        <music21.pitch.Pitch G>
+
+        * Changed in v11: always an int; `.octaveIsImplicit` says whether it was given.
         '''
+        if self._octave is None:
+            return defaults.pitchOctave
         return self._octave
 
     @octave.setter
@@ -3204,14 +3211,17 @@ class Pitch(prebase.ProtoM21Object):
     @property
     def octaveIsImplicit(self) -> bool:
         '''
-        True if this Pitch was never given an octave, so it stands for
-        its pitch class in any octave, and prints without an octave number.
+        True if this Pitch was never given an octave, so it stands for its
+        pitch class in any octave: it prints without an octave number, and
+        `.octave` reports the default, 4.
 
         >>> anyFSharp = pitch.Pitch('F#')
         >>> anyFSharp.octaveIsImplicit
         True
         >>> anyFSharp
         <music21.pitch.Pitch F#>
+        >>> anyFSharp.octave
+        4
 
         Setting `.octave` makes the octave explicit:
 
@@ -3242,22 +3252,16 @@ class Pitch(prebase.ProtoM21Object):
     @property
     def implicitOctave(self) -> int:
         '''
-        Returns the octave of the Pitch, or defaultOctave if
-        octave was never set. To set an octave, use .octave.
-        Default octave is usually 4.
+        Synonym for `.octave`.  To be deprecated no earlier than v12 and
+        removed later; use `.octave` instead.
 
         >>> p = pitch.Pitch('C#')
-        >>> p.octave is None
-        True
         >>> p.implicitOctave
         4
 
-        Cannot be set.  Instead, just change the `.octave` of the pitch
+        * Changed in v11: the same as `.octave`.
         '''
-        if self.octave is None:
-            return defaults.pitchOctave
-        else:
-            return self.octave
+        return self.octave
 
     # noinspection SpellCheckingInspection,GrazieInspection
     @property
@@ -4504,7 +4508,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> b.diatonicNoteNum
         0
 
-        An `implicitOctave` of 4 is used if octave is not set:
+        The default octave, 4, is used if none was given:
 
         >>> c = pitch.Pitch('C')
         >>> c.diatonicNoteNum
@@ -4534,7 +4538,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> lowLowLowD.diatonicNoteNum
         -19
         '''
-        return STEP_TO_DNN_OFFSET[self.step] + 1 + (7 * self.implicitOctave)
+        return STEP_TO_DNN_OFFSET[self.step] + 1 + (7 * self.octave)
 
     @diatonicNoteNum.setter
     def diatonicNoteNum(self, newNum: int) -> None:
@@ -4770,7 +4774,6 @@ class Pitch(prebase.ProtoM21Object):
             src = self
         else:
             src = copy.deepcopy(self)
-        assert src.octave is not None
 
         while True:
             # ref 20, min 10, lower ref.
@@ -4855,7 +4858,6 @@ class Pitch(prebase.ProtoM21Object):
             src = self
         else:
             src = copy.deepcopy(self)
-        assert src.octave is not None
 
         # case where self is below target
         while True:

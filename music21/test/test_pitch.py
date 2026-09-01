@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -16,6 +16,7 @@ import unittest
 from music21 import common
 from music21 import converter
 from music21 import corpus
+from music21 import defaults
 from music21 import key
 from music21 import note
 from music21 import pitch
@@ -44,20 +45,44 @@ class Test(unittest.TestCase):
     def testOctaveIsImplicit(self):
         anyFSharp = Pitch('F#')
         self.assertTrue(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.octave, 4)
+        self.assertEqual(anyFSharp.implicitOctave, 4)
         self.assertEqual(anyFSharp.nameWithOctave, 'F#')
         self.assertEqual(anyFSharp.ps, 66.0)
 
         anyFSharp.octave = 5
         self.assertFalse(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.octave, 5)
+        self.assertEqual(anyFSharp.implicitOctave, 5)
         self.assertEqual(anyFSharp.nameWithOctave, 'F#5')
 
         anyFSharp.octaveIsImplicit = True
+        self.assertEqual(anyFSharp.octave, 4)
         self.assertEqual(anyFSharp.nameWithOctave, 'F#')
         self.assertEqual(anyFSharp.ps, 66.0)
 
         # False gives the default octave explicitly
         anyFSharp.octaveIsImplicit = False
         self.assertEqual(anyFSharp.nameWithOctave, 'F#4')
+
+        # octave = None still forgets the octave
+        anyFSharp.octave = None
+        self.assertTrue(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.octave, 4)
+
+        # Notes proxy the int
+        self.assertEqual(note.Note('B-').octave, 4)
+        self.assertEqual(note.Note('B-3').octave, 3)
+
+        # the default is read live from defaults.pitchOctave
+        savedDefaultOctave = defaults.pitchOctave
+        try:
+            defaults.pitchOctave = 3
+            self.assertEqual(Pitch('C').octave, 3)
+            self.assertEqual(Pitch('C').ps, 48.0)
+            self.assertEqual(Pitch('C5').octave, 5)
+        finally:
+            defaults.pitchOctave = savedDefaultOctave
 
         # creation paths
         self.assertTrue(Pitch().octaveIsImplicit)
