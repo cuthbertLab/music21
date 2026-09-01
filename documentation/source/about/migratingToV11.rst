@@ -201,8 +201,9 @@ For developers
 
 * Type annotations across nearly the whole library, with ``t.cast()`` for
   narrowing and ``@property`` decorators throughout.
-* ``common.enums.ContainsEnum`` is ``HexEnum``; the alias leaves in v12.
-  ``common.defaultlist`` is deprecated.
+* ``common.enums.ContainsEnum`` is not needed: Python 3.12's ``StrEnum``
+  suffices, or ``HexEnum`` for hex values such as MIDI.  The alias leaves in
+  v12.  ``common.defaultlist`` is deprecated.
 * The test runners import modules the normal way, so a module's tests no
   longer need ``from music21.key import KeySignature`` to compare types.
 * AI agents get their own instructions, skills and shared memory in
@@ -261,7 +262,7 @@ Removed and deprecated
    * - ``common.defaultlist``
      - a ``list`` or a ``dict``
    * - ``common.enums.ContainsEnum``
-     - ``HexEnum``
+     - not needed: ``enum.StrEnum`` suffices, or ``HexEnum`` for hex values such as MIDI
    * - tinyNotation ``0`` duration
      - the duration plus an ``expressions.Fermata``
    * - ``Pitch.implicitOctave``
