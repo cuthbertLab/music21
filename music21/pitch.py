@@ -2592,6 +2592,8 @@ class Pitch(prebase.ProtoM21Object):
         True
         >>> d.ps
         63.0
+        >>> d.ps == pitch.Pitch('D#4').ps
+        True
 
         >>> d.octave = 5
         >>> d.ps
