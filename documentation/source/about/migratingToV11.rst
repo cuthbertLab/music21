@@ -96,13 +96,14 @@ flag plus a list of pitches.  ``sharps=None`` still works but warns:
 <music21.key.KeySignature of pitches: [E-, G#4]>
 
 
-Chords index to Notes
----------------------
+Chord indexing gets simpler
+---------------------------
 
-``c[0]`` is the chord's first :class:`~music21.note.Note`, not a Pitch, and
-``c['G4']`` or ``c[somePitch]`` find a note by pitch.  The old string paths
-such as ``c['2.tie']`` are gone, and the per-note getters and setters
-(``getTie``, ``setColor``, ``getNotehead``, and their siblings) are
+``c[1]``, ``c['G4']`` and ``c[somePitch]`` still return the chord's
+:class:`~music21.note.Note`; everything fancier is gone.  Attribute paths
+such as ``c['2.tie']`` and ``c['D-4.style.color']`` no longer work, a Note is
+no longer accepted as a key (use its pitch), and the per-note getters and
+setters (``getTie``, ``setColor``, ``getNotehead``, and their siblings) are
 deprecated.  Index, then use the Note:
 
 >>> c = chord.Chord('C4 E4 G4')
@@ -245,8 +246,10 @@ Removed and deprecated
      - an ``int``
    * - ``VoiceLeadingQuartet.unison`` / ``.fifth`` / ``.octave``
      - ``interval.Interval('P1')`` and friends
-   * - ``c['2.tie']`` string paths into a Chord
+   * - ``c['2.tie']`` attribute paths into a Chord
      - ``c[2].tie``
+   * - a Note as a Chord index, ``c[someNote]``
+     - ``c[someNote.pitch]``
 
 .. list-table:: Deprecated in v11 (removed in v12 unless noted)
    :header-rows: 1
