@@ -3188,7 +3188,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> g.ps
         187.0
 
-        To forget the octave again, set `.octaveIsImplicit = True`.  Setting
+        To make the pitch octaveless, set `.octaveIsImplicit = True`.  Setting
         `.octave = None` is deprecated and will be removed in v13.
 
         * Changed in v11: always an int; `.octaveIsImplicit` says whether it was given.
@@ -3229,7 +3229,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> anyFSharp
         <music21.pitch.Pitch F#5>
 
-        Set it back to True to forget the octave again:
+        Set it back to True to make the pitch octaveless again:
 
         >>> anyFSharp.octaveIsImplicit = True
         >>> anyFSharp
@@ -4506,7 +4506,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> b.diatonicNoteNum
         0
 
-        The default octave, 4, is used if none was given:
+        The default octave, 4, is used as a basis if the pitch had no octave:
 
         >>> c = pitch.Pitch('C')
         >>> c.diatonicNoteNum

@@ -424,7 +424,7 @@ class AbstractScale(Scale):
         >>> pitchList = [pitch.Pitch(p) for p in pitchListStrs]
 
         Here's the problem, between `pitchList[1]` and `pitchList[2]` the `.octave`
-        stays the same, so the `.ps` drops:
+        stays the same (since both pitches have .octaveIsImplicit == True), so the `.ps` drops:
 
         >>> (pitchList[1].octave, pitchList[2].octave)
         (4, 4)
