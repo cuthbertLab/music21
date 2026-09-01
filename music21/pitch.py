@@ -120,11 +120,11 @@ unicodeFromModifier = OrderedDict([
     ('#', '\u266f'),
     ('~', chr(0x1d132)),  # 1D132
     ('----', chr(0x1d12b) + chr(0x1d12b)),
-    ('---', '\u266D'),
+    ('---', '\u266D' + chr(0x1d12b)),
     ('--', chr(0x1d12b)),
-    ('-`', '\u266D' + chr(0x1d132)),
+    ('-`', '\u266D' + chr(0x1d133)),  # 1D133
     ('-', '\u266D'),
-    ('`', chr(0x1d132)),  # 1D132; raised flat: 1D12C
+    ('`', chr(0x1d133)),  # 1D133; raised flat: 1D12C
     ('', '\u266e'),  # natural
 ])
 
@@ -5481,6 +5481,21 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self) -> None:
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
+
+    def testUnicodeDistinguishesEveryAccidental(self) -> None:
+        '''
+        Each accidental gets its own unicode spelling, and the flat side
+        mirrors the sharp side.  AI-assisted (Claude).
+        '''
+        spellings = {name: Accidental(name).unicode for name in accidentalNameToModifier}
+        self.assertEqual(len(set(spellings.values())), len(spellings))
+        # QUARTER TONE FLAT, not QUARTER TONE SHARP
+        self.assertEqual(spellings['half-flat'], '\U0001d133')
+        self.assertEqual(spellings['one-and-a-half-flat'], '♭\U0001d133')
+        # three flats is a flat plus a double flat, as three sharps is a sharp
+        # plus a double sharp
+        self.assertEqual(spellings['triple-flat'], '♭\U0001d12b')
+        self.assertEqual(spellings['triple-sharp'], '♯\U0001d12a')
 
 
 # define presented order in documentation
