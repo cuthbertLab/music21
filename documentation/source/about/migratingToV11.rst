@@ -22,9 +22,7 @@ type checker can follow ``stream.Stream[note.Note]()`` all the way to
 Octaves are always integers
 ---------------------------
 
-**In one line:** ``Pitch.octave`` is always an ``int``.  A pitch made without
-an octave reports ``4``, not ``None``, and a new flag, ``octaveIsImplicit``,
-remembers that you never gave one.
+**In one line:** ``octave`` is always an ``int``, and ``octaveIsImplicit`` says whether you gave one.
 
 Before v11, ``pitch.Pitch('F#').octave`` was ``None``: a lovely idea (an
 F-sharp in *any* octave) that crashed the moment someone wrote
