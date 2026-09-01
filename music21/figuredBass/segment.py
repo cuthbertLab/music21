@@ -938,7 +938,7 @@ def getPitches(pitchNames: Iterable[str] = ('C', 'E', 'G'),
         maxPitch = pitch.Pitch(maxPitch)
 
     if maxPitch.octaveIsImplicit:
-        raise ValueError('maxPitch must be given an octave')
+        raise ValueError('maxPitch must not have an implicit octave')
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
     iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
     iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
