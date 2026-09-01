@@ -3237,10 +3237,9 @@ class Pitch(prebase.ProtoM21Object):
 
     @octaveIsImplicit.setter
     def octaveIsImplicit(self, value: bool) -> None:
-        if value:
-            self._octave = None
-        elif self._octave is None:
-            self._octave = defaults.pitchOctave
+        if bool(value) == self.octaveIsImplicit:
+            return
+        self._octave = None if value else defaults.pitchOctave
         self.informClient()
 
     @property

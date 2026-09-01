@@ -107,9 +107,11 @@ class Test(unittest.TestCase):
         self.assertEqual(Pitch('C'), Pitch('C'))
         self.assertNotEqual(hash(Pitch('C')), hash(Pitch('C4')))
 
-        # the setter informs a Note client
+        # the setter informs a Note client only when something changed
         n = note.Note('C4')
         n._cache['junk'] = 1
+        n.pitch.octaveIsImplicit = False
+        self.assertEqual(n._cache, {'junk': 1})
         n.pitch.octaveIsImplicit = True
         self.assertEqual(n._cache, {})
 
