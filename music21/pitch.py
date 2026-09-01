@@ -3159,9 +3159,14 @@ class Pitch(prebase.ProtoM21Object):
     @property
     def octave(self) -> int:
         '''
-        Returns or sets the octave of the note.  Always an int: a Pitch
-        created without an octave reports the default octave, 4
-        (`defaults.pitchOctave`), and has `.octaveIsImplicit` True.
+        Returns or sets the octave of the Pitch.
+
+        >>> b = pitch.Pitch('B5')
+        >>> b.octave
+        5
+
+        Always an int: a Pitch created without an octave reports the default
+        octave, 4 (`defaults.pitchOctave`), and has `.octaveIsImplicit` True.
 
         >>> g = pitch.Pitch('g')
         >>> g.octave
