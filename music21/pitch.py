@@ -1932,12 +1932,6 @@ class Pitch(prebase.ProtoM21Object):
         # 5% of pitch creation time; it'll be created in a sec anyhow
         self._microtone: Microtone|None = None
 
-        # # CA, Q: should this remain an attribute or only refer to value in defaults?
-        # # MSC A: no, it's a useful attribute for cases such as scales where if there are
-        # #        no octaves we give a defaultOctave higher than the previous
-        # #        MSC 12 years later: maybe Chris was right!
-        # self.defaultOctave: int = defaults.pitchOctave
-        # # MSC: even later: Chris Ariza was right
         # None means implicit: .octave then reports defaults.pitchOctave
         self._octave: int|None = None
 
