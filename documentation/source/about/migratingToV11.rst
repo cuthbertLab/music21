@@ -87,8 +87,8 @@ so nothing breaks today; it will be deprecated no earlier than v12.
 KeySignature.sharps is always an int
 ------------------------------------
 
-``KeySignature.sharps`` (and ``Key.sharps``) is an ``int`` you can add to and
-subtract from.  A non-traditional signature is a
+Similar idea to Octave.  ``KeySignature.sharps`` (and ``Key.sharps``) is an
+``int`` you can add to and subtract from.  A non-traditional signature is a
 flag plus a list of pitches.  ``sharps=None`` still works but warns:
 
 >>> unusual = key.KeySignature()
