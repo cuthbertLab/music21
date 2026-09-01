@@ -141,7 +141,6 @@ Durations and sorting
 
 * Two Durations with ``expressionIsInferred`` True are equal when their
   quarterLengths match; type, dots and tuplets are free to be re-expressed.
-* Infinite durations are rejected on unlinked durations too, not only on notes.
 * ``sorting.SortTuple`` is a modern NamedTuple.  ``priority`` and
   ``classSortOrder`` may be floats, and ``modify()`` with a bad field name
   raises ``ValueError``.
@@ -157,16 +156,11 @@ Streams
   ``hasElementOfClass`` is deprecated: write ``if s.getElementsByClass(X):``.
 
 
-Pitches, intervals, accidentals
--------------------------------
+Pitches
+-------
 
-* Transposing a pitch that carries a microtone keeps the microtone.  It used
-  to corrupt the spelling above 25 cents and could raise.
-* ``displayType='always'`` is honored on the very first note of a part, and an
-  explicit natural whose ``displayStatus`` is ``None`` stays ``None`` instead
-  of being flipped to ``True``.
-* ``pitch.simplifyMultipleEnharmonics``: ``criterion`` and ``keyContext`` are
-  keyword-only.  ``Pitch.isTwelveTone()`` is about a third faster.
+``pitch.simplifyMultipleEnharmonics`` takes ``criterion`` and ``keyContext``
+as keyword-only arguments.
 
 
 File formats
@@ -174,18 +168,12 @@ File formats
 
 * **ABC**: ``w:`` lyric lines are imported, with hyphenation and ``*`` skips.
   ``abcToStreamOpus`` always returns an Opus.
-* **Humdrum**: grace notes keep their written duration; a chord that gives
-  its duration only on the first note (``8C E G``) parses; duration parsing
-  lives in ``hdStringToDuration``; a token with no duration warns when a
-  quarter is assumed; unparsable ``**harm`` tokens are warned about and
-  skipped; global comments land at the right offset; ``GlobalReference`` is
-  no longer a Music21Object.
+* **Humdrum**: grace notes keep their written duration instead of becoming
+  eighths; duration parsing lives in a new ``hdStringToDuration``; a token
+  with no duration warns when a quarter is assumed; ``GlobalReference`` is no
+  longer a Music21Object.
 * **LilyPond**: output targets current LilyPond (``\tuplet``, modern barline
-  names, ``\markuplist``); MetronomeMarks are written instead of dropped;
-  every ``stringOutput()`` returns a ``str``.
-* **MEI**: ``<bTrem>`` is imported rather than dropped, so later onsets no
-  longer shift.
-* **MusicXML**: an unpitched grace note inside a voice exports valid XML.
+  names, ``\markuplist``), and every ``stringOutput()`` returns a ``str``.
 * **MIDI**: ``midiEventsToInstrument`` is removed; use
   ``midiEventToInstrument``.
 * **Vexflow**: the ``music21.vexflow`` module is gone.  It had not worked in
@@ -200,8 +188,7 @@ figuredBass, features, tree
 * figuredBass: ``hiddenFifth`` and ``hiddenOctave`` are now ``hiddenFifths``
   and ``hiddenOctaves``, matching ``parallelFifths``.  ``FiguredBassScale``'s
   first argument is ``scaleTonic``, not ``scaleValue``.  Rests inside a
-  possibility are typed sentinels rather than the string ``'RT'``, and the
-  voice-leading caches work, so realization is faster.
+  possibility are typed sentinels rather than the string ``'RT'``.
 * features: ``Feature.vector`` starts as ``[]`` rather than ``None``, and
   ``FeatureExtractor.dimensions`` defaults to 1.
 * tree: ``ElementTimespan`` and ``PitchedTimespan`` take their arguments in
@@ -213,8 +200,7 @@ For developers
 --------------
 
 * Type annotations across nearly the whole library, with ``t.cast()`` for
-  narrowing and ``@property`` decorators throughout.  ``mypy music21`` is
-  clean.
+  narrowing and ``@property`` decorators throughout.
 * ``common.enums.ContainsEnum`` is ``HexEnum``; the alias leaves in v12.
   ``common.defaultlist`` is deprecated.
 * The test runners import modules the normal way, so a module's tests no
