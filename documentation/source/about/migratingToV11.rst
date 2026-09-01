@@ -79,7 +79,7 @@ on the note's pitch, ``n.pitch.octaveIsImplicit``.
 methods that need a pitch's *own* octave, such as
 :meth:`~music21.pitch.Pitch.transposeAboveTarget`, still raise for an
 implicit one; set ``.octave`` first.  ``implicitOctave`` stays as a synonym
-so nothing breaks today; it will be deprecated no earlier than v12.
+so nothing breaks today, but it is deprecated and starts warning in v12.
 
 
 KeySignature.sharps is always an int
@@ -266,4 +266,4 @@ Removed and deprecated
    * - tinyNotation ``0`` duration
      - the duration plus an ``expressions.Fermata``
    * - ``Pitch.implicitOctave``
-     - ``Pitch.octave``  (deprecation no earlier than v12)
+     - ``Pitch.octave``  (warns from v12, removed later)

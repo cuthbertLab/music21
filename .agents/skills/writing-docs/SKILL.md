@@ -47,7 +47,12 @@ what a reader must act on; drop the before-picture.
 * Changed in v11: `stringOutput()` always returns a `str`, never None.
 * Changed in v11: emits `\tuplet`; the arguments are now actual, normal.
 * New in v11.
+* Deprecated in v11: use `.octave`, which is now always an int.
 ```
+
+A deprecated function or method also gets `@common.deprecated(...)`. A property
+gets only the marker, since IDEs read every property while inspecting an object;
+leave `# Add real deprecation message here in vX` in its body instead.
 
 A plain bug fix — code now does what it always claimed — gets no marker and no
 doctest. It goes in the commit message.

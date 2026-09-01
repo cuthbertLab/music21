@@ -3246,15 +3246,16 @@ class Pitch(prebase.ProtoM21Object):
     @property
     def implicitOctave(self) -> int:
         '''
-        Synonym for `.octave`.  To be deprecated no earlier than v12 and
-        removed later; use `.octave` instead.
+        Synonym for `.octave`.
 
         >>> p = pitch.Pitch('C#')
         >>> p.implicitOctave
         4
 
-        * Changed in v11: the same as `.octave`.
+        * Deprecated in v11: use `.octave`, which is now always an int.
+          A warning arrives in v12 and the property goes away later.
         '''
+        # Add real deprecation message here in v12
         return self.octave
 
     # noinspection SpellCheckingInspection,GrazieInspection
