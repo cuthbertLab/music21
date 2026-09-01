@@ -1557,16 +1557,14 @@ class Chord(ChordBase):
                 while pBass.octave != forceOctave:
                     # shift octave of all pitches
                     for p in returnObj.pitches:
-                        if p.octave is None:
-                            p.octave = p.implicitOctave
+                        p.octaveIsImplicit = False
                         p.octave += dif
 
         # can change these pitches in place
         for p in returnObj.pitches:
             # bring each pitch down octaves until pitch space is
             # within an octave
-            if p.octave is None:
-                p.octave = p.implicitOctave
+            p.octaveIsImplicit = False
             while p.ps >= pBass.ps + 12:
                 p.octave -= 1
             # check for a bass of C4 and the note B#7 added to it, should be B#4 not B#3...

@@ -304,7 +304,7 @@ class ToneRow(stream.Stream):
             else:
                 n = pc
 
-            n.pitch.octave = None
+            n.pitch.octaveIsImplicit = True
             self.append(n)
 
     def _reprInternal(self):
@@ -399,7 +399,7 @@ class ToneRow(stream.Stream):
             n = note.Note()
             n.duration.quarterLength = 0.0
             n.pitch.pitchClass = thisPc
-            n.pitch.octave = None
+            n.pitch.octaveIsImplicit = True
             a.append(n)
         return a
 
@@ -700,7 +700,7 @@ class TwelveToneRow(ToneRow):
                 n = note.Note()
                 n.duration.quarterLength = 0.0
                 n.pitch.pitchClass = p
-                n.pitch.octave = None
+                n.pitch.octaveIsImplicit = True
                 rowObject.append(n)
             matrixObj.insert(0, rowObject)
 
@@ -1286,7 +1286,7 @@ def pcToToneRow(pcSet):
     for thisPc in pcSet:
         n = note.Note()
         n.pitch.pitchClass = thisPc
-        n.pitch.octave = None
+        n.pitch.octaveIsImplicit = True
         a.append(n)
     return a
 

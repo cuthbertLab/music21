@@ -98,7 +98,6 @@ from music21.scale import scala
 # -------------------------
 from music21 import base
 from music21 import common
-from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import note
@@ -250,8 +249,7 @@ class Scale(base.Music21Object):
                 seen.add(hashValue)
                 post.append(p)
         for p in post:
-            if p.octave is None:
-                p.octave = defaults.pitchOctave
+            p.octaveIsImplicit = False
 
         return post
 
@@ -388,8 +386,7 @@ class AbstractScale(Scale):
                 self.octaveDuplicating = False
         else:
             p = copy.deepcopy(pitchListProcessed[0])
-            if p.octave is None:
-                p.octave = p.implicitOctave
+            p.octaveIsImplicit = False
             if pitchListProcessed[-1] > pitchListProcessed[0]:  # ascending
                 while p.ps < pitchListProcessed[-1].ps:
                     p.octave += 1
@@ -454,7 +451,7 @@ class AbstractScale(Scale):
         lastPs: float = 0
         lastOctave = pitchList[0].implicitOctave
         for p in pitchList:
-            if p.octave is None:
+            if p.octaveIsImplicit:
                 if lastPs > p.ps:
                     p.octave = lastOctave
                 while lastPs > p.ps:

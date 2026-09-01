@@ -2909,9 +2909,9 @@ class Test(unittest.TestCase):
 
         # Repeat the test without octaves and reset state
         low, high = augmented_octave.pitches
-        low.octave = None
+        low.octaveIsImplicit = True
         low.accidental = None
-        high.octave = None
+        high.octaveIsImplicit = True
         high.accidental.displayStatus = None
 
         s2.makeAccidentals(inPlace=True)

@@ -579,7 +579,7 @@ def _dissonanceScore(pitches: list[Pitch],
             intervals = []
             for p1, p2 in itertools.combinations(pitches, 2):
                 p2 = copy.deepcopy(p2)
-                p2.octave = None
+                p2.octaveIsImplicit = True
                 this_interval = interval.Interval(noteStart=p1, noteEnd=p2)
                 intervals.append(this_interval)
         except interval.IntervalException:
@@ -2892,9 +2892,9 @@ class Pitch(prebase.ProtoM21Object):
         Traceback (most recent call last):
         music21.pitch.PitchException: Cannot set a nameWithOctave with 'C#'
 
-        Set octave to None explicitly instead.
+        Set `.octaveIsImplicit = True` instead.
         '''
-        if self.octave is None:
+        if self.octaveIsImplicit:
             return self.name
         else:
             return self.name + str(self.octave)
@@ -2922,7 +2922,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.unicodeNameWithOctave
         'C♯4'
         '''
-        if self.octave is None:
+        if self.octaveIsImplicit:
             return self.unicodeName
         else:
             return self.unicodeName + str(self.octave)
@@ -2948,7 +2948,7 @@ class Pitch(prebase.ProtoM21Object):
         if self.accidental is not None:
             name += f'-{self.accidental.fullName}'
 
-        if self.octave is not None:
+        if not self.octaveIsImplicit:
             name += f' in octave {self.octave}'
 
         if self._microtone is not None and self.microtone.cents != 0:
@@ -3199,6 +3199,44 @@ class Pitch(prebase.ProtoM21Object):
             self._octave = int(value)
         else:
             self._octave = None
+        self.informClient()
+
+    @property
+    def octaveIsImplicit(self) -> bool:
+        '''
+        True if this Pitch was never given an octave, so it stands for
+        its pitch class in any octave, and prints without an octave number.
+
+        >>> anyFSharp = pitch.Pitch('F#')
+        >>> anyFSharp.octaveIsImplicit
+        True
+        >>> anyFSharp
+        <music21.pitch.Pitch F#>
+
+        Setting `.octave` makes the octave explicit:
+
+        >>> anyFSharp.octave = 5
+        >>> anyFSharp.octaveIsImplicit
+        False
+        >>> anyFSharp
+        <music21.pitch.Pitch F#5>
+
+        Set it back to True to forget the octave again:
+
+        >>> anyFSharp.octaveIsImplicit = True
+        >>> anyFSharp
+        <music21.pitch.Pitch F#>
+
+        * New in v11.
+        '''
+        return self._octave is None
+
+    @octaveIsImplicit.setter
+    def octaveIsImplicit(self, value: bool) -> None:
+        if value:
+            self._octave = None
+        elif self._octave is None:
+            self._octave = defaults.pitchOctave
         self.informClient()
 
     @property
@@ -4006,7 +4044,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> pD4.isEnharmonic(pEbb4) and pD4.step == pEbb4.step
         False
         '''
-        if other.octave is None or self.octave is None:
+        if other.octaveIsImplicit or self.octaveIsImplicit:
             return (other.ps - self.ps) % 12 == 0
         else:
             # if pitch spaces are equal, these are enharmonics
@@ -4040,19 +4078,19 @@ class Pitch(prebase.ProtoM21Object):
         if intervalString not in self._transpositionIntervals:
             self._transpositionIntervals[intervalString] = interval.Interval(intervalString)
         intervalObj = self._transpositionIntervals[intervalString]
-        octaveStored = self.octave  # may be None
+        octaveWasImplicit = self.octaveIsImplicit
         p = intervalObj.transposePitch(self, maxAccidental=None)
         if not inPlace:
-            if octaveStored is None:
-                p.octave = None
+            if octaveWasImplicit:
+                p.octaveIsImplicit = True
             return p
         else:
             self.step = p.step
             self.accidental = p.accidental
             if p.microtone is not None:
                 self.microtone = p.microtone
-            if octaveStored is None:
-                self.octave = None
+            if octaveWasImplicit:
+                self.octaveIsImplicit = True
             else:
                 self.octave = p.octave
             return None
@@ -4231,10 +4269,10 @@ class Pitch(prebase.ProtoM21Object):
             else:
                 # by resetting the pitch space value, we will get a simpler
                 # enharmonic spelling
-                saveOctave = self.octave
+                octaveWasImplicit = self.octaveIsImplicit
                 returnObj.ps = self.ps
-                if saveOctave is None:
-                    returnObj.octave = None
+                if octaveWasImplicit:
+                    returnObj.octaveIsImplicit = True
 
         if mostCommon:
             if returnObj.name == 'D#':
@@ -4641,7 +4679,7 @@ class Pitch(prebase.ProtoM21Object):
             # pitch attributes
             # NOTE: in some cases this may not return exactly the proper config
             self.name = p.name
-            if self.octave is not None:
+            if not self.octaveIsImplicit:
                 self.octave = p.octave
             # manually copy accidental object
             self.accidental = p.accidental
@@ -4725,7 +4763,7 @@ class Pitch(prebase.ProtoM21Object):
 
         * Changed in v3: default for inPlace=False.
         '''
-        if self.octave is None:
+        if self.octaveIsImplicit:
             raise PitchException('Cannot call transposeBelowTarget with an octaveless Pitch.')
 
         if inPlace:
@@ -4810,7 +4848,7 @@ class Pitch(prebase.ProtoM21Object):
 
         * Changed in v3: default for inPlace=False.
         '''
-        if self.octave is None:
+        if self.octaveIsImplicit:
             raise PitchException('Cannot call transposeAboveTarget with an octaveless Pitch.')
 
         if inPlace:

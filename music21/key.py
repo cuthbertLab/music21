@@ -127,7 +127,7 @@ def sharpsToPitch(sharpCount: int) -> pitch.Pitch:
         return copy.deepcopy(_sharpsToPitchCache[sharpCount])
 
     pitchInit = pitch.Pitch('C')
-    pitchInit.octave = None
+    pitchInit.octaveIsImplicit = True
     # keyPc = (self.sharps * 7) % 12
     if sharpCount > 0:
         intervalStr = 'P5'
@@ -139,7 +139,7 @@ def sharpsToPitch(sharpCount: int) -> pitch.Pitch:
     intervalObj = interval.Interval(intervalStr)
     for i in range(abs(sharpCount)):
         pitchInit = intervalObj.transposePitch(pitchInit)
-    pitchInit.octave = None
+    pitchInit.octaveIsImplicit = True
 
     _sharpsToPitchCache[sharpCount] = pitchInit
     return pitchInit
@@ -518,7 +518,7 @@ class KeySignature(base.Music21Object):
             for i in range(self.sharps):
                 pKeep.transpose('P5', inPlace=True)
                 p = copy.deepcopy(pKeep)
-                p.octave = None
+                p.octaveIsImplicit = True
                 post.append(p)
 
         elif self.sharps < 0:
@@ -526,7 +526,7 @@ class KeySignature(base.Music21Object):
             for i in range(abs(self.sharps)):
                 pKeep.transpose('P4', inPlace=True)
                 p = copy.deepcopy(pKeep)
-                p.octave = None
+                p.octaveIsImplicit = True
                 post.append(p)
 
         return post
@@ -780,7 +780,7 @@ class KeySignature(base.Music21Object):
         for i in range(transTimes):
             transInterval.transposePitch(p, inPlace=True)
 
-        if originalOctave is not None:
+        if not p.octaveIsImplicit:
             p.octave = originalOctave
 
         if not inPlace:

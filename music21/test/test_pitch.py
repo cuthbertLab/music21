@@ -41,6 +41,53 @@ class Test(unittest.TestCase):
         b = Pitch('B#3')
         self.assertEqual(b.octave, 3)
 
+    def testOctaveIsImplicit(self):
+        anyFSharp = Pitch('F#')
+        self.assertTrue(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#')
+        self.assertEqual(anyFSharp.ps, 66.0)
+
+        anyFSharp.octave = 5
+        self.assertFalse(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#5')
+
+        anyFSharp.octaveIsImplicit = True
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#')
+        self.assertEqual(anyFSharp.ps, 66.0)
+
+        # False gives the default octave explicitly
+        anyFSharp.octaveIsImplicit = False
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#4')
+
+        # creation paths
+        self.assertTrue(Pitch().octaveIsImplicit)
+        self.assertTrue(Pitch(3).octaveIsImplicit)  # pitch class
+        self.assertFalse(Pitch(65).octaveIsImplicit)  # midi
+        self.assertFalse(Pitch('C4').octaveIsImplicit)
+        self.assertFalse(Pitch('C', octave=4).octaveIsImplicit)
+        self.assertTrue(Pitch(step='D', accidental='#').octaveIsImplicit)
+        self.assertTrue(note.Note('B-').pitch.octaveIsImplicit)
+        self.assertFalse(note.Note().pitch.octaveIsImplicit)
+
+        # implicitness survives copying and transposition
+        anyD = Pitch('D')
+        self.assertTrue(copy.deepcopy(anyD).octaveIsImplicit)
+        self.assertTrue(anyD.transpose('M2').octaveIsImplicit)
+        self.assertTrue(anyD.transpose(3).octaveIsImplicit)
+        self.assertTrue(anyD.getEnharmonic().octaveIsImplicit)
+        self.assertFalse(Pitch('D4').transpose('M2').octaveIsImplicit)
+
+        # an implicit octave is not the same as an explicit default octave
+        self.assertNotEqual(Pitch('C'), Pitch('C4'))
+        self.assertEqual(Pitch('C'), Pitch('C'))
+        self.assertNotEqual(hash(Pitch('C')), hash(Pitch('C4')))
+
+        # the setter informs a Note client
+        n = note.Note('C4')
+        n._cache['junk'] = 1
+        n.pitch.octaveIsImplicit = True
+        self.assertEqual(n._cache, {})
+
     def testNameSetting(self):
         with self.assertRaisesRegex(ValueError,
                                     r"Cannot have octave given before pitch name in '8D-4'\."):
