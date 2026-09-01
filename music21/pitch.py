@@ -3181,12 +3181,9 @@ class Pitch(prebase.ProtoM21Object):
         >>> g.ps
         187.0
 
-        Setting `.octave = None` forgets the octave again, the same as
-        setting `.octaveIsImplicit = True`:
-
-        >>> g.octave = None
-        >>> g
-        <music21.pitch.Pitch G>
+        To forget the octave again, set `.octaveIsImplicit = True`.  Setting
+        `.octave = None` still does the same, but that path will be deprecated
+        in v12 and removed in v13.
 
         * Changed in v11: always an int; `.octaveIsImplicit` says whether it was given.
         '''
@@ -3199,6 +3196,7 @@ class Pitch(prebase.ProtoM21Object):
         if value is not None:
             self._octave = int(value)
         else:
+            # None: to be deprecated in v12 and removed in v13; use octaveIsImplicit = True
             self._octave = None
         self.informClient()
 
