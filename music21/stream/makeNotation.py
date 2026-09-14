@@ -7,7 +7,7 @@
 #               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -1320,9 +1320,8 @@ def makeTies(
                 # manage bridging voices
                 if mNextHasVoices:
                     if mHasVoices:  # try to match voice id
-                        if not isinstance(vId, int):
-                            dst = mNext.voices[vId]
-                        else:
+                        dst = mNext.voices.getElementById(vId)
+                        if dst is None:
                             dst = mNext.getElementById(vId)
                     # src does not have voice, but dst does
                     else:  # place in top-most voice
@@ -2346,6 +2345,21 @@ class Test(unittest.TestCase):
         self.assertEqual(pp[stream.Measure][1].notes.first().duration.quarterLength, 24.0)
         self.assertEqual(len(pp[stream.Measure][2].notes), 1)
         self.assertEqual(pp[stream.Measure][2].notes.first().duration.quarterLength, 24.0)
+
+    def testMakeTiesMissingStringVoiceId(self):
+        from music21 import stream
+        part = stream.Part()
+        firstMeasure = stream.Measure()
+        sourceVoice = stream.Voice(id='6')
+        sourceVoice.insert(0, note.Note(quarterLength=1))
+        sourceVoice.insert(5, note.Note(quarterLength=1))
+        firstMeasure.insert(0, sourceVoice)
+        secondMeasure = stream.Measure([stream.Voice(id='1')])
+        part.append([firstMeasure, secondMeasure])
+
+        part.makeRests(fillGaps=True, inPlace=True)
+
+        self.assertEqual(secondMeasure[note.Rest].first().quarterLength, 1.0)
 
     def testConsolidateCompletedTupletsNoFalsePositive(self):
         from fractions import Fraction
