@@ -69,19 +69,18 @@ Maintainers will respect confidentiality with regard to reports.
 
 The early development of `music21` was supported by
 the generosity of the Seaver Institute and the
-National Endowment for the Humanities, along with MIT's Music and Theater Arts Section
-and the School of Humanities, Arts, and Social Sciences.
+National Endowment for the Humanities, along with support from across MIT.
 
 ## License Coverage and Other/Prior Licenses ##
 
 Music21 is Open-Source Software released under the BSD (3-clause) license.
-Essentially, it's free and you can do with it what you'd like as long as you
-keep the LICENSE file and copyright statement.
+Essentially, it's free and you can do almost anything what it that you'd like as long as you
+keep the LICENSE file and copyright statements.
 
 The license applies to all code files that are new to music21 along with
 documentation. Externally provided software (including the MIT-licensed 
 Lilypond/MusicXML test Suite) may have other licenses.  The encoded
-musical scores in the corpus have their own copyrights and licenses. They
+musical scores in the corpus have their own copyrights and licenses. The
 underlying music is believed to be in the public domain in the US, EU, and
 Canada (and most of the world) and the encodings are also either public domain
 or used by permission. For those needing a strict BSD-license of all parts of
