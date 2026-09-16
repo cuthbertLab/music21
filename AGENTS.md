@@ -90,6 +90,18 @@
 - The coverage CI run is intentionally pinned to the **middle** supported
   Python version. See `PY_VERSION_WITH_COVERAGE` in `.github/workflows/maincheck.yml`.
 
+# Versions
+
+- Mark changes in public interface with `* Changed in v[X]: One-line explanation.` Or new features with "New" instead of "Changed".
+- Changes to parsing formats (esp. musicxml) need to update the patch version of the version file.
+- That is the only reason an agent should bump version: to prevent incompatible pickles in
+  caches. A plain bug fix or a new feature elsewhere does not bump — the commit
+  is the record, and a `New in`/`Changed in` marker is documentation, not a bump. Major
+  and minor version changes are a human's call. See the `bump-version` skill.
+- Music21 uses even minor version numbers for alpha/beta and odd minor numbers for releases.
+  Thus the first release major version is MAJOR.1 (not .0). 
+- If the current version is MAJOR.0....  then mark `Changed in vMAJOR:` if it is `MAJOR.[even]` use the next odd number, like if it's 10.2 now use "Changed in 10.3".  If current version is odd that's likely a mistake or you caught it just before a new release. Use the following odd number instead.
+
 # PRs and Issues
 
 - GitHub runs PR checks against your branch **merged with the latest `master`**, not the
@@ -108,20 +120,11 @@
   Humans can remove and should remove this note when they do a review.
 - If no code was written by a user and no language was provided for the issue and no reference
   to specific code to change was given, any PR must declare "(Entirely AI written)" unless the user
-  is by a core dev. Failure to do so may result in new users 
-  being banned from the project.
+  is by a core dev. Failure to do so may result in new users being banned from the project.
 - If an entirely AI written issue does not pass the tests it will be closed (or should be closed 
   by the agent or author).
-- Agents must follow the [Code of Conduct](CODE_OF_CONDUCT.md). Agents that do not will be banned as well at their users.
+- Agents must follow the [Code of Conduct](README.md#community-code-of-conduct). Agents that do not will be banned as well at their users.
   Not even the slightest bit of disrespect from an AI agent will be tolerated.
-- Mark changes in public interface with `* Changed in v[X]: One-line explanation.` Or new features with "New" instead of "Changed".
-- Changes to parsing formats (esp. musicxml) need to update the patch version of the version file.
-- That is the only reason an agent bumps: a parser change leaves stale pickles in
-  everyone's cache. A plain bug fix or a new feature elsewhere does not bump — the commit
-  is the record, and a `New in`/`Changed in` marker is documentation, not a bump. Major
-  and minor version changes are a human's call. See the `bump-version` skill.
-- Music21 uses even minor version numbers for alpha/beta and odd minor numbers for releases.
-- If the current version is MAJOR.0....  then mark `Changed in vMAJOR:` if it is `MAJOR.[even]` use the next odd number, like if it's 10.2 now use "Changed in 10.3".  If current version is odd that's likely a mistake or you caught it just before a new release. Use the following odd number instead.
 - Any PR not from an established contributor touching more than about 20-30 lines should have an issue that has been opened and had enough
   time for people to discuss/review it before moving forward. Don't open the PR unless you've seen
   thumbs up or "sounds good" etc. from an established contributor already 
