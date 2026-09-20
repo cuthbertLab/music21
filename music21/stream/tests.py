@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -2922,6 +2922,32 @@ class Test(unittest.TestCase):
         s3 = Stream([key.KeySignature(1), two_f_sharps])
         s3.makeAccidentals(inPlace=True)
         self.assertTrue(all(n.pitch.accidental.displayStatus is False for n in two_f_sharps))
+
+    def testMakeAccidentalsAfterChord(self):
+        '''
+        A pitch that also sounded in the immediately preceding chord is an immediate
+        repeat and needs no cautionary accidental; an intervening note, rest, or
+        different chord still does. (#1190)
+        '''
+        s = Stream([chord.Chord('C#4 G#5'), note.Note('C#4')])
+        s.makeAccidentals(inPlace=True)
+        self.assertTrue(all(p.accidental.displayStatus for p in s[0].pitches))
+        self.assertIs(s[1].pitch.accidental.displayStatus, False)
+
+        # Chord to chord behaves the same way.
+        s2 = Stream([chord.Chord('C#4 G#5'), chord.Chord('C#4 A#5')])
+        s2.makeAccidentals(inPlace=True)
+        self.assertIs(s2[1].pitches[0].accidental.displayStatus, False)
+
+        # An actually intervening pitch still calls for the cautionary accidental.
+        s3 = Stream([chord.Chord('C#4 G#5'), note.Note('G#5'), note.Note('C#4')])
+        s3.makeAccidentals(inPlace=True)
+        self.assertIs(s3[2].pitch.accidental.displayStatus, True)
+
+        # A rest intervening likewise.
+        s4 = Stream([chord.Chord('C#4 G#5'), note.Rest(), note.Note('C#4')])
+        s4.makeAccidentals(inPlace=True)
+        self.assertIs(s4[2].pitch.accidental.displayStatus, True)
 
     def testMakeNotationTiesKeyless(self):
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')

@@ -4952,6 +4952,7 @@ class Pitch(prebase.ProtoM21Object):
         pitchPast: list[Pitch]|None = None,
         pitchPastMeasure: list[Pitch]|None = None,
         otherSimultaneousPitches: list[Pitch]|None = None,
+        previousSimultaneousPitches: list[Pitch]|None = None,
         alteredPitches: list[Pitch]|None = None,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
@@ -4974,6 +4975,11 @@ class Pitch(prebase.ProtoM21Object):
 
         `otherSimultaneousPitches` is a list of other pitches in this simultaneity, for use
         when `cautionaryPitchClass` is True.
+
+        `previousSimultaneousPitches` is a list of the pitches that began together with the
+        pitch immediately preceding this one -- the other pitches of the preceding chord, if
+        it was a chord.  They sound at the same time as that pitch, so they do not count as
+        intervening and a repeated pitch is still an immediate repeat. (#1190)
 
         The `alteredPitches` list supplies pitches from a :class:`~music21.key.KeySignature`
         object using the :attr:`~music21.key.KeySignature.alteredPitches` property.
@@ -5024,6 +5030,7 @@ class Pitch(prebase.ProtoM21Object):
         True
 
         * Changed in v8: all parameteres are keyword-only; added `otherSimultaneousPitches`.
+        * Changed in v11: added `previousSimultaneousPitches`.
         '''
         # N.B. -- this is a very complex method
         # do not alter it without significant testing.
@@ -5047,12 +5054,15 @@ class Pitch(prebase.ProtoM21Object):
             pitchPastMeasure = []
         if alteredPitches is None:
             alteredPitches = []
+        if previousSimultaneousPitches is None:
+            previousSimultaneousPitches = []
 
         # should we display accidental if no previous accidentals have been displayed
         # i.e. if it's the first instance of an accidental after a tie
         displayAccidentalIfNoPreviousAccidentals = False
 
         pitchPastAll = pitchPastMeasure + pitchPast
+        previousSimultaneousNames = {p.nameWithOctave for p in previousSimultaneousPitches}
 
         if overrideStatus is False:  # go with what we have defined
             if acc is None:
@@ -5187,6 +5197,10 @@ class Pitch(prebase.ProtoM21Object):
 
                     # do we have a continuous stream of the same note leading up to this one
                     if pitchPastAll[j].nameWithOctave != self.nameWithOctave:
+                        # A pitch that began with the immediately preceding pitch sounded
+                        # at the same time as it, so it does not interrupt a repeat. (#1190)
+                        if pitchPastAll[j].nameWithOctave in previousSimultaneousNames:
+                            continue
                         continuousRepeatsInMeasure = False
                         break
                 else:

@@ -7,7 +7,7 @@
 #               Joséphine Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -6876,6 +6876,10 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             tiePitchSet = set()
 
         last_measure: Measure|None = None
+        # The pitches of the immediately preceding chord, if it was one.  They began
+        # together with the pitch that precedes this one, so they sound at the same time
+        # as it and do not interrupt a repeat. (#1190)
+        previousSimultaneousPitches: list[pitch.Pitch] = []
 
         for e in noteIterator:
             if e.activeSite is not None and e.activeSite.isMeasure:
@@ -6899,7 +6903,8 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                     cautionaryAll=cautionaryAll,
                     overrideStatus=overrideStatus,
                     cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                    lastNoteWasTied=lastNoteWasTied)
+                    lastNoteWasTied=lastNoteWasTied,
+                    previousSimultaneousPitches=previousSimultaneousPitches)
                 pitchPast.append(e.pitch)
 
                 tiePitchSet.clear()
@@ -6940,7 +6945,8 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                         cautionaryAll=cautionaryAll,
                         overrideStatus=overrideStatus,
                         cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                        lastNoteWasTied=lastNoteWasTied)
+                        lastNoteWasTied=lastNoteWasTied,
+                        previousSimultaneousPitches=previousSimultaneousPitches)
 
                     if n.tie is not None and n.tie.type != 'stop':
                         seenPitchNames.add(p.nameWithOctave)
@@ -6975,6 +6981,11 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
             else:
                 tiePitchSet.clear()
+
+            if isinstance(e, chord.Chord):
+                previousSimultaneousPitches = list(e.pitches)
+            else:
+                previousSimultaneousPitches = []
 
         returnObj.streamStatus.accidentals = True
 
