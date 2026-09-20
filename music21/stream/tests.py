@@ -2949,6 +2949,80 @@ class Test(unittest.TestCase):
         s4.makeAccidentals(inPlace=True)
         self.assertIs(s4[2].pitch.accidental.displayStatus, True)
 
+    def testMakeAccidentalsAfterChordAcrossBarline(self):
+        '''
+        Accidentals do not carry across a barline, so a pitch repeated from the last
+        chord of the previous measure still gets its courtesy accidental. The
+        immediate-repeat handling must not reach into `pitchPastMeasure`. (#1190)
+
+        AI-assisted (DeepSeek).
+        '''
+        s = Stream()
+        s.append(meter.TimeSignature('4/4'))
+        firstMeasure = Measure(number=1)
+        firstMeasure.append(chord.Chord('C#4 G#5'))
+        secondMeasure = Measure(number=2)
+        secondMeasure.append(note.Note('C#4'))
+        s.append(firstMeasure)
+        s.append(secondMeasure)
+
+        s.makeAccidentals(inPlace=True)
+        self.assertIs(secondMeasure.notes.first().pitch.accidental.displayStatus, True)
+
+        # The same two pitches inside one measure do not need it.
+        inOneMeasure = Stream()
+        inOneMeasure.append(meter.TimeSignature('4/4'))
+        measure = Measure(number=1)
+        measure.append(chord.Chord('C#4 G#5'))
+        measure.append(note.Note('C#4'))
+        inOneMeasure.append(measure)
+        inOneMeasure.makeAccidentals(inPlace=True)
+        self.assertIs(measure.notes.last().pitch.accidental.displayStatus, False)
+
+    def testMakeAccidentalsAfterChordStrategies(self):
+        '''
+        The other accidental strategies keep their own behaviour after a chord, so the
+        immediate-repeat change does not override them. (#1190)
+
+        AI-assisted (DeepSeek).
+        '''
+        # makeAccidentals works in place, so build fresh objects for every attempt.
+        def make(build, **kwargs):
+            s = Stream(build())
+            s.makeAccidentals(inPlace=True, **kwargs)
+            return s
+
+        def afterChord():
+            return [chord.Chord('C#4 G#5'), note.Note('C#4')]
+
+        def intervening():
+            return [chord.Chord('C#4 G#5'), note.Note('G#5'), note.Note('C#4')]
+
+        # An intervening pitch still calls for the cautionary accidental...
+        self.assertIs(make(intervening)[2].pitch.accidental.displayStatus, True)
+
+        # ...unless cautionary accidentals for non-immediate repeats are turned off.
+        self.assertIs(
+            make(intervening, cautionaryNotImmediateRepeat=False)[2].pitch.accidental.displayStatus,
+            False)
+
+        # cautionaryAll shows every accidental, immediate repeat or not.
+        self.assertIs(make(afterChord, cautionaryAll=True)[1].pitch.accidental.displayStatus, True)
+
+        # A key signature does not change the immediate-repeat decision.
+        def withKey():
+            return [key.KeySignature(1), chord.Chord('C#4 G#5'), note.Note('C#4')]
+
+        self.assertIs(make(withKey)[2].pitch.accidental.displayStatus, False)
+
+        # Neither does comparing by pitch space rather than pitch class.
+        self.assertIs(
+            make(afterChord, cautionaryPitchClass=False)[1].pitch.accidental.displayStatus, False)
+
+        # overrideStatus still lets the caller set the decision.
+        self.assertIs(
+            make(afterChord, overrideStatus=True)[1].pitch.accidental.displayStatus, False)
+
     def testMakeNotationTiesKeyless(self):
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')
         # Key of no sharps/flats
