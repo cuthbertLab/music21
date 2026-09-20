@@ -6,7 +6,7 @@
 #               Michael Scott Asato Cuthbert
 #               Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1020,7 +1020,7 @@ class AbstractOctaveRepeatingScale(AbstractScale):
         intervalSum = interval.add(mode)
         iComplement = intervalSum.complement
         if iComplement is not None:
-            mode.append(iComplement)
+            mode = [*mode, iComplement]  # a copy: mode is the caller's list
 
         self.tonicDegree = 1
         self._net = intervalNetwork.IntervalNetwork(mode,
