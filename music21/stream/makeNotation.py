@@ -7,7 +7,7 @@
 #               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -1320,10 +1320,7 @@ def makeTies(
                 # manage bridging voices
                 if mNextHasVoices:
                     if mHasVoices:  # try to match voice id
-                        if not isinstance(vId, int):
-                            dst = mNext.voices[vId]
-                        else:
-                            dst = mNext.getElementById(vId)
+                        dst = mNext.voices.getElementById(vId)
                     # src does not have voice, but dst does
                     else:  # place in top-most voice
                         dst = mNext.voices[0]
