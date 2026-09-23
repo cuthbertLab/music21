@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -232,6 +232,11 @@ class Test(unittest.TestCase):
              <music21.pitch.Pitch E5>,
              <music21.pitch.Pitch F#5>],
  'notMatched': [<music21.pitch.Pitch C#5>, <music21.pitch.Pitch G#5>]}''', pformat(sc1.match(sc2)))
+
+    def testOctaveRepeatingScaleWiderThanAnOctave(self):
+        sc = scale.OctaveRepeatingScale('c4', ['P5', 'P5'])
+        self.assertEqual(self.pitchOut(sc.pitches), '[C4, G4, D5, C6]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c6')), '[D3, C4, G4, D5, C6]')
 
     def testCyclicalScales(self):
         sc = scale.CyclicalScale('c4', ['m2', 'm2'])
