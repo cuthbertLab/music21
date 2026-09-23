@@ -2486,7 +2486,8 @@ class ConcreteScale(Scale):
         abstract = t.cast(AbstractScale, self._abstract)
         net = t.cast('intervalNetwork.IntervalNetwork', abstract._net)
         pairs = net.find(pitchTarget=otherPitches,
-                         comparisonAttribute=comparisonAttribute)
+                         comparisonAttribute=comparisonAttribute,
+                         alteredDegrees=abstract._alteredDegrees)
 
         newScale = self.__class__(tonic=pairs[0][1])
         if newScale.abstract is None:
