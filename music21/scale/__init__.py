@@ -6,7 +6,7 @@
 #               Michael Scott Asato Cuthbert
 #               Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1005,10 +1005,6 @@ class AbstractOctaveRepeatingScale(AbstractScale):
             mode = ['P8']
         self.buildNetwork(mode=mode)
 
-        # by definition, these are forced to be octave duplicating
-        # though, do to some intervals, duplication may not happen every oct
-        self.octaveDuplicating = True
-
     def buildNetwork(self, mode: t.Any = None) -> None:
         '''
         Here, mode is the list of intervals.
@@ -1021,6 +1017,11 @@ class AbstractOctaveRepeatingScale(AbstractScale):
         iComplement = intervalSum.complement
         if iComplement is not None:
             mode.append(iComplement)
+
+        # steps wider than an octave complete a pattern spanning several
+        # octaves, which does not repeat every octave
+        span = intervalSum.semitones + (iComplement.semitones if iComplement else 0)
+        self.octaveDuplicating = span == 12
 
         self.tonicDegree = 1
         self._net = intervalNetwork.IntervalNetwork(mode,
