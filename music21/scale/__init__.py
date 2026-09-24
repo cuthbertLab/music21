@@ -611,7 +611,7 @@ class AbstractScale(Scale):
             direction=direction,
             alteredDegrees=self._alteredDegrees
         )
-        return copy.deepcopy(post)
+        return post
 
     def nextPitch(self,
                   pitchReference: _PitchOrStr,
@@ -633,7 +633,7 @@ class AbstractScale(Scale):
                              alteredDegrees=self._alteredDegrees,
                              getNeighbor=getNeighbor
                              )
-        return copy.deepcopy(post)
+        return post
 
     def getNewTonicPitch(self,
                          pitchReference: _PitchOrStr,
