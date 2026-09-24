@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1739,16 +1739,16 @@ class IntervalNetwork:
         while True:
             appendPitch = False
             if (minPitchObj is not None
-                    and _gte(p.ps, minPitchObj.ps)
+                    and _gte(pCollect.ps, minPitchObj.ps)
                     and maxPitchObj is not None
-                    and _lte(p.ps, maxPitchObj.ps)):
+                    and _lte(pCollect.ps, maxPitchObj.ps)):
                 appendPitch = True
             elif (minPitchObj is not None
-                  and _gte(p.ps, minPitchObj.ps)
+                  and _gte(pCollect.ps, minPitchObj.ps)
                   and maxPitchObj is None):
                 appendPitch = True
             elif (maxPitchObj is not None
-                  and _lte(p.ps, maxPitchObj.ps)
+                  and _lte(pCollect.ps, maxPitchObj.ps)
                   and minPitchObj is None):
                 appendPitch = True
             elif minPitchObj is None and maxPitchObj is None:

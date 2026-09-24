@@ -242,6 +242,11 @@ class Test(unittest.TestCase):
         again = scale.OctaveRepeatingScale('c4', mode)
         self.assertEqual(self.pitchOut(again.pitches), '[C4, E4, G#4, C5]')
 
+    def testOctaveRepeatingScaleWiderThanAnOctave(self):
+        sc = scale.OctaveRepeatingScale('c4', ['P5', 'P5'])
+        self.assertEqual(self.pitchOut(sc.pitches), '[C4, G4, D5, C6]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c6')), '[D3, C4, G4, D5, C6]')
+
     def testCyclicalScales(self):
         sc = scale.CyclicalScale('c4', ['m2', 'm2'])
 
@@ -280,6 +285,15 @@ class Test(unittest.TestCase):
         # test default args
         sc2 = scale.CyclicalScale()
         self.assertEqual(self.pitchOut(sc2.getPitches()), '[C4, D-4]')
+
+    def testHarmonicMinorDescendingRange(self):
+        sc = scale.HarmonicMinorScale('c4')
+        descending = sc.getPitches('b2', 'e3', direction=Direction.DESCENDING)
+        self.assertEqual(self.pitchOut(descending), '[E-3, D3, C3, B2]')
+
+        sc = scale.HarmonicMinorScale('b-3')
+        descending = sc.getPitches('c#4', 'g#4', direction=Direction.DESCENDING)
+        self.assertEqual(self.pitchOut(descending), '[G-4, F4, E-4, D-4]')
 
     def testDeriveByDegree(self):
         sc1 = scale.MajorScale()

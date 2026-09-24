@@ -5,7 +5,7 @@
 # Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2013-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -18,7 +18,7 @@ import typing as t
 import unittest
 
 from music21.base import Music21Object
-from music21.common.types import M21ObjType, StreamType
+from music21.common.types import M21ObjType, OffsetQL, StreamType
 from music21 import common
 from music21 import note
 from music21.tree import spans
@@ -34,7 +34,7 @@ def listOfTreesByClass(
     *,
     classLists: Sequence[Sequence[type[M21ObjType]]] = (),
     currentParentage: tuple[stream.Stream, ...]|None = None,
-    initialOffset: float = 0.0,
+    initialOffset: OffsetQL = 0.0,
     flatten: bool|str = False,
     useTimespans: bool = False
 ) -> list[trees.OffsetTree|timespanTree.TimespanTree]:
@@ -107,7 +107,7 @@ def listOfTreesByClass(
     # do this to avoid munging activeSites
     inputStreamElements = inputStream._elements[:] + inputStream._endElements
     for element in inputStreamElements:
-        offset = lastParentage.elementOffset(element) + initialOffset
+        offset = common.opFrac(lastParentage.elementOffset(element) + initialOffset)
         wasStream = False
 
         if element.isStream:
@@ -128,8 +128,8 @@ def listOfTreesByClass(
 
         if not wasStream or flatten == 'semiFlat':
             parentOffset = initialOffset
-            parentEndTime = initialOffset + lastParentage.duration.quarterLength
-            endTime = offset + element.duration.quarterLength
+            parentEndTime = common.opFrac(initialOffset + lastParentage.duration.quarterLength)
+            endTime = common.opFrac(offset + element.duration.quarterLength)
 
             for classBasedTree, classList in zip(outputTrees, classLists):
                 if classList and element.classSet.isdisjoint(classList):
@@ -220,7 +220,7 @@ def asTree(
 
         # do this to avoid munging activeSites
         innerStreamElements = innerStream._elements[:] + innerStream._endElements
-        parentEndTime = initialOffset + lastParentage.duration.quarterLength
+        parentEndTime = common.opFrac(initialOffset + lastParentage.duration.quarterLength)
 
         for element in innerStreamElements:
             flatOffset = common.opFrac(lastParentage.elementOffset(element) + initialOffset)
@@ -238,7 +238,7 @@ def asTree(
                 continue
 
             if useTimespans:
-                endTime = flatOffset + element.duration.quarterLength
+                endTime = common.opFrac(flatOffset + element.duration.quarterLength)
                 pitchedTimespan = spans.PitchedTimespan(
                     element=element,
                     parentage=tuple(reversed(currentParentage)),
@@ -402,6 +402,22 @@ class Test(unittest.TestCase):
         scTree = asTree(sc)
         self.assertEqual(scTree.endTime, 8.0)
         # print(repr(scTree))
+
+    def testTripletEndsWhereTheNextNoteStarts(self):
+        from fractions import Fraction
+        from music21 import stream
+        triplet = note.Note('F#3', quarterLength=Fraction(2, 3))
+        after = note.Note('E-3')
+        measure = stream.Measure()
+        measure.insert(Fraction(8, 3), triplet)
+        measure.insert(Fraction(10, 3), after)
+        part = stream.Part()
+        part.insert(25.0, measure)
+
+        timespans = part.asTimespans()
+        verticality = list(timespans.iterateVerticalities())[-1]
+        self.assertEqual([ts.element for ts in verticality.startTimespans], [after])
+        self.assertEqual(list(verticality.overlapTimespans), [])
 
 
 # --------------------
