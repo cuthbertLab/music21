@@ -764,6 +764,8 @@ class MusicXMLImporter(XMLParserBase):
         self.definesExplicitPageBreaks = False
 
         self.spannerBundle = self.stream.spannerBundle
+        # keyed by number and offset: number only tells apart simultaneous arpeggios
+        self.arpeggioSpanners: dict[tuple[str, OffsetQL], expressions.ArpeggioMarkSpanner] = {}
         self.mxScorePartDict = {}
         self.m21PartObjectsById = {}
         self.partGroupList = []
@@ -3873,15 +3875,15 @@ class MeasureParser(XMLParserBase):
                     arpeggio = expressions.ArpeggioMark(arpeggioType)
                     n.expressions.append(arpeggio)
                 else:
-                    sb = self.spannerBundle.getByClassIdLocalComplete(
-                        expressions.ArpeggioMarkSpanner, idFound, False)
-                    if sb:
-                        # if we already have a spanner matching
-                        arpeggioSpanner = t.cast(expressions.ArpeggioMarkSpanner, sb[0])
-                    else:
+                    arpeggioSpanners = self.parent.parent.arpeggioSpanners
+                    offset = opFrac(self.parent.lastMeasureOffset + self.offsetMeasureNote)
+                    numberAndOffset = (idFound, offset)
+                    arpeggioSpanner = arpeggioSpanners.get(numberAndOffset)
+                    if arpeggioSpanner is None:
                         arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType=arpeggioType)
                         arpeggioSpanner.idLocal = idFound
                         self.spannerBundle.append(arpeggioSpanner)
+                        arpeggioSpanners[numberAndOffset] = arpeggioSpanner
                     arpeggioSpanner.addSpannedElements(n)
 
         mostRecentOrnament: expressions.Ornament|None = None
