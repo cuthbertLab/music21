@@ -233,6 +233,15 @@ class Test(unittest.TestCase):
              <music21.pitch.Pitch F#5>],
  'notMatched': [<music21.pitch.Pitch C#5>, <music21.pitch.Pitch G#5>]}''', pformat(sc1.match(sc2)))
 
+    def testOctaveRepeatingScaleLeavesModeAlone(self):
+        mode = ['M3', 'M3']
+        sc = scale.OctaveRepeatingScale('c4', mode)
+        self.assertEqual(mode, ['M3', 'M3'])
+        self.assertEqual(self.pitchOut(sc.pitches), '[C4, E4, G#4, C5]')
+
+        again = scale.OctaveRepeatingScale('c4', mode)
+        self.assertEqual(self.pitchOut(again.pitches), '[C4, E4, G#4, C5]')
+
     def testOctaveRepeatingScaleWiderThanAnOctave(self):
         sc = scale.OctaveRepeatingScale('c4', ['P5', 'P5'])
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, G4, D5, C6]')

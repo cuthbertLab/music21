@@ -1016,7 +1016,7 @@ class AbstractOctaveRepeatingScale(AbstractScale):
         intervalSum = interval.add(mode)
         iComplement = intervalSum.complement
         if iComplement is not None:
-            mode.append(iComplement)
+            mode = [*mode, iComplement]  # a copy: mode is the caller's list
 
         # steps wider than an octave complete a pattern spanning several
         # octaves, which does not repeat every octave
