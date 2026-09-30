@@ -1392,6 +1392,72 @@ class Test(unittest.TestCase):
         for spanned, ch in zip(sp, chords):
             self.assertIs(spanned, ch)
 
+    @staticmethod
+    def arpeggiatedChordsXml(partIds: list[str]) -> str:
+        '''
+        One part per id, each with two measures holding one arpeggiated chord,
+        every <arpeggiate> with number="1", as MuseScore writes them.
+
+        AI-assisted (Claude).
+        '''
+        def mxChord(steps: tuple[str, str]) -> str:
+            return ''.join(
+                f'<note>{"<chord/>" if i else ""}'
+                f'<pitch><step>{step}</step><octave>4</octave></pitch><duration>4</duration>'
+                '<notations><arpeggiate number="1"/></notations></note>'
+                for i, step in enumerate(steps)
+            )
+
+        mxParts = ''.join(
+            f'<part id="{partId}">'
+            f'<measure number="1"><attributes><divisions>1</divisions></attributes>'
+            f'{mxChord(("C", "E"))}</measure>'
+            f'<measure number="2">{mxChord(("D", "F"))}</measure>'
+            '</part>'
+            for partId in partIds
+        )
+        mxScoreParts = ''.join(
+            f'<score-part id="{partId}"><part-name/></score-part>' for partId in partIds
+        )
+        return (f'<score-partwise><part-list>{mxScoreParts}</part-list>'
+                f'{mxParts}</score-partwise>')
+
+    def testArpeggioMarkSpannersSameNumberDifferentOffsets(self) -> None:
+        '''
+        The same number at two offsets makes two arpeggios, not one.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import converter
+
+        s = t.cast(stream.Score,
+                   converter.parse(self.arpeggiatedChordsXml(['P1']), format='musicxml'))
+        spanners = s.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner)
+        chords = s.parts[0][chord.Chord]
+        self.assertEqual(
+            [[id(spanned) for spanned in sp] for sp in spanners],
+            [[id(ch)] for ch in chords],
+        )
+
+    def testArpeggioMarkSpannersSameNumberDifferentParts(self) -> None:
+        '''
+        The same number at the same offset in two parts makes two arpeggios:
+        number only tells apart arpeggios within a part, where they may
+        cross staves (see testArpeggioMarkSpanners).
+
+        AI-assisted (Claude).
+        '''
+        from music21 import converter
+
+        s = t.cast(stream.Score,
+                   converter.parse(self.arpeggiatedChordsXml(['P1', 'P2']), format='musicxml'))
+        spanners = s.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner)
+        chords = [ch for p in s.parts for ch in p[chord.Chord]]
+        self.assertEqual(
+            [[id(spanned) for spanned in sp] for sp in spanners],
+            [[id(ch)] for ch in chords],
+        )
+
     def testHiddenRests(self):
         from music21 import converter
         from music21 import corpus

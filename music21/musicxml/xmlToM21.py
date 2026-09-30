@@ -1489,6 +1489,9 @@ class PartParser(XMLParserBase):
         # a dict of clefs per staff number -- needed for converting rests w/ steps
         self.lastClefs: dict[int, clef.Clef|None] = {}
         self.activeTuplets: list[duration.Tuplet|None] = [None] * 7
+        # keyed by number and offset: number only tells apart simultaneous
+        # arpeggios, which may cross staves but not parts
+        self.arpeggioSpanners: dict[tuple[str, OffsetQL], expressions.ArpeggioMarkSpanner] = {}
 
         self.maxStaves = 1  # will be changed in measure parsing
 
@@ -3873,15 +3876,15 @@ class MeasureParser(XMLParserBase):
                     arpeggio = expressions.ArpeggioMark(arpeggioType)
                     n.expressions.append(arpeggio)
                 else:
-                    sb = self.spannerBundle.getByClassIdLocalComplete(
-                        expressions.ArpeggioMarkSpanner, idFound, False)
-                    if sb:
-                        # if we already have a spanner matching
-                        arpeggioSpanner = t.cast(expressions.ArpeggioMarkSpanner, sb[0])
-                    else:
+                    arpeggioSpanners = self.parent.arpeggioSpanners
+                    offset = opFrac(self.parent.lastMeasureOffset + self.offsetMeasureNote)
+                    numberAndOffset = (idFound, offset)
+                    arpeggioSpanner = arpeggioSpanners.get(numberAndOffset)
+                    if arpeggioSpanner is None:
                         arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType=arpeggioType)
                         arpeggioSpanner.idLocal = idFound
                         self.spannerBundle.append(arpeggioSpanner)
+                        arpeggioSpanners[numberAndOffset] = arpeggioSpanner
                     arpeggioSpanner.addSpannedElements(n)
 
         mostRecentOrnament: expressions.Ornament|None = None
