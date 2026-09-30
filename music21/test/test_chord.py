@@ -713,8 +713,33 @@ class Test(unittest.TestCase):
     def testInvertingSimple(self):
         a = chord.Chord(['g4', 'b4', 'd5', 'f5'])
         self.assertEqual(a.inversion(), 0)
-        a.inversion(1)
+        a.setInversion(1, inPlace=True)
         self.assertEqual(repr(a), '<music21.chord.Chord B4 D5 F5 G5>')
+
+    def testSetInversionCopies(self):
+        a = chord.Chord('C4 E4 G4')
+        b = a.setInversion(2)
+        self.assertEqual(repr(a), '<music21.chord.Chord C4 E4 G4>')
+        self.assertEqual(repr(b), '<music21.chord.Chord G4 C5 E5>')
+        self.assertIs(b.derivation.origin, a)
+        with self.assertRaises(chord.ChordException):
+            chord.Chord().setInversion(1)
+        with self.assertRaises(chord.ChordException):
+            a.setInversion('six-four')
+
+        a.setInversion(1, transpose=False, inPlace=True)
+        cleared = a.setInversion(None)
+        self.assertEqual(cleared.inversion(), 0)
+        self.assertEqual(a.inversion(), 1)
+
+    def testInversionSetterLegacy(self):
+        # setting through inversion() works in place until its v13 removal
+        a = chord.Chord('C4 E4 G4')
+        self.assertIsNone(a.inversion(1))
+        self.assertEqual(repr(a), '<music21.chord.Chord E4 G4 C5>')
+        a.inversion(2, transposeOnSet=False)
+        self.assertEqual(a.inversion(), 2)
+        self.assertEqual(chord.Chord().inversion(1), -1)
 
     def testDeepcopyChord(self):
         ch = Chord('C4 E4 G4')
