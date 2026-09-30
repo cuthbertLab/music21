@@ -68,6 +68,9 @@
   so an example built from input no one would ever write teaches nothing and puts an
   obscure bug on a billboard. The test: would a first-time reader of this object want
   this example? If no, it is a unittest. See the `writing-docs` skill.
+- **Fix a bug test-first.** Write the regression test before changing the code, run it,
+  and see it fail for the reason the bug describes, not on an import error or a typo.
+  Then fix it and see it pass. A test that passed before the fix does not test the fix.
 - Never commit `forceSource=True` to a test or doctest (it reparses from source every
   run and slows the suite for everyone). The ONLY exception is the one test that exercises
   `forceSource` itself. If you hit a stale-parse problem while developing:
