@@ -7,7 +7,7 @@
 #               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -1320,10 +1320,7 @@ def makeTies(
                 # manage bridging voices
                 if mNextHasVoices:
                     if mHasVoices:  # try to match voice id
-                        if not isinstance(vId, int):
-                            dst = mNext.voices[vId]
-                        else:
-                            dst = mNext.getElementById(vId)
+                        dst = mNext.voices.getElementById(vId)
                     # src does not have voice, but dst does
                     else:  # place in top-most voice
                         dst = mNext.voices[0]
@@ -2346,6 +2343,33 @@ class Test(unittest.TestCase):
         self.assertEqual(pp[stream.Measure][1].notes.first().duration.quarterLength, 24.0)
         self.assertEqual(len(pp[stream.Measure][2].notes), 1)
         self.assertEqual(pp[stream.Measure][2].notes.first().duration.quarterLength, 24.0)
+
+    def testMakeTiesVoiceIdMissingFromNextMeasure(self):
+        '''
+        A note crossing the barline in a voice whose (string) id is not
+        in the next measure goes to the measure itself, as it already
+        does for an int id, instead of raising KeyError.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import stream
+        p = stream.Part()
+        m1 = stream.Measure(number=1)
+        m1.insert(0, meter.TimeSignature('4/4'))
+        soprano = stream.Voice(id='soprano')
+        soprano.insert(3, note.Note('C4', quarterLength=2.0))
+        m1.insert(0, soprano)
+        m2 = stream.Measure(number=2)
+        m2.insert(0, stream.Voice(id='alto'))
+        p.insert(0, m1)
+        p.insert(4, m2)
+
+        p.makeTies(inPlace=True)
+        self.assertEqual(soprano.notes.first().duration.quarterLength, 1.0)
+        self.assertEqual(soprano.notes.first().tie.type, 'start')
+        remainder = m2.getElementsByClass(note.Note).first()
+        self.assertEqual(remainder.duration.quarterLength, 1.0)
+        self.assertEqual(remainder.tie.type, 'stop')
 
     def testConsolidateCompletedTupletsNoFalsePositive(self):
         from fractions import Fraction
