@@ -171,7 +171,7 @@ class Harmony(chord.Chord):
     >>> h = harmony.ChordSymbol()
     >>> h.root('B-3')
     >>> h.bass('D', allow_add=True)
-    >>> h.inversion(1, transposeOnSet=False)
+    >>> h.setInversion(1, transpose=False, inPlace=True)
     >>> h.addChordStepModification(harmony.ChordStepModification('add', 4))
     >>> h
     <music21.harmony.ChordSymbol B- add 4/D>
@@ -304,7 +304,7 @@ class Harmony(chord.Chord):
 
         # set inversion first...
         if inversion is not None:
-            self.inversion(inversion, transposeOnSet=True)
+            self.setInversion(inversion, inPlace=True)
 
         # and then bass.
         if bass and isinstance(bass, str):
@@ -1650,7 +1650,7 @@ class ChordSymbol(Harmony):
     important: we are not asking for transposition, merely specifying the inversion that
     the chord should be read in (transposeOnSet = False)
 
-    >>> cs.inversion(2, transposeOnSet=False)
+    >>> cs.setInversion(2, transpose=False, inPlace=True)
 
     >>> cs.romanNumeral = 'I64'
     >>> cs.chordKind = 'major'
@@ -2203,7 +2203,7 @@ class ChordSymbol(Harmony):
                 self._overrides['bass'].octave = 2
                 pitches.append(self._overrides['bass'])
         else:
-            self.inversion(None, transposeOnSet=False)
+            self.setInversion(None, inPlace=True)
             inversionNum = None
 
         pitches = self._adjustPitchesForChordStepModifications(pitches)
@@ -2681,7 +2681,7 @@ class Test(unittest.TestCase):
         cs = ChordSymbol()
         cs.root('E-')
         cs.bass('B-', allow_add=True)
-        cs.inversion(2, transposeOnSet=False)
+        cs.setInversion(2, transpose=False, inPlace=True)
         cs.romanNumeral = 'I64'
         cs.chordKind = 'major'
         cs.chordKindStr = 'M'
