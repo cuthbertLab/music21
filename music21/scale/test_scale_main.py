@@ -247,6 +247,27 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, G4, D5, C6]')
         self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c6')), '[D3, C4, G4, D5, C6]')
 
+    def testOctatonicModesDoNotSharePitchDegreeCache(self):
+        sc1 = scale.OctatonicScale('C', mode=1)
+        sc2 = scale.OctatonicScale('C', mode=2)
+
+        self.assertEqual(str(sc1.pitchFromDegree(2)), 'D-4')
+        self.assertEqual(str(sc2.pitchFromDegree(2)), 'D4')
+
+    def testDiatonicModesDoNotSharePitchDegreeCache(self):
+        sc1 = scale.DiatonicScale('C', mode='dorian')
+        sc2 = scale.DiatonicScale('C', mode='major')
+
+        self.assertEqual(str(sc1.pitchFromDegree(3)), 'E-4')
+        self.assertEqual(str(sc2.pitchFromDegree(3)), 'E4')
+
+    def testSwapAbstractScaleDoesNotReuseCachedPitch(self):
+        sc = scale.OctatonicScale('C', mode=2)
+        self.assertEqual(str(sc.pitchFromDegree(2)), 'D4')
+
+        sc.abstract = scale.AbstractOctatonicScale(mode=1)
+        self.assertEqual(str(sc.pitchFromDegree(2)), 'D-4')
+
     def testCyclicalScales(self):
         sc = scale.CyclicalScale('c4', ['m2', 'm2'])
 
