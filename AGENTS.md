@@ -118,14 +118,11 @@
   or PR that ignores the template may be closed without comment.
 - A PR from an account with no merged PR here is profiled automatically, and anything flagged
   is posted publicly as a comment on the PR.
-- All PRs and Issues that use AI to be declared AI-assisted. Just write "AI-assisted (Claude)" with short name of Agent replacing "Claude". No robot emoji under any circumstance.
-- 20 or more lines of code written by an agent needs to be declared as AI-assisted in the docstring.  
-  Humans can remove and should remove this note when they do a review.
-- If no code was written by a user and no language was provided for the issue and no reference
-  to specific code to change was given, any PR must declare "(Entirely AI written)" unless the user
-  is by a core dev. Failure to do so may result in new users being banned from the project.
-- If an entirely AI written issue does not pass the tests it will be closed (or should be closed 
-  by the agent or author).
+- All PRs and Issues that use AI to be declared AI-assisted in their bodies. Just write "AI-assisted (Claude)" with short name of Agent replacing "Claude". No robot emoji under any circumstance.  
+- 20 or more lines of code written by an agent needs to be declared as AI-assisted in the docstring.   Humans can remove and should remove this note when they do a review.
+- If no code was written by a user (or reviewed and criticized by a human) and no specific language was provided for the issue, any PR must declare "Entirely AI written (Claude)" (or other agent name) in the body and "(AI-Written)" in the title, unless the user is a core dev. Failure to do so may result in new users being banned from the project. 
+- Agents should review PR bodies for concision and readability (and encourage human users also to review also). 
+- If an entirely AI written issue does not pass the tests it will be closed (or should be closed by at agent if not immediately fixed by the agent or author).
 - Agents must follow the [Code of Conduct](README.md#community-code-of-conduct). Agents that do not will be banned as well at their users.
   Not even the slightest bit of disrespect from an AI agent will be tolerated.
 - Any PR not from an established contributor touching more than about 20-30 lines should have an issue that has been opened and had enough
@@ -143,6 +140,7 @@
   after addressing the problem.  (A blind close or close with "not accepted" etc. generally means that the issue/PR
   has too many problems to easily solve and has become a burden for the maintainer).
 - Do not include a "Tests run" section unless the testing procedure was unusual (like it affects part of the system without standard tests, like the testing system itself.)
+- Once a PR has been opened and a review or comment has been made on it, commits should not be amended or force-pushed (this makes it impossible to review "changes since the review").  Put changes in response to reviews/comments in new commits.
 - While someone is reviewing a PR or a pushed branch, "do X" is not "commit and push X":
   make the change and leave it unstaged. When the list looks finished (or you hear "done!"
   or "push it"), offer to commit, or to commit and push. Batch a round's small fixes into

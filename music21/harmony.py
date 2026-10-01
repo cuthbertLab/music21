@@ -1150,7 +1150,7 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
         although certain subtractions are permitted for example a 9th chord will
         still be identified correctly even if it is missing the 5th
     5. the type with the most identical matches is used, and if no type matches,
-        "Chord Type Cannot Be Identified" is returned
+        "Chord Symbol Cannot Be Identified" is returned
     6. the output format for the chord symbol figure is the chord's root,
         the chord type's Abbreviation (saved in CHORD_TYPES dictionary),
         a '/' if the chord is in an inversion, and the chord's bass
