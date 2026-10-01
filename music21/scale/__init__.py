@@ -118,13 +118,14 @@ type _PitchDegreeCacheKey = tuple[
     type,  # scale class
     str,  # scale type
     str,  # tonic name with octave
+    str,  # stringified mode
     int,  # degree
     Direction,  # direction
     bool  # equating termini
 ]
 
 # a dictionary mapping an abstract scale class, tonic.nameWithOctave,
-# and degree to a pitchNameWithOctave.
+# _abstract.mode, and degree to a pitchNameWithOctave.
 _pitchDegreeCache: dict[_PitchDegreeCacheKey, str] = {}
 
 # a pitch given in any of the forms that can be coerced to a pitch.Pitch
@@ -298,6 +299,8 @@ class AbstractScale(Scale):
         self._net: intervalNetwork.IntervalNetwork|None = None
         # in most cases tonic/final of scale is step one, but not always
         self.tonicDegree: int = 1  # step of tonic
+
+        self.mode: t.Any = None
 
         # declare if this scale is octave duplicating
         # can be used as to optimize pitch gathering
@@ -750,7 +753,6 @@ class AbstractDiatonicScale(AbstractScale):
     '''
     def __init__(self, mode: str|None = None, **keywords) -> None:
         super().__init__(**keywords)
-        self.mode = mode
         self.type = 'Abstract diatonic'
         # tonicDegree and dominantDegree are set below by buildNetwork
         self.dominantDegree: int = 5  # step of dominant
@@ -861,6 +863,7 @@ class AbstractDiatonicScale(AbstractScale):
             intervalList,
             octaveDuplicating=self.octaveDuplicating,
             pitchSimplification=None)
+        self.mode = mode
 
 
 class AbstractOctatonicScale(AbstractScale):
@@ -900,6 +903,7 @@ class AbstractOctatonicScale(AbstractScale):
         self._net = intervalNetwork.IntervalNetwork(intervalList,
                                                     octaveDuplicating=self.octaveDuplicating,
                                                     pitchSimplification='maxAccidental')
+        self.mode = mode
         # might also set weights for tonic and dominant here
 
 
@@ -1785,10 +1789,12 @@ class ConcreteScale(Scale):
         if (self.usePitchDegreeCache and self.tonic
                 and not minPitch and not maxPitch and getattr(self, 'type', None)):
             tonicCacheKey = self.tonic.nameWithOctave
+            modeCacheKey = str(self._abstract.mode)
             cacheKey = (
                 self.__class__,
                 self.type,
                 tonicCacheKey,
+                modeCacheKey,
                 degree,
                 direction,
                 equateTermini
