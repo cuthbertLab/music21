@@ -2549,9 +2549,6 @@ def getAllNamesForInstrument(instrumentClass: Instrument,
     language = language.lower()
     instrumentNameDict = {}
 
-    # the lookup tables name classes: the nearest one they know stands for
-    # this instrument, whatever it is called or subclassed as.  A generic
-    # Instrument is found by its name.
     namedClasses = set(instrumentLookup.allToClassName.values())
     instrumentClassName = next((cls.__name__ for cls in type(instrumentClass).__mro__
                                 if cls.__name__ in namedClasses),
