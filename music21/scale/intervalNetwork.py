@@ -1338,46 +1338,56 @@ class IntervalNetwork:
         # at this point a valid node id is required to continue
         foundNodeId = t.cast('Terminus|int', nodeId)
 
-        # realize the pitch from the found node degree
-        # we may be getting an altered
-        # tone, and we need to transpose an unaltered tone, thus
-        # leave out altered nodes argument
-        p = self.getPitchFromNodeDegree(
-            pitchReference=pitchReference,
-            nodeName=nodeName,
-            nodeDegreeTarget=self.nodes[foundNodeId].degree,
-            direction=direction,
-            minPitch=None,  # not using a range here to
-            maxPitch=None,  # get natural expansion
-            alteredDegrees=None  # need unaltered tone here, thus omitted
-        )
-        if p is None:
-            raise IntervalNetworkException(
-                'Could not find a pitch for the requested node degree')
-
-        # environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName',
-        # nodeName, 'p', p, 'nodeId', nodeId, 'self.nodes[nodeId].degree',
-        # self.nodes[nodeId].degree])
-
-        # transfer octave from origin to new pitch derived from node
-        # note: this assumes octave equivalence and may be a problem
-        p.octave = pitchOriginObj.octave
-
-        # correct for derived pitch crossing octave boundary
-        # https://github.com/cuthbertLab/music21/issues/319
         alterSemitones: int|float = 0
         degree = self.nodeIdToDegree(foundNodeId)
         if alteredDegrees and degree in alteredDegrees:
             alterSemitones = alteredDegrees[degree]['interval'].semitones
         alterSemitonesInt = t.cast('int', alterSemitones)
-        if not p.octaveIsImplicit:
-            if ((usedNeighbor and getNeighbor == Direction.DESCENDING)
-                    or (not usedNeighbor and direction == Direction.ASCENDING)):
-                while p.transpose(alterSemitonesInt) > pitchOriginObj:
-                    p.octave -= 1
-            else:
-                while p.transpose(alterSemitonesInt) < pitchOriginObj:
-                    p.octave += 1
+        startBelowOrigin = ((usedNeighbor and getNeighbor == Direction.DESCENDING)
+                            or (not usedNeighbor and direction == Direction.ASCENDING))
+        p: pitch.Pitch|None
+        if not self.octaveDuplicating:
+            p = self._nodePitchNearOrigin(pitchReference,
+                                          nodeName,
+                                          foundNodeId,
+                                          pitchOriginObj,
+                                          direction=direction,
+                                          alteredDegrees=alteredDegrees,
+                                          atOrBelow=startBelowOrigin)
+        else:
+            # realize the pitch from the found node degree
+            # we may be getting an altered
+            # tone, and we need to transpose an unaltered tone, thus
+            # leave out altered nodes argument
+            p = self.getPitchFromNodeDegree(
+                pitchReference=pitchReference,
+                nodeName=nodeName,
+                nodeDegreeTarget=self.nodes[foundNodeId].degree,
+                direction=direction,
+                minPitch=None,  # not using a range here to
+                maxPitch=None,  # get natural expansion
+                alteredDegrees=None  # need unaltered tone here, thus omitted
+            )
+            if p is None:
+                raise IntervalNetworkException(
+                    'Could not find a pitch for the requested node degree')
+
+            # environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName',
+            # nodeName, 'p', p, 'nodeId', nodeId, 'self.nodes[nodeId].degree',
+            # self.nodes[nodeId].degree])
+
+            # transfer octave from origin to new pitch derived from node
+            p.octave = pitchOriginObj.octave
+
+            # correct for derived pitch crossing octave boundary
+            # https://github.com/cuthbertLab/music21/issues/319
+            if not p.octaveIsImplicit:
+                if startBelowOrigin:
+                    while p.transpose(alterSemitonesInt) > pitchOriginObj:
+                        p.octave -= 1
+                else:
+                    while p.transpose(alterSemitonesInt) < pitchOriginObj:
+                        p.octave += 1
 
         # pitchObj = p
         n = self.nodes[foundNodeId]
@@ -1409,6 +1419,55 @@ class IntervalNetwork:
                 direction=direction)
 
         return pCollect
+
+    def _nodePitchNearOrigin(
+        self,
+        pitchReference: pitch.Pitch|str,
+        nodeName: Node|int|Terminus|None,
+        nodeId: Terminus|int,
+        pitchOrigin: pitch.Pitch,
+        *,
+        direction: Direction,
+        alteredDegrees: AlteredDegrees|None,
+        atOrBelow: bool,
+    ) -> pitch.Pitch:
+        '''
+        Return the unaltered pitch of `nodeId` nearest `pitchOrigin`: the highest
+        at or below it if `atOrBelow`, otherwise the lowest at or above it.
+
+        Read off a realization around the origin, since in a network that does
+        not repeat at the octave one node can stand for several pitch classes:
+        every note of a cycle of major thirds is the same node.
+
+        AI-assisted (Claude).
+        '''
+        origin = copy.deepcopy(pitchOrigin)
+        origin.octaveIsImplicit = False
+        realizedPitches, realizedNodes = self.realize(
+            pitchReference,
+            nodeName,
+            minPitch=origin.transpose(-12, inPlace=False),
+            maxPitch=origin.transpose(12, inPlace=False),
+            direction=direction,
+            alteredDegrees=alteredDegrees,
+        )
+        nodePitches = [realizedPitch
+                       for realizedPitch, realizedNode in zip(realizedPitches, realizedNodes)
+                       if realizedNode == nodeId]
+        if atOrBelow:
+            found = max((p for p in nodePitches if p.ps <= origin.ps),
+                        key=lambda p: p.ps, default=None)
+        else:
+            found = min((p for p in nodePitches if p.ps >= origin.ps),
+                        key=lambda p: p.ps, default=None)
+        if found is None:
+            raise IntervalNetworkException(
+                'Could not find a pitch for the requested node degree')
+
+        degree = self.nodeIdToDegree(nodeId)
+        if alteredDegrees and degree in alteredDegrees:
+            return found.transpose(alteredDegrees[degree]['interval'].reverse())
+        return copy.deepcopy(found)
 
     # TODO: need to collect intervals as well
 
