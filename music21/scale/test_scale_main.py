@@ -334,6 +334,22 @@ class Test(unittest.TestCase):
         self.assertEqual(str(fifths.nextPitch('g4')), 'D5')
         self.assertEqual(str(fifths.nextPitch('g4', Direction.DESCENDING)), 'C4')
 
+        thirdsAndMinorThirds = scale.CyclicalScale('d3', ['M3', 'm3'])
+        self.assertEqual(str(thirdsAndMinorThirds.nextPitch('d4')), 'E4')
+        self.assertEqual(str(thirdsAndMinorThirds.nextPitch('d4', Direction.DESCENDING)), 'C#4')
+        self.assertEqual(str(thirdsAndMinorThirds.nextPitch('a4')), 'B4')
+        self.assertEqual(str(thirdsAndMinorThirds.nextPitch('a4', Direction.DESCENDING)), 'G#4')
+
+    def testNextPitchFromEnharmonic(self):
+        thirds = scale.CyclicalScale('d3', ['M3'])
+        for enharmonicOfD in ('c##4', 'e--4'):
+            self.assertEqual(str(thirds.nextPitch(enharmonicOfD)), 'F#4')
+            self.assertEqual(str(thirds.nextPitch(enharmonicOfD, Direction.DESCENDING)), 'B-3')
+
+        sc = scale.MajorScale('c4')
+        self.assertEqual(str(sc.nextPitch('b#3')), 'D4')
+        self.assertEqual(str(sc.nextPitch('d-4', Direction.DESCENDING)), 'C4')
+
     def testDeriveByDegree(self):
         sc1 = scale.MajorScale()
         self.assertEqual(str(sc1.deriveByDegree(7, 'G#')),
