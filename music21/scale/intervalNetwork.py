@@ -83,8 +83,16 @@ class Direction(enum.Enum):
 type CacheKey = tuple[
     int|Terminus, str, str|None, str|None, bool, bool|None]
 
+# node id, start pitch, and (degree, direction, generic, semitones) per altered degree
+type WalkKey = tuple[
+    Terminus|int, str, tuple[tuple[int, Direction, int, int|float], ...]]
+
+
 @dataclasses.dataclass
 class _Step:
+    '''
+    One pitch of an ascending walk: as transposed, as altered, and its node id.
+    '''
     pitchObj: pitch.Pitch
     collected: pitch.Pitch
     nodeId: Terminus|int
@@ -92,6 +100,9 @@ class _Step:
 
 @dataclasses.dataclass
 class _Walk:
+    '''
+    An ascending walk from one start, kept so later calls can extend it.
+    '''
     steps: list[_Step]
     node: Node
     ended: bool = False
@@ -489,6 +500,7 @@ class IntervalNetwork:
             CacheKey,
             tuple[list[pitch.Pitch], list[Terminus|int]]
         ] = OrderedDict()
+        self._ascendingWalks: dict[WalkKey, _Walk] = {}
 
     def clear(self) -> None:
         '''
@@ -500,7 +512,7 @@ class IntervalNetwork:
         self.nodes = OrderedDict()
         self._ascendingCache = OrderedDict()
         self._descendingCache = OrderedDict()
-        vars(self).pop('_ascendingWalks', None)
+        self._ascendingWalks = {}
 
     def __eq__(self, other) -> bool:
         '''
@@ -1410,19 +1422,20 @@ class IntervalNetwork:
         Return the unaltered pitch of `nodeId` nearest `pitchOrigin`: the highest
         at or below it if `atOrBelow`, otherwise the lowest at or above it.
 
-        Read off a realization around the origin, since one node can stand for
-        several pitch classes: a cycle of major thirds has a single edge, so
-        every pitch after its first is the high terminus.
+        One node can stand for several pitch classes (a cycle of major thirds is
+        one edge, so D, F# and A# after the first D are all its high terminus),
+        so read the pitch off a realization around the origin.
+
+        `pitchOrigin` is changed in place.
 
         AI-assisted (Claude).
         '''
-        origin = copy.deepcopy(pitchOrigin)
-        origin.octaveIsImplicit = False
+        pitchOrigin.octaveIsImplicit = False
         realizedPitches, realizedNodes = self.realize(
             pitchReference,
             nodeName,
-            minPitch=origin.transpose(-12, inPlace=False),
-            maxPitch=origin.transpose(12, inPlace=False),
+            minPitch=pitchOrigin.transpose(-12, inPlace=False),
+            maxPitch=pitchOrigin.transpose(12, inPlace=False),
             direction=direction,
             alteredDegrees=alteredDegrees,
         )
@@ -1430,10 +1443,10 @@ class IntervalNetwork:
                        for realizedPitch, realizedNode in zip(realizedPitches, realizedNodes)
                        if realizedNode == nodeId]
         if atOrBelow:
-            found = max((p for p in nodePitches if p.ps <= origin.ps),
+            found = max((p for p in nodePitches if p.ps <= pitchOrigin.ps),
                         key=lambda p: p.ps, default=None)
         else:
-            found = min((p for p in nodePitches if p.ps >= origin.ps),
+            found = min((p for p in nodePitches if p.ps >= pitchOrigin.ps),
                         key=lambda p: p.ps, default=None)
         if found is None:
             raise IntervalNetworkException(
@@ -1442,7 +1455,7 @@ class IntervalNetwork:
         degree = self.nodeIdToDegree(nodeId)
         if alteredDegrees and degree in alteredDegrees:
             return found.transpose(alteredDegrees[degree]['interval'].reverse())
-        return copy.deepcopy(found)
+        return found
 
     # TODO: need to collect intervals as well
 
@@ -1671,19 +1684,16 @@ class IntervalNetwork:
 
         AI-assisted (Claude).
         '''
-        key: tuple[t.Any, ...] = (nodeObj.id, start.nameWithOctave)
-        if alteredDegrees:
-            key += tuple((degree,
-                          spec['direction'],
-                          spec['interval'].generic.directed,
-                          spec['interval'].semitones)
-                         for degree, spec in alteredDegrees.items())
-        # made on first use: networks pickled before it existed do not have it
-        walks: dict[tuple[t.Any, ...], _Walk] = vars(self).setdefault('_ascendingWalks', {})
-        walk = walks.get(key)
+        key: WalkKey = (nodeObj.id, start.nameWithOctave, tuple(
+            (degree,
+             spec['direction'],
+             spec['interval'].generic.directed,
+             spec['interval'].semitones)
+            for degree, spec in (alteredDegrees or {}).items()))
+        walk = self._ascendingWalks.get(key)
         if walk is None:
             walk = _Walk([_Step(start, start, nodeObj.id)], nodeObj)
-            walks[key] = walk
+            self._ascendingWalks[key] = walk
         while not walk.ended and not _gte(walk.steps[-1].pitchObj.ps, maxPitch.ps):
             if len(walk.steps) >= 100:
                 break

@@ -350,6 +350,21 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc.nextPitch('b#3')), 'D4')
         self.assertEqual(str(sc.nextPitch('d-4', Direction.DESCENDING)), 'C4')
 
+    def testNextPitchNodeNearOrigin(self):
+        thirds = scale.CyclicalScale('d3', ['M3'])
+        self.assertEqual(str(thirds.nextPitch('d4', stepSize=2)), 'A#4')
+
+        fifths = scale.CyclicalScale('c4', ['P5'])
+        self.assertEqual(str(fifths.nextPitch('f4', Direction.DESCENDING)), 'C4')
+
+        aMinor = scale.HarmonicMinorScale('a4')
+        self.assertEqual(str(aMinor.nextPitch('f##4')), 'G#4')
+        self.assertEqual(str(aMinor.nextPitch('a4', Direction.DESCENDING)), 'G#4')
+
+        gMinor = scale.HarmonicMinorScale('g4')
+        gMinor.nextPitch('a4')
+        self.assertEqual(str(gMinor.pitches[6]), 'F#5')
+
     def testDeriveByDegree(self):
         sc1 = scale.MajorScale()
         self.assertEqual(str(sc1.deriveByDegree(7, 'G#')),
