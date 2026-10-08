@@ -649,13 +649,13 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc.nextPitch('c1', Direction.ASCENDING)), 'D1')
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
 
-    def test_next_pitch_is_the_callers_own(self):
+    def testNextPitchNotReusePitchInstances(self):
         sc = scale.MajorScale('c4')
         p = sc.nextPitch('e4')
         p.octave = 1
         self.assertEqual(str(sc.nextPitch('e4')), 'F4')
 
-    def test_find_missing_is_the_callers_own(self):
+    def testFindMissingNotReusePitchInstances(self):
         net = IntervalNetwork(['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2'])
         missing = net.findMissing('c4', 1, ['d'])
         self.assertEqual(self.pitchOut(missing), '[C4, E4, F4, G4, A4, B4, C5]')
