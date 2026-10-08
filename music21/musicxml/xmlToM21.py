@@ -5049,8 +5049,9 @@ class MeasureParser(XMLParserBase):
             ly.identifier = identifier
 
         self.setStyleAttributes(mxLyric, ly,
-                                ('justify', 'placement', 'print-object'),
-                                ('justify', 'placement', 'hideObjectOnPrint'))
+                                ('justify', 'placement'),
+                                ('justify', 'placement'))
+        self.setPrintObject(mxLyric, ly)
         self.setColor(mxLyric, ly)
         self.setPosition(mxLyric, ly)
 
