@@ -16,7 +16,6 @@ import unittest
 from music21 import common
 from music21 import converter
 from music21 import corpus
-from music21 import defaults
 from music21 import key
 from music21 import note
 from music21 import pitch
@@ -73,16 +72,6 @@ class Test(unittest.TestCase):
         # Notes proxy the int
         self.assertEqual(note.Note('B-').octave, 4)
         self.assertEqual(note.Note('B-3').octave, 3)
-
-        # the default is read live from defaults.pitchOctave
-        savedDefaultOctave = defaults.pitchOctave
-        try:
-            defaults.pitchOctave = 3
-            self.assertEqual(Pitch('C').octave, 3)
-            self.assertEqual(Pitch('C').ps, 48.0)
-            self.assertEqual(Pitch('C5').octave, 5)
-        finally:
-            defaults.pitchOctave = savedDefaultOctave
 
         # creation paths
         self.assertTrue(Pitch().octaveIsImplicit)

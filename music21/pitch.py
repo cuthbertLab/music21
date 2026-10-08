@@ -29,7 +29,6 @@ from music21 import base
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
 from music21.common.types import StepName
-from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import interval
@@ -1693,8 +1692,7 @@ class Pitch(prebase.ProtoM21Object):
 
     Yet an octave is often needed anyhow, to play the `Pitch` in MIDI or
     put it on a staff, so `.octave` is always an integer: the default octave,
-    4 (`defaults.pitchOctave`), when none was given.  `.octaveIsImplicit`
-    tells the two cases apart.
+    4, when none was given.  `.octaveIsImplicit` tells the two cases apart.
 
     >>> anyGSharp.octave
     4
@@ -1920,8 +1918,8 @@ class Pitch(prebase.ProtoM21Object):
         # No need for super().__init__() on protoM21Object
         self._groups: base.Groups|None = None
 
-        # this should not be set, as will be updated when needed
-        self._step: StepName = defaults.pitchStep  # this is only the pitch step
+        # this will be updated below when needed
+        self._step: StepName = 'C'  # this does not include the accidental
 
         self._overridden_freq440: float|None = None
 
@@ -1932,7 +1930,7 @@ class Pitch(prebase.ProtoM21Object):
         # 5% of pitch creation time; it'll be created in a sec anyhow
         self._microtone: Microtone|None = None
 
-        # None means implicit: .octave then reports defaults.pitchOctave
+        # None means implicit: .octave then reports the default octave of 4
         self._octave: int|None = None
 
         # if True, accidental is not known; is determined algorithmically
@@ -3168,7 +3166,7 @@ class Pitch(prebase.ProtoM21Object):
         5
 
         Always an int: a Pitch created without an octave reports the default
-        octave, 4 (`defaults.pitchOctave`), and has `.octaveIsImplicit` True.
+        octave, 4, and has `.octaveIsImplicit` True.
 
         >>> g = pitch.Pitch('g')
         >>> g.octave
@@ -3194,7 +3192,7 @@ class Pitch(prebase.ProtoM21Object):
         * Changed in v11: always an int; `.octaveIsImplicit` says whether it was given.
         '''
         if self._octave is None:
-            return defaults.pitchOctave
+            return 4
         return self._octave
 
     @octave.setter
@@ -3243,7 +3241,7 @@ class Pitch(prebase.ProtoM21Object):
     def octaveIsImplicit(self, value: bool) -> None:
         if bool(value) == self.octaveIsImplicit:
             return
-        self._octave = None if value else defaults.pitchOctave
+        self._octave = None if value else 4
         self.informClient()
 
     @property

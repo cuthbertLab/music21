@@ -14,12 +14,10 @@ Simple storage for data defaults used throughout music21.
 from __future__ import annotations
 
 import unittest
-import typing as t
 from music21 import _version
 
 
 # note: this module should not import any higher level modules
-type StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
 
 
 # TODO: defaults should check the environment object to see
@@ -40,9 +38,6 @@ limitOffsetDenominator = 65535  # > CD track level precision.
 # allows for tuples up to n:x within m:y within l:z within k:w where x,y,z <=100 and w<=44
 # not allowing more can be construed as a feature.
 
-
-pitchStep: StepName = 'C'
-pitchOctave = 4
 
 partGroup = 'Part Group'
 partGroupAbbreviation = 'PG'

@@ -2078,7 +2078,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     >>> ex2 = voiceLeading.ThreeNoteLinearSegment('a', 'b', 'c')
     >>> ex2.n1
     <music21.note.Note A>
-    >>> defaults.pitchOctave
+    >>> ex2.n1.octave
     4
     '''
     _DOC_ORDER = ['couldBePassingTone',
