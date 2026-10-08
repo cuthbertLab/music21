@@ -1353,7 +1353,8 @@ class IntervalNetwork:
             neighborIds = self.getNeighborNodeIds(pitchReference=pitchReference,
                                                   nodeName=nodeName,
                                                   pitchTarget=pitchOriginObj,
-                                                  direction=direction)  # must add direction
+                                                  direction=direction,
+                                                  alteredDegrees=alteredDegrees)
             lowId, highId = t.cast(
                 'tuple[Terminus|int, Terminus|int]', neighborIds)
 
@@ -1740,7 +1741,7 @@ class IntervalNetwork:
                 break
         if len(walked) >= 100:
             raise IntervalNetworkException(
-                'Cannot realize these pitches; is your scale '
+                'Cannot realize these pitches; is the network '
                 + "well-formed? (especially check if you're giving notes without octaves)")
         return walked
 

@@ -360,6 +360,8 @@ class Test(unittest.TestCase):
         aMinor = scale.HarmonicMinorScale('a4')
         self.assertEqual(str(aMinor.nextPitch('f##4')), 'G#4')
         self.assertEqual(str(aMinor.nextPitch('a4', Direction.DESCENDING)), 'G#4')
+        self.assertEqual(str(aMinor.nextPitch('g4')), 'G#4')
+        self.assertEqual(str(aMinor.nextPitch('g4', Direction.DESCENDING)), 'F4')
 
         gMinor = scale.HarmonicMinorScale('g4')
         gMinor.nextPitch('a4')
