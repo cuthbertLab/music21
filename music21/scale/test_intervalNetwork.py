@@ -655,6 +655,14 @@ class Test(unittest.TestCase):
         p.octave = 1
         self.assertEqual(str(sc.nextPitch('e4')), 'F4')
 
+    def test_find_missing_is_the_callers_own(self):
+        net = IntervalNetwork(['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2'])
+        missing = net.findMissing('c4', 1, ['d'])
+        self.assertEqual(self.pitchOut(missing), '[C4, E4, F4, G4, A4, B4, C5]')
+        missing[0].octave = 7
+        self.assertEqual(self.pitchOut(net.realizePitch('c4')),
+                         '[C4, D4, E4, F4, G4, A4, B4, C5]')
+
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
