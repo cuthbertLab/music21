@@ -155,6 +155,45 @@ alternateNameToAccidentalName = {
 }
 
 
+def _makeAccidentalLookupTable() -> dict[str|float, tuple[str, float, str]]:
+    '''
+    Build accidentalLookupTable from accidentalNameToModifier and
+    alternateNameToAccidentalName.
+    '''
+    # AI-assisted (Claude)
+    nameToAlter = {
+        'natural': 0.0,
+        'sharp': 1.0,
+        'double-sharp': 2.0,
+        'triple-sharp': 3.0,
+        'quadruple-sharp': 4.0,
+        'flat': -1.0,
+        'double-flat': -2.0,
+        'triple-flat': -3.0,
+        'quadruple-flat': -4.0,
+        'half-sharp': 0.5,
+        'one-and-a-half-sharp': 1.5,
+        'half-flat': -0.5,
+        'one-and-a-half-flat': -1.5,
+    }
+    table: dict[str|float, tuple[str, float, str]] = {}
+    for name, alter in nameToAlter.items():
+        modifier = accidentalNameToModifier[name]
+        table[name] = table[alter] = (name, alter, modifier)
+        # not natural's '': set('') is an error, and .modifier = '' leaves the name alone
+        if modifier:
+            table[modifier] = table[name]
+    for alternateName, name in alternateNameToAccidentalName.items():
+        table[alternateName] = table[name]
+    return table
+
+
+# every lowercase name, modifier, alternate name, and alter that Accidental() and
+# Accidental.set() accept, mapped to (name, alter, modifier), e.g. "eses" or -2 to
+# ("double-flat", -2.0, "--")
+accidentalLookupTable = _makeAccidentalLookupTable()
+
+
 def isValidAccidentalName(name: str) -> bool:
     '''
     Check if name is a valid accidental name string that can
@@ -1000,8 +1039,13 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     # INITIALIZER #
 
-    def __init__(self, specifier: int|str|float = 'natural') -> None:
-        super().__init__()
+    def __init__(  # pylint: disable=super-init-not-called
+        self,
+        specifier: int|str|float = 'natural',
+    ) -> None:
+        # StyleMixin.__init__, inlined for speed; keep in sync
+        self._style = None
+        self._editorial = None
         # managed by properties
         self._displayType = 'normal'
         # normal, always, never, if-absolutely-necessary,
@@ -1017,11 +1061,15 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         # store a reference to the Pitch that has this Accidental object as a property
         self._client: Pitch|None = None
-        self._name = ''
-        self._modifier = ''
-        self._alter = 0.0     # semitones to alter step
-        # potentially can be a fraction, but not exponent
-        self.set(specifier)
+        try:
+            standard = accidentalLookupTable.get(specifier)
+        except TypeError:  # unhashable
+            standard = None
+        if standard is None:
+            self.set(specifier)
+        else:
+            # alter: semitones to alter step; potentially a fraction, but not exponent
+            self._name, self._alter, self._modifier = standard
 
     # SPECIAL METHODS #
     def _hashValues(self) -> tuple[t.Any, ...]:
@@ -1227,81 +1275,29 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         This is the argument that .name and .alter use to allow non-standard names
 
+        `Accidental()` calls `set()` only for values not in `accidentalLookupTable`,
+        so a subclass overriding `set()` should override `__init__` too.
+
         * Changed in v5: added allowNonStandardValue.
         '''
-        if isinstance(name, str):
+        try:
+            standard = accidentalLookupTable.get(name)
+        except TypeError:  # unhashable
+            standard = None
+        if standard is None and isinstance(name, str):
             name = name.lower()  # sometimes args get capitalized
-        if name in ('natural', 'n', 0):
-            self._name = 'natural'
-            self._alter = 0.0
-        elif name in ('sharp', '#', 'is', 1):
-            # accidentalNameToModifier['sharp'] will always be #!
-            self._name = 'sharp'
-            self._alter = 1.0
-        elif name in ('double-sharp', accidentalNameToModifier['double-sharp'],
-                      'isis', 2):
-            self._name = 'double-sharp'
-            self._alter = 2.0
-        elif name in ('flat', accidentalNameToModifier['flat'], 'es', 'b', -1):
-            self._name = 'flat'
-            self._alter = -1.0
-        elif name in ('double-flat', accidentalNameToModifier['double-flat'],
-                      'eses', -2):
-            self._name = 'double-flat'
-            self._alter = -2.0
+            standard = accidentalLookupTable.get(name)
 
-        elif name in ('half-sharp', accidentalNameToModifier['half-sharp'],
-                      'quarter-sharp', 'ih', 'semisharp', 0.5):
-            self._name = 'half-sharp'
-            self._alter = 0.5
-        elif name in ('one-and-a-half-sharp',
-                      accidentalNameToModifier['one-and-a-half-sharp'],
-                      'three-quarter-sharp', 'three-quarters-sharp', 'isih',
-                      'sesquisharp', 1.5):
-            self._name = 'one-and-a-half-sharp'
-            self._alter = 1.5
-        elif name in ('half-flat', accidentalNameToModifier['half-flat'],
-                      'quarter-flat', 'eh', 'semiflat', -0.5):
-            self._name = 'half-flat'
-            self._alter = -0.5
-        elif name in ('one-and-a-half-flat',
-                      accidentalNameToModifier['one-and-a-half-flat'],
-                      'three-quarter-flat', 'three-quarters-flat', 'eseh',
-                      'sesquiflat', -1.5):
-            self._name = 'one-and-a-half-flat'
-            self._alter = -1.5
-        elif name in ('triple-sharp', accidentalNameToModifier['triple-sharp'],
-                      'isisis', 3):
-            self._name = 'triple-sharp'
-            self._alter = 3.0
-        elif name in ('quadruple-sharp',
-                      accidentalNameToModifier['quadruple-sharp'], 'isisisis', 4):
-            self._name = 'quadruple-sharp'
-            self._alter = 4.0
-        elif name in ('triple-flat', accidentalNameToModifier['triple-flat'],
-                      'eseses', -3):
-            self._name = 'triple-flat'
-            self._alter = -3.0
-        elif name in ('quadruple-flat',
-                      accidentalNameToModifier['quadruple-flat'], 'eseseses', -4):
-            self._name = 'quadruple-flat'
-            self._alter = -4.0
+        if standard is not None:
+            self._name, self._alter, self._modifier = standard
+            if self._client:
+                self._client.informClient()
+        elif allowNonStandardValue and isinstance(name, str):
+            self._name = name
+        elif allowNonStandardValue and isinstance(name, (int, float)):
+            self._alter = name
         else:
-            if not allowNonStandardValue:
-                raise AccidentalException(f'{name} is not a supported accidental type')
-
-            if isinstance(name, str):
-                self._name = name
-                return
-            elif isinstance(name, (int, float)):
-                self._alter = name
-                return
-            else:  # pragma: no cover
-                raise AccidentalException(f'{name} is not a supported accidental type')
-
-        self._modifier = accidentalNameToModifier[self._name]
-        if self._client:
-            self._client.informClient()
+            raise AccidentalException(f'{name} is not a supported accidental type')
 
 
     def isTwelveTone(self) -> bool:
