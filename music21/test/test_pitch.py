@@ -101,11 +101,11 @@ class Test(unittest.TestCase):
 
         # the setter informs a Note client only when something changed
         n = note.Note('C4')
-        n._cache['junk'] = 1
-        n.pitch.octaveIsImplicit = False
-        self.assertEqual(n._cache, {'junk': 1})
-        n.pitch.octaveIsImplicit = True
-        self.assertEqual(n._cache, {})
+        with mock.patch.object(n, 'pitchChanged') as pitchChanged:
+            n.pitch.octaveIsImplicit = False
+            pitchChanged.assert_not_called()
+            n.pitch.octaveIsImplicit = True
+        pitchChanged.assert_called_once()
 
     def testNameSetting(self):
         with self.assertRaisesRegex(ValueError,
