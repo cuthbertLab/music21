@@ -133,6 +133,45 @@ class Test(unittest.TestCase):
         with self.assertRaises(PitchException):
             Pitch(step='CD')
 
+    def testPsAndMidiSettersInformNoteOnce(self):
+        for attribute in ('ps', 'midi'):
+            with self.subTest(attribute=attribute):
+                n = note.Note('D4')
+                with mock.patch.object(n, 'pitchChanged') as pitchChanged:
+                    setattr(n.pitch, attribute, 61)
+                pitchChanged.assert_called_once()
+
+    def testWholeNumberPsAndMidi(self):
+        '''
+        Setting a whole-number .ps or .midi replaces a quarter-tone accidental
+        and clears a microtone.
+        '''
+        p = Pitch('D~5')
+        p.microtone = 20
+        p.ps = 61
+        self.assertEqual(p.nameWithOctave, 'C#4')
+        self.assertEqual(p.microtone.cents, 0)
+
+        # a natural is None, and a negative ps floors to the octave below
+        p.ps = 60.0
+        self.assertEqual(p.nameWithOctave, 'C4')
+        self.assertIsNone(p.accidental)
+        p.ps = -1
+        self.assertEqual((p.step, p.octave), ('B', -2))
+
+        # above 127, the midi setter wraps into the top octave; ps does not
+        p = Pitch()
+        p.midi = 130
+        self.assertEqual(p.nameWithOctave, 'B-8')
+        p.ps = 130
+        self.assertEqual(p.nameWithOctave, 'B-9')
+
+        # Pitch(number) keeps the natural
+        for value in (60, 60.0):
+            p = Pitch(value)
+            self.assertEqual(p.nameWithOctave, 'C4')
+            self.assertEqual(p.accidental.name, 'natural')
+
 
 
     def testAccidentalImport(self):
