@@ -1044,6 +1044,10 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
             new = Accidental.__new__(Accidental)
             for s in self._getSlotsRecursive():
                 setattr(new, s, getattr(self, s))
+            if self._style is not None:
+                new._style = copy.deepcopy(self._style, memo)
+            if self._editorial is not None:
+                new._editorial = copy.deepcopy(self._editorial, memo)
             return new
         else:  # pragma: no cover
             return common.defaultDeepcopy(self, memo)

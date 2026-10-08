@@ -16,6 +16,7 @@ import unittest
 from music21 import common
 from music21 import converter
 from music21 import corpus
+from music21 import editorial
 from music21 import key
 from music21 import note
 from music21 import pitch
@@ -136,6 +137,21 @@ class Test(unittest.TestCase):
         pAltered = altoM6.pitches[2]
         self.assertEqual(pAltered.accidental.name, 'sharp')
         self.assertTrue(pAltered.accidental.displayStatus)
+
+    def testAccidentalDeepcopyDoesNotShareStyleOrEditorial(self):
+        '''
+        A deepcopy of an Accidental gets its own Style and Editorial.
+        '''
+        a = Accidental('sharp')
+        a.style.color = 'red'
+        a.editorial.comments.append(editorial.Comment('cautionary'))
+        b = copy.deepcopy(a)
+        self.assertEqual(b.style.color, 'red')
+        self.assertEqual(len(b.editorial.comments), 1)
+        b.style.color = 'blue'
+        b.editorial.comments.append(editorial.Comment('ficta'))
+        self.assertEqual(a.style.color, 'red')
+        self.assertEqual(len(a.editorial.comments), 1)
 
     def testUpdateAccidentalDisplaySimple(self):
         '''
