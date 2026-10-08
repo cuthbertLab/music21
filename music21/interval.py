@@ -7,7 +7,7 @@
 #               Amy Hailes
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -3402,10 +3402,11 @@ class Interval(IntervalBase):
 
         if self.implicitDiatonic:
             # this will not preserve diatonic relationships
-            pOut = self.chromatic.transposePitch(
-                p,
-                inPlace=inPlace,
-            )
+            if inPlace:
+                self.chromatic.transposePitch(p, inPlace=True)
+                pOut = p
+            else:
+                pOut = self.chromatic.transposePitch(p)
         else:
             pOut = self._diatonicTransposePitch(
                 p,

@@ -364,6 +364,10 @@ class Test(unittest.TestCase):
         gMinor = scale.HarmonicMinorScale('g4')
         gMinor.nextPitch('a4')
         self.assertEqual(str(gMinor.pitches[6]), 'F#5')
+    def testHarmonicMinorKeepsItsSeventhAfterNextPitch(self):
+        sc = scale.HarmonicMinorScale('g4')
+        sc.nextPitch('a4')
+        self.assertEqual(self.pitchOut(sc.pitches), '[G4, A4, B-4, C5, D5, E-5, F#5, G5]')
 
     def testDeriveByDegree(self):
         sc1 = scale.MajorScale()

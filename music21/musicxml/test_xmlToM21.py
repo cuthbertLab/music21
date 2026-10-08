@@ -1597,6 +1597,25 @@ class Test(unittest.TestCase):
         self.assertEqual(ly3.components[2].syllabic, 'end')
         self.assertEqual(len(s.lyrics(recurse=True)[1][0]), 4)
 
+    def testLyricPrintObject(self):
+        # print-object="no" was read as hideObjectOnPrint = False, and "yes" as True
+        from music21 import converter
+        from music21.musicxml import m21ToXml
+
+        MP = MeasureParser()
+        hiddenLyric = MP.xmlToLyric(self.EL('<lyric print-object="no"><text>la</text></lyric>'))
+        self.assertIs(hiddenLyric.style.hideObjectOnPrint, True)
+        shownLyric = MP.xmlToLyric(self.EL('<lyric print-object="yes"><text>la</text></lyric>'))
+        self.assertIs(shownLyric.style.hideObjectOnPrint, False)
+
+        n = note.Note('D4')
+        n.lyric = 'la'
+        n.lyrics[0].style.hideObjectOnPrint = True
+        GEX = m21ToXml.GeneralObjectExporter()
+        xmlOut = GEX.parse(n).decode('utf-8')
+        roundTrip = converter.parse(xmlOut, format='musicxml')
+        self.assertIs(roundTrip.flatten().notes[0].lyrics[0].style.hideObjectOnPrint, True)
+
     def testDirectionPosition(self):
         from music21 import converter
         from music21 import corpus

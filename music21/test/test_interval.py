@@ -443,6 +443,18 @@ class Test(unittest.TestCase):
         p2 = intv.transposePitch(p)
         self.assertEqual(p2.nameWithOctave, 'B-20')
 
+    def testTransposePitchInPlaceImplicitDiatonicFundamental(self):
+        '''
+        transposePitch(inPlace=True) with an Interval made from a number of semitones
+        also transposes the pitch's fundamental.
+        '''
+        intv = interval.Interval(2)
+        self.assertTrue(intv.implicitDiatonic)
+        p = pitch.Pitch('E5', fundamental=pitch.Pitch('C3'))
+        self.assertIsNone(intv.transposePitch(p, inPlace=True))
+        self.assertEqual(p.nameWithOctave, 'F#5')
+        self.assertEqual(p.fundamental.nameWithOctave, 'D3')
+
 
     def testIntervalWithOneNoteGiven(self):
         noteC = note.Note('C4')
