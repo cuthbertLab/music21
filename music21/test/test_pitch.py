@@ -157,10 +157,12 @@ class Test(unittest.TestCase):
 
         # Pitch(number) keeps the natural
         for midiNumber in range(12, 128):
-            p = Pitch(midiNumber)
-            self.assertEqual(p.nameWithOctave, f'{names[midiNumber % 12]}{midiNumber // 12 - 1}')
-            self.assertIsNotNone(p.accidental)
-            self.assertTrue(p.spellingIsInferred)
+            for value in (midiNumber, float(midiNumber)):
+                p = Pitch(value)
+                self.assertEqual(p.nameWithOctave,
+                                 f'{names[midiNumber % 12]}{midiNumber // 12 - 1}')
+                self.assertIsNotNone(p.accidental)
+                self.assertTrue(p.spellingIsInferred)
 
 
 
