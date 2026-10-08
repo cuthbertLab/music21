@@ -63,6 +63,20 @@ STEPREF_REVERSED: dict[int, StepName] = {
     9: 'A',
     11: 'B',
 }
+pitchClassToDefaultStepAlter: tuple[tuple[StepName, int], ...] = (
+    ('C', 0),  # 0
+    ('C', 1),  # 1
+    ('D', 0),  # 2
+    ('E', -1),  # 3
+    ('E', 0),  # 4
+    ('F', 0),  # 5
+    ('F', 1),  # 6
+    ('G', 0),  # 7
+    ('G', 1),  # 8
+    ('A', 0),  # 9
+    ('B', -1),  # 10
+    ('B', 0),  # 11
+)
 STEPNAMES: set[StepName] = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
 STEP_TO_DNN_OFFSET: dict[StepName, int] = {
     'C': 0,
@@ -369,14 +383,9 @@ def _convertPsToStep(
     >>> pitch._convertPsToStep(59.9999999)
     ('C', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     '''
-    if isinstance(ps, int):
-        pc = ps % 12
-        alter = 0.0
-        micro = 0.0
-    elif ps == int(ps):
-        pc = int(ps) % 12
-        alter = 0.0
-        micro = 0.0
+    if isinstance(ps, int) or ps == int(ps):
+        step, wholeAlter = pitchClassToDefaultStepAlter[int(ps) % 12]
+        return step, Accidental(wholeAlter), Microtone(0), 0
     else:
         # rounding here is essential
         ps = round(ps, PITCH_SPACE_SIG_DIGITS)
@@ -1959,7 +1968,11 @@ class Pitch(prebase.ProtoM21Object):
             else:  # is a number
                 # is a midiNumber or a ps -- a float midiNumber
                 # get step and accidental w/o octave
-                self.step, self._accidental = _convertPsToStep(name)[0:2]
+                if isinstance(name, int) or name == int(name):
+                    self._step, alter = pitchClassToDefaultStepAlter[int(name) % 12]
+                    self._accidental = Accidental(alter)
+                else:
+                    self.step, self._accidental = _convertPsToStep(name)[0:2]
                 self.spellingIsInferred = True
                 if name >= 12:  # is not a pitchClass
                     self._octave = int(name / 12) - 1
@@ -2641,19 +2654,28 @@ class Pitch(prebase.ProtoM21Object):
 
     @ps.setter
     def ps(self, value: int|float) -> None:
-        # can assign microtone here; will be either None or a Microtone object
-        self.step, acc, self._microtone, octShift = _convertPsToStep(value)
-
-        # replace a natural with a None
-        if acc.name == 'natural':
-            self.accidental = None
+        if isinstance(value, int) or value == int(value):
+            wholePs = int(value)
+            self._step, alter = pitchClassToDefaultStepAlter[wholePs % 12]
+            # a natural is None
+            self._accidental = Accidental(alter) if alter else None
+            self._microtone = None
+            self._octave = wholePs // 12 - 1
         else:
-            self.accidental = acc
-        self.octave = _convertPsToOct(value) + octShift
+            # can assign microtone here; will be either None or a Microtone object
+            self._step, acc, self._microtone, octShift = _convertPsToStep(value)
+
+            # replace a natural with a None
+            if acc.name == 'natural':
+                self._accidental = None
+            else:
+                self._accidental = acc
+            self._octave = _convertPsToOct(value) + octShift
 
         # all ps settings must set implicit to True, as we do not know
         # what accidental this is
         self.spellingIsInferred = True
+        self.informClient()
 
     @property
     def midi(self) -> int:

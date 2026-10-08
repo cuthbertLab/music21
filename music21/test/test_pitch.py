@@ -131,6 +131,37 @@ class Test(unittest.TestCase):
         with self.assertRaises(PitchException):
             Pitch(step='CD')
 
+    def testWholeNumberPsAndMidi(self):
+        '''
+        Setting a whole-number .ps or .midi spells the pitch, resets the microtone,
+        marks the spelling inferred, and tells the Note.  A natural is None.
+        '''
+        names = ['C', 'C#', 'D', 'E-', 'E', 'F', 'F#', 'G', 'G#', 'A', 'B-', 'B']
+        for ps in range(-13, 140):
+            for attribute, value in (('ps', ps), ('ps', float(ps)), ('midi', ps)):
+                if attribute == 'midi' and not 0 <= ps <= 127:
+                    continue
+                with self.subTest(attribute=attribute, value=value):
+                    n = note.Note('D~5')
+                    n.pitch.microtone = 20
+                    n._cache['junk'] = 1
+                    setattr(n.pitch, attribute, value)
+                    self.assertEqual(n.pitch.name, names[ps % 12])
+                    self.assertEqual(n.pitch.octave, ps // 12 - 1)
+                    self.assertEqual(n.pitch.ps, ps)
+                    if len(names[ps % 12]) == 1:
+                        self.assertIsNone(n.pitch.accidental)
+                    self.assertEqual(n.pitch.microtone.cents, 0)
+                    self.assertTrue(n.pitch.spellingIsInferred)
+                    self.assertEqual(n._cache, {})
+
+        # Pitch(number) keeps the natural
+        for midiNumber in range(12, 128):
+            p = Pitch(midiNumber)
+            self.assertEqual(p.nameWithOctave, f'{names[midiNumber % 12]}{midiNumber // 12 - 1}')
+            self.assertIsNotNone(p.accidental)
+            self.assertTrue(p.spellingIsInferred)
+
 
 
     def testAccidentalImport(self):
