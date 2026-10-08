@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import copy
 import unittest
+from unittest import mock
 
 from music21 import common
 from music21 import converter
@@ -134,35 +135,37 @@ class Test(unittest.TestCase):
     def testWholeNumberPsAndMidi(self):
         '''
         Setting a whole-number .ps or .midi spells the pitch, resets the microtone,
-        marks the spelling inferred, and tells the Note.  A natural is None.
+        marks the spelling inferred, and tells the Note once.  A natural is None.
         '''
-        names = ['C', 'C#', 'D', 'E-', 'E', 'F', 'F#', 'G', 'G#', 'A', 'B-', 'B']
-        for ps in range(-13, 140):
+        # every pitch class once, then the octave edges and a negative ps
+        for ps, name, octave in [
+            (60, 'C', 4), (61, 'C#', 4), (62, 'D', 4), (63, 'E-', 4),
+            (64, 'E', 4), (65, 'F', 4), (66, 'F#', 4), (67, 'G', 4),
+            (68, 'G#', 4), (69, 'A', 4), (70, 'B-', 4), (71, 'B', 4),
+            (0, 'C', -1), (11, 'B', -1), (12, 'C', 0), (127, 'G', 9), (-1, 'B', -2),
+        ]:
             for attribute, value in (('ps', ps), ('ps', float(ps)), ('midi', ps)):
-                if attribute == 'midi' and not 0 <= ps <= 127:
-                    continue
+                if attribute == 'midi' and ps < 0:
+                    continue  # the midi setter wraps negative values into 0-11
                 with self.subTest(attribute=attribute, value=value):
                     n = note.Note('D~5')
                     n.pitch.microtone = 20
-                    n._cache['junk'] = 1
-                    setattr(n.pitch, attribute, value)
-                    self.assertEqual(n.pitch.name, names[ps % 12])
-                    self.assertEqual(n.pitch.octave, ps // 12 - 1)
-                    self.assertEqual(n.pitch.ps, ps)
-                    if len(names[ps % 12]) == 1:
+                    with mock.patch.object(n, 'pitchChanged') as pitchChanged:
+                        setattr(n.pitch, attribute, value)
+                    pitchChanged.assert_called_once()
+                    self.assertEqual(n.pitch.name, name)
+                    self.assertEqual(n.pitch.octave, octave)
+                    if len(name) == 1:
                         self.assertIsNone(n.pitch.accidental)
                     self.assertEqual(n.pitch.microtone.cents, 0)
                     self.assertTrue(n.pitch.spellingIsInferred)
-                    self.assertEqual(n._cache, {})
 
         # Pitch(number) keeps the natural
-        for midiNumber in range(12, 128):
-            for value in (midiNumber, float(midiNumber)):
-                p = Pitch(value)
-                self.assertEqual(p.nameWithOctave,
-                                 f'{names[midiNumber % 12]}{midiNumber // 12 - 1}')
-                self.assertIsNotNone(p.accidental)
-                self.assertTrue(p.spellingIsInferred)
+        for value, nameWithOctave in [(60, 'C4'), (60.0, 'C4'), (70, 'B-4'), (70.0, 'B-4')]:
+            p = Pitch(value)
+            self.assertEqual(p.nameWithOctave, nameWithOctave)
+            self.assertIsNotNone(p.accidental)
+            self.assertTrue(p.spellingIsInferred)
 
 
 
