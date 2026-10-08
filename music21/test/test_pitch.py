@@ -34,6 +34,27 @@ class Test(unittest.TestCase):
         self.assertIsNot(p1, p2)
         self.assertIsNot(p1.accidental, p2.accidental)
 
+    def testPitchDeepcopyAttributes(self):
+        '''
+        Pitch.__deepcopy__ copies attributes one at a time, for speed.  Check that it
+        copies every attribute, including any set after __init__.  Objects are copied,
+        not shared, and _client is cleared.
+        '''
+        p = Pitch('C#4', microtone=20, fundamental=Pitch('C2'))
+        p.groups.append('ficta')
+        owner = note.Note(p)
+        self.assertIs(p._client, owner)
+        p.frequencyShifts = [1, 0.5, -1, 2]  # not set by __init__
+
+        p2 = copy.deepcopy(p)
+        self.assertEqual(set(vars(p2)), set(vars(p)))
+        self.assertIsNone(p2._client)
+        for attr in ('_accidental', '_microtone', '_groups', 'fundamental', 'frequencyShifts'):
+            self.assertEqual(getattr(p2, attr), getattr(p, attr), attr)
+            self.assertIsNot(getattr(p2, attr), getattr(p, attr), attr)
+        for attr in ('_step', '_octave', '_overridden_freq440', 'spellingIsInferred'):
+            self.assertEqual(getattr(p2, attr), getattr(p, attr), attr)
+
     def testRepr(self):
         p = pitch.Pitch('B#3')
         self.assertEqual(repr(p), '<music21.pitch.Pitch B#3>')
@@ -164,6 +185,24 @@ class Test(unittest.TestCase):
         b.editorial.comments.append(editorial.Comment('ficta'))
         self.assertEqual(a.style.color, 'red')
         self.assertEqual(len(a.editorial.comments), 1)
+
+    def testAccidentalDeepcopyCopiesEverySlot(self):
+        '''
+        Every slot but _client is copied; a slot added to Accidental
+        must be added to its __deepcopy__ too.
+        '''
+        a = Accidental('sharp')
+        a.displayStatus = True
+        a.displayType = 'always'
+        a.displayStyle = 'parentheses'
+        a.displaySize = 'cue'
+        a.displayLocation = 'above'
+        a._client = Pitch('C#4')  # Accidental has no public client
+        b = copy.deepcopy(a)
+        for slot in a._getSlotsRecursive() - {'_client'}:
+            with self.subTest(slot=slot):
+                self.assertEqual(getattr(b, slot), getattr(a, slot))
+        self.assertIsNone(b._client)
 
     def testUpdateAccidentalDisplaySimple(self):
         '''

@@ -1042,8 +1042,17 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     def __deepcopy__(self, memo: dict[int, t.Any]) -> Accidental:
         if type(self) is Accidental:  # pylint: disable=unidiomatic-typecheck
             new = Accidental.__new__(Accidental)
-            for s in self._getSlotsRecursive():
-                setattr(new, s, getattr(self, s))
+            new._alter = self._alter
+            new._displayStatus = self._displayStatus
+            new._displayType = self._displayType
+            new._modifier = self._modifier
+            new._name = self._name
+            new._client = None
+            new.displayLocation = self.displayLocation
+            new.displaySize = self.displaySize
+            new.displayStyle = self.displayStyle
+            new._style = None
+            new._editorial = None
             if self._style is not None:
                 new._style = copy.deepcopy(self._style, memo)
             if self._editorial is not None:
@@ -2068,17 +2077,26 @@ class Pitch(prebase.ProtoM21Object):
         '''
         if type(self) is Pitch:  # pylint: disable=unidiomatic-typecheck
             new = Pitch.__new__(Pitch)
-            for k in self.__dict__:
-                v = getattr(self, k, None)
-                if k in ('_step', '_overridden_freq440',
-                         '_octave', 'spellingIsInferred'):
-                    setattr(new, k, v)
-                elif k == '_client':
-                    setattr(new, k, None)
-                elif v is None:  # common -- save time over deepcopy.
-                    setattr(new, k, None)
-                else:
-                    setattr(new, k, copy.deepcopy(v, memo))
+            new._groups = None if self._groups is None else copy.deepcopy(self._groups, memo)
+            new._step = self._step
+            new._overridden_freq440 = self._overridden_freq440
+            new._accidental = (None if self._accidental is None
+                               else copy.deepcopy(self._accidental, memo))
+            new._microtone = (None if self._microtone is None
+                              else copy.deepcopy(self._microtone, memo))
+            new._octave = self._octave
+            new.spellingIsInferred = self.spellingIsInferred
+            new.fundamental = (None if self.fundamental is None
+                               else copy.deepcopy(self.fundamental, memo))
+            new._client = None
+
+            selfDict = self.__dict__
+            newDict = new.__dict__
+            if len(selfDict) != len(newDict):
+                # attributes not set in __init__
+                for k, v in selfDict.items():
+                    if k not in newDict:
+                        setattr(new, k, copy.deepcopy(v, memo))
             return new
         else:  # pragma: no cover
             return common.defaultDeepcopy(self, memo)
