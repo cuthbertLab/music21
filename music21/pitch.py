@@ -1066,6 +1066,9 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         except TypeError:  # unhashable
             standard = None
         if standard is None:
+            self._name = ''
+            self._modifier = ''
+            self._alter = 0.0
             self.set(specifier)
         else:
             # alter: semitones to alter step; potentially a fraction, but not exponent
