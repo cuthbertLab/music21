@@ -2,7 +2,7 @@
 name: writing-docs
 description: >-
   House style for music21 prose: docstrings, comments, and `Changed in`/`New in`
-  markers. Read before writing any of them. Sets the length target, the voice,
+  markers. Read before writing any of them or writing tests. Sets the length target, the voice,
   and where a bug fix's test belongs.
 ---
 
@@ -134,6 +134,9 @@ unittest.
 Naming the guarded bug **is** appropriate in a unittest; that is what the test
 is for. The rule against narrating old bugs applies to docstrings and to
 comments in shipping code, not to tests.
+
+For copy and identity checks, say "is a new instance" or "does not share instances," not
+"the caller's own": `testFindMissingNotReusePitchInstances`.
 
 ## Writing and Comment style
 - When writing comments in code, assume a strong code reader — anything inferable from the code is noise (docs that paraphrase names of functions or variable names esp.); focus on high level issues and gotchas that might bite again if not documented.

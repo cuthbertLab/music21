@@ -2918,7 +2918,7 @@ class IntervalNetwork:
                     break
             # environLocal.printDebug(['looking at:', target, p, 'match', match])
             if not match:
-                post.append(target)
+                post.append(copy.deepcopy(target))
         return post
 
 
