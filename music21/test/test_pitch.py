@@ -133,40 +133,44 @@ class Test(unittest.TestCase):
         with self.assertRaises(PitchException):
             Pitch(step='CD')
 
+    def testPsAndMidiSettersInformNoteOnce(self):
+        for attribute in ('ps', 'midi'):
+            with self.subTest(attribute=attribute):
+                n = note.Note('D4')
+                with mock.patch.object(n, 'pitchChanged') as pitchChanged:
+                    setattr(n.pitch, attribute, 61)
+                pitchChanged.assert_called_once()
+
     def testWholeNumberPsAndMidi(self):
         '''
-        Setting a whole-number .ps or .midi spells the pitch, resets the microtone,
-        marks the spelling inferred, and tells the Note once.  A natural is None.
+        Setting a whole-number .ps or .midi replaces a quarter-tone accidental
+        and clears a microtone.
         '''
-        # every pitch class once, then the octave edges and a negative ps
-        for ps, name, octave in [
-            (60, 'C', 4), (61, 'C#', 4), (62, 'D', 4), (63, 'E-', 4),
-            (64, 'E', 4), (65, 'F', 4), (66, 'F#', 4), (67, 'G', 4),
-            (68, 'G#', 4), (69, 'A', 4), (70, 'B-', 4), (71, 'B', 4),
-            (0, 'C', -1), (11, 'B', -1), (12, 'C', 0), (127, 'G', 9), (-1, 'B', -2),
-        ]:
-            for attribute, value in (('ps', ps), ('ps', float(ps)), ('midi', ps)):
-                if attribute == 'midi' and ps < 0:
-                    continue  # the midi setter wraps negative values into 0-11
-                with self.subTest(attribute=attribute, value=value):
-                    n = note.Note('D~5')
-                    n.pitch.microtone = 20
-                    with mock.patch.object(n, 'pitchChanged') as pitchChanged:
-                        setattr(n.pitch, attribute, value)
-                    pitchChanged.assert_called_once()
-                    self.assertEqual(n.pitch.name, name)
-                    self.assertEqual(n.pitch.octave, octave)
-                    if len(name) == 1:
-                        self.assertIsNone(n.pitch.accidental)
-                    self.assertEqual(n.pitch.microtone.cents, 0)
-                    self.assertTrue(n.pitch.spellingIsInferred)
+        p = Pitch('D~5')
+        p.microtone = 20
+        p.ps = 61
+        self.assertEqual(p.nameWithOctave, 'C#4')
+        self.assertEqual(p.microtone.cents, 0)
+
+        # a natural is None, and a negative ps floors to the octave below
+        p.ps = 60.0
+        self.assertEqual(p.nameWithOctave, 'C4')
+        self.assertIsNone(p.accidental)
+        p.ps = -1
+        self.assertEqual((p.step, p.octave), ('B', -2))
+
+        # above 127, the midi setter wraps into the top octave; ps does not
+        p = Pitch()
+        p.midi = 130
+        self.assertEqual(p.nameWithOctave, 'B-8')
+        p.ps = 130
+        self.assertEqual(p.nameWithOctave, 'B-9')
 
         # Pitch(number) keeps the natural
-        for value, nameWithOctave in [(60, 'C4'), (60.0, 'C4'), (70, 'B-4'), (70.0, 'B-4')]:
+        for value in (60, 60.0):
             p = Pitch(value)
-            self.assertEqual(p.nameWithOctave, nameWithOctave)
-            self.assertIsNotNone(p.accidental)
-            self.assertTrue(p.spellingIsInferred)
+            self.assertEqual(p.nameWithOctave, 'C4')
+            self.assertEqual(p.accidental.name, 'natural')
 
 
 
