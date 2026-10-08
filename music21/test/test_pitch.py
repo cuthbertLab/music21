@@ -11,7 +11,9 @@
 from __future__ import annotations
 
 import copy
+from fractions import Fraction
 import unittest
+from unittest import mock
 
 from music21 import common
 from music21 import converter
@@ -23,7 +25,7 @@ from music21 import pitch
 from music21 import scale
 from music21 import stream
 from music21.musicxml import m21ToXml
-from music21.pitch import Pitch, Accidental, PitchException
+from music21.pitch import Pitch, Accidental, AccidentalException, PitchException
 
 
 class Test(unittest.TestCase):
@@ -203,6 +205,125 @@ class Test(unittest.TestCase):
             with self.subTest(slot=slot):
                 self.assertEqual(getattr(b, slot), getattr(a, slot))
         self.assertIsNone(b._client)
+
+    def testAccidentalLookupTable(self):
+        '''
+        Every way of writing each standard accidental gives the same accidental
+        from Accidental(), set(), and set(allowNonStandardValue=True),
+        and set() tells the client once.  AI-assisted (Claude).
+        '''
+        import numpy
+        valuesByResult = {
+            ('natural', 0.0, ''): ['natural', 'n', 0, 0.0, False, 'Natural', 'N'],
+            ('sharp', 1.0, '#'): ['sharp', '#', 'is', 1, 1.0, True, 'Sharp', 'IS'],
+            ('double-sharp', 2.0, '##'): [
+                'double-sharp', '##', 'isis', 2, 2.0, 'Double-Sharp', numpy.int64(2)],
+            ('triple-sharp', 3.0, '###'): ['triple-sharp', '###', 'isisis', 3, 3.0],
+            ('quadruple-sharp', 4.0, '####'): ['quadruple-sharp', '####', 'isisisis', 4, 4.0],
+            ('flat', -1.0, '-'): [
+                'flat', '-', 'es', 'b', -1, -1.0, 'FLAT', 'B', numpy.float64(-1.0)],
+            ('double-flat', -2.0, '--'): ['double-flat', '--', 'eses', -2, -2.0, 'ESES'],
+            ('triple-flat', -3.0, '---'): ['triple-flat', '---', 'eseses', -3, -3.0],
+            ('quadruple-flat', -4.0, '----'): ['quadruple-flat', '----', 'eseseses', -4, -4.0],
+            ('half-sharp', 0.5, '~'): [
+                'half-sharp', '~', 'quarter-sharp', 'ih', 'semisharp', 0.5, Fraction(1, 2)],
+            ('one-and-a-half-sharp', 1.5, '#~'): [
+                'one-and-a-half-sharp', '#~', 'three-quarter-sharp', 'three-quarters-sharp',
+                'isih', 'sesquisharp', 1.5],
+            ('half-flat', -0.5, '`'): [
+                'half-flat', '`', 'quarter-flat', 'eh', 'semiflat', -0.5],
+            ('one-and-a-half-flat', -1.5, '-`'): [
+                'one-and-a-half-flat', '-`', 'three-quarter-flat', 'three-quarters-flat',
+                'eseh', 'sesquiflat', -1.5, Fraction(-3, 2)],
+        }
+        listed = set()
+        for values in valuesByResult.values():
+            listed.update(values)
+        # every name, every alternate name, and every modifier except natural's ''
+        self.assertLessEqual(set(pitch.accidentalNameToModifier), listed)
+        self.assertLessEqual(set(pitch.alternateNameToAccidentalName), listed)
+        self.assertLessEqual(set(pitch.accidentalNameToModifier.values()) - {''}, listed)
+
+        for (name, alter, modifier), values in valuesByResult.items():
+            for value in values:
+                for allowNonStandardValue in (None, False, True):
+                    with self.subTest(value=value, allowNonStandardValue=allowNonStandardValue):
+                        if allowNonStandardValue is None:
+                            acc = Accidental(value)
+                        else:
+                            acc = Accidental('sharp')
+                            acc.setAttributeIndependently('name', 'unset')
+                            acc.setAttributeIndependently('alter', 99)
+                            acc.setAttributeIndependently('modifier', '?')
+                            acc._client = mock.Mock()
+                            acc.set(value, allowNonStandardValue=allowNonStandardValue)
+                            self.assertEqual(acc._client.informClient.call_count, 1)
+                        self.assertEqual(acc.name, name)
+                        self.assertIs(type(acc.alter), float)
+                        self.assertEqual(acc.alter, alter)
+                        self.assertEqual(acc.modifier, modifier)
+
+    def testUnsupportedAccidentalValues(self):
+        '''
+        Anything else raises, naming the value (lowercased).
+        '''
+        # '' is natural's modifier, but set() does not take it
+        for value, shown in [
+            ('flat-flat-up', 'flat-flat-up'),
+            ('FLAT-FLAT-UP', 'flat-flat-up'),
+            ('Dièse', 'dièse'),
+            ('', ''),
+            (5, '5'),
+            (0.25, '0.25'),
+            (None, 'None'),
+            (['flat'], "['flat']"),
+        ]:
+            with self.subTest(value=value):
+                message = f'{shown} is not a supported accidental type'
+                with self.assertRaises(AccidentalException) as cm:
+                    Accidental(value)
+                self.assertEqual(str(cm.exception), message)
+
+                acc = Accidental('sharp')
+                acc._client = mock.Mock()
+                with self.assertRaises(AccidentalException) as cm:
+                    acc.set(value)
+                self.assertEqual(str(cm.exception), message)
+                self.assertEqual((acc.name, acc.alter, acc.modifier), ('sharp', 1.0, '#'))
+                self.assertEqual(acc._client.informClient.call_count, 0)
+
+    def testAccidentalSetNonStandardValue(self):
+        '''
+        A nonstandard string changes only the name (lowercased); a nonstandard
+        number changes only the alter.  Neither tells the client.
+        '''
+        for value, name, alter in [
+            ('quintuple-sharp', 'quintuple-sharp', 1.0),
+            ('FLAT-FLAT-UP', 'flat-flat-up', 1.0),
+            ('', '', 1.0),
+            (5, 'sharp', 5),
+            (0.25, 'sharp', 0.25),
+        ]:
+            with self.subTest(value=value):
+                acc = Accidental('sharp')
+                acc._client = mock.Mock()
+                acc.set(value, allowNonStandardValue=True)
+                self.assertEqual(acc.name, name)
+                self.assertEqual(acc.alter, alter)
+                self.assertEqual(acc.modifier, '#')
+                self.assertEqual(acc._client.informClient.call_count, 0)
+
+    def testAccidentalInitDefaults(self):
+        for acc in (Accidental(), Accidental('Flat')):
+            self.assertEqual(acc.displayType, 'normal')
+            self.assertIsNone(acc.displayStatus)
+            self.assertEqual(acc.displayStyle, 'normal')
+            self.assertEqual(acc.displaySize, 'full')
+            self.assertEqual(acc.displayLocation, 'normal')
+            self.assertIsNone(acc._client)
+            self.assertFalse(acc.hasStyleInformation)
+            self.assertIsNone(acc._editorial)
+        self.assertEqual(repr(Accidental()), '<music21.pitch.Accidental natural>')
 
     def testUpdateAccidentalDisplaySimple(self):
         '''
