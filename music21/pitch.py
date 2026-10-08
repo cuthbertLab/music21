@@ -1919,7 +1919,7 @@ class Pitch(prebase.ProtoM21Object):
                  ps: float|None = None,
                  fundamental: Pitch|None = None,
                  **keywords) -> None:
-        # No need for super().__init__() on protoM21Object
+        # No need for super().__init__() on ProtoM21Object
         self._groups: base.Groups|None = None
 
         # this will be updated below when needed
@@ -1949,7 +1949,12 @@ class Pitch(prebase.ProtoM21Object):
 
         # name combines step, octave, and accidental
         if name is not None:
-            if isinstance(name, str):
+            if name == 'C':
+                pass  # a new Pitch is already C
+            elif name == 'C4':
+                # no other change needed here.
+                self._octave = 4
+            elif isinstance(name, str):
                 self.name = name  # set based on string
             else:  # is a number
                 # is a midiNumber or a ps -- a float midiNumber
@@ -1958,8 +1963,12 @@ class Pitch(prebase.ProtoM21Object):
                 self.spellingIsInferred = True
                 if name >= 12:  # is not a pitchClass
                     self._octave = int(name / 12) - 1
-        elif step is not None:
-            self.step = step
+        elif step is not None and step != 'C':
+            if step in STEPNAMES:
+                # set it directly.
+                self._step = step
+            else:
+                self.step = step
 
         if octave is not None:
             self._octave = octave

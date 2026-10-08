@@ -23,7 +23,7 @@ from music21 import pitch
 from music21 import scale
 from music21 import stream
 from music21.musicxml import m21ToXml
-from music21.pitch import Pitch, Accidental
+from music21.pitch import Pitch, Accidental, PitchException
 
 
 class Test(unittest.TestCase):
@@ -118,6 +118,18 @@ class Test(unittest.TestCase):
             "Argument to name, 32, must be a string, not <class 'int'>."
         ):
             p.name = 32
+
+    def testInitShortcutsMatchParsing(self):
+        # 'C', 'C4', and step= skip the name and step setters
+        self.assertEqual(Pitch('C'), Pitch('c'))
+        self.assertTrue(Pitch('C').octaveIsImplicit)
+        self.assertEqual(Pitch('C4'), Pitch('c4'))
+        self.assertFalse(Pitch('C4').octaveIsImplicit)
+        self.assertEqual(Pitch('C', step='D').step, 'C')
+        self.assertEqual(Pitch(step='D'), Pitch('d'))
+        self.assertEqual(Pitch(step='d').step, 'D')
+        with self.assertRaises(PitchException):
+            Pitch(step='CD')
 
 
 
