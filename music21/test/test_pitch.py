@@ -142,6 +142,43 @@ class Test(unittest.TestCase):
         ):
             p.name = 32
 
+    def testNameCache(self):
+        '''
+        A name is parsed once and remembered; names that cannot be parsed are not.
+        '''
+        with mock.patch.dict(pitch._pitchNameCache, clear=True):
+            first = Pitch('E-6')
+            self.assertEqual(pitch._pitchNameCache, {'E-6': ('E', '-', 6)})
+            second = Pitch('E-6')
+            self.assertEqual(second.nameWithOctave, 'E-6')
+            # Accidentals can be changed, so each Pitch gets its own
+            self.assertIsNot(second.accidental, first.accidental)
+
+            with self.assertRaises(AccidentalException):
+                Pitch('C$')
+            with self.assertRaisesRegex(ValueError, 'must be a string'):
+                second.name = ['C4']  # not hashable
+            self.assertEqual(list(pitch._pitchNameCache), ['E-6'])
+
+            # cleared when full
+            with mock.patch.object(pitch, '_pitchNameCacheSize', 1):
+                Pitch('F4')
+            self.assertEqual(list(pitch._pitchNameCache), ['F4'])
+
+    def testRememberedNameInformsNoteOnce(self):
+        '''
+        Setting a remembered name without an octave keeps the octave and the
+        microtone, makes the spelling explicit, and tells the Note once.
+        '''
+        Pitch('B-')
+        n = note.Note(73)  # C#5, spelling inferred
+        n.pitch.microtone = 20
+        with mock.patch.object(n, 'pitchChanged') as pitchChanged:
+            n.pitch.name = 'B-'
+        pitchChanged.assert_called_once()
+        self.assertEqual(str(n.pitch), 'B-5(+20c)')
+        self.assertFalse(n.pitch.spellingIsInferred)
+
     def testInitShortcutsMatchParsing(self):
         # 'C', 'C4', and step= skip the name and step setters
         self.assertEqual(Pitch('C'), Pitch('c'))
