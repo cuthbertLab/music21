@@ -39,6 +39,9 @@ limitOffsetDenominator = 65535  # > CD track level precision.
 # not allowing more can be construed as a feature.
 
 
+# we used to have a defaultStep ('C') and defaultOctave (4) but
+# no one ever changed them, and inlining makes so much faster.
+
 partGroup = 'Part Group'
 partGroupAbbreviation = 'PG'
 

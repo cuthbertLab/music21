@@ -2216,7 +2216,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         >>> voiceLeading.ThreeNoteLinearSegment('B##3', 'C4', 'D--4').couldBePassingTone()
         False
 
-        If no octave is given then ._defaultOctave is used.  This is generally octave 4.
+        If no octave is given then octave 4 is used:
 
         >>> voiceLeading.ThreeNoteLinearSegment('C', 'D', 'E').couldBePassingTone()
         True
@@ -2224,6 +2224,14 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         True
         >>> voiceLeading.ThreeNoteLinearSegment('C5', 'D', 'E').couldBePassingTone()
         False
+
+        But I wouldn't skip the octave, because otherwise this will always seem baffling:
+
+        >>> voiceLeading.ThreeNoteLinearSegment('G', 'A', 'B').couldBePassingTone()
+        True
+        >>> voiceLeading.ThreeNoteLinearSegment('A', 'B', 'C').couldBePassingTone()
+        False
+
 
         Method returns True if either a chromatic passing tone or a diatonic passing
         tone is identified. Spelling of the pitch does matter!
