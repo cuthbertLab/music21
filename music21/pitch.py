@@ -4726,9 +4726,8 @@ class Pitch(prebase.ProtoM21Object):
             # set fundamental
             self.fundamental = p.fundamental
             self.spellingIsInferred = p.spellingIsInferred
-            # deepcopy _microtone if present (not thru microtone property to detect None)
-            if p._microtone is not None:
-                self._microtone = copy.deepcopy(p._microtone)
+            # deepcopy _microtone (not thru microtone property to detect None)
+            self._microtone = copy.deepcopy(p._microtone)
             return None
 
     # --------------------------------------------------------------------------
