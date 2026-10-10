@@ -5,7 +5,7 @@
 # Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2013-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -494,6 +494,8 @@ class TimespanTree(trees.OffsetTree):
         <music21.tree.verticality.Verticality 30.0 {A#2 C#4 E4 F#4}>
         <music21.tree.verticality.Verticality 29.5 {A#2 F#3 D4 F#4}>
         '''
+        if self.rootNode is None:
+            return
         if reverse:
             offset = self.highestPosition()
             verticality = self.getVerticalityAt(offset)
@@ -838,6 +840,12 @@ class Test(unittest.TestCase):
         v = scoreTree.getVerticalityAt(0.0)
         ps = v.pitchSet
         self.assertEqual(len(ps), 1)
+
+    def testIterateVerticalitiesEmptyTree(self):
+        emptyTree = TimespanTree()
+        self.assertEqual(list(emptyTree.iterateVerticalities()), [])
+        self.assertEqual(list(emptyTree.iterateVerticalities(reverse=True)), [])
+        self.assertEqual(list(emptyTree.iterateVerticalitiesNwise()), [])
 
     def testTimespanTree(self):
         for attempt in range(100):
