@@ -912,8 +912,6 @@ class AbstractHarmonicMinorScale(AbstractScale):
     A true bidirectional scale that with the augmented
     second to a leading tone.
 
-    This is the only scale to use the "_alteredDegrees" property.
-
     mode is not used
     '''
     def __init__(self, mode: str|None = None, **keywords) -> None:
@@ -924,19 +922,12 @@ class AbstractHarmonicMinorScale(AbstractScale):
         self.buildNetwork()
 
     def buildNetwork(self, mode: t.Any = None) -> None:
-        intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']  # a to A
+        intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'A2', 'm2']  # a to A
         self.tonicDegree = 1
         self.dominantDegree = 5
         self._net = intervalNetwork.IntervalNetwork(intervalList,
                                                     octaveDuplicating=self.octaveDuplicating,
                                                     pitchSimplification=None)
-
-        # raise the seventh in all directions
-        # 7 here is scale step/degree, not node id
-        self._alteredDegrees[7] = {
-            'direction': intervalNetwork.Direction.BI,
-            'interval': interval.Interval('a1')
-        }
 
 
 class AbstractMelodicMinorScale(AbstractScale):
