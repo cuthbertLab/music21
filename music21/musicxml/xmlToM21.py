@@ -301,6 +301,9 @@ class XMLParserBase:
         >>> m21Obj.style.hideObjectOnPrint
         True
         '''
+        if not mxObject.attrib:
+            return
+
         if isinstance(m21Object, style.Style):
             stObj = m21Object
         else:

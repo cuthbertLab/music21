@@ -1639,6 +1639,12 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
 
 # ------------------------------------------------------------------------------
+# strings that Pitch.name parsed: (step, accidental string or None, octave or None).
+# Holds no Accidental objects, since those are mutable.  Cleared when full.
+_pitchNameCache: dict[str, tuple[StepName, str|None, int|None]] = {}
+_pitchNameCacheSize = 1000
+
+
 # tried as SlottedObjectMixin -- made creation time slower! Not worth the restrictions
 class Pitch(prebase.ProtoM21Object):
     '''
@@ -2811,6 +2817,8 @@ class Pitch(prebase.ProtoM21Object):
         >>> a = pitch.Pitch('B---')
         >>> a.name
         'B---'
+
+        * Changed in v11: a name longer than 100 characters raises a ValueError.
         '''
         if self.accidental is not None:
             return self.step + self.accidental.modifier
@@ -2824,9 +2832,37 @@ class Pitch(prebase.ProtoM21Object):
         are both accepted.
         '''
         try:
+            step, accidentalStr, octave = _pitchNameCache[usrStr]
+        except (KeyError, TypeError):  # TypeError: not hashable, so not a str
+            self._cacheParsedName(usrStr)
+            step, accidentalStr, octave = _pitchNameCache[usrStr]
+        self._step = step
+        self.spellingIsInferred = False
+        self._accidental = (None if accidentalStr is None
+                            else Accidental(accidentalStr))
+        if octave is not None:
+            self._octave = octave
+        self.informClient()
+
+    def _cacheParsedName(self, usrStr: str) -> None:
+        '''
+        Parse a name not yet seen and remember its step, accidental, and
+        octave for the `.name` setter.  Raises if it is not a name.
+
+        >>> p = pitch.Pitch()
+        >>> p._cacheParsedName(' f#5')
+        >>> pitch._pitchNameCache[' f#5']
+        ('F', '#', 5)
+        '''
+        cacheKey = usrStr
+        try:
             usrStr = usrStr.strip()
         except AttributeError:
             raise ValueError(f'Argument to name, {usrStr!r}, must be a string, not {type(usrStr)}.')
+        # remembered names are kept, so do not keep huge ones
+        if len(cacheKey) > 100:
+            raise ValueError(
+                f'Argument to name must be at most 100 characters, not {len(cacheKey)}.')
 
         # extract any numbers that may be octave designations
         octFound: list[str] = []
@@ -2843,20 +2879,24 @@ class Pitch(prebase.ProtoM21Object):
                 octNot.append(char)
         usrStr = ''.join(octNot)
         octFoundStr = ''.join(octFound)
-        # we have nothing but pitch specification
-        if len(usrStr) == 1:
-            self.step = usrStr  # type: ignore
-            self.accidental = None
-        # assume everything following pitch is accidental specification
-        elif len(usrStr) > 1:
-            self.step = usrStr[0]  # type: ignore
-            self.accidental = Accidental(usrStr[1:])
-        else:
+        if not usrStr:
             raise PitchException(f'Cannot make a name out of {usrStr!r}')
+        step = t.cast(StepName, usrStr[0].upper())
+        if step not in STEPNAMES:
+            raise PitchException(f'Cannot make a step out of {step!r}')
+        # assume everything following pitch is accidental specification
+        accidentalStr: str|None = None
+        if len(usrStr) > 1:
+            accidentalStr = usrStr[1:]
+            Accidental(accidentalStr)  # raises if it is not an accidental
 
+        octave: int|None = None
         if octFoundStr:  # bool('0') == True, so okay
             octave = int(octFoundStr)
-            self.octave = octave
+
+        if len(_pitchNameCache) >= _pitchNameCacheSize:
+            _pitchNameCache.clear()
+        _pitchNameCache[cacheKey] = (step, accidentalStr, octave)
 
     @property
     def unicodeName(self) -> str:
