@@ -134,26 +134,31 @@ class Test(unittest.TestCase):
             # Accidentals can be changed, so each Pitch gets its own
             self.assertIsNot(second.accidental, first.accidental)
 
+            # a name that cannot be parsed changes nothing
             with self.assertRaises(AccidentalException):
-                Pitch('C$')
+                second.name = 'D$'
+            self.assertEqual(second.nameWithOctave, 'E-6')
             with self.assertRaisesRegex(ValueError, 'must be a string'):
                 second.name = ['C4']  # not hashable
+            with self.assertRaisesRegex(ValueError, 'at most 100 characters'):
+                second.name = 'C4'.center(101)  # padding counts
             self.assertEqual(list(pitch._pitchNameCache), ['E-6'])
+            self.assertEqual(Pitch('C4'.center(100)).nameWithOctave, 'C4')
 
             # cleared when full
             with mock.patch.object(pitch, '_pitchNameCacheSize', 1):
                 Pitch('F4')
             self.assertEqual(list(pitch._pitchNameCache), ['F4'])
 
-    def testRememberedNameInformsNoteOnce(self):
+    def testNameSetterInformsNoteOnce(self):
         '''
-        Setting a remembered name without an octave keeps the octave and the
-        microtone, makes the spelling explicit, and tells the Note once.
+        Setting a name without an octave, even one not seen before, keeps the
+        octave and the microtone, makes the spelling explicit, and tells the Note once.
         '''
-        Pitch('B-')
         n = note.Note(73)  # C#5, spelling inferred
         n.pitch.microtone = 20
-        with mock.patch.object(n, 'pitchChanged') as pitchChanged:
+        with (mock.patch.dict(pitch._pitchNameCache, clear=True),
+              mock.patch.object(n, 'pitchChanged') as pitchChanged):
             n.pitch.name = 'B-'
         pitchChanged.assert_called_once()
         self.assertEqual(str(n.pitch), 'B-5(+20c)')
