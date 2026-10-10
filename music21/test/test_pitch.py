@@ -19,6 +19,7 @@ from music21 import common
 from music21 import converter
 from music21 import corpus
 from music21 import editorial
+from music21 import interval
 from music21 import key
 from music21 import note
 from music21 import pitch
@@ -800,6 +801,12 @@ class Test(unittest.TestCase):
         lowC = dPitch.transpose('M-23')
         self.assertEqual(lowC.name, 'C')
         self.assertEqual(lowC.octave, -1)
+
+    def testTransposeInPlaceReplacesMicrotone(self):
+        p = Pitch('C4')
+        p.microtone = 50
+        p.transpose(interval.ChromaticInterval(0.5), inPlace=True)
+        self.assertEqual(str(p), 'C#4')
 
     def testQuarterToneA(self):
         p1 = Pitch('D#~')
