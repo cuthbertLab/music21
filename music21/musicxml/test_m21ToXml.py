@@ -1021,6 +1021,39 @@ class Test(unittest.TestCase):
                     self.assertEqual(arpNum, '1')
 
 
+    def testArpeggioMarkSpannersOnNotes(self):
+        # one note alone: no number
+        n1 = note.Note('C4')
+        am1 = expressions.ArpeggioMarkSpanner([n1])
+        # a note and a chord together: shared number
+        n2 = note.Note('D4')
+        c3 = chord.Chord(['E4', 'G4'])
+        am2 = expressions.ArpeggioMarkSpanner([n2, c3])
+        m = stream.Measure([n1, n2, c3])
+        s = stream.Score([am1, am2, stream.Part([m])])
+
+        x = self.getET(s)
+        mxNotes = x.find('part').find('measure').findall('note')
+        arpNumbers = [mxNote.find('notations').find('arpeggiate').get('number')
+                      for mxNote in mxNotes]
+        self.assertEqual(arpNumbers, [None, '1', '1', '1'])
+
+    def testArpeggioOnSingleNoteRoundTrip(self):
+        xmlIn = '''<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name/></score-part></part-list>
+  <part id="P1"><measure number="1">
+    <attributes><divisions>1</divisions></attributes>
+    <note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration>
+      <type>whole</type><notations><arpeggiate number="1"/></notations></note>
+  </measure></part>
+</score-partwise>'''
+        s = converter.parse(xmlIn, format='musicxml')
+        x = self.getET(s)
+        mxArpeggios = x.findall('.//arpeggiate')
+        self.assertEqual(len(mxArpeggios), 1)
+        self.assertIsNone(mxArpeggios[0].get('number'))
+
     def testExportChordSymbolsWithRealizedDurations(self):
 
         def realizeDurationsAndAssertTags(mm: stream.Measure, forwardTag=False, offsetTag=False):

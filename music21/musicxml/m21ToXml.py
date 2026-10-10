@@ -3955,7 +3955,9 @@ class MeasureExporter(XMLExporterBase):
                 mxArpeggio = Element('arpeggiate')
                 if ams.type != 'normal':
                     mxArpeggio.set('direction', ams.type)
-            if mxArpeggio is not None and (len(ams) > 1 or (len(ams) == 1 and len(ams[0]) > 1)):
+            if mxArpeggio is not None and (
+                    len(ams) > 1
+                    or (isinstance(ams[0], chord.ChordBase) and len(ams[0]) > 1)):
                 # There is more than one GeneralNote in the arpeggio, so we must
                 # add a number attribute that will be the same for all GeneralNotes
                 # in this spanner.  In MusicXML this number must be between
