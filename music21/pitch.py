@@ -1057,13 +1057,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     # INITIALIZER #
 
-    def __init__(  # pylint: disable=super-init-not-called
-        self,
-        specifier: int|str|float = 'natural',
-    ) -> None:
-        # StyleMixin.__init__, inlined for speed; keep in sync
-        self._style = None
-        self._editorial = None
+    def __init__(self, specifier: int|str|float = 'natural') -> None:
+        super().__init__()
         # managed by properties
         self._displayType = 'normal'
         # normal, always, never, if-absolutely-necessary,
