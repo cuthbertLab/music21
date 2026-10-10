@@ -6,7 +6,7 @@
 #               Christopher Ariza
 #               Neena Parikh
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1548,7 +1548,7 @@ class Trill(Ornament):
         if p is None:
             return
 
-        if self.accidental:
+        if self.accidental is not None and self.accidental.displayStatus is not None:
             # copy displayStatus from self.accidental
             if p.accidental is None:
                 p.accidental = pitch.Accidental(0)

@@ -402,6 +402,34 @@ class Test(unittest.TestCase):
         self.assertEqual(turn.ornamentalPitches[1].accidental, pitch.Accidental('natural'))
         self.assertTrue(turn.ornamentalPitches[1].accidental.displayStatus)
 
+    def testUpdateAccidentalDisplayWithUndecidedAccidental(self):
+        noSharpsOrFlats = key.KeySignature(0)
+        for ornament in (expressions.Trill(), expressions.InvertedMordent()):
+            with self.subTest(ornament=ornament):
+                ornament.accidental = pitch.Accidental('sharp')
+                ornament.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+                ornament.updateAccidentalDisplay(pitchPast=[])
+                self.assertEqual(ornament.ornamentalPitch.nameWithOctave, 'A#4')
+                self.assertTrue(ornament.ornamentalPitch.accidental.displayStatus)
+
+        trill = expressions.Trill()
+        trill.accidental = pitch.Accidental('sharp')
+        trill.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+        trill.updateAccidentalDisplay(pitchPast=[pitch.Pitch('A#4')])
+        self.assertIs(trill.ornamentalPitch.accidental.displayStatus, False)
+
+        trill = expressions.Trill()
+        trill.accidental = pitch.Accidental('sharp')
+        trill.accidental.displayStatus = False
+        trill.resolveOrnamentalPitches(note.Note('G4'), keySig=noSharpsOrFlats)
+        trill.updateAccidentalDisplay(pitchPast=[])
+        self.assertIs(trill.ornamentalPitch.accidental.displayStatus, False)
+
+        n = note.Note('G4')
+        n.expressions.append(expressions.Trill(accidental=pitch.Accidental('sharp')))
+        raw = m21ToXml.GeneralObjectExporter().parse(stream.Stream([n]))
+        self.assertIn(b'<accidental-mark', raw)
+
     def testEdgeCases(self):
         # Make sure you can call resolveOrnamentalPitches() on non-Trill/Mordent/Turn Ornaments
         # without raising an exception (or actually doing anything interesting).
