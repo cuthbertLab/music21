@@ -316,13 +316,13 @@ class Test(unittest.TestCase):
 
     def testSplitSpines2(self):
         '''
-        Currently this does not work since a second split on a stream that
-        already resulted from a split does not parse properly.  Shows up also
-        in strangeWTCOpening, below.
+        A spine split a second time after a split.
         '''
         hf1 = HumdrumDataCollection(testFiles.splitLots)
         hf1.parse()
-        unused_masterStream = hf1.stream
+        m2 = hf1.stream.parts[0].measure(2)
+        self.assertEqual(sorted(n.nameWithOctave for n in m2.recurse().notes),
+                         ['A#4', 'B#4', 'F#4'])
 
     def testParseStrangeSplit(self):
         hf1 = HumdrumDataCollection(testFiles.strangeWTCOpening)
@@ -464,6 +464,60 @@ class Test(unittest.TestCase):
         self.assertEqual(
             sorted(n.pitch.name for v in m3.voices for n in v.notes),
             ['F', 'G'],
+        )
+
+    def testNestedSplit(self):
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M2/4
+=1
+2c
+=2
+*^
+2d    2e
+*^    *
+2f    2g    2a
+*v    *v    *
+*v    *v
+=3
+2b
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        m2 = hdc.stream.parts[0].measure(2)
+        self.assertEqual(
+            [[(n.pitch.name, n.offset) for n in v.notes] for v in m2.voices],
+            [[('D', 0.0), ('F', 2.0)], [('E', 0.0), ('A', 2.0)], [('G', 2.0)]],
+        )
+
+    def testNestedSplitThreeLevels(self):
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M3/4
+=1
+*^
+4d    4e
+*^    *
+4f    4g    4a
+*^    *    *
+4B    4c    4d    4e
+*v    *v    *    *
+*v    *v    *
+*v    *v
+=2
+2.c
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        m1 = hdc.stream.parts[0].measure(1)
+        self.assertEqual(
+            [[(n.pitch.name, n.offset) for n in v.notes] for v in m1.voices],
+            [[('D', 0.0), ('F', 1.0), ('B', 2.0)],
+             [('E', 0.0), ('A', 1.0), ('E', 2.0)],
+             [('G', 1.0), ('D', 2.0)],
+             [('C', 2.0)]],
         )
 
     def testDynamAttachedAligned(self):
