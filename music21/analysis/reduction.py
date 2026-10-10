@@ -742,8 +742,8 @@ class PartReduction:
                     )
                     match = inRegion.getElementsByClass(target).stream()
                     # environLocal.printDebug(['matched elements', target, match])
-                    # extend duration of all found dynamics
-                    match.extendDuration(target, inPlace=True)
+                    # extend duration of copies of all found dynamics
+                    match = match.extendDuration(target, inPlace=False)
                     # match.show('t')
                     dsFirst = copy.deepcopy(ds)
                     if not match:
@@ -752,7 +752,7 @@ class PartReduction:
                         continue
                     # create new spans for each target in this segment
                     for i, tar in enumerate(match):
-                        targetStart = tar.getOffsetBySite(flatRef)
+                        targetStart = match.elementOffset(tar)
                         # can use extended duration
                         targetSpan = tar.duration.quarterLength
                         # if dur of target is greater tn this span
@@ -1242,6 +1242,26 @@ class Test(unittest.TestCase):
         self._matchWeightedData(match, target)
         # p = graph.PlotDolan(s, title='Dynamics')
         # p.process()
+
+    def testPartReductionLeavesScore(self):
+        from music21 import analysis
+        from music21 import dynamics
+        p = stream.Part()
+        p.id = 'solo'
+        p.append(note.Note(quarterLength=4))
+        p.insert(0, dynamics.Dynamic('p'))
+        p.insert(2, dynamics.Dynamic('f'))
+        s = stream.Score([p])
+
+        pr = analysis.reduction.PartReduction(s)
+        pr.process()
+        self.assertEqual([d.quarterLength for d in p[dynamics.Dynamic]], [0.0, 0.0])
+        target = [('solo', [[0.0, 2.0, 0.5, '#666666'],
+                            [2.0, 2.0, 1.0, '#666666']])]
+        self._matchWeightedData(pr.getGraphHorizontalBarWeightedData(), target)
+
+        pr.process()
+        self._matchWeightedData(pr.getGraphHorizontalBarWeightedData(), target)
 
 
     def testPartReductionE(self):
