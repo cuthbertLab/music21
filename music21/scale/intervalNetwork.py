@@ -36,6 +36,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from collections.abc import Sequence
 import copy
+import dataclasses
 import enum
 import typing as t
 
@@ -82,6 +83,34 @@ class Direction(enum.Enum):
 type CacheKey = tuple[
     int|Terminus, str, str|None, str|None, bool, bool|None,
     tuple[tuple[int, Direction, int, int|float], ...]]
+
+# node id, start pitch, and (degree, direction, generic, semitones) per altered degree
+type NetworkWalkKey = tuple[
+    Terminus|int,
+    str,
+    tuple[tuple[int, Direction, int, int|float], ...],
+]
+
+
+@dataclasses.dataclass
+class NetworkWalkStep:
+    '''
+    One pitch of an ascending walk: unaltered, as realized, and its node id.
+    '''
+    unalteredPitch: pitch.Pitch
+    realizedPitch: pitch.Pitch
+    nodeId: Terminus|int
+
+
+@dataclasses.dataclass
+class NetworkWalkPath:
+    '''
+    An ascending walk from one start, kept so later calls can extend it.
+    '''
+    steps: list[NetworkWalkStep]
+    lastWalkedNode: Node
+    ended: bool = False
+
 
 class AlteredDegree(t.TypedDict):
     '''
@@ -475,6 +504,7 @@ class IntervalNetwork:
             CacheKey,
             tuple[list[pitch.Pitch], list[Terminus|int]]
         ] = OrderedDict()
+        self._ascendingWalks: dict[NetworkWalkKey, NetworkWalkPath] = {}
 
     def clear(self) -> None:
         '''
@@ -486,6 +516,7 @@ class IntervalNetwork:
         self.nodes = OrderedDict()
         self._ascendingCache = OrderedDict()
         self._descendingCache = OrderedDict()
+        self._ascendingWalks = {}
 
     def __eq__(self, other) -> bool:
         '''
@@ -1322,7 +1353,8 @@ class IntervalNetwork:
             neighborIds = self.getNeighborNodeIds(pitchReference=pitchReference,
                                                   nodeName=nodeName,
                                                   pitchTarget=pitchOriginObj,
-                                                  direction=direction)  # must add direction
+                                                  direction=direction,
+                                                  alteredDegrees=alteredDegrees)
             lowId, highId = t.cast(
                 'tuple[Terminus|int, Terminus|int]', neighborIds)
 
@@ -1339,46 +1371,15 @@ class IntervalNetwork:
         # at this point a valid node id is required to continue
         foundNodeId = t.cast('Terminus|int', nodeId)
 
-        # realize the pitch from the found node degree
-        # we may be getting an altered
-        # tone, and we need to transpose an unaltered tone, thus
-        # leave out altered nodes argument
-        p = self.getPitchFromNodeDegree(
-            pitchReference=pitchReference,
-            nodeName=nodeName,
-            nodeDegreeTarget=self.nodes[foundNodeId].degree,
-            direction=direction,
-            minPitch=None,  # not using a range here to
-            maxPitch=None,  # get natural expansion
-            alteredDegrees=None  # need unaltered tone here, thus omitted
-        )
-        if p is None:
-            raise IntervalNetworkException(
-                'Could not find a pitch for the requested node degree')
-
-        # environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName',
-        # nodeName, 'p', p, 'nodeId', nodeId, 'self.nodes[nodeId].degree',
-        # self.nodes[nodeId].degree])
-
-        # transfer octave from origin to new pitch derived from node
-        # note: this assumes octave equivalence and may be a problem
-        p.octave = pitchOriginObj.octave
-
-        # correct for derived pitch crossing octave boundary
-        # https://github.com/cuthbertLab/music21/issues/319
-        alterSemitones: int|float = 0
-        degree = self.nodeIdToDegree(foundNodeId)
-        if alteredDegrees and degree in alteredDegrees:
-            alterSemitones = alteredDegrees[degree]['interval'].semitones
-        alterSemitonesInt = t.cast('int', alterSemitones)
-        if not p.octaveIsImplicit:
-            if ((usedNeighbor and getNeighbor == Direction.DESCENDING)
-                    or (not usedNeighbor and direction == Direction.ASCENDING)):
-                while p.transpose(alterSemitonesInt) > pitchOriginObj:
-                    p.octave -= 1
-            else:
-                while p.transpose(alterSemitonesInt) < pitchOriginObj:
-                    p.octave += 1
+        startBelowOrigin = ((usedNeighbor and getNeighbor == Direction.DESCENDING)
+                            or (not usedNeighbor and direction == Direction.ASCENDING))
+        p = self._nodePitchNear(pitchReference,
+                                nodeName,
+                                foundNodeId,
+                                pitchOriginObj,
+                                direction=direction,
+                                alteredDegrees=alteredDegrees,
+                                atOrBelow=startBelowOrigin)
 
         # pitchObj = p
         n = self.nodes[foundNodeId]
@@ -1410,6 +1411,56 @@ class IntervalNetwork:
                 direction=direction)
 
         return pCollect
+
+    def _nodePitchNear(
+        self,
+        pitchReference: pitch.Pitch|str,
+        nodeName: Node|int|Terminus|None,
+        nodeId: Terminus|int,
+        pitchOrigin: pitch.Pitch,
+        *,
+        direction: Direction,
+        alteredDegrees: AlteredDegrees|None,
+        atOrBelow: bool,
+    ) -> pitch.Pitch:
+        '''
+        Return the unaltered pitch of `nodeId` nearest `pitchOrigin`: the highest
+        at or below it if `atOrBelow`, otherwise the lowest at or above it.
+
+        One node can stand for several pitch classes (a cycle of major thirds is
+        one edge, so D, F# and A# after the first D are all its high terminus),
+        so read the pitch off a realization around the origin.
+
+        `pitchOrigin` is changed in place.
+
+        AI-assisted (Claude).
+        '''
+        pitchOrigin.octaveIsImplicit = False
+        realizedPitches, realizedNodes = self.realize(
+            pitchReference,
+            nodeName,
+            minPitch=pitchOrigin.transpose(-12, inPlace=False),
+            maxPitch=pitchOrigin.transpose(12, inPlace=False),
+            direction=direction,
+            alteredDegrees=alteredDegrees,
+        )
+        nodePitches = [realizedPitch
+                       for realizedPitch, realizedNode in zip(realizedPitches, realizedNodes)
+                       if realizedNode == nodeId]
+        if atOrBelow:
+            found = max((p for p in nodePitches if p.ps <= pitchOrigin.ps),
+                        key=lambda p: p.ps, default=None)
+        else:
+            found = min((p for p in nodePitches if p.ps >= pitchOrigin.ps),
+                        key=lambda p: p.ps, default=None)
+        if found is None:
+            raise IntervalNetworkException(
+                'Could not find a pitch for the requested node degree')
+
+        degree = self.nodeIdToDegree(nodeId)
+        if alteredDegrees and degree in alteredDegrees:
+            return found.transpose(alteredDegrees[degree]['interval'].reverse())
+        return found
 
     # TODO: need to collect intervals as well
 
@@ -1538,6 +1589,19 @@ class IntervalNetwork:
         if self.octaveDuplicating and minPitch is not None:
             pitchReference.transposeBelowTarget(minPitch, minimize=True, inPlace=True)
 
+        if ck is not None and minPitch is not None and maxPitch is not None:
+            walked = self._walkAscending(nodeObj, pitchReference, maxPitch, alteredDegrees)
+            if walked is not None:
+                post = []
+                postNodeId = []
+                for step in walked:
+                    if (_gte(step.realizedPitch.ps, minPitch.ps)
+                            and _lte(step.realizedPitch.ps, maxPitch.ps)):
+                        post.append(step.realizedPitch)
+                        postNodeId.append(step.nodeId)
+                self._ascendingCache[ck] = post, postNodeId
+                return post, postNodeId
+
         # first, go upward from this pitch to the high terminus
         n = nodeObj
         p = pitchReference  # we start with the pitch that is the reference
@@ -1620,6 +1684,66 @@ class IntervalNetwork:
         # environLocal.printDebug(['realizeAscending()', 'post', post, 'postNodeId', postNodeId])
 
         return post, postNodeId
+
+    def _walkAscending(
+        self,
+        nodeObj: Node,
+        start: pitch.Pitch,
+        maxPitch: pitch.Pitch,
+        alteredDegrees: AlteredDegrees|None,
+    ) -> list[NetworkWalkStep]|None:
+        '''
+        Return the pitches and node ids an ascending realization from `start` passes
+        through, up to and including the first at or above `maxPitch`, or None if
+        the walk reaches a node with more than one way up.
+
+        The walk depends only on where it starts, so it is kept and extended rather
+        than repeated for every range starting there.
+
+        AI-assisted (Claude).
+        '''
+        key: NetworkWalkKey = (nodeObj.id, start.nameWithOctave, tuple(
+            (degree,
+             spec['direction'],
+             spec['interval'].generic.directed,
+             spec['interval'].semitones)
+            for degree, spec in (alteredDegrees or {}).items()))
+        walk = self._ascendingWalks.get(key)
+        if walk is None:
+            walk = NetworkWalkPath([NetworkWalkStep(start, start, nodeObj.id)], nodeObj)
+            self._ascendingWalks[key] = walk
+        while not walk.ended and not _gte(walk.steps[-1].unalteredPitch.ps, maxPitch.ps):
+            if len(walk.steps) >= 100:
+                break
+            n = walk.lastWalkedNode
+            if n.id == Terminus.HIGH:
+                n = self.terminusLowNodes[0]
+            nextBundle = self.getNext(n, Direction.ASCENDING)
+            if nextBundle is None:
+                walk.ended = True
+                break
+            postEdge, postNode = nextBundle
+            if len(postEdge) > 1:
+                return None
+            walk.lastWalkedNode = postNode[0]
+            p = self.transposePitchAndApplySimplification(postEdge[0].interval,
+                                                          walk.steps[-1].unalteredPitch)
+            realizedPitch = self.processAlteredNodes(alteredDegrees=alteredDegrees,
+                                                     n=walk.lastWalkedNode,
+                                                     p=p,
+                                                     direction=Direction.ASCENDING)
+            walk.steps.append(NetworkWalkStep(p, realizedPitch, walk.lastWalkedNode.id))
+
+        walked = []
+        for step in walk.steps:
+            walked.append(step)
+            if _gte(step.unalteredPitch.ps, maxPitch.ps):
+                break
+        if len(walked) >= 100:
+            raise IntervalNetworkException(
+                'Cannot realize these pitches; is the network '
+                + "well-formed? (especially check if you're giving notes without octaves)")
+        return walked
 
     def realizeDescending(
         self,
