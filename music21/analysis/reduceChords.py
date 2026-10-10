@@ -800,6 +800,24 @@ class Test(unittest.TestCase):
         self.assertEqual(reducedPitches(reduction),
                          [(pitch.Pitch('C3'), pitch.Pitch('E4'), pitch.Pitch('G4'))])
 
+    def testRunMergesRepeatedPitches(self):
+        from music21 import converter
+        from music21 import instrument
+
+        parts = []
+        for i, tinyNotation in enumerate(['tinyNotation: 4/4 c4 c4 d2 e1',
+                                          'tinyNotation: 4/4 C2 G,2 C1']):
+            p = converter.parse(tinyNotation)
+            inst = instrument.Instrument()
+            inst.partId = f'P{i}'
+            p.insert(0, inst)
+            parts.append(p)
+        reduction = ChordReducer().run(stream.Score(parts))
+        firstMeasure = reduction.parts.first().getElementsByClass(stream.Measure).first()
+        chords = list(firstMeasure.getElementsByClass(chord.Chord))
+        self.assertEqual(len(chords), 1)
+        self.assertEqual([p.nameWithOctave for p in chords[0].pitches], ['C3', 'C4'])
+
 
 class TestExternal(unittest.TestCase):
     show = True
