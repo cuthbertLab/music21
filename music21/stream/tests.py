@@ -1547,6 +1547,35 @@ class Test(unittest.TestCase):
         self.assertIsNone(right.leftBarline)
         self.assertEqual(right.rightBarline.type, 'final')
 
+    def testSliceByGreatestDivisorGraceAndEmpty(self):
+        '''
+        A grace note takes no time to divide, and a measure with no notes
+        of its own has nothing to slice.
+        '''
+        m = Measure()
+        m.append(note.Note('C4').getGrace())
+        m.append(note.Note('D4', quarterLength=1.5))
+        m.append(note.Note('E4', quarterLength=0.5))
+        m.sliceByGreatestDivisor(inPlace=True)
+        self.assertEqual([n.quarterLength for n in m.notes], [0.0, 0.5, 0.5, 0.5, 0.5])
+
+        empty = Measure()
+        empty.sliceByGreatestDivisor(inPlace=True)
+        self.assertEqual(len(empty), 0)
+
+        voiced = Measure()
+        voiced.insert(0, Voice([note.Note(quarterLength=2)]))
+        voiced.sliceByGreatestDivisor(inPlace=True)
+        self.assertEqual(len(voiced.voices[0].notes), 1)
+
+        sc = Score()
+        for unused in range(2):
+            p = Part()
+            p.append([Measure([note.Note(type='whole')]), Measure()])
+            sc.insert(0, p)
+        sc.sliceByGreatestDivisor(inPlace=True)
+        self.assertEqual(len(sc.parts[0].getElementsByClass(Measure)[0].notes), 1)
+
     def testStripTiesScore(self):
         '''
         Test stripTies using the Score method
