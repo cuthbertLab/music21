@@ -1397,6 +1397,31 @@ class Test(unittest.TestCase):
         self.assertEqual(l1, 3)
         self.assertEqual(l2, 3)
 
+    def testGetElementsByOffsetFloatAtFraction(self):
+        '''
+        A float offset is found where the fraction it stands for is,
+        whether or not an end is given.
+        '''
+        from fractions import Fraction
+        s = Stream()
+        n = note.Note()
+        s.insert(Fraction(5, 6), n)
+        at = 1 / 3 + 0.5  # slightly below 5/6
+        self.assertEqual(list(s.getElementsByOffset(at)), [n])
+        self.assertEqual(list(s.getElementsByOffset(at, at)), [n])
+
+        # extendTies looks where each note ends, so it ties across
+        # a note that starts on a triplet
+        s = Stream()
+        s.insert(0, note.Note('C4', quarterLength=Fraction(1, 3)))
+        first = note.Note('D4', quarterLength=0.5)
+        second = note.Note('D4', quarterLength=Fraction(1, 6))
+        s.insert(Fraction(1, 3), first)
+        s.insert(Fraction(5, 6), second)
+        s.extendTies()
+        self.assertEqual(first.tie.type, 'start')
+        self.assertEqual(second.tie.type, 'stop')
+
     def testStripTiesScore(self):
         '''
         Test stripTies using the Score method
