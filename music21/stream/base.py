@@ -3248,8 +3248,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         * Changed in v7: all but quarterLength are keyword only
         '''
-        keySignatures: list[key.KeySignature] = []
-
         quarterLength = opFrac(quarterLength)
         if retainOrigin:
             sLeft = self
@@ -3265,17 +3263,25 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                 returnDefault=False,
             )
             if timeSignatures:
-                sRight.keySignature = copy.deepcopy(timeSignatures[0])
-            if searchContext:
-                ksContext = sLeft.getContextByClass(key.KeySignature)
-                if ksContext is not None:
-                    keySignatures = [ksContext]
-            else:
-                keySignatures = list(sLeft.getElementsByClass(key.KeySignature))
+                sRight.timeSignature = copy.deepcopy(timeSignatures[0])
 
-            if keySignatures:
-                sRight.keySignature = copy.deepcopy(keySignatures[0])
-            endClef = sLeft.getContextByClass(clef.Clef)
+            def inForceAtSplit(klass):
+                '''
+                The last one of sLeft's own before the split, else the
+                one in force before sLeft when searchContext is True.
+                '''
+                own = [e for e in sLeft.getElementsByClass(klass)
+                       if sLeft.elementOffset(e) < quarterLength]
+                if own:
+                    return own[-1]
+                if searchContext:
+                    return sLeft.getContextByClass(klass)
+                return None
+
+            keySignature = inForceAtSplit(key.KeySignature)
+            if keySignature is not None:
+                sRight.keySignature = copy.deepcopy(keySignature)
+            endClef = inForceAtSplit(clef.Clef)
             if endClef is not None:
                 sRight.clef = copy.deepcopy(endClef)
 
