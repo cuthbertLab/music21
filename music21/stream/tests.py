@@ -1422,6 +1422,26 @@ class Test(unittest.TestCase):
         self.assertEqual(first.tie.type, 'start')
         self.assertEqual(second.tie.type, 'stop')
 
+    def testBeatAndMeasureFromOffsetPartialAfterNewMeter(self):
+        '''
+        The second half of a measure split in two counts its beats on in
+        the time signature the first half opens with.
+        '''
+        p = Part()
+        m1 = Measure(number=1)
+        m1.append(meter.TimeSignature('4/4'))
+        m1.append(note.Note(type='whole'))
+        m2 = Measure(number=2)
+        m2.append(meter.TimeSignature('6/8'))
+        m2.append(note.Note(quarterLength=1.5))
+        m3 = Measure(number=2)
+        m3.numberSuffix = 'X1'
+        m3.append(note.Note(quarterLength=1.5))
+        p.append([m1, m2, m3])
+        beat, measure = p.beatAndMeasureFromOffset(5.5)
+        self.assertEqual(beat, 2.0)
+        self.assertIs(measure, m2)
+
     def testStripTiesScore(self):
         '''
         Test stripTies using the Score method

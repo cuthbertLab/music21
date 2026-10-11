@@ -9044,7 +9044,9 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         if numSuffix is not None or (fixZeros and foundMeasureNumber == 0):
             prevMeas = myStream.getElementBeforeOffset(myMeas.offset, classList=['Measure'])
             if prevMeas:
-                ts2 = prevMeas.getContextByClass(meter.TimeSignature)
+                ts2 = prevMeas.timeSignature
+                if ts2 is None:
+                    ts2 = prevMeas.getContextByClass(meter.TimeSignature)
                 if not ts2:
                     raise StreamException(
                         'beatAndMeasureFromOffset: partial measure found, '
