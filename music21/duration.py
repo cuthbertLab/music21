@@ -716,7 +716,7 @@ def quarterConversion(
                     multiples = int(largestType.quarterLength // tup.totalTupletLength())
                     numComponentsLargestType = multiples * tup.numberNotesActual
                     numComponentsRemainder = int(
-                        (qLenRemainder / tup.totalTupletLength())
+                        opFrac(qLenRemainder / tup.totalTupletLength())
                         * tup.numberNotesActual
                     )
                     numComponentsTotal = numComponentsLargestType + numComponentsRemainder
@@ -4129,6 +4129,8 @@ class Test(unittest.TestCase):
         )
 
     def testDeriveComponentsForTuplet(self):
+        # BUG: The "total" QL is being annotated on each component QL.
+        # Fix in fullName()?
         self.assertEqual(
             ('16th Triplet (5/6 QL) tied to ' * 4)
             + '16th Triplet (5/6 QL) (5/6 total QL)',
@@ -4138,6 +4140,11 @@ class Test(unittest.TestCase):
             ('32nd Triplet (5/12 QL) tied to ' * 4)
             + '32nd Triplet (5/12 QL) (5/12 total QL)',
             Duration(fractions.Fraction(5 / 12)).fullName
+        )
+        self.assertEqual(
+            ('Dotted Eighth Quintuplet (6 3/5 QL) tied to ' * 10)
+            + 'Dotted Eighth Quintuplet (6 3/5 QL) (6 3/5 total QL)',
+            Duration(fractions.Fraction(33 / 5)).fullName
         )
 
     def testTinyDuration(self):
