@@ -2902,9 +2902,7 @@ class PartExporter(XMLExporterBase):
             try:
                 part.makeBeams(inPlace=True)
             except exceptions21.StreamException as se:  # no measures or no time sig?
-                # incorrectly flagging MusicXMLWarning as not a Warning
-                # noinspection PyTypeChecker
-                warnings.warn(MusicXMLWarning, str(se))
+                warnings.warn(MusicXMLWarning(se), stacklevel=2)
         for m in measures:
             for m_or_v in [m, *m.voices]:
                 if not m_or_v.streamStatus.tuplets:

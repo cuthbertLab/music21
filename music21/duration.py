@@ -480,7 +480,7 @@ def quarterConversion(
     All quarterLengths can, technically, be notated as a single unit
     given a complex enough tuplet. (As a last resort will look up to 199 as a tuplet type.)
     If this type of solution is *preferred* over a solution involving multiple tied components,
-    then pass `forceSingleComponent=True` (new in v9.3, and can be set directly on
+    then pass `forceSingleComponent=True` (new in v11, and can be set directly on
     :class:`Duration` objects via the :attr:`Duration.forceSingleComponent` attribute instead
     of calling this function directly).
 
@@ -4308,3 +4308,4 @@ _DOC_ORDER: DocOrder = [
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testAugmentOrDiminish')
+
