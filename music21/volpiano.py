@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         volpiano.py
 # Purpose:      music21 classes for converting to and from volpiano
@@ -15,12 +14,11 @@ easily with immediate visual feedback (see the CANTUS database).
 This module parses chants encoded in Volpiano and can generate Volpiano
 from any music21 Stream.
 
-This module will move to a medren package hopefully by v7
+This module will move to a medren package hopefully by v7.
 '''
 from __future__ import annotations
 
 import enum
-import unittest
 
 from music21 import bar
 from music21 import base
@@ -62,7 +60,7 @@ class LineBreak(base.Music21Object):
 
 class PageBreak(base.Music21Object):
     '''
-    Indicates that the page breaks at this point in the manuscript
+    Indicates that the page breaks at this point in the manuscript.
 
     Denoted by two 7s.
     '''
@@ -71,7 +69,7 @@ class PageBreak(base.Music21Object):
 
 class ColumnBreak(base.Music21Object):
     '''
-    Indicates that the page breaks at this point in the manuscript
+    Indicates that the page breaks at this point in the manuscript.
 
     Denoted by three 7s.
     '''
@@ -97,7 +95,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
     Returns a music21 Part from volpiano text.
 
     >>> veniSancti = volpiano.toPart('1---c--d---f--d---ed--c--d---f'
-    ...                              + '---g--h--j---hgf--g--h---')
+    ...                              '---g--h--j---hgf--g--h---')
     >>> veniSancti.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
@@ -159,7 +157,6 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {0.0} <music21.note.Note E>
         {1.0} <music21.bar.Barline type=double>
 
-
     As layout objects using breaksToLayout=True
 
     >>> breakTest = volpiano.toPart('1---e-7-e-77-e-777-e-3-e-4', breaksToLayout=True)
@@ -177,7 +174,6 @@ def toPart(volpianoText, *, breaksToLayout=False):
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note E>
         {1.0} <music21.bar.Barline type=double>
-
 
     Liquescence test:
 
@@ -298,7 +294,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
 
     if continuousNumberOfBreakTokens > 0:
         breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-        breakToken = breakClass()  # pylint: disable=not-callable
+        breakToken = breakClass()
         currentMeasure.append(breakToken)
 
     if m:
@@ -396,8 +392,8 @@ def fromStream(s, *, layoutToBreaks=False):
                 continue
 
             if n.notehead == 'x' or (n.hasEditorialInformation
-                                      and 'liquescence' in n.editorial
-                                      and n.editorial.liquescence):
+                                     and 'liquescence' in n.editorial
+                                     and n.editorial.liquescence):
                 tokenName = liquescentPitches[indexInPitchString]
             else:
                 tokenName = normalPitches[indexInPitchString]
@@ -460,14 +456,8 @@ def fromStream(s, *, layoutToBreaks=False):
     return ''.join(volpianoTokens)
 
 
-
-class Test(unittest.TestCase):
-    pass
-
-    def testNoteNames(self):
-        pass
-
-
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, 'importPlusRelative')
+    # allow things like "fromStream" to be called in doctests as "fromStream"
+    # and not just "volpiano.fromStream"
+    music21.mainTest('importPlusRelative')

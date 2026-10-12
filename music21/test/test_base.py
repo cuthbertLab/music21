@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         test.test_base.py
 # Purpose:      music21 tests for Music21Objects etc.
@@ -6,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -34,7 +33,7 @@ from music21 import stream
 from music21 import tempo
 
 # -----------------------------------------------------------------------------
-class TestMock(Music21Object):
+class MockObject(Music21Object):
     pass
 
 
@@ -46,7 +45,7 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(a), f'<music21.base.Music21Object object at {address}>')
 
     def testObjectCreation(self):
-        a = TestMock()
+        a = MockObject()
         a.groups.append('hello')
         a.id = 'hi'
         a.offset = 2.0
@@ -460,7 +459,7 @@ class Test(unittest.TestCase):
         self.assertEqual(m2.duration.quarterLength, 4.0)
         # we cannot get a bar duration b/c we have not associated a ts
         try:
-            m2.barDuration.quarterLength
+            m2.barDuration.quarterLength  # noqa: B018 (useless expression)
         except exceptions21.StreamException:
             pass
 
@@ -570,14 +569,14 @@ class Test(unittest.TestCase):
         n2 = copy.deepcopy(n1)
         self.assertEqual(id(n2.derivation.origin), id(n1))
 
-    def testHasElement(self):
+    def testContains(self):
         n1 = note.Note()
         s1 = stream.Stream()
         s1.append(n1)
         s2 = copy.deepcopy(s1)
         n2 = s2[0]  # this is a new instance; not the same as n1
-        self.assertFalse(s2.hasElement(n1))
-        self.assertTrue(s2.hasElement(n2))
+        self.assertFalse(n1 in s2)
+        self.assertTrue(n2 in s2)
 
         self.assertFalse(s1 in n2.sites)
         self.assertTrue(s2 in n2.sites)
@@ -622,7 +621,7 @@ class Test(unittest.TestCase):
             s.insert(i, el)
 
         for ew in storage:
-            self.assertTrue(s.hasElement(ew))
+            self.assertTrue(ew in s)
 
         match = [e.getOffsetBySite(s) for e in storage]
         self.assertEqual(match, [0.0, 1.0])
@@ -641,14 +640,14 @@ class Test(unittest.TestCase):
         storage = []
         for i in range(6):
             soundFile = Wave_read()
-            # el = music21.Music21Object()
+            # el = base.Music21Object()
             el = base.ElementWrapper(soundFile)
             storage.append(el)
             self.assertEqual(el.obj, soundFile)
             s.insert(i, el)
 
         for ew in storage:
-            self.assertTrue(s.hasElement(ew))
+            self.assertTrue(ew in s)
 
         matchOffset = []
         matchBeatStrength = []
@@ -871,11 +870,11 @@ class Test(unittest.TestCase):
         m0viaPrev = measures[3].previous('Measure').previous('Measure').previous('Measure')
         self.assertEqual(m0viaPrev, measures[0])
 
-        m0viaPrev.activeSite = s.parts[0]  # otherwise there are no instruments...
+        m0viaPrev.activeSite = s.parts[0]  # otherwise there are no instruments
         sopranoInst = m0viaPrev.previous()
         self.assertEqual(str(sopranoInst), 'P1: Soprano: Instrument 1')
 
-        # set active site back to measure stream...
+        # set active site back to measure stream
         self.assertEqual(str(measures[0].previous()), str(p1))
 
     def testActiveSiteCopyingA(self):
@@ -895,9 +894,9 @@ class Test(unittest.TestCase):
         ss = n1.getSpannerSites()
         self.assertEqual(ss, [sp1])
 
-        # test same for inherited classes and multiple sites, in order...
+        # test same for inherited classes and multiple sites, in order
         sp2 = dynamics.Crescendo(n2, n1)
-        # can return in arbitrary order esp. if speed is fast...
+        # can return in arbitrary order esp. if speed is fast
         # TODO: use Ordered Dict.
         self.assertEqual(set(n2.getSpannerSites()), {sp1, sp2})
 
@@ -964,7 +963,7 @@ class Test(unittest.TestCase):
         siteList = []
 
         cParts = c.parts.stream()  # need this otherwise it could possibly be garbage collected.
-        cParts.id = 'partStream'  # to make it easier to see below, will be cached...
+        cParts.id = 'partStream'  # to make it easier to see below, will be cached
         pTemp = cParts[1]
         m3 = pTemp.measure(3)
         self.assertIs(m, m3)
@@ -1051,7 +1050,7 @@ class Test(unittest.TestCase):
                 followDerivation=True
             )
 
-# great isolation test, but no asserts for now...
+# great isolation test, but no asserts for now
 #     def testPreviousA(self):
 #         s = corpus.parse('bwv66.6')
 #         o = s.parts[0].getElementsByClass(stream.Measure)[2][1]
@@ -1111,7 +1110,7 @@ class Test(unittest.TestCase):
         self.assertIs(v[1][0].previous('Note'), e1)
 
         w = v.transpose('M3')  # same as deepcopy,
-        # but more instructive in debugging since pitches change...
+        # but more instructive in debugging since pitches change
         #    w = copy.deepcopy(v)
         eCopy1 = w[0][0]
         self.assertEqual(eCopy1.pitch.name, 'E')

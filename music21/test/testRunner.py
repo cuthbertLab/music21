@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         testRunner.py
 # Purpose:      Music21 testing suite
@@ -6,8 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2016 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2006-2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -58,7 +56,7 @@ def addDocAttrTestsToSuite(suite,
     client ()
     '''
     dtp = doctest.DocTestParser()
-    if globs is False:
+    if not globs:
         globs = __import__(defaultImports[0]).__dict__.copy()
 
     elif globs is None:
@@ -85,12 +83,13 @@ def addDocAttrTestsToSuite(suite,
 
 def fixDoctests(doctestSuite: doctest._DocTestSuite) -> None:
     r'''
-    Fix doctests so that addresses are sanitized.
+    Fix doctests so that addresses are sanitized and WindowsPath is okay on windows.
 
-    In the past this fixed other differences among Python versions.
-    In the future, it might again!
+    In the past this fixed other differences among Python versions (such as the
+    pre-3.12 OrderedDict repr).  In the future, it will again!
     '''
     windows: bool = platform.system() == 'Windows'
+
     for dtc in doctestSuite:  # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
             continue
@@ -121,7 +120,6 @@ def stripAddresses(textString, replacement='ADDRESS') -> str:
     >>> stripA('{0.0} <music21.humdrum.spineParser.MiscTandem *>I>')
     '{0.0} <music21.humdrum.spineParser.MiscTandem *>I>'
 
-
     For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS
 
     >>> stripA('{0.0} <music21.base.Music21Object object at 0x102a0ff10>', '0x...')
@@ -131,7 +129,6 @@ def stripAddresses(textString, replacement='ADDRESS') -> str:
 
 
 # ------------------------------------------------------------------------------
-
 def mainTest(*testClasses, **keywords):
     '''
     Takes as its arguments modules (or a string 'noDocTest' or 'verbose')
@@ -157,8 +154,7 @@ def mainTest(*testClasses, **keywords):
         if __name__ == '__main__':
             music21.mainTest(Test)
 
-
-    This module tries to fix up some differences between python2 and python3 so
+    This module tries to fix up some differences between Python 2 and Python 3 so
     that the same doctests can work.  These differences can now be removed, but
     I cannot remember what they are!
     '''
@@ -205,6 +201,8 @@ def mainTest(*testClasses, **keywords):
             if ('importPlusRelative' in testClasses
                     or 'importPlusRelative' in sys.argv
                     or bool(keywords.get('importPlusRelative', False))):
+                # allow things like volpiano.py's function "fromStream"
+                # to be called in doctests as "fromStream" and not just "volpiano.fromStream"
                 globs.update(inspect.stack()[1][0].f_globals)
 
         try:
@@ -214,8 +212,7 @@ def mainTest(*testClasses, **keywords):
                 optionflags=optionflags,
             )
         except ValueError as ve:  # no docstrings
-            print('Problem in docstrings [usually a missing r value before '
-                  + f'the quotes:] {ve}')
+            print(f'Problem in docstrings [usually a missing r value before the quotes]: {ve}')
             s1 = unittest.TestSuite()
 
     verbosity = 1
@@ -248,7 +245,7 @@ def mainTest(*testClasses, **keywords):
         testClasses = []  # remove cases
     for t in testClasses:
         if not isinstance(t, str):
-            if displayNames is True:
+            if displayNames:
                 for tName in unittest.defaultTestLoader.getTestCaseNames(t):
                     print(f'Unit Test Method: {tName}')
             if runThisTest is not None:
@@ -256,8 +253,8 @@ def mainTest(*testClasses, **keywords):
                 # search all names for case-insensitive match
                 for name in dir(tObj):
                     if (name.lower() == runThisTest.lower()
-                           or name.lower() == ('test' + runThisTest.lower())
-                           or name.lower() == ('xtest' + runThisTest.lower())):
+                            or name.lower() == ('test' + runThisTest.lower())
+                            or name.lower() == ('xtest' + runThisTest.lower())):
                         runThisTest = name
                         break
                 if hasattr(tObj, runThisTest):
@@ -273,7 +270,7 @@ def mainTest(*testClasses, **keywords):
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(t)
             s1.addTests(s2)
 
-    # Add _DOC_ATTR tests...
+    # Add _DOC_ATTR tests
     if not skipDoctest:
         stacks = inspect.stack()
         if len(stacks) > 1:
@@ -285,7 +282,7 @@ def mainTest(*testClasses, **keywords):
         localVariables = list(outerFrame.f_locals.values())
         addDocAttrTestsToSuite(s1, localVariables, outerFilename, globs, optionflags)
 
-    if runAllTests is True:
+    if runAllTests:
         fixDoctests(s1)
 
         runner = unittest.TextTestRunner()

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/fileTools.py
 # Purpose:      Utilities for files
@@ -15,12 +14,14 @@ Tools for working with files
 from __future__ import annotations
 
 import codecs
+from collections.abc import Sequence
 import contextlib  # for with statements
 import gzip
 import io
 import pathlib
 import pickle
 import os
+import subprocess
 import typing as t
 
 from music21.exceptions21 import Music21Exception
@@ -31,11 +32,12 @@ __all__ = [
     'cd',
     'preparePathClassesForUnpickling',
     'restorePathClassesAfterUnpickling',
+    'runSubprocessCapturingStderr',
 ]
 
 
 @contextlib.contextmanager
-def cd(targetDir):
+def cd(targetDir: str|pathlib.Path) -> t.Generator[None, None, None]:
     '''
     Useful for a temporary cd for use in a `with` statement:
 
@@ -53,7 +55,7 @@ def cd(targetDir):
         os.chdir(cwd)
 
 
-def readPickleGzip(filePath: str | pathlib.Path) -> t.Any:
+def readPickleGzip(filePath: str|pathlib.Path) -> t.Any:
     '''
     Read a gzip-compressed pickle file, uncompress it, unpickle it, and
     return the contents.
@@ -63,7 +65,7 @@ def readPickleGzip(filePath: str | pathlib.Path) -> t.Any:
         try:
             uncompressed = pickledFile.read()
             newMdb = pickle.loads(uncompressed)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:
             # pickle exceptions cannot be caught directly
             # because they might come from pickle or _pickle and the latter cannot
             # be caught.
@@ -73,41 +75,43 @@ def readPickleGzip(filePath: str | pathlib.Path) -> t.Any:
     restorePathClassesAfterUnpickling()
     return newMdb
 
-def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
+def readFileEncodingSafe(filePath: str|pathlib.Path, firstGuess: str = 'utf-8') -> str:
     # noinspection PyShadowingNames
     r'''
     Slow, but will read a file of unknown encoding as safely as possible using
-    the chardet package.
+    the chardet package.  Mostly obsolete in the utf-8 world of today, but
+    useful for older code
 
-    Let's try to load this file as ascii -- it has a copyright symbol at the top,
-    so it won't load in Python3:
+    Let's try to load the `music21.common.__init__.py` file as ascii --
+    it has a copyright symbol near the top, so it won't load in Python3:
 
     >>> import os
     >>> c = str(common.getSourceFilePath() / 'common' / '__init__.py')
-    >>> #_DOCS_SHOW f = open(c)
-    >>> #_DOCS_SHOW data = f.read()
+    >>> f = open(c, encoding='ascii')
+    >>> data = f.read()
     Traceback (most recent call last):
     UnicodeDecodeError: 'ascii' codec can't decode byte 0xc2 in position ...:
         ordinal not in range(128)
 
-    That won't do! now I know that it is in utf-8, but maybe you don't. Or it could
-    be an old humdrum or Noteworthy file with unknown encoding.  This will load it safely.
+    That won't do! Now I know that it is in utf-8, but maybe you don't. Or it could
+    be an old Humdrum or Noteworthy file with Windows or unknown encoding.
+    This will load it as safely as possible.
 
     >>> data = common.readFileEncodingSafe(c)
-    >>> data[0:30]
-    '# -*- coding: utf-8 -*-\n# ----'
+    >>> data[83:106]
+    'Name:         common.py'
 
     Well, that's nothing, since the first guess here is utf-8, and it's right. So let's
     give a worse first guess:
 
     >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS')  # old Japanese standard
-    >>> data[0:30]
-    '# -*- coding: utf-8 -*-\n# ----'
+    >>> data[83:106]
+    'Name:         common.py'
 
     It worked!
 
-    Note that this is slow enough if it gets it wrong that the firstGuess should be set
-    to something reasonable like 'ascii' or 'utf-8'.
+    Note that trying lots of encodings is slow enough when the first guess is wrong
+    that the firstGuess should be set to something reasonable like 'utf-8' or 'ascii'.
     '''
     try:
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
@@ -124,7 +128,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
 
 _storedPathlibClasses = {'posixPath': pathlib.PosixPath, 'windowsPath': pathlib.WindowsPath}
 
-def preparePathClassesForUnpickling():
+def preparePathClassesForUnpickling() -> None:
     '''
     When we need to unpickle a function that might have relative paths
     (like some music21 stream options), Windows chokes if the PosixPath
@@ -132,22 +136,42 @@ def preparePathClassesForUnpickling():
     '''
     from music21.common.misc import getPlatform
     platform = getPlatform()
+    # deliberately swap the pathlib classes so cross-platform pickles can load
     if platform == 'win':
-        pathlib.PosixPath = pathlib.WindowsPath
+        pathlib.PosixPath = pathlib.WindowsPath  # type: ignore[misc, assignment]
     else:
-        pathlib.WindowsPath = pathlib.PosixPath
+        pathlib.WindowsPath = pathlib.PosixPath  # type: ignore[misc, assignment]
 
 
-def restorePathClassesAfterUnpickling():
+def restorePathClassesAfterUnpickling() -> None:
     '''
     After unpickling, leave pathlib alone.
     '''
     from music21.common.misc import getPlatform
     platform = getPlatform()
     if platform == 'win':
-        pathlib.PosixPath = _storedPathlibClasses['posixPath']
+        pathlib.PosixPath = _storedPathlibClasses['posixPath']  # type: ignore[misc, assignment]
     else:
-        pathlib.WindowsPath = _storedPathlibClasses['windowsPath']
+        pathlib.WindowsPath = _storedPathlibClasses['windowsPath']  # type: ignore[misc, assignment]
+
+
+def runSubprocessCapturingStderr(subprocessCommand: Sequence[str|pathlib.Path]) -> None:
+    '''
+    Run a subprocess command, capturing stderr and
+    only show the error if an exception is raised.
+    '''
+    completed_process = subprocess.run(subprocessCommand, capture_output=True, check=False)
+    if completed_process.returncode != 0:
+        # Raise same exception class as findNumberedPNGPath()
+        # for backward compatibility
+        stderr_bytes = completed_process.stderr
+        try:
+            import locale
+            stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
+        except UnicodeDecodeError:
+            # not really a str, but best we can do.
+            stderr_str = stderr_bytes.decode('ascii', errors='ignore')
+        raise IOError(stderr_str)
 
 
 # -----------------------------------------------------------------------------

@@ -1,0 +1,7 @@
+[shell_environment_policy]
+inherit = "all"
+
+[shell_environment_policy.set]
+UV_CACHE_DIR = "/tmp/uv-cache"
+UV_TOOL_DIR = "/tmp/uv-tools"
+UV_OFFLINE = "1"

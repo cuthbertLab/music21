@@ -3,10 +3,16 @@ source =
     music21/
 
 omit =
-    music21/test/timeGraph*
+    music21/test/*
+    music21/configure.py
+    music21/figuredBass/examples.py
+    music21/alpha/*
+    dist/dist.py
 
 [report]
 exclude_lines =
+    import music21
+    music21.mainTest()
     if TYPE_CHECKING:
     if t.TYPE_CHECKING:
     if __name__ == .__main__.:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         omr/correctors.py
 # Purpose:      music21 modules for correcting the output from OMR software
@@ -102,7 +101,6 @@ class ScoreCorrector:
     def getSinglePart(self, pn):
         '''
         returns a NEW SinglePart object for part number pn from the score
-
         '''
 
         return SinglePart(self.score.parts[pn], pn)
@@ -133,7 +131,7 @@ class ScoreCorrector:
         try:
             ms = self.measureSlices[i]
             if ms == 0:
-                raise IndexError('nope...')
+                raise IndexError(f'Measure slice {i} out of range')
         except IndexError:
             ms = MeasureSlice(self, i)
             if i >= len(self.measureSlices):
@@ -168,7 +166,6 @@ class ScoreCorrector:
         '''
         Uses a score and returns an array of probabilities.
         For n in the array, n is the probability that the nth part
-
         '''
         if self.distributionArray is not None:
             return self.distributionArray
@@ -189,7 +186,7 @@ class ScoreCorrector:
         >>> omrScore = converter.parse(omrPath)
         >>> ssOMR = omr.correctors.ScoreCorrector(omrScore)
         >>> allDists = ssOMR.getVerticalProbabilityDistributionSinglePart(1)
-        >>> ['%0.3f' % p for p in allDists]
+        >>> [f'{p:0.3f}' for p in allDists]
         ['0.571', '1.000', '0.667', '0.714']
         '''
         i = pn
@@ -465,7 +462,6 @@ class SinglePart:
         >>> p[1].insert(0, meter.TimeSignature('3/8'))
         >>> sp.getIncorrectMeasureIndices(runFast=False)
         []
-
         '''
         from music21 import meter
         self.incorrectMeasures = []
@@ -556,7 +552,6 @@ class SinglePart:
         '''
         Returns an array of the indices of the minimum distance measures
         given a measure (with index i) to compare to.
-
         '''
         unused_probabilityDistribution = self.horizontalProbabilityDist()
         incorrectMeasures = self.incorrectMeasures
@@ -761,11 +756,10 @@ class MeasureHash:
                 hashString += self.hashGrace(n)
             elif n.isNote:
                 hashString += self.hashNote(n)
-            elif not n.isNote:
-                if n.isRest:
-                    hashString += self.hashRest(n)
-                elif n.isChord:
-                    hashString += self.hashNote(n)
+            elif n.isRest:
+                hashString += self.hashRest(n)
+            elif n.isChord:
+                hashString += self.hashNote(n)
         self.hashString = hashString
         return hashString
 
@@ -799,14 +793,13 @@ class MeasureHash:
         elif duration1to127 < 0:
             byteEncoding = chr(1)
         else:
-            raise Exception('Invalid Byte Encoding')
+            raise ValueError('Invalid Byte Encoding')
 
         return byteEncoding
 
     def hashGrace(self, n):
         '''
         Gives a Grace Note a duration of a 128th note
-
         '''
         graceNoteDuration = self.hashQuarterLength(0.015625)
         byteEncoding = chr(graceNoteDuration)
@@ -888,7 +881,6 @@ class MeasureHash:
         >>> hasher.setSequenceMatcher()
         >>> hasher.getMeasureDifference('VFUF')
         1.0
-
         '''
 
         self.sequenceMatcher.set_seq2(hashString)
@@ -1007,8 +999,11 @@ class MeasureHash:
         'PFFPFF'
         >>> opCodes = vlnIIMH.getOpCodes(violaMH.hashString)
         >>> for oc in opCodes:
-        ...    print('%30r : %.3f' %
-        ...           (oc, vlnIIMH.differenceProbabilityForOneOpCode(oc, violaMH.hashString)))
+        ...     prob = vlnIIMH.differenceProbabilityForOneOpCode(
+        ...         oc,
+        ...         violaMH.hashString,
+        ...     )
+        ...     print(f'{oc!r:>30} : {prob:.3f}')
                  ('equal', 0, 1, 0, 1) : 0.968
                ('replace', 1, 2, 1, 2) : 0.009
                  ('equal', 2, 6, 2, 6) : 0.876
@@ -1016,7 +1011,7 @@ class MeasureHash:
         if destination is None:
             destination = self.hashString
             if destination is None:
-                raise Exception('HashString has not yet been set!')
+                raise ValueError('HashString has not yet been set!')
 
         opCodeType = opCodeTuple[0]
         if opCodeType == 'equal':
@@ -1033,7 +1028,7 @@ class MeasureHash:
             numberOfAdditions = opCodeTuple[2] - opCodeTuple[1]
             return self.getProbabilityOnAddition() ** numberOfAdditions
         else:
-            raise Exception('Incorrect opCode type!')
+            raise ValueError('Incorrect opCodeType value.')
 
     def getProbabilityOnEquality(self):
         '''
@@ -1110,11 +1105,9 @@ class MeasureHash:
         >>> mh.getProbabilityOnSubstitute('F', 'PP')
         0.0001485
 
-
         Take minimum length. Compare index to index. Any additional letters
         in the flagged measure get graded as additions. Any additional letters
         in the comparison measure get graded as omissions.
-
         '''
         ls = len(source)
         ld = len(destination)
@@ -1160,7 +1153,6 @@ class MeasureHash:
 
         >>> mh.getProbabilityFromOneCharSub('P', 'V')
         0.009
-
 
         Dotted quarter note to quarter note:
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/stringTools.py
 # Purpose:      Utilities for strings
@@ -25,8 +24,13 @@ __all__ = [
     'stripAccents',
     'normalizeFilename',
     'removePunctuation',
+    'parenthesesMatch',
+    'ParenthesesMatch',
 ]
 
+from collections.abc import Iterable
+import typing as t
+import dataclasses
 import hashlib
 import random
 import re
@@ -160,7 +164,11 @@ def camelCaseToHyphen(usrStr: str, replacement: str = '-') -> str:
     return re.sub('([a-z0-9])([A-Z])', r'\1' + replacement + r'\2', s1).lower()
 
 
-def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
+def spaceCamelCase(
+    usrStr: str,
+    replaceUnderscore: bool = True,
+    fixMeList: Iterable[str]|None = None
+) -> str:
     '''
     Given a camel-cased string, or a mixture of numbers and characters,
     create a space separated string.
@@ -197,7 +205,8 @@ def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
     lastIsNum = False
     post: list[str] = []
 
-    # do not split these...
+    # do not split these
+    fixupList: Iterable[str]
     if fixMeList is None:
         fixupList = ('PMFC',)
     else:
@@ -241,7 +250,7 @@ def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
     return postStr
 
 
-def getMd5(value=None) -> str:
+def getMd5(value: str|bytes|None = None) -> str:
     # noinspection SpellCheckingInspection
     '''
     Return an md5 hash from a string.  If no value is given then
@@ -252,18 +261,16 @@ def getMd5(value=None) -> str:
     '''
     if value is None:
         value = str(time.time()) + str(random.random())
+    if isinstance(value, str):
+        value = value.encode('UTF-8')
     m = hashlib.md5()
-    try:
-        m.update(value)
-    except TypeError:  # unicode...
-        m.update(value.encode('UTF-8'))
-
+    m.update(value)
     return m.hexdigest()
 
 
-def formatStr(msg,
-              *rest_of_message,
-              **keywords) -> str:
+def formatStr(msg: object,
+              *rest_of_message: object,
+              **keywords: object) -> str:
     '''
     DEPRECATED: do not use.  May be removed at any time.
 
@@ -275,20 +282,20 @@ def formatStr(msg,
     test 1 2 3
     <BLANKLINE>
     '''
-    msg = [msg, *rest_of_message]
-    for i in range(len(msg)):
-        x = msg[i]
+    msgList: list[t.Any] = [msg, *rest_of_message]
+    for i in range(len(msgList)):
+        x = msgList[i]
         if isinstance(x, bytes):
-            msg[i] = x.decode('utf-8')
+            msgList[i] = x.decode('utf-8')
         if not isinstance(x, str):
             try:
-                msg[i] = repr(x)
+                msgList[i] = repr(x)
             except TypeError:
                 try:
-                    msg[i] = x.decode('utf-8')
+                    msgList[i] = x.decode('utf-8')
                 except AttributeError:
-                    msg[i] = ''
-    return ' '.join(msg) + '\n'
+                    msgList[i] = ''
+    return ' '.join(msgList) + '\n'
 
 
 def stripAccents(inputString: str) -> str:
@@ -301,12 +308,27 @@ def stripAccents(inputString: str) -> str:
     >>> common.stripAccents(s)
     'tres vite'
 
-    Also handles the German Eszett
+    Also handles the German Eszett and smart quotes
 
     >>> common.stripAccents('Muß')
     'Muss'
+    >>> common.stripAccents('Süss, “êtré”')
+    'Suss, "etre"'
+
+    Note -- it is still possible to have non-Ascii characters after this,
+    like in this Japanese expression for music:
+
+    >>> common.stripAccents('音楽')
+    '音楽'
     '''
-    nfkd_form = unicodedata.normalize('NFKD', inputString).replace('ß', 'ss')
+    nfkd_form = (
+        unicodedata.normalize('NFKD', inputString)
+        .replace('ß', 'ss')
+        .replace('“', '"')
+        .replace('”', '"')
+        .replace('‘', "'")
+        .replace('’', "'")
+    )
     return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
@@ -321,7 +343,7 @@ def normalizeFilename(name: str) -> str:
     without any accented characters.
 
     >>> common.normalizeFilename('03-Niccolò all’lessandra.not really.xml')
-    '03-Niccolo_alllessandra_not_really.xml'
+    '03-Niccolo_all_lessandra_not_really.xml'
     '''
     extension = None
     lenName = len(name)
@@ -349,9 +371,130 @@ def removePunctuation(s: str) -> str:
     out = s.translate(maketrans)
     return out
 
+@dataclasses.dataclass
+class ParenthesesMatch:
+    start: int
+    end: int
+    text: str
+    nested: list[ParenthesesMatch]
+
+def parenthesesMatch(
+    s: str,
+    open: str = '(',  # pylint: disable=redefined-builtin
+    close: str = ')',
+) -> list[ParenthesesMatch]:
+    r'''
+    Utility tool to return a list of parentheses matches for a string using a dataclass
+    called `ParenthesesMatch` which has indices of the `start` and `end`
+    of the match, and the `text` of the match, and a set of `nested`
+    ParenthesesMatch objects (which may have their own nested objects).
+
+    >>> st = r'Bologne wrote (a (whole) (lot) \(of\)) sym\(ph(on)ies\) concertantes.'
+    >>> common.stringTools.parenthesesMatch(st)
+    [ParenthesesMatch(start=15, end=37, text='a (whole) (lot) \\(of\\)',
+                      nested=[ParenthesesMatch(start=18, end=23, text='whole', nested=[]),
+                              ParenthesesMatch(start=26, end=29, text='lot', nested=[])]),
+     ParenthesesMatch(start=47, end=49, text='on', nested=[])]
+
+    Other brackets can be used:
+
+    >>> st = r'[Whammy bars] and [oboes] do [not [mix] very] [well.]'
+    >>> common.stringTools.parenthesesMatch(st, open='[', close=']')
+    [ParenthesesMatch(start=1, end=12, text='Whammy bars', nested=[]),
+     ParenthesesMatch(start=19, end=24, text='oboes', nested=[]),
+     ParenthesesMatch(start=30, end=44, text='not [mix] very',
+                      nested=[ParenthesesMatch(start=35, end=38, text='mix', nested=[])]),
+     ParenthesesMatch(start=47, end=52, text='well.', nested=[])]
+
+    The `open` and `close` parameters can be multiple characters:
+
+    >>> st = r'Did you eat <<beans>> today <<Pythagoreas<<?>>>>'
+    >>> common.stringTools.parenthesesMatch(st, open='<<', close='>>')
+    [ParenthesesMatch(start=14, end=19, text='beans', nested=[]),
+     ParenthesesMatch(start=30, end=46, text='Pythagoreas<<?>>',
+                      nested=[ParenthesesMatch(start=43, end=44, text='?', nested=[])])]
+
+    They cannot, however, be empty:
+
+    >>> common.stringTools.parenthesesMatch(st, open='', close='')
+    Traceback (most recent call last):
+    ValueError: Neither open nor close can be empty.
+
+    Unmatched opening or closing parentheses will raise a ValueError:
+
+    >>> common.stringTools.parenthesesMatch('My (parentheses (sometimes (continue',)
+    Traceback (most recent call last):
+    ValueError:  Opening '(' at index 3 was never closed
+
+    >>> common.stringTools.parenthesesMatch('This is a <bad> example>', open='<', close='>')
+    Traceback (most recent call last):
+    ValueError: Closing '>' without '<' at index 23.
+
+    Note that using multiple characters like a prefix can have unintended consequences:
+
+    >>> st = r'[Pitch("C4"), [Pitch("D5"), Pitch("E6")], Pitch("Pity("Z9")")]'
+    >>> common.stringTools.parenthesesMatch(st, open='Pitch("', close='")')
+    Traceback (most recent call last):
+    ValueError: Closing '")' without 'Pitch("' at index 59.
+
+    So to do something like this, you might need to get creative:
+
+    >>> out = common.stringTools.parenthesesMatch(st, open='("', close='")')
+    >>> out
+    [ParenthesesMatch(start=8, end=10, text='C4', nested=[]),
+     ParenthesesMatch(start=22, end=24, text='D5', nested=[]),
+     ParenthesesMatch(start=35, end=37, text='E6', nested=[]),
+     ParenthesesMatch(start=49, end=59, text='Pity("Z9")',
+                      nested=[ParenthesesMatch(start=55, end=57, text='Z9', nested=[])])]
+    >>> extractedPitches = []
+    >>> for match in out:
+    ...     if st[match.start - 7:match.start] == 'Pitch("':
+    ...          extractedPitches.append(match.text)
+    >>> extractedPitches
+    ['C4', 'D5', 'E6', 'Pity("Z9")']
+
+    * New in v9.3.
+    '''
+    if not open or not close:
+        raise ValueError('Neither open nor close can be empty.')
+
+    mainMatch = ParenthesesMatch(-1, -1, '', [])
+    stack: list[ParenthesesMatch] = [mainMatch]
+
+    lastCharWasBackslash = False
+
+    i = 0
+    while i < len(s):
+        if (not lastCharWasBackslash
+                and s[i:i + len(open)] == open):
+            curPM = ParenthesesMatch(i + len(open), -1, '', [])
+            stack.append(curPM)
+            i += len(open)
+            continue
+        elif (not lastCharWasBackslash
+              and s[i:i + len(close)] == close):
+            if len(stack) <= 1:
+                raise ValueError(f'Closing {close!r} without {open!r} at index {i}.')
+            curPM = stack.pop()
+            curPM.end = i
+            curPM.text = s[curPM.start:i]
+            stack[-1].nested.append(curPM)
+            i += len(close)
+            continue
+
+        if s[i] == '\\':
+            lastCharWasBackslash = not lastCharWasBackslash
+        else:
+            lastCharWasBackslash = False
+        i += 1
+
+    if len(stack) > 1:
+        raise ValueError(f'Opening {open!r} at index {stack[1].start - 1} was never closed')
+
+    return mainMatch.nested
+
 
 # -----------------------------------------------------------------------------
-
 if __name__ == '__main__':
     import music21
     music21.mainTest()

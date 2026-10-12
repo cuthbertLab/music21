@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         timespans/node.py
 # Purpose:      Internal data structures for timespan collections
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2016 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -26,13 +24,13 @@ from music21.sorting import SortTuple
 # -----------------------------------------------------------------------------
 
 
-class ElementNode(core.AVLNode):
+class ElementNode[PayloadType](core.AVLNode[PayloadType]):
     r'''
     A node containing a single element, which is aware of the element's
     endTime and index within a stream, as well as the endTimes and indices of the
     elements to the left and right of it.
 
-    Here's an element node that is at first is no different from an AVL node, except in
+    Here's an element node that at first is no different from an AVL node, except in
     representation:
 
     >>> n = note.Note('C4')
@@ -76,14 +74,12 @@ class ElementNode(core.AVLNode):
     >>> m.offset
     0.0
 
-
     >>> rElNode.payloadElementIndex = 0
     >>> elNode.payloadElementIndex = 1
     >>> n2ElNode.payloadElementIndex = 2
 
     >>> elNode.updateIndices()
     >>> elNode.updateEndTimes()
-
 
     Now let's look at the ElementNode:
 
@@ -108,7 +104,7 @@ class ElementNode(core.AVLNode):
     3
 
     If they've never been set then they return -1, but the .updateIndices() call above
-    set these number for the children also. So they return the node's own index and one above:
+    set these numbers for the children also. So they return the node's own index and one above:
 
     >>> n2ElNode.subtreeElementsStartIndex
     2
@@ -131,7 +127,7 @@ class ElementNode(core.AVLNode):
     can know from this information whether there's going to be an element whose start or
     end time will possibly match the offset span without needing to descend into the tree.
 
-    The last element in a Stream often doesn't has the highest endTime (think of different
+    The last element in a Stream often doesn't have the highest endTime (think of different
     voices, flat streams, etc.) so searches for offsets are often O(n) when
     they could be O(log n) if the information were cached into a tree as this does.
     '''
@@ -183,13 +179,14 @@ class ElementNode(core.AVLNode):
         pos = self.position
         if hasattr(pos, 'shortRepr'):
             pos = pos.shortRepr()
-        return '<ElementNode: Start:{} Indices:(l:{} *{}* r:{}) Payload:{!r}>'.format(
-            pos,
-            self.subtreeElementsStartIndex,
-            self.payloadElementIndex,
-            self.subtreeElementsStopIndex,
-            self.payload,
-        )
+
+        ps = pos
+        li = self.subtreeElementsStartIndex
+        pi = self.payloadElementIndex
+        ri = self.subtreeElementsStopIndex
+        pl = self.payload
+
+        return f'<ElementNode: Start:{ps} Indices:(l:{li} *{pi}* r:{ri}) Payload:{pl!r}>'
 
     # PROPERTIES #
     @property
@@ -260,45 +257,40 @@ class ElementNode(core.AVLNode):
 
         Returns None.
         '''
-        pos = self.position
-        if isinstance(pos, SortTuple):
-            pos = pos.offset
-
         try:
             endTimeLow = self.payload.endTime
             endTimeHigh = endTimeLow
         except AttributeError:  # elements do not have endTimes. do NOT mix elements and timespans.
+            pos = self.position
+            if isinstance(pos, SortTuple):
+                pos = pos.offset
             endTimeLow = pos + self.payload.duration.quarterLength
             endTimeHigh = endTimeLow
 
         leftChild = self.leftChild
         if leftChild:
             leftChild.updateEndTimes()
-            if leftChild.endTimeLow < endTimeLow:
-                endTimeLow = leftChild.endTimeLow
-            if endTimeHigh < leftChild.endTimeHigh:
-                endTimeHigh = leftChild.endTimeHigh
+            endTimeLow = min(endTimeLow, leftChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, leftChild.endTimeHigh)
 
         rightChild = self.rightChild
         if rightChild:
             rightChild.updateEndTimes()
-            if rightChild.endTimeLow < endTimeLow:
-                endTimeLow = rightChild.endTimeLow
-            if endTimeHigh < rightChild.endTimeHigh:
-                endTimeHigh = rightChild.endTimeHigh
+            endTimeLow = min(endTimeLow, rightChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, rightChild.endTimeHigh)
         self.endTimeLow = endTimeLow
         self.endTimeHigh = endTimeHigh
 
 
 # -----------------------------------------------------------------------------
-class OffsetNode(ElementNode):
+class OffsetNode(ElementNode[list[object]]):
     r'''
     A node representing zero, one, or many elements at an offset.  It has all the
     power of an ElementNode but substantially more.
 
     Here's an example of what it means and does:
 
-    >>> score = tree.makeExampleScore()
+    >>> score = tree.examples.makeExampleScore()
     >>> sf = score.flatten()
     >>> sf.show('text', addEndTimes=True)
     {0.0 - 0.0} <music21.instrument.Instrument 'PartA: : '>
@@ -325,9 +317,9 @@ class OffsetNode(ElementNode):
     >>> scoreTree = tree.fromStream.asTimespans(sf, flatten=False, classList=None)
     >>> rn = scoreTree.rootNode
 
-    The RootNode here represents the starting position of the Note F at 3.0; It is the center
+    The RootNode here represents the starting position of the Note F at 3.0; it is the center
     of the elements in the flat Stream.  Its index is 5 (that is, it's the sixth note in the
-    element list) and its offset is 3.0
+    element list) and its offset is 3.0.
 
     >>> rn
     <OffsetNode 3.0 Indices:0,11,12,20 Length:1>
@@ -336,14 +328,14 @@ class OffsetNode(ElementNode):
     >>> sf[11].offset
     3.0
 
-    Thus, the indices of 0:5:6:12 indicate that the left-side of the node handles indices
-    from >= 0 to < 5; and the right-side of the node handles indices >= 6 and < 12, and this node
-    handles indices >= 5 and < 6.
+    Thus, the indices of 0,11,12,20 indicate that the left-side of the node handles indices
+    from >= 0 to < 11; and the right-side of the node handles indices >= 12 and < 20, and this node
+    handles indices >= 11 and < 12.
 
-    The `Length: {1}` indicates that there is exactly one element at this location, that is,
+    The `Length: 1` indicates that there is exactly one element at this location, that is,
     the F.
 
-    The "payload" of the node, is just that element wrapped in a list wrapped in an
+    The "payload" of the node is just that element wrapped in a list wrapped in an
     ElementTimespan or PitchedTimespan:
 
     >>> rn.payload
@@ -352,7 +344,6 @@ class OffsetNode(ElementNode):
     <music21.note.Note F>
     >>> rn.payload[0].element is sf[11]
     True
-
 
     We can look at the leftChild of the root node to get some more interesting cases:
 
@@ -384,7 +375,7 @@ class OffsetNode(ElementNode):
     >>> leftLeft.rightChild is None
     True
 
-    What makes an OffsetNode more interesting than other AWL Nodes is that it is aware of
+    What makes an OffsetNode more interesting than other AVL Nodes is that it is aware of
     the fact that it might have objects that end at different times, such as the zero-length
     metadata and the 2.0 length half note
 
@@ -406,7 +397,7 @@ class OffsetNode(ElementNode):
             The contents of the node at this point.  Usually a list of ElementTimespans
             or PitchedTimespans.
 
-            >>> score = tree.makeExampleScore()
+            >>> score = tree.examples.makeExampleScore()
             >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
             ...                  classList=(note.Note, chord.Chord))
             >>> print(scoreTree.rootNode.debug())
@@ -516,18 +507,14 @@ class OffsetNode(ElementNode):
         leftChild = self.leftChild
         if leftChild:
             leftChild.updateEndTimes()
-            if leftChild.endTimeLow < endTimeLow:
-                endTimeLow = leftChild.endTimeLow
-            if endTimeHigh < leftChild.endTimeHigh:
-                endTimeHigh = leftChild.endTimeHigh
+            endTimeLow = min(endTimeLow, leftChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, leftChild.endTimeHigh)
 
         rightChild = self.rightChild
         if rightChild:
             rightChild.updateEndTimes()
-            if rightChild.endTimeLow < endTimeLow:
-                endTimeLow = rightChild.endTimeLow
-            if endTimeHigh < rightChild.endTimeHigh:
-                endTimeHigh = rightChild.endTimeHigh
+            endTimeLow = min(endTimeLow, rightChild.endTimeLow)
+            endTimeHigh = max(endTimeHigh, rightChild.endTimeHigh)
         self.endTimeLow = endTimeLow
         self.endTimeHigh = endTimeHigh
 

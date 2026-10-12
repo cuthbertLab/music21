@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         commonTest.py
 # Purpose:      Things common to testing
@@ -10,19 +9,16 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Things that are common to testing...
+Things that are common to testing.
 '''
 from __future__ import annotations
 
 import copy
 import doctest
 import importlib
-import importlib.util
 import os
-import sys
 import typing
 import types
-import unittest
 import unittest.runner
 from unittest.signals import registerResult
 import warnings
@@ -55,35 +51,13 @@ def testCopyAll(testInstance: unittest.TestCase, globals_: typing.Dict[str, typi
 
         try:
             copy.copy(instance)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             testInstance.fail(f'Could not copy obj {part}: {e}')
         try:
             copy.deepcopy(instance)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             testInstance.fail(f'Could not deepcopy obj {part}: {e}')
 
-
-def load_source(name: str, path: str) -> types.ModuleType:
-    '''
-    Replacement for deprecated imp.load_source()
-
-    Thanks to:
-    https://github.com/epfl-scitas/spack for pointing out the
-    important missing "spec.loader.exec_module(module)" line.
-    '''
-    spec = importlib.util.spec_from_file_location(name, path)
-    if spec is None or spec.loader is None:
-        raise FileNotFoundError(f'No such file or directory: {path!r}')
-    if name in sys.modules:
-        module = sys.modules[name]
-    else:
-        module = importlib.util.module_from_spec(spec)
-        if module is None:
-            raise FileNotFoundError(f'No such file or directory: {path!r}')
-        sys.modules[name] = module
-    spec.loader.exec_module(module)
-
-    return module
 
 # noinspection PyPackageRequirements
 def testImports():
@@ -92,12 +66,12 @@ def testImports():
     '''
     # pylint: disable=unused-import
     try:
-        import scipy  # type: ignore
+        import scipy  # type: ignore  # noqa: F401
     except ImportError as e:
         raise ImportError('pip install scipy : needed for running test suites') from e
 
     try:
-        from Levenshtein import StringMatcher  # type: ignore
+        from Levenshtein import StringMatcher  # type: ignore  # noqa: F401
     except ImportError as e:
         raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
 
@@ -121,8 +95,8 @@ def defaultDoctestSuite(name=None):
         s1 = doctest.DocTestSuite(**keywords)
     return s1
 
-# from testRunner...
-# more silent type...
+# from testRunner
+# more silent type
 
 
 class Music21TestRunner(unittest.runner.TextTestRunner):
@@ -223,7 +197,7 @@ class ModuleGather:
             'timeGraphs.py',
             'timeGraphImportStar.py',
             'multiprocessTest.py',
-            'setup.py',  # somehow got committed once and now screwing things up...
+            'setup.py',  # somehow got committed once and now screwing things up
 
             # 'corpus/virtual.py',  # offline for v.4+
             'figuredBass/examples.py',  # 40 seconds and runs fine
@@ -231,7 +205,7 @@ class ModuleGather:
         ]
 
         self.moduleSkipExtended = self.moduleSkip + [
-            'configure.py',  # runs oddly...
+            'configure.py',  # runs oddly
 
             'testSerialization.py',
             'mptCurses.py',
@@ -256,7 +230,7 @@ class ModuleGather:
             'audioSearch/repetitionGame.py',
             'abcFormat/testFiles.py',
         ]
-        # run these first...
+        # run these first
         self.slowModules = ['metadata/bundles',
                             'metadata/caching',
                             'features',
@@ -350,7 +324,8 @@ class ModuleGather:
         if fn.startswith(os.sep):
             fn = fn[1:]
         fn = fn.replace(os.sep, '_')  # replace w/ _
-        fn = fn.replace('.py', '')
+        if fn.endswith('.py'):
+            fn = fn[:-3]
         return fn
 
     def _getNamePeriod(self, fp, *, addM21=False):
@@ -365,11 +340,11 @@ class ModuleGather:
         '''
         fn = fp.replace(self.dirParent, '')  # remove parent
         parts = [x for x in fn.split(os.sep) if x]
-        if parts[-1] == '__init__.py':
+        if parts[-1].endswith('.py'):
+            parts[-1] = parts[-1][:-3]
+        if parts[-1] == '__init__':
             parts.pop()
         fn = '.'.join(parts)  # replace w/ period
-
-        fn = fn.replace('.py', '')
         if addM21 and fn:
             fn = 'music21.' + fn
         elif addM21:
@@ -418,12 +393,12 @@ class ModuleGather:
         if skip:
             return None
 
-        name = self._getNamePeriod(fp, addM21=False)
+        name = self._getNamePeriod(fp, addM21=True)
 
         try:
             with warnings.catch_warnings():
-                mod = load_source(name, fp)
-        except Exception as excp:  # pylint: disable=broad-except
+                mod = importlib.import_module(name)
+        except Exception as excp:  # pylint: disable=broad-exception-caught
             environLocal.warn(['failed import:', name, '\t', fp, '\n',
                                '\tEXCEPTION:', str(excp).strip()])
             return None

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         basic.py
 # Purpose:      music21 class which allows transcription of music21Object instances to braille.
@@ -118,7 +117,6 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
     Takes in a :class:`~music21.chord.Chord` and returns its representation
     as a braille string in UTF-8 unicode.
 
-
     In braille, only one pitch of a chord is brailled, with the rest represented
     as numeric intervals from that one pitch. If descending is True, the highest
     (sounding) pitch is brailled, and intervals are labeled in descending order;
@@ -126,7 +124,6 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
     intervals are labeled in ascending order. Convention dictates that chords
     found in the treble clef are brailled descending, and those found in the bass
     clef are brailled ascending.
-
 
     If showOctave is True, the octave of the brailled pitch is shown. Other
     octave marks are shown in context relative to the brailled pitch.
@@ -189,7 +186,7 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
         music21Chord.editorial.brailleEnglish.append(f'{music21Chord} None')
         return symbols['basic_exception']
     chordTrans.append(brailleNote)
-    englishJoined = '\n'.join(initNote.editorial.brailleEnglish)
+    englishJoined = '\n'.join(initNote.editorial.get('brailleEnglish', []))
     music21Chord.editorial.brailleEnglish.append(
         f'{direction} Chord:\n{englishJoined}'
     )
@@ -205,7 +202,7 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
         except KeyError:
             environRules.warn(
                 f'Accidental {currentPitch.accidental} of '
-                + f'chord {music21Chord} cannot be transcribed to braille.'
+                f'chord {music21Chord} cannot be transcribed to braille.'
             )
         intervalDistance = interval.notesToGeneric(basePitch, currentPitch).undirected
         if intervalDistance > 8:
@@ -376,10 +373,8 @@ def dynamicToBraille(music21Dynamic, precedeByWordSign=True):
     :attr:`~music21.dynamics.Dynamic.value` as a braille string in
     UTF-8 unicode.
 
-
     If precedeByWordSign is True, the value is preceded by a word
     sign (⠜).
-
 
     >>> from music21.braille.basic import dynamicToBraille
     >>> print(dynamicToBraille(dynamics.Dynamic('f')))
@@ -458,7 +453,7 @@ def keySigToBraille(music21KeySignature, outgoingKeySig=None):
             f'Incoming Key Signature {music21KeySignature} cannot be transcribed to braille.'
         )
         music21KeySignature.editorial.brailleEnglish.append(
-            f'Key Signature {music21KeySignature} sharps None'
+            f'Key Signature {music21KeySignature} cannot be transcribed'
         )
         return symbols['basic_exception']
 
@@ -517,14 +512,21 @@ def metronomeMarkToBraille(music21MetronomeMark):
     >>> mm2 = tempo.MetronomeMark(number=135, referent=note.Note(quarterLength=0.5))
     >>> print(metronomeMarkToBraille(mm2))
     ⠙⠶⠼⠁⠉⠑
+
+    >>> mm3 = tempo.MetronomeMark(numberSounding=80)
+    >>> metronomeMarkToBraille(mm3)
+    ''
     '''
+    if music21MetronomeMark.number is None:
+        return ''
+
     music21MetronomeMark.editorial.brailleEnglish = []
     try:
         metroTrans = []
         metroNote = note.Note('C4', quarterLength=music21MetronomeMark.referent.quarterLength)
         brailleNote = noteToBraille(metroNote, showOctave=False)
         metroTrans.append(brailleNote)
-        englishJoined = ' '.join(metroNote.editorial.brailleEnglish)
+        englishJoined = ' '.join(metroNote.editorial.get('brailleEnglish', []))
         music21MetronomeMark.editorial.brailleEnglish.append(
             f'Metronome Note {englishJoined}'
         )
@@ -590,7 +592,6 @@ def yieldBrailleArticulations(noteEl):
     ⠦
     ⠨⠦
     ⠸⠦
-
     '''
     def _brailleArticulationsSortKey(inner_articulation):
         isBowing = isinstance(inner_articulation, articulations.Bowing)
@@ -621,15 +622,12 @@ def noteToBraille(
     Given a :class:`~music21.note.Note`, returns the appropriate braille
     characters as a string in UTF-8 unicode.
 
-
     The format for note display in braille is the accidental (if necessary)
     + octave (if necessary) + pitch name with length.
-
 
     If the note has an :class:`~music21.pitch.Accidental`, the accidental is always
     displayed unless its :attr:`~music21.pitch.Accidental.displayStatus` is set to
     False. The octave of the note is only displayed if showOctave is set to True.
-
 
     >>> from music21.braille.basic import noteToBraille
     >>> C4 = note.Note('C4')
@@ -651,7 +649,6 @@ def noteToBraille(
     >>> print(noteToBraille(A2))
     ⠘⠎⠄
 
-
     >>> B = note.Note('B4')
     >>> f = expressions.Fermata()
     >>> B.expressions.append(f)
@@ -671,7 +668,6 @@ def noteToBraille(
     Octave 4 ⠐
     B quarter ⠺
     Note-fermata: Shape square: ⠰⠣⠇
-
 
     >>> C4 = note.Note('C4')
     >>> print(noteToBraille(C4))
@@ -743,8 +739,8 @@ def noteToBraille(
                         f'transcriber-added {symbols["transcriber-added_sign"]}')
                 tupletTrans = symbols['tuplet_prefix']  # dots 4,5,6
                 tupletTrans += numberToBraille(allTuplets[0].numberNotesActual,
-                                                 withNumberSign=False,
-                                                 lower=True)
+                                               withNumberSign=False,
+                                               lower=True)
                 tupletTrans += symbols['dot']
                 noteTrans.append(tupletTrans)
             music21Note.editorial.brailleEnglish.append(
@@ -794,7 +790,7 @@ def noteToBraille(
     # note duration
     # -------------
     if isinstance(music21Note.duration, duration.GraceDuration):
-        # TODO: Short Appoggiatura mark...
+        # TODO: Short Appoggiatura mark
         nameWithDuration = notesInStep['eighth']
         noteTrans.append(nameWithDuration)
         music21Note.editorial.brailleEnglish.append(
@@ -906,7 +902,6 @@ def restToBraille(music21Rest):
     '''
     Given a :class:`~music21.note.Rest`, returns the appropriate braille
     characters as a string in UTF-8 unicode.
-
 
     Currently, only supports single rests with or without dots.
     Complex rests are not supported.
@@ -1050,7 +1045,7 @@ def textExpressionToBraille(music21TextExpression, precedeByWordSign=True):
             f'Text Expression {teWords} {simpleReturn}')
         return simpleReturn
 
-    # not in this basic list...
+    # not in this basic list
 
     allExpr = teWords.split()
     textExpressionTrans = []
@@ -1109,7 +1104,7 @@ def timeSigToBraille(m21TimeSignature):
         brailleSig = ''.join(timeSigTrans)
         m21TimeSignature.editorial.brailleEnglish.append(
             f'Time Signature {m21TimeSignature.numerator}/{m21TimeSignature.denominator} '
-            + f'{brailleSig}'
+            f'{brailleSig}'
         )
         return brailleSig
     except (BrailleBasicException, KeyError) as unused_error:  # pragma: no cover
@@ -1150,10 +1145,8 @@ def showOctaveWithNote(previousNote, currentNote):
     1) If a braille measure goes to a new line, the first note in the measure carries an
        octave designation regardless of what the previous note was.
 
-
     2) If a braille measure contains a new key or time signature, the first note carries
        an octave designation regardless of what the previous note was.
-
 
     3) If a new key or time signature occurs in the middle of a measure, or if a double bar
        line is encountered, both of which would necessitate a music hyphen, the next note after
@@ -1243,7 +1236,6 @@ def transcribeHeading(
     ⠀⠀⠀⠀⠑⠀⠀⠀⠀⠀
     ⠞⠗⠁⠝⠟⠥⠊⠇⠇⠕⠲
     ⠀⠀⠀⠣⠣⠨⠉⠀⠀⠀
-
     '''
     if (music21KeySignature is None
             and music21TimeSignature is None
@@ -1364,7 +1356,6 @@ def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True)
     ⠂⠄
     >>> print(transcribeNoteFingering('4,x', upperFirstInFingering=False))
     ⠠⠂
-
 
     A change of fingering and a choice of fingering combined (thanks to Bo-cheng Jhan
     for the patch):

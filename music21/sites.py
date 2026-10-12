@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         sites.py
 # Purpose:      Objects for keeping track of relationships among Music21Objects
@@ -43,7 +42,7 @@ WEAKREF_ACTIVE = True
 # that still exists, then restore it from the dictionary; otherwise, do not
 # sweat it.  Should make pickle deepcopies of music21 objects in Streams still
 # possible without needing to recreate the whole stream.
-GLOBAL_SITE_STATE_DICT: MutableMapping[str, t.Any | None] = weakref.WeakValueDictionary()
+GLOBAL_SITE_STATE_DICT: MutableMapping[str, t.Any|None] = weakref.WeakValueDictionary()
 
 
 class SitesException(exceptions21.Music21Exception):
@@ -54,7 +53,7 @@ class SitesException(exceptions21.Music21Exception):
 
 class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
     '''
-    a single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
+    A single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
 
     A very simple object.
 
@@ -76,11 +75,16 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
     >>> s.site
     <music21.stream.Stream hi>
     >>> s.siteWeakref
-    <weakref at 0x123456; to 'Stream' at 0x111111>
-
+    <weakref at 0x123456; to ...Stream' at 0x111111>
 
     If you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
     the site.  Bad for memory. Good for debugging pickling.
+
+    OMIT_FROM_DOCS
+
+    Note that the ...Stream was needed after Python 3.13.
+    When 3.13 is the lowest version, replace ... with the
+    actual output.
     '''
     # CLASS VARIABLES #
 
@@ -110,7 +114,8 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
 
         return f'{self.siteIndex}/{self.globalSiteIndex} to {siteRepr}'
 
-    def _getAndUnwrapSite(self):
+    @property
+    def site(self):
         if WEAKREF_ACTIVE:
             ret = common.unwrapWeakref(self.siteWeakref)
         else:
@@ -121,14 +126,13 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
 
         return ret
 
-    def _setAndWrapSite(self, site):
+    @site.setter
+    def site(self, site):
         if WEAKREF_ACTIVE:
             self.siteWeakref = common.wrapWeakref(site)
         else:
             self.siteWeakref = site
         self.isDead = False
-
-    site = property(_getAndUnwrapSite, _setAndWrapSite)
 
     # called before pickling.
     def __getstate__(self):
@@ -166,7 +170,7 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
 
 
 _NoneSiteRef = SiteRef()
-_NoneSiteRef.globalSiteIndex = -2  # -1 is used elsewhere...
+_NoneSiteRef.globalSiteIndex = -2  # -1 is used elsewhere
 _NoneSiteRef.siteIndex = -2
 
 _singletonCounter = common.SingletonCounter()
@@ -251,8 +255,6 @@ class Sites(common.SlottedObjectMixin):
                 newIdKey = None
             else:
                 newIdKey = id(newSite.site)
-                # if newIdKey != idKey and oldSite.site != None:
-                #    print('Error! %s %s' % (newIdKey, idKey))
             newSite.siteIndex = oldSite.siteIndex
             newSite.globalSiteIndex = _singletonCounter()
             newSite.classString = oldSite.classString
@@ -279,13 +281,12 @@ class Sites(common.SlottedObjectMixin):
         >>> aContexts.add(aObj)
         >>> len(aContexts)
         2
-
         '''
         return len(self.siteDict)
 
     def __contains__(self, checkSite):
         '''
-        returns True if checkSite in Sites.
+        Returns True if checkSite in Sites.
 
         >>> m1 = stream.Measure(number=1)
         >>> m2 = stream.Measure(number=2)
@@ -353,7 +354,10 @@ class Sites(common.SlottedObjectMixin):
                 updateNotAdd = True
 
             # if idKey is not None:
-            #    print('Updating idKey %s for object %s' % (idKey, id(obj)))
+            #     print(
+            #         'Updating idKey '
+            #         f'{idKey} for object {id(obj)}'
+            #     )
 
         # environLocal.printDebug(['adding obj', obj, idKey])
         # weak refs were being passed in __deepcopy__ calling this method
@@ -365,7 +369,7 @@ class Sites(common.SlottedObjectMixin):
 
         if updateNotAdd is True:
             siteRef = self.siteDict[idKey]
-            siteRef.isDead = False  # in case it used to be a dead site...
+            siteRef.isDead = False  # in case it used to be a dead site
         else:
             siteRef = SiteRef()
 
@@ -392,27 +396,26 @@ class Sites(common.SlottedObjectMixin):
     def yieldSites(self,
                    *,
                    excludeNone: t.Literal[True],
-                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   sortByCreationTime: bool|t.Literal['reverse'] = False,
                    priorityTarget=None,
                    ) -> Generator[stream.Stream, None, None]:
-        from music21 import stream
-        yield stream.Stream()
+        ...
 
     @overload
     def yieldSites(self,
                    *,
                    excludeNone: bool = False,
-                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   sortByCreationTime: bool|t.Literal['reverse'] = False,
                    priorityTarget=None,
-                   ) -> Generator[stream.Stream | None, None, None]:
-        yield None
+                   ) -> Generator[stream.Stream|None, None, None]:
+        ...
 
     def yieldSites(self,
                    *,
                    excludeNone: bool = False,
-                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   sortByCreationTime: bool|t.Literal['reverse'] = False,
                    priorityTarget=None,
-                   ) -> Generator[stream.Stream | None, None, None]:
+                   ) -> Generator[stream.Stream|None, None, None]:
         # noinspection PyDunderSlots
         '''
         Yield references; order, based on dictionary keys, is from least
@@ -423,7 +426,7 @@ class Sites(common.SlottedObjectMixin):
 
         Note that priorityTarget is searched only on id -- this could be dangerous if the
         target has been garbage collected and the id is reused. Unlikely since you have to
-        pass in the priorityTarget itself, so therefore it still exists...
+        pass in the priorityTarget itself, so therefore it still exists.
 
         This can be much faster than .get in the case where the sought-for site
         is earlier in the list.
@@ -465,7 +468,7 @@ class Sites(common.SlottedObjectMixin):
         * Changed in v3: changed dramatically from previously unused version
           `sortByCreationTime='reverse'` is removed, since the ordered dict takes
           care of it and was not working.
-        * Changed in v8: arguments are keyword only
+        * Changed in v8: arguments are keyword only.
         '''
         keyRepository = list(self.siteDict.keys())
         if sortByCreationTime is True:
@@ -581,7 +584,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> aSites.getAttrByName('blah') is None
         True
-
         '''
         post = None
         for obj in self.yieldSites(sortByCreationTime='reverse'):
@@ -610,11 +612,11 @@ class Sites(common.SlottedObjectMixin):
         This will recursively search the sitesDicts of objects in Site objects in
         the siteDict.
 
-        The `callerFirst` parameters is simply used to pass a reference of the
+        The `callerFirst` parameter is simply used to pass a reference of the
         first caller; this is necessary if we are looking within a Stream for a
         flat offset position.
 
-        If `priorityTarget` is specified, this location will be searched first. use
+        If `priorityTarget` is specified, this location will be searched first. Use
         priorityTarget=activeSite to prioritize that.
 
         The `getElementMethod` is a string that selects which Stream method is
@@ -660,7 +662,11 @@ class Sites(common.SlottedObjectMixin):
             priorityTarget=priorityTarget,
             excludeNone=True,
         )  # objs is a generator
-        # printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
+        # printMemo(
+        #     memo,
+        #     'getObjByClass() called: looking at '
+        #     + f'{len(objs)} sites'
+        # )
         classNameIsStr = isinstance(className, str)
         for obj in objs:
             # environLocal.printDebug(['memo', memo])
@@ -686,7 +692,7 @@ class Sites(common.SlottedObjectMixin):
                 # environLocal.printDebug(
                 #    ['\tY: skipping flat stream that does not contain object:'])
                 if obj.sites.getSiteCount() == 0:  # is top level; no more to search
-                    if not obj.hasElementOfClass(className, forceFlat=True):
+                    if not obj.getElementsByClass(className):
                         continue  # skip, not in this stream
 
             # if after trying to match name, look in the defined contexts'
@@ -766,7 +772,7 @@ class Sites(common.SlottedObjectMixin):
         (generally a Stream)
         that matches the provided class.
 
-        Input can be either a Class object or a string
+        Input can be either a Class object or a string.
 
         >>> class Mock(base.Music21Object):
         ...     pass
@@ -943,7 +949,6 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites.remove(aSite)
         >>> len(aSites)
         3
-
         '''
         # must clear
         self._lastID = -1  # cannot be None
@@ -955,10 +960,10 @@ class Sites(common.SlottedObjectMixin):
             del self.siteDict[siteId]
             # environLocal.printDebug(['removed site w/o exception:', siteId,
             #    'self.siteDict.keys()', self.siteDict.keys()])
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:
             raise SitesException(
                 'an entry for this object '
-                + f'({site}) is not stored in this Sites object'
+                f'({site}) is not stored in this Sites object'
             ) from e
 
     def removeById(self, idKey):

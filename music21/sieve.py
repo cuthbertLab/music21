@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         sieve.py
 # Purpose:      sieve operations, after Iannis Xenakis.
@@ -10,11 +9,11 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-A comprehensive, object model of the Xenakis Sieve. :class:`music21.sieve.Sieve`
+A comprehensive object model of the Xenakis Sieve. :class:`music21.sieve.Sieve`
 objects can be created from high-level string notations, and used to generate line segments
-in various representation. Additional functionality is available through associated objects.
+in various representations. Additional functionality is available through associated objects.
 
-The :class:`music21.sieve.Sieve` class permits generation segments in four formats.
+The :class:`music21.sieve.Sieve` class permits the generation of segments in four formats.
 
 >>> a = sieve.Sieve('3@2|7@1')
 >>> a.segment()
@@ -34,15 +33,12 @@ The :class:`music21.sieve.Sieve` class permits generation segments in four forma
 >>> len(a.segment(segmentFormat='unit'))
 43
 
-
-A :class:`music21.sieve.CompressionSegment` can be used to derive a Sieve from a
-ny sequence of integers.
-
+A :class:`music21.sieve.CompressionSegment` can be used to derive a Sieve from
+any sequence of integers.
 
 >>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8, 13, 19])
 >>> str(a)
 '6@1|7@6|8@5|9@4|10@3|11@8'
-
 
 The :class:`music21.sieve.PitchSieve` class provides a quick generation of
 :class:`music21.pitch.Pitch` lists from Sieves.
@@ -116,7 +112,7 @@ RESIDUAL = list(string.digits) + ['@']
 def eratosthenes(firstCandidate=2):
     '''
     Yields the sequence of prime numbers via the Sieve of Eratosthenes.
-    rather than creating a fixed list of a range (z) and crossing out
+    Rather than creating a fixed list of a range (z) and crossing out
     multiples of sequential candidates, this algorithm stores primes under
     their next possible candidate, thus allowing the generation of primes
     in sequence without storing a complete range (z).
@@ -126,13 +122,12 @@ def eratosthenes(firstCandidate=2):
     the prime. The dictionary only has as many entries as found primes.
 
     If a candidate is not a key in the dictionary, it is not a multiple of
-    any already-found prime; it is thus a prime. a new entry is added to the
+    any already-found prime; it is thus a prime. A new entry is added to the
     dictionary, with the square of the prime as the key. The square of the prime
     is the next possible multiple to be found.
 
     To use this generator, create an instance and then call the .next() method
     on the instance.
-
 
     >>> a = sieve.eratosthenes()
     >>> next(a)
@@ -140,10 +135,8 @@ def eratosthenes(firstCandidate=2):
     >>> next(a)
     3
 
-
     We can also specify a starting value for the sequence, skipping over
     initial primes smaller than this number:
-
 
     >>> a = sieve.eratosthenes(95)
     >>> next(a)
@@ -163,14 +156,14 @@ def eratosthenes(firstCandidate=2):
         if p is not None:  # key (prime candidate) in dictionary
             # update dictionary w/ the next multiple of this prime not already
             # in dictionary
-            nextMult = p + q  # prime prime plus the candidate; next multiple
+            nextMult = p + q  # prime plus the candidate; next multiple
             while nextMult in D:  # incr x by p until it is a unique key
                 nextMult = nextMult + p
             # re-store the prime under a key of the next multiple
             D[nextMult] = p  # x is now the next unique multiple to be found
         # candidate (q) not already in dictionary; q is prime
         else:  # value not in dictionary
-            nextMult = q * q  # square is next multiple tt will be found
+            nextMult = q * q  # square is next multiple that will be found
             D[nextMult] = q
             if q >= firstCandidate:
                 yield q  # return prime
@@ -183,7 +176,6 @@ def rabinMiller(n):
     Rabin Miller primality test.
 
     See also here: http://www.4dsolutions.net/ocn/numeracy2.html
-
 
     >>> sieve.rabinMiller(234)
     False
@@ -211,7 +203,7 @@ def rabinMiller(n):
 
     # primes up to 100;  2, 3 handled by mod 6
     primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
-               47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+              47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 
     if n <= 100:
         if n in primes:
@@ -256,13 +248,11 @@ def discreteBinaryPad(series: Iterable[int], fixRange=None) -> list[int]:
     the first entry (signifying 3), 0s for the next six entries (signifying
     4-9), a 1 (for 10), a 0 (for 11), and a 1 (for 12).
 
-
     >>> sieve.discreteBinaryPad([3, 10, 12])
     [1, 0, 0, 0, 0, 0, 0, 1, 0, 1]
 
     >>> sieve.discreteBinaryPad([3, 4, 5])
     [1, 1, 1]
-
     '''
     # make sure these are ints
     for x in series:
@@ -294,19 +284,14 @@ def unitNormRange(series, fixRange=None):
     according to their distance between these two units.  For instance, for 0, 3, 4
     the middle entry will be 0.75 since 3 is 3/4 of the distance between 0 and 4:
 
-
     >>> sieve.unitNormRange([0, 3, 4])
     [0.0, 0.75, 1.0]
-
 
     but for [1, 3, 4], it will be 0.666... because 3 is 2/3 of the distance between
     1 and 4
 
-
     >>> sieve.unitNormRange([1, 3, 4])
     [0.0, 0.666..., 1.0]
-
-
     '''
     if fixRange is not None:
         fixRange.sort()
@@ -351,7 +336,7 @@ def unitNormEqual(parts):
     else:
         unit = []
         step = 1 / (parts - 1)
-        for y in range(parts - 1):  # one less value tn needed
+        for y in range(parts - 1):  # one less value than needed
             unit.append(y * step)
         unit.append(1)  # make last an integer, add manually
         return unit
@@ -364,7 +349,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
     necessary to cover region.
 
     Note that returned values are, by default, normalized within the unit interval.
-
 
     >>> sieve.unitNormStep(0.5, 0, 1)
     [0.0, 0.5, 1]
@@ -381,7 +365,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
     >>> post = sieve.unitNormStep(0.25, 0, 20, normalized=False)
     >>> len(post)
     81
-
     '''
     if a == b:
         return []  # no range, return boundary
@@ -456,10 +439,10 @@ class PrimeSegment:
 
     def _fillRabinMiller(self, start, length, stop=None, direction='up'):
         '''
-        scan all number in range and return a list of primes
-        provide a max to force stoppage at  certain point before the
-        maximum length
-        direction determines which way things go.
+        Scan all numbers in range and return a list of primes.
+        Provide a max to force stoppage at a certain point before the
+        maximum length.
+        Direction determines which way things go.
         '''
         seg = []
         _oddBoundary = 4  # number above which only odd primes are found
@@ -493,7 +476,7 @@ class PrimeSegment:
 
     def _fillRange(self):
         '''
-        fill positive and negative range
+        Fill positive and negative range.
         '''
         if self.start < 0:
             # create the negative portion of the segment
@@ -501,7 +484,7 @@ class PrimeSegment:
             segNeg = [-x for x in segNeg]  # make negative
             if len(segNeg) < self.length:
                 segPos = self._fillRabinMiller(0, self.length - len(segNeg),
-                                                         None, 'up')
+                                               None, 'up')
                 self.seg = segNeg + segPos
             else:  # add positive values
                 self.seg = segNeg
@@ -511,8 +494,8 @@ class PrimeSegment:
 
     def __call__(self, segmentFormat=None):
         '''
-        assumes that min and max values are derived from found primes
-        means that primes will always be at boundaries
+        Assumes that min and max values are derived from found primes.
+        Means that primes will always be at boundaries.
         '''
         z = [self.seg[0], self.seg[-1]]
 
@@ -532,9 +515,9 @@ class PrimeSegment:
 # ------------------------------------------------------------------------------
 class Residual:
     '''
-    object that represents a modulus and a start point
-    each object stores a range of integers (self._z) from which sections are drawn
-    this range of integers can be changed whenever the section os drawn
+    Object that represents a modulus and a start point.
+    Each object stores a range of integers (self._z) from which sections are drawn.
+    This range of integers can be changed whenever the section is drawn.
 
     >>> residual = sieve.Residual(3, 2)
     '''
@@ -562,14 +545,14 @@ class Residual:
     # utility functions
     def setZ(self, z):
         '''
-        z is the range of integers to use when generating a list
+        z is the range of integers to use when generating a list.
         '''
         self._z = z
 
     def setZRange(self, minInt, maxInt):
         '''
-        z is the range of integers to use when generating a list
-        convenience function that fixes max
+        z is the range of integers to use when generating a list.
+        Convenience function that fixes max.
         '''
         self._z = list(range(minInt, maxInt + 1))
 
@@ -583,9 +566,9 @@ class Residual:
     # --------------------------------------------------------------------------
     def segment(self, n=0, z=None, segmentFormat=None):
         '''
-        get a residual subset of this modulus at this n
-        within the integer range provided by z
-        format can be 'int' or 'bin', for integer or binary
+        Get a residual subset of this modulus at this n
+        within the integer range provided by z.
+        Format can be 'int' or 'bin', for integer or binary.
 
         >>> a = sieve.Residual(3, 2)
         >>> a.segment(3)
@@ -630,7 +613,7 @@ class Residual:
 
     def period(self) -> int:
         '''
-        period is M; obvious, but nice for completeness
+        Period is M; obvious, but nice for completeness.
 
         >>> a = sieve.Residual(3, 2)
         >>> a.period()
@@ -649,7 +632,7 @@ class Residual:
 
     def __call__(self, n=0, z=None, segmentFormat=None):
         '''
-        calls self.segment(); uses _segmentFormat
+        Calls self.segment(); uses _segmentFormat.
 
         >>> a = sieve.Residual(3, 2)
         >>> a()
@@ -661,7 +644,7 @@ class Residual:
 
     def represent(self, style=None):
         '''
-        does not show any logical operator but unary negation
+        Does not show any logical operator but unary negation.
         '''
         if style == 'classic':  # mathematical style
             if self._shift != 0:
@@ -678,7 +661,7 @@ class Residual:
 
     def __str__(self):
         '''
-        str representation using M(n + shift) style notation
+        str representation using M(n + shift) style notation.
 
         >>> a = sieve.Residual(3, 2)
         >>> str(a)
@@ -688,7 +671,7 @@ class Residual:
 
     def __eq__(self, other):
         '''
-        ==, compare residual classes in terms of m and shift
+        ==, compare residual classes in terms of m and shift.
         '''
         if other is None:
             return 0
@@ -701,7 +684,7 @@ class Residual:
 
     def __cmp__(self, other):
         '''
-        allow comparison based on m and shift; if all equal look at neg
+        Allow comparison based on m and shift; if all equal look at neg.
 
         Still being used internally even though __cmp__ is not used in Python 3
         '''
@@ -719,7 +702,7 @@ class Residual:
                 return 1
             else:  # shifts are equal
                 if self._neg != other._neg:
-                    if self._neg == 1:  # its negative, then less
+                    if self._neg == 1:  # it's negative, then less
                         return -1
                     else:
                         return 1
@@ -740,7 +723,7 @@ class Residual:
 
     def __neg__(self):
         '''
-        unary neg operators; return neg object
+        Unary neg operators; return neg object.
         '''
         if self._neg:  # if 1
             neg = 0
@@ -750,9 +733,9 @@ class Residual:
 
     def __and__(self, other):
         '''
-        &, produces an intersection of two Residual classes
-        returns a new Residual class
-        cannot be done if R under complementation
+        &, produces an intersection of two Residual classes.
+        Returns a new Residual class.
+        Cannot be done if R under complementation.
 
         >>> a = sieve.Residual(3, 2)
         >>> b = sieve.Residual(5, 1)
@@ -771,8 +754,8 @@ class Residual:
 
     def __or__(self, other):
         '''
-        |, not sure if this can be implemented
-        i.e., a union of two Residual classes can not be expressed as a single
+        ``|``, not sure if this can be implemented.
+        i.e., a union of two Residual classes cannot be expressed as a single
         Residual, that is intersections can always be reduced, whereas unions
         cannot be reduced.
         '''
@@ -782,8 +765,8 @@ class Residual:
 
     def _cmpIntersection(self, m1, m2, n1, n2):
         '''
-        compression by intersection
-        find m,n such that the intersection of two Residuals can
+        Compression by intersection.
+        Find m,n such that the intersection of two Residuals can
         be reduced to one Residual. Xenakis p 273.
         '''
         d = gcd(m1, m2)
@@ -815,8 +798,8 @@ class CompressionSegment:
     Utility to convert from a point sequence to sieve.
 
     A z range can be supplied to explicitly provide the complete sieve segment,
-    both positive and negative values. all values in the z range not in the
-    segment are interpreted as negative values. thus, there is an essential
+    both positive and negative values. All values in the z range not in the
+    segment are interpreted as negative values. Thus, there is an essential
     dependency on the z range and the realized sieve.
 
     No matter the size of the z range, there is a modulus at which one point
@@ -824,7 +807,7 @@ class CompressionSegment:
     minimum, a residual for each point in the segment, each, for the supplied z,
     providing a segment with one point.
 
-    The same segment can then have multiplied logical string representations,
+    The same segment can then have multiple logical string representations,
     depending on the provided z.
 
     >>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8, 13, 19])
@@ -861,8 +844,10 @@ class CompressionSegment:
         # assign self._residuals and do analysis
         try:
             self._process()
-        except AssertionError:
-            raise CompressionSegmentException('no Residual classes found for this z range')
+        except AssertionError as assertError:
+            raise CompressionSegmentException(
+                'no Residual classes found for this z range'
+            ) from assertError
 
     def _zUpdate(self, z=None):
         # z must at least be a superset of match
@@ -881,7 +866,6 @@ class CompressionSegment:
     # --------------------------------------------------------------------------
     def __call__(self):
         '''
-
         >>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8])
         >>> b = a()
         >>> str(b[0])
@@ -902,7 +886,7 @@ class CompressionSegment:
     # --------------------------------------------------------------------------
     def _subset(self, sub, thisSet):
         '''
-        True if sub is part of set; assumes no redundancies in each
+        True if sub is part of set; assumes no redundancies in each.
         '''
         commonNum = 0
         for x in sub:
@@ -915,7 +899,7 @@ class CompressionSegment:
 
     def _find(self, n, part, whole):
         '''
-        given a point, and SieveSegment, find a modulus and shift that
+        Given a point, and SieveSegment, find a modulus and shift that
         match.
         '''
         m = 1  # could start at one, but only pertains to the single case of 1@0
@@ -934,9 +918,9 @@ class CompressionSegment:
 
     def _process(self):
         '''
-        take a copy of match; move through each value of this list as if it
+        Take a copy of match; move through each value of this list as if it
         were n; for each n test each modulo (from 1 to len(z) + 1) to find a
-        residual. when found (one will be found), keep it; remove the found
+        residual. When found (one will be found), keep it; remove the found
         segments from the match, and repeat.
         '''
         # process residuals
@@ -1010,7 +994,7 @@ class Sieve:
     >>> c = sieve.Sieve('(5|2)&4&8')
     '''
 
-    def __init__(self, usrStr: str | list[str], z: list[int] | None = None):
+    def __init__(self, usrStr: str|list[str], z: list[int]|None = None):
         # note: this z should only be used if usrStr is a str, and not a list
         if z is None and isinstance(usrStr, str):
             z = list(range(100))
@@ -1120,7 +1104,7 @@ class Sieve:
 
     def _getParameterData(self):
         '''
-        Provides a dictionary data representation for exchange
+        Provides a dictionary data representation for exchange.
         '''
         data = {
             'logStr': self.represent('exp'),
@@ -1156,7 +1140,7 @@ class Sieve:
 
     # --------------------------------------------------------------------------
     # operator overloading for sieves
-    # problem: redundant parenthesis are not removed
+    # problem: redundant parentheses are not removed
 
     def __neg__(self):
         '''
@@ -1201,7 +1185,7 @@ class Sieve:
 
     def __or__(self, other):
         '''
-        |, produces a union
+        ``|``, produces a union
 
         >>> a = sieve.Sieve('3@11')
         >>> b = sieve.Sieve('2&4&8|5')
@@ -1251,12 +1235,12 @@ class Sieve:
     # string conversions
     def _parseResidual(self, usrStr):
         '''
-        process an arg string for proper Residual creation
-        valid syntax for Mod, shift pairs:
+        Process an arg string for proper Residual creation.
+        Valid syntax for Mod, shift pairs:
         all valid: MsubN, M@N, M,N, M
-        if M is given alone, shift is assumed to be 0
-        this method assumes that all brackets have been replaced with parentheses
-        returns a dictionary of args suitable for creating a Residual class
+        If M is given alone, shift is assumed to be 0.
+        This method assumes that all brackets have been replaced with parentheses.
+        Returns a dictionary of args suitable for creating a Residual class.
         '''
         m = 0
         # if given a number, not a string
@@ -1270,8 +1254,8 @@ class Sieve:
             usrStr = usrStr.replace('sub', ',')
         if usrStr.find('@'):
             usrStr = usrStr.replace('@', ',')
-        # remove any braces remain, remove
-        # all parenthesis and brackets are converted to braces
+        # remove any braces that remain
+        # all parentheses and brackets are converted to braces
         usrStr = usrStr.replace(LGROUP, '')
         usrStr = usrStr.replace(RGROUP, '')
 
@@ -1289,7 +1273,7 @@ class Sieve:
         try:
             # assume we have either an int (M), or a tuple (M,N)
             # better to remove the eval, but at least there are no globals or locals this way
-            # waste of two {} dicts -- could be cached, but not worth it for now...
+            # waste of two {} dicts -- could be cached, but not worth it for now
             args = literal_eval(usrStr)
         except (NameError, SyntaxError, TypeError):
             return None
@@ -1312,16 +1296,18 @@ class Sieve:
 
     def _parseLogic(self, usrStr):
         '''
-        provide synonyms for logical symbols
-        intersection == and, &, *
-        union        == or, |, +
-        not          == not, -
-        the native format for str representation uses only &, |, -
-        this method converts all other string representations
+        Provide synonyms for logical symbols::
 
-        all brackets and braces are replaced with parenthesis
-        parentheses are only used for the internal representation
-        on string representation, braces are restored
+            intersection == and, &, *
+            union        == or, |, +
+            not          == not, -
+
+        The native format for str representation uses only ``&``, ``|``, ``-``;
+        this method converts all other string representations.
+
+        All brackets and braces are replaced with parentheses.
+        Parentheses are only used for the internal representation.
+        On string representation, braces are restored.
         '''
         # if not a string but a number
         if common.isNum(usrStr):  # assume its a single modulus
@@ -1330,7 +1316,7 @@ class Sieve:
 
         if usrStr.find('and') >= 0:  # replace with '&'
             usrStr = usrStr.replace('and', AND)
-        if usrStr.find('*') >= 0:  # Xenakis notation'
+        if usrStr.find('*') >= 0:  # Xenakis notation
             usrStr = usrStr.replace('*', AND)
         if usrStr.find('or') >= 0:
             usrStr = usrStr.replace('or', OR)
@@ -1341,7 +1327,7 @@ class Sieve:
         if usrStr.find('not') >= 0:
             usrStr = usrStr.replace('not', NEG)
         # all groupings converted to braces
-        if usrStr.find('[') >= 0:  # replace brackets w/ parenthesis
+        if usrStr.find('[') >= 0:  # replace brackets w/ parentheses
             usrStr = usrStr.replace('[', LGROUP)
         if usrStr.find(']') >= 0:
             usrStr = usrStr.replace(']', RGROUP)
@@ -1356,7 +1342,7 @@ class Sieve:
     # --------------------------------------------------------------------------
     def _setInstantiateStr(self, valList):
         '''
-        return string necessary to instantiate a set object.
+        Return string necessary to instantiate a set object.
         '''
         valList = list(valList)
         valList = repr(valList).replace(' ', '')
@@ -1367,7 +1353,7 @@ class Sieve:
 
     def _resKeys(self, state):
         '''
-        get residual keys based on library.
+        Get residual keys based on library.
         '''
         if state not in ('cmp', 'exp'):
             raise SieveException("state must be 'cmp' or 'exp'")
@@ -1399,9 +1385,9 @@ class Sieve:
 
     def _resCreate(self, resId, resStr):
         '''
-        create a residual object, store in expResidualLib
-        return a string id representation
-        this uses self._z at initialization.
+        Create a residual object, store in expResidualLib.
+        Return a string id representation.
+        This uses self._z at initialization.
         '''
         resDict = self._parseResidual(''.join(resStr))
         if resDict is None:
@@ -1420,8 +1406,8 @@ class Sieve:
 
     def _resToSetStr(self, resId, n=0, z=None):
         '''
-        this is where residuals are converted to set evaluating strings
-        z should not be stored; should be a temporary value
+        This is where residuals are converted to set evaluating strings.
+        z should not be stored; should be a temporary value.
         '''
         if z is None:  # if none given, give internal
             z = self._z
@@ -1433,15 +1419,15 @@ class Sieve:
 
     def _resIdIncrement(self):
         '''
-        increment the _resId.
+        Increment the _resId.
         '''
         self._resId = self._resId + 1
 
     def _resResetId(self):
         '''
-        reset self._resId to the next available number
-        may need to re-label some residual classes if gaps develop
-        ids should be contiguous integer sequence
+        Reset self._resId to the next available number.
+        May need to re-label some residual classes if gaps develop.
+        Ids should be contiguous integer sequence.
         '''
         iVals = range(len(self._resLib.keys()))
         for i in iVals:
@@ -1469,8 +1455,8 @@ class Sieve:
 
     def _initLoadSegment(self, usrData):
         '''
-        load from a segments
-        reload _resId.
+        Load from a segment.
+        Reload _resId.
         '''
         # clear first
         self._expTree = []  # string that stores representation
@@ -1487,7 +1473,7 @@ class Sieve:
 
     def _initParse(self, z=None):
         '''
-        process usrStr string into proper argument dictionaries for Residual
+        Process usrStr string into proper argument dictionaries for Residual.
         '''
         # clear first
         self._resLib = {}  # store id and object
@@ -1578,7 +1564,7 @@ class Sieve:
 
     def _cmpIntersection(self):
         '''
-        an unbound sieve, intersection Residual
+        An unbound sieve, intersection Residual.
         '''
         self._cmpTree = []  # clear first
         logStr = copy.copy(self._expTree)  # create scratch copy
@@ -1588,7 +1574,7 @@ class Sieve:
         for orGroup in orList:
             if orGroup == '':
                 continue
-            # need deal with mixed not operations in an and-group
+            # need to deal with mixed not operations in an and-group
             andList = orGroup.split(AND)
             # do intersections, reduce, and add
             if len(andList) == 1:
@@ -1610,7 +1596,7 @@ class Sieve:
 
     def _cmpSegment(self):
         '''
-        a bound sieve, uss a newly created segment
+        A bound sieve, uses a newly created segment.
         '''
         # clear first
         self._cmpTree = []
@@ -1629,7 +1615,7 @@ class Sieve:
 
     def segment(
         self,
-        state: t.Literal['cmp'] | t.Literal['exp'] | None = None,
+        state: t.Literal['cmp']|t.Literal['exp']|None = None,
         n=0,
         z=None,
         segmentFormat=None
@@ -1662,26 +1648,26 @@ class Sieve:
         keys = self._resKeys(state)
 
         # The only "NEG" values that remain are those that are applied to groups.
-        # Replace all remain NEG in the formula w/ '1@1-'
+        # Replace all remaining NEG in the formula w/ '1@1-'
         # as long as binary negation is evaluated before & and |, this will work
         # see http://docs.python.org/ref/summary.html
         # must do this before converting segments (where there will be neg numbers)
 
-        resObj = Residual(1, 0, 0, z)  # create a temporary residual 1@!
+        resObj = Residual(1, 0, 0, z)  # create a temporary residual 1@0
         setStr = self._setInstantiateStr(resObj())  # get segment
         evalStr = evalStr.replace('-', setStr + '-')
         # replace residuals (this will add - as -numbers)
         for key in keys:
             evalStr = evalStr.replace(key, self._resToSetStr(key, n, z))
 
-        # convert all braces to parenthesis
+        # convert all braces to parentheses
         evalStr = evalStr.replace(LGROUP, '(')
         evalStr = evalStr.replace(RGROUP, ')')
 
         # this may raise an exception if mal-formed
         try:
             # better to remove the eval, but at least there are no globals or locals this way
-            # waste of two {} dicts -- could be cached, but not worth it for now...
+            # waste of two {} dicts -- could be cached, but not worth it for now
             seg = eval(evalStr, {'__builtins__': {'set': set}}, {})  # pylint: disable=eval-used
             # print('---: ' + evalStr)
             # print('xxx: ' + repr(seg))
@@ -1799,8 +1785,8 @@ class Sieve:
 
     def represent(self, state=None, style=None):
         '''
-        style of None is use for users; adds | to single residuals
-        style abs (absolute) does not add | tos single residual class
+        Style of None is used for users; adds | to single residuals.
+        Style abs (absolute) does not add | to a single residual class.
         '''
         if state is None:
             state = self._state
@@ -1841,10 +1827,10 @@ class PitchSieve:
 
     def __init__(self,
                  sieveString,
-                 pitchLower: str | None = None,
-                 pitchUpper: str | None = None,
-                 pitchOrigin: str | None = None,
-                 eld: int | float = 1):
+                 pitchLower: str|None = None,
+                 pitchUpper: str|None = None,
+                 pitchOrigin: str|None = None,
+                 eld: int|float = 1):
         self.sieveString = sieveString  # logical sieve string
 
         # should be in a try block
@@ -1977,7 +1963,7 @@ class PitchSieve:
         #            self.sieveObject.period())
         p = self.sieveObject.period()
 
-        z: list[int] | None
+        z: list[int]|None
         if p < 999999999:
             z = list(range(p + 1))
         else:  # too big to get z as list of values
@@ -2107,22 +2093,18 @@ class Test(unittest.TestCase):
                          '{-{13@3|13@5|13@7|13@9}&11@2}|{-{11@4|11@8}&13@9}|{13@0|13@1|13@6}')
 
     def testPitchSieveA(self):
-        from music21 import sieve
-
-        s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6')
+        s1 = PitchSieve('3@0|7@0', 'c2', 'c6')
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, E-2, F#2, G2, A2, C3, D3, E-3, F#3, A3, C4, E-4, '
                          'E4, F#4, A4, B4, C5, E-5, F#5, A5, C6]')
 
-        s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6', eld=2)
+        s1 = PitchSieve('3@0|7@0', 'c2', 'c6', eld=2)
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, D2, F#2, C3, E3, F#3, C4, F#4, C5, F#5, G#5, C6]')
 
     def testPitchSieveB(self):
-        from music21 import sieve
-
-        # mircotonal elds
-        s1 = sieve.PitchSieve('1@0', 'c2', 'c6', eld=0.5)
+        # microtonal elds
+        s1 = PitchSieve('1@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, C~2, C#2, C#~2, D2, D~2, E-2, E`2, E2, E~2, F2, F~2, F#2, '
                          'F#~2, G2, G~2, G#2, G#~2, A2, A~2, B-2, B`2, B2, B~2, C3, C~3, C#3, '
@@ -2132,7 +2114,7 @@ class Test(unittest.TestCase):
                          'B`4, B4, B~4, C5, C~5, C#5, C#~5, D5, D~5, E-5, E`5, E5, E~5, F5, F~5, '
                          'F#5, F#~5, G5, G~5, G#5, G#~5, A5, A~5, B-5, B`5, B5, B~5, C6]')
 
-        s1 = sieve.PitchSieve('3@0', 'c2', 'c6', eld=0.5)
+        s1 = PitchSieve('3@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, '
                          'A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, '

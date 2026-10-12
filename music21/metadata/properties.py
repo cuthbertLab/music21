@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         properties.py
 # Purpose:      Data describing the standard set of metadata properties
@@ -6,8 +5,7 @@
 # Authors:      Greg Chapman
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2023–2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -47,11 +45,11 @@ class PropertyDescription:
         metadata, and is the tuple element type clients will always receive from
         md['uniqueName'] or md['namespace:name'].
     '''
-    uniqueName: str | None = None
+    uniqueName: str|None = None
     name: str = ''
     namespace: str = ''
-    oldMusic21Abbrev: str | None = None
-    oldMusic21WorkId: str | None = None
+    oldMusic21Abbrev: str|None = None
+    oldMusic21WorkId: str|None = None
     valueType: type[ValueType] = Text
     needsArticleNormalization: bool = False
     isContributor: bool = False
@@ -385,7 +383,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: tuple[PropertyDescription, ...] = (
         isContributor=False),
 
     # The following 'marcrel' property terms are MARC Relator terms,
-    # found at:  http://www.loc.gov/loc.terms/relators/
+    # found at: https://id.loc.gov/vocabulary/relators.html
 
     # adapter: a person or organization who 1) reworks a musical composition,
     #   usually for a different medium, or 2) rewrites novels or stories
@@ -851,7 +849,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: tuple[PropertyDescription, ...] = (
         oldMusic21Abbrev='osc',
         isContributor=False),
 
-    # movementNumber: movement number (e.g. '4', or 'mov. 4', or...)
+    # movementNumber: movement number (e.g. '4', or 'mov. 4')
     PropertyDescription(
         uniqueName='movementNumber',
         name='OMV',
@@ -1136,6 +1134,12 @@ STANDARD_PROPERTY_DESCRIPTIONS: tuple[PropertyDescription, ...] = (
     # filePath: The path to the file that was parsed to produce this metadata
     PropertyDescription(
         name='filePath',
+        namespace='m21FileInfo',
+        isContributor=False),
+
+    # corpusFilePath: The path withing the corpus that the file was found at
+    PropertyDescription(
+        name='corpusFilePath',
         namespace='m21FileInfo',
         isContributor=False),
 

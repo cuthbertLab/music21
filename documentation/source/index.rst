@@ -27,3 +27,8 @@
    :maxdepth: 2
 
    developerReference/index
+
+.. toctree::
+   :maxdepth: 1
+   
+   testsAndInProgress/index

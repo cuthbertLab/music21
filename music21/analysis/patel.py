@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         patel.py
 # Purpose:      Tools for testing Aniruddh D. Patel's analysis theories
@@ -10,7 +9,7 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-import math
+from statistics import mean, stdev
 import unittest
 
 def nPVI(streamForAnalysis):
@@ -18,11 +17,9 @@ def nPVI(streamForAnalysis):
     Algorithm to give the normalized pairwise variability index
     (Low, Grabe, & Nolan, 2000) of the rhythm of a stream.
 
-
     Used by Aniruddh D. Patel to argue for national differences between musical
     themes.  First encountered it in a presentation by Patel, Chew, Francois,
     and Child at MIT.
-
 
     n.b. -- takes the distance between each element, including clefs, keys, etc.
     use .notesAndRests etc. to filter out elements that are not useful (though this will skip
@@ -95,18 +92,10 @@ def melodicIntervalVariability(streamForAnalysis, **skipKeywords):
     totalElements = len(intervalStream)
     if totalElements < 2:  # this is correct.
         raise ValueError('need at least three notes to have '
-                             + 'a std-deviation of intervals (and thus a MIV)')
+                         + 'a std-deviation of intervals (and thus a MIV)')
     # summation = 0
     semitoneList = [myInt.chromatic.undirected for myInt in intervalStream]
-    mean = 0
-    std = 0
-    for a in semitoneList:
-        mean = mean + a
-    mean = mean / totalElements
-    for a in semitoneList:
-        std = std + (a - mean) ** 2
-    std = math.sqrt(std / (totalElements - 1))
-    return 100 * (std / mean)
+    return 100 * (stdev(semitoneList) / mean(semitoneList))
 
 
 class Test(unittest.TestCase):

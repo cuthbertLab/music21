@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/misc.py
 # Purpose:      Everything that doesn't fit into anything else.
@@ -10,11 +9,11 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-If it doesn't fit anywhere else in the common directory, you'll find it here...
+If it doesn't fit anywhere else in the common directory, you'll find it here!
 '''
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Sequence
 import copy
 import os
 import platform
@@ -27,19 +26,22 @@ import typing as t
 import weakref
 
 __all__ = [
+    'cleanedFlatNotation',
+    'defaultDeepcopy',
     'flattenList',
     'getMissingImportStr',
     'getPlatform',
     'macOSVersion',
-    'sortModules',
     'pitchList',
+    'runningInNotebook',
+    'sortModules',
     'unique',
-    'runningUnderIPython',
-    'defaultDeepcopy',
-    'cleanedFlatNotation',
 ]
 
+from functools import cache
+
 if t.TYPE_CHECKING:
+    from music21 import pitch
     _T = t.TypeVar('_T')
 
 # -----------------------------------------------------------------------------
@@ -47,18 +49,22 @@ if t.TYPE_CHECKING:
 
 def flattenList(originalList: Iterable[Iterable[_T]]) -> list[_T]:
     '''
-    Flatten a list of lists into a flat list
-
-    but not a list of lists of lists...
+    Flatten a list of lists into a flat list:
 
     >>> l = [[1, 2, 3], [4, 5], [6]]
     >>> common.flattenList(l)
     [1, 2, 3, 4, 5, 6]
+
+    But not a list of lists-of-lists!
+
+    >>> l2 = [[1, 2, 3], [4, 5], [6, [7, 8]]]
+    >>> common.flattenList(l2)
+    [1, 2, 3, 4, 5, 6, [7, 8]]
     '''
     return [item for sublist in originalList for item in sublist]
 
 
-def unique(originalList: Iterable, *, key: Callable | None = None) -> list:
+def unique(originalList: Iterable, *, key: Callable|None = None) -> list:
     '''
     Return a List of unique items from an iterable, preserving order.
     (unlike casting to a set and back)
@@ -100,21 +106,20 @@ def unique(originalList: Iterable, *, key: Callable | None = None) -> list:
 # provide warning strings to users for use in conditional imports
 
 
-def getMissingImportStr(modNameList):
+def getMissingImportStr(modNameList: Sequence[str]) -> str|None:
     '''
     Given a list of missing module names, returns a nicely-formatted message to the user
     that gives instructions on how to expand music21 with optional packages.
 
-
     >>> print(common.getMissingImportStr(['matplotlib']))
     Certain music21 functions might need the optional package matplotlib;
     if you run into errors, install it by following the instructions at
-    http://mit.edu/music21/doc/installing/installAdditional.html
+    https://www.music21.org/music21docs/installing/installAdditional.html
 
     >>> print(common.getMissingImportStr(['matplotlib', 'numpy']))
     Certain music21 functions might need these optional packages: matplotlib, numpy;
     if you run into errors, install them by following the instructions at
-    http://mit.edu/music21/doc/installing/installAdditional.html
+    https://www.music21.org/music21docs/installing/installAdditional.html
     '''
     if not modNameList:
         return None
@@ -122,13 +127,13 @@ def getMissingImportStr(modNameList):
         m = modNameList[0]
         return textwrap.dedent(f'''Certain music21 functions might need the optional package {m};
                   if you run into errors, install it by following the instructions at
-                  http://mit.edu/music21/doc/installing/installAdditional.html''')
+                  https://www.music21.org/music21docs/installing/installAdditional.html''')
     else:
         m = ', '.join(modNameList)
         return textwrap.dedent(
             f'''Certain music21 functions might need these optional packages: {m};
                    if you run into errors, install them by following the instructions at
-                   http://mit.edu/music21/doc/installing/installAdditional.html''')
+                   https://www.music21.org/music21docs/installing/installAdditional.html''')
 
 
 def getPlatform() -> str:
@@ -196,7 +201,7 @@ def sortModules(moduleList: Iterable[t.Any]) -> list[object]:
 
 
 # ----------------------------
-def pitchList(pitchL):
+def pitchList(pitchL: Iterable[pitch.Pitch]) -> str:
     '''
     utility method that replicates the previous behavior of
     lists of pitches.
@@ -206,24 +211,32 @@ def pitchList(pitchL):
     return '[' + ', '.join([x.nameWithOctave for x in pitchL]) + ']'
 
 
-def runningUnderIPython() -> bool:
+@cache
+def runningInNotebook() -> bool:
     '''
-    return bool if we are running under IPython Notebook (not IPython terminal)
-    or Google Colabatory (colab).
+    return bool if we are running under Jupyter Notebook (not IPython terminal)
+    or Google Colabatory (colab) or Marimo.
 
     Methods based on:
 
     https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
-
     (No tests provided here, since results will differ depending on environment)
-
-    May be moved in v8 or later to the ipython21 module.  Implementation may
-    change.
     '''
-    if sys.stderr.__class__.__name__ == 'OutStream':
+    if runningInJupyterOrColab():
+        return True
+    elif runningInMarimo():
         return True
     else:
         return False
+
+def runningInJupyterOrColab() -> bool:
+    return sys.stderr.__class__.__name__ == 'OutStream'
+
+def runningInMarimo() -> bool:
+    if 'marimo' not in sys.modules:  # only True if it's been loaded already
+        return False
+    # so this is very fast, even if False.
+    return __import__('marimo').running_in_notebook()
 
 
 # ----------------------------
@@ -242,7 +255,12 @@ _IMMUTABLE_DEEPCOPY_TYPES = {
     weakref.ref, property,
 }
 
-def defaultDeepcopy(obj: t.Any, memo=None, *, ignoreAttributes: Iterable[str] = ()):
+def defaultDeepcopy(
+    obj: t.Any,
+    memo: dict[int, t.Any]|None = None,
+    *,
+    ignoreAttributes: Iterable[str] = ()
+) -> t.Any:
     '''
     Unfortunately, it is not possible to do something like::
 
@@ -265,7 +283,7 @@ def defaultDeepcopy(obj: t.Any, memo=None, *, ignoreAttributes: Iterable[str] = 
     Does a deepcopy of the state returned by `__reduce_ex__` for protocol 4.
 
     * Changed in v9: callInit is removed, replaced with ignoreAttributes.
-      uses `__reduce_ex__` and `copy._reconstruct` internally.
+      uses `__reduce_ex__` internally.
     '''
     if memo is None:
         memo = {}

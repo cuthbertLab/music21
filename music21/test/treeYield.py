@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         treeYield.py
 # Purpose:      traverse a complex datastructure and yield elements
@@ -55,30 +54,28 @@ class TreeYielder:  # pragma: no cover
         if self.yieldValue(obj) is True:
             yield obj
 
-        # now check for sub values...
+        # now check for sub values
         self.currentStack.append(obj)
 
         tObj = type(obj)
         if tObj in self.nonIterables:
             pass
-        elif tObj == dict:
+        elif tObj is dict:
             for keyX in obj:
                 dictTuple = ('dict', keyX)
                 self.stackVals.append(dictTuple)
                 x = obj[keyX]
-                for z in self.run(x, memo=memo):
-                    yield z
+                yield from self.run(x, memo=memo)
                 self.stackVals.pop()
 
         elif tObj in [list, tuple]:
             for i, x in enumerate(obj):
                 listTuple = ('listLike', i)
                 self.stackVals.append(listTuple)
-                for z in self.run(x, memo=memo):
-                    yield z
+                yield from self.run(x, memo=memo)
                 self.stackVals.pop()
 
-        else:  # objects or uncaught types...
+        else:  # objects or uncaught types
             # from http://bugs.python.org/file18699/static.py
             try:
                 instance_dict = object.__getattribute__(obj, '__dict__')
@@ -90,15 +87,16 @@ class TreeYielder:  # pragma: no cover
                 # noinspection PyBroadException
                 try:
                     gotValue = object.__getattribute__(obj, x)
-                except Exception:  # pylint: disable=broad-except
+                except Exception:  # pylint: disable=broad-exception-caught
                     continue
                 objTuple = ('getattr', x)
                 self.stackVals.append(objTuple)
                 try:
-                    for z in self.run(gotValue, memo=memo):
-                        yield z
-                except RuntimeError:
-                    raise Exception(f'Maximum recursion on:\n{self.currentLevel()}')
+                    yield from self.run(gotValue, memo=memo)
+                except RuntimeError as runError:
+                    raise ValueError(
+                        f'Maximum recursion on:\n{self.currentLevel()}'
+                    ) from runError
                 self.stackVals.pop()
 
         self.currentStack.pop()
@@ -109,14 +107,14 @@ class TreeYielder:  # pragma: no cover
             if stackType == 'dict':
                 if isinstance(stackValue, str):
                     currentStr += "['" + stackValue + "']"
-                else:  # numeric key...
+                else:  # numeric key
                     currentStr += '[' + str(stackValue) + ']'
             elif stackType == 'listLike':
                 currentStr += '[' + str(stackValue) + ']'
             elif stackType == 'getattr':
                 currentStr += ".__getattribute__('" + stackValue + "')"
             else:
-                raise Exception(f'Cannot get attribute of type {stackType}')
+                raise ValueError(f'Cannot get attribute for stackType {stackType!r}')
         return currentStr
 
 

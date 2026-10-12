@@ -6,11 +6,19 @@ labels: ''
 assignees: ''
 
 ---
+
 <!-- Version of music21:  print(music21.__version__) -->
 **music21 version**
 
-`9.8.7`   <!-- replace with actual version -->
+`1.2.3`   <!-- replace with actual version -->
 
+**Operating System(s) checked**
+Windows 11  <!-- replace with OS -->
+
+<!-- Note: only Mac and Windows are directly supported by music21 developers.  
+     Bug reports that are specific to other OSes w/o a PR will be closed
+     unless the reporter is willing to contribute a fix.
+ -->
 
 **Problem summary**
 <!-- Briefly: what undesired thing happens when what action is taken? -->
@@ -31,9 +39,5 @@ myStream2.insert(note.Rest(0.5))
 <!-- Consider annotating the output produced by a function -->
 
 **More information**
-<!-- If relevant: OS, suggested fix, attempted workarounds -->
+<!-- If relevant: suggested fix, attempted workarounds -->
 
-<!-- Note: only Mac and Windows are directly supported by music21 staff.  
-     Bug reports that are specific to other OSes w/o a PR will be closed
-     unless the reporter is willing to contribute a fix.
- -->

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         editorial.py
 # Purpose:      music21 classes for representing editorial information
@@ -6,8 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2015 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -70,11 +68,10 @@ class Editorial(prebase.ProtoM21Object, dict):
     >>> n = note.Note('F')
     >>> n.editorial.ficta = fictaSharp
     >>> assert(n.editorial.ficta.alter == 1.0) #_DOCS_HIDE
-    >>> #_DOCS_SHOW n.show('lily.png')  # only Lilypond currently supports musica ficta
+    >>> #_DOCS_SHOW n.show('lily.png')  # only LilyPond currently supports musica ficta
 
     .. image:: images/noteEditorialFictaSharp.*
         :width: 103
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'comments': '''
@@ -87,10 +84,10 @@ class Editorial(prebase.ProtoM21Object, dict):
             ''',
         'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica
             ficta for the note.  Will only be displayed in LilyPond and then only if
-            there is no Accidental object on the note itself''',
+            there is no Accidental object on the note itself.''',
         'harmonicInterval': '''an :class:`~music21.interval.Interval` object that specifies
             the harmonic interval between this object and a single other object, or None
-            (useful for storing information post analysis)''',
+            (useful for storing information post analysis).''',
         'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies
             the melodic interval to the next object in this Part/Voice/Stream, etc.''',
     }
@@ -131,6 +128,14 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):  # type: ignore
     A comment or footnote or something else attached to a note.
 
     >>> c = editorial.Comment('presented as C natural in the 1660 print.')
+    >>> c
+    <music21.editorial.Comment 'presented as C na...'>
+
+    Note that the text is truncated in representation, but it is all there in `.text`:
+
+    >>> c.text
+    'presented as C natural in the 1660 print.'
+
     >>> c.isFootnote = True
     >>> c.levelInformation = 'musicological'
 

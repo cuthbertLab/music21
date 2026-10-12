@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         windowed.py
 # Purpose:      Framework for modular, windowed analysis
@@ -95,7 +94,6 @@ class WindowedAnalysis:
 
         >>> wa1 = analysis.windowed.WindowedAnalysis(s, p)
         >>> wa2 = analysis.windowed.WindowedAnalysis(s.flatten(), p)
-
         '''
         # create a stream that contains just a 1/4 time signature; this is
         # the minimum window size (and partitioning will be done by measure)
@@ -128,7 +126,6 @@ class WindowedAnalysis:
         minus the window size plus one. If we have 20 1/4 windows, then the results lists
         will be of length 20 for window size 1, 19 for window size 2, 18 for window size 3, etc.
 
-
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
         >>> wa = analysis.windowed.WindowedAnalysis(s.flatten(), p)
@@ -153,7 +150,6 @@ class WindowedAnalysis:
         >>> a, b = wa.analyze(1, windowType='adjacentAverage')
         >>> len(a), len(b)
         (36, 36)
-
         '''
         maxWindowCount = len(self._windowedStream)
         # assuming that this is sorted
@@ -165,7 +161,8 @@ class WindowedAnalysis:
             windowCount = int(windowCountFloat)
             if windowCountFloat != windowCount:
                 warnings.warn(
-                    'maxWindowCount is not divisible by windowSize, possibly undefined behavior'
+                    'maxWindowCount is not divisible by windowSize, possibly undefined behavior',
+                    stacklevel=2
                 )
         elif windowType == 'adjacentAverage':
             windowCount = maxWindowCount
@@ -187,16 +184,14 @@ class WindowedAnalysis:
                 try:
                     data[i], color[i] = self.processor.process(current)
                 except DiscreteAnalysisException:
-                    # current might have no notes...all rests?
+                    # current might have no notes: all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
 
         elif windowType == 'noOverlap':
             start = 0
             end = start + windowSize
-            i = 0
-            while True:
-                if end >= len(self._windowedStream):
-                    end = len(self._windowedStream)
+            for i in range(windowCount):
+                end = min(end, len(self._windowedStream))
 
                 current = stream.Stream()
                 for j in range(start, end):
@@ -205,14 +200,11 @@ class WindowedAnalysis:
                 try:
                     data[i], color[i] = self.processor.process(current)
                 except DiscreteAnalysisException:
-                    # current might have no notes...all rests?
+                    # current might have no notes: all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
 
                 start = end
                 end = start + windowSize
-                i += 1
-                if i >= windowCount:
-                    break
 
         elif windowType == 'adjacentAverage':
             # first get overlapping windows
@@ -237,16 +229,16 @@ class WindowedAnalysis:
                 try:
                     data[i], color[i] = self.processor.process(current)
                 except DiscreteAnalysisException:
-                    # current might have no notes...all rests?
+                    # current might have no notes: all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
 
         return data, color
 
 
     def process(self,
-                minWindow: int | None = 1,
-                maxWindow: int | None = 1,
-                windowStepSize: int | str = 1,
+                minWindow: int|None = 1,
+                maxWindow: int|None = 1,
+                windowStepSize: int|str = 1,
                 windowType='overlap',
                 includeTotalWindow=True):
         # noinspection PyShadowingNames
@@ -263,7 +255,6 @@ class WindowedAnalysis:
         If `minWindow` or `maxWindow` is None, the largest window size available will be set.
 
         If `includeTotalWindow` is True, the largest window size will always be added.
-
 
         >>> s = corpus.parse('bach/bwv324')
         >>> ksAnalyzer = analysis.discrete.KrumhanslSchmuckler()
@@ -350,13 +341,13 @@ class WindowedAnalysis:
 
 # -----------------------------------------------------------------------------
 
-class TestMockProcessor:
+class MockObjectProcessor:
 
     def process(self, subStream):
         '''
         Simply count the number of notes found
         '''
-        return len(subStream.flatten().notesAndRests), None
+        return len(subStream.recurse().notesAndRests), None
 
 
 class Test(unittest.TestCase):
@@ -385,7 +376,7 @@ class Test(unittest.TestCase):
         '''
         Test that windows are doing what they are supposed to do
         '''
-        p = TestMockProcessor()
+        p = MockObjectProcessor()
 
         from music21 import note
         s1 = stream.Stream()

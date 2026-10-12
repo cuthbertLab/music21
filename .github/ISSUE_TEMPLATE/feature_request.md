@@ -6,6 +6,7 @@ labels: 'enhancement'
 assignees: ''
 
 ---
+
 **Motivation**
 <!-- E.g. does this fill a gap? build on music21's strengths? improve usability? -->
 

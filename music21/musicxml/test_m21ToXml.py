@@ -27,6 +27,7 @@ from music21 import note
 from music21 import repeat
 from music21 import spanner
 from music21 import stream
+from music21 import style
 from music21 import tempo
 
 from music21.musicxml import helpers
@@ -35,6 +36,15 @@ from music21.musicxml.m21ToXml import (
     GeneralObjectExporter, ScoreExporter,
     MusicXMLWarning, MusicXMLExportException
 )
+from music21.musicxml.xmlToM21 import MeasureParser
+
+def stripInnerSpaces(txt: str):
+    '''
+    Collapse all whitespace (say, in some XML) to a single space,
+    for ease of comparison.
+    '''
+    return re.sub(r'\s+', ' ', txt)
+
 
 class Test(unittest.TestCase):
 
@@ -91,6 +101,75 @@ class Test(unittest.TestCase):
         p.insert(0.0, sl3)
         self.assertEqual(self.getXml(p).count('<slur '), 6)
 
+    def testSpannerAnchors(self):
+        score = stream.Score()
+        part = stream.Part()
+        score.insert(0, part)
+        measure = stream.Measure()
+        part.insert(0, measure)
+        voice = stream.Voice()
+        measure.insert(0, voice)
+
+        n = note.Note('C', quarterLength=4)
+        sa1 = spanner.SpannerAnchor()
+        sa2 = spanner.SpannerAnchor()
+        voice.insert(0, n)
+        voice.insert(2, sa1)
+        voice.insert(4, sa2)
+        cresc = dynamics.Crescendo(n, sa1)  # cresc from n to sa1
+        dim = dynamics.Diminuendo(sa1, sa2)   # dim from sa1 to sa2
+        score.append((cresc, dim))
+
+        xmlOut = self.getXml(score)
+
+        self.assertIn(
+            stripInnerSpaces(
+                '''<measure implicit="no" number="0">
+                       <attributes>
+                           <divisions>10080</divisions>
+                       </attributes>
+                       <note>
+                           <pitch>
+                               <step>C</step>
+                               <octave>4</octave>
+                           </pitch>
+                           <duration>40320</duration>
+                           <type>whole</type>
+                       </note>
+                       <backup>
+                           <duration>40320</duration>
+                       </backup>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="1" spread="0" type="crescendo" />
+                           </direction-type>
+                       </direction>
+                       <forward>
+                           <duration>20160</duration>
+                       </forward>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="2" spread="15" type="diminuendo" />
+                           </direction-type>
+                       </direction>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="1" spread="15" type="stop" />
+                           </direction-type>
+                       </direction>
+                       <forward>
+                           <duration>20160</duration>
+                       </forward>
+                       <direction placement="below">
+                           <direction-type>
+                               <wedge number="2" spread="0" type="stop" />
+                           </direction-type>
+                       </direction>
+                   </measure>'''),
+            stripInnerSpaces(xmlOut)
+        )
+
+
     def testSpannersWritePartStaffs(self):
         '''
         Test that spanners are gathered on the PartStaffs that need them.
@@ -117,9 +196,6 @@ class Test(unittest.TestCase):
         # and written after the backup tag, i.e. on the LH?
         xmlOut = self.getXml(s)
         xmlAfterFirstBackup = xmlOut.split('</backup>\n')[1]
-
-        def stripInnerSpaces(txt):
-            return re.sub(r'\s+', ' ', txt)
 
         self.assertIn(
             stripInnerSpaces(
@@ -152,6 +228,21 @@ class Test(unittest.TestCase):
         v2.id = 'hello'
         xmlOut = self.getXml(m)
         self.assertIn('<voice>hello</voice>', xmlOut)
+
+    def testUnpitchedGraceInVoice(self):
+        '''
+        <unpitched> must precede <voice> even on a grace note, which has
+        no <duration> element to insert before.
+        '''
+        # https://github.com/cuthbertLab/music21/issues/1732
+        grace = note.Unpitched(duration=duration.GraceDuration())
+        v1 = stream.Voice([grace])
+        v2 = stream.Voice([note.Note()])
+        m = stream.Measure([v1, v2])
+
+        tree = self.getET(m)
+        mxNote = tree.find('part/measure/note')
+        self.assertEqual([el.tag for el in mxNote], ['grace', 'unpitched', 'voice', 'type'])
 
     def testVoiceNumberOffsetsThreeStaffsInGroup(self):
         n1_1 = note.Note()
@@ -229,6 +320,46 @@ class Test(unittest.TestCase):
         self.assertEqual(ly2.findall('text')[0].text, 'd')
         self.assertEqual(ly2.findall('syllabic')[1].text, 'end')
         self.assertEqual(ly2.findall('text')[1].text, 'e')
+
+    def testExportChordSymbolWithInversions(self):
+        '''
+        This test checks for the issue in 1756 where a chord symbol imported
+        with both inversion and bass would not have them both set.
+
+        There were multiple bugs fixed, so important to check.
+        '''
+        explicitFm6 = harmony.ChordSymbol(root='F', bass='A-', inversion=1, kind='minor')
+        et = self.getET(explicitFm6)
+        harmonyEls = et.findall('part/measure/harmony')
+        self.assertEqual(len(harmonyEls), 1)
+        harmonyEl = harmonyEls[0]
+        # helpers.dump(harmonyEl)
+        root = harmonyEl.find('root')
+        rootStep = root.find('root-step')
+        self.assertEqual(rootStep.text, 'F')
+        self.assertEqual(harmonyEl.find('kind').text, 'minor')
+        self.assertEqual(harmonyEl.find('inversion').text, '1')
+        self.assertEqual(harmonyEl.find('bass/bass-step').text, 'A')
+        self.assertEqual(harmonyEl.find('bass/bass-alter').text, '-1')
+
+        # test round trip
+        mp = MeasureParser()
+        cs = mp.xmlToChordSymbol(harmonyEl)
+        self.assertEqual(explicitFm6.bass(find=False), cs.bass(find=False))
+        self.assertEqual(explicitFm6.root(find=False), cs.root(find=False))
+        self.assertEqual(explicitFm6.inversion(), cs.inversion())
+
+    def testExportChordSymbolPlacement(self):
+        cs = harmony.ChordSymbol('C')
+        cs.placement = 'below'
+        et = self.getET(cs)
+        harmonyEl = et.find('part/measure/harmony')
+        self.assertEqual(harmonyEl.get('placement'), 'below')
+
+        cs2 = harmony.ChordSymbol('G')
+        et2 = self.getET(cs2)
+        harmonyEl2 = et2.find('part/measure/harmony')
+        self.assertIsNone(harmonyEl2.get('placement'))
 
     def testExportNC(self):
         s = stream.Score()
@@ -378,6 +509,20 @@ class Test(unittest.TestCase):
         )
         self.assertEqual(len(tree.findall('.//measure/note/instrument')), 6)
 
+    def testExportIdOfMeasure(self):
+        ''' Check that id of measure are exported
+            as attributes of the <measure> eelement in MusicXML
+        '''
+        measure = stream.Measure(id='test', number=1)
+        measure.append(note.Note(type='whole'))
+        s = stream.Score(measure)
+        scEx = ScoreExporter(s)
+        tree = scEx.parse()
+
+        for measure_xml in tree.findall('.//measure'):
+            self.assertTrue('id' in measure_xml.attrib)
+            self.assertEqual(measure_xml.get('id'), 'test')
+
     def testMidiInstrumentNoName(self):
         i = instrument.Instrument()
         i.midiProgram = 42
@@ -390,6 +535,15 @@ class Test(unittest.TestCase):
         mxScoreInstrument = tree.findall('.//score-instrument')[0]
         mxMidiInstrument = tree.findall('.//midi-instrument')[0]
         self.assertEqual(mxScoreInstrument.get('id'), mxMidiInstrument.get('id'))
+
+    def testOrnamentAccidentals(self):
+        s = converter.parse(testPrimitive.notations32a)
+        x = self.getET(s)
+        accidentalMarks = x.findall('.//ornaments/accidental-mark')
+        self.assertEqual(
+            [accMark.text for accMark in accidentalMarks],
+            ['natural', 'sharp', 'three-quarters-flat']
+        )
 
     def testMultiDigitEndingsWrite(self):
         # Relevant barlines:
@@ -529,6 +683,13 @@ class Test(unittest.TestCase):
         n = note.Note()
         a = articulations.StringIndication()
         n.articulations.append(a)
+        h = articulations.HammerOn()
+        # Appending a spanner such as HammerOn to the articulations
+        # array is contrary to the documentation and contrary to the
+        # behavior of the musicxml importer, but we're testing it here
+        # anyway to just ensure that *IF* a user decides to do this themselves,
+        # we don't create a superfluous <other-technical> tag on export.
+        n.articulations.append(h)
 
         # Legal values for StringIndication begin at 1
         self.assertEqual(a.number, 0)
@@ -536,6 +697,7 @@ class Test(unittest.TestCase):
         gex = GeneralObjectExporter(n)
         tree = et_fromstring(gex.parse().decode('utf-8'))
         self.assertIsNone(tree.find('.//string'))
+        self.assertIsNone(tree.find('.//other-technical'))
 
     def testMeasurePadding(self):
         s = stream.Score([converter.parse('tinyNotation: 4/4 c4')])
@@ -570,6 +732,60 @@ class Test(unittest.TestCase):
         self.assertTrue(tree.findall('.//note'))
         self.assertFalse(tree.findall('.//forward'))
 
+    def test_writeFromSpannerAnchorsGetsMeasureEndOffsetRight(self):
+        '''
+        Write to MusicXML from a Measure containing SpannerAnchors was not positioning
+        the current time offset correctly before starting the next written measure.
+        Now the next measure is positioned at the correct offset.
+        '''
+        m1 = stream.Measure()
+        m1.append(note.Note())
+        m1.append(note.Note())
+        m1.append(note.Note())
+        m1.append(note.Note())
+        cresc = dynamics.Crescendo()
+        startAnchor = spanner.SpannerAnchor()
+        endAnchor = spanner.SpannerAnchor()
+        m1.insert(0.5, startAnchor)
+        m1.insert(1.5, endAnchor)
+        cresc.addSpannedElements(startAnchor, endAnchor)
+        m1.append(cresc)
+        p = stream.Part()
+        p.append(m1)
+        s = stream.Score()
+        s.append(p)
+        # write to MusicXML
+        tree = self.getET(s)
+
+        # walk all the durations (notes, forwards, backups) and make sure they add up
+        # to where the end of the measure should be (4.0ql)
+        measEl = None
+        divisionsEl = None
+        for el in tree.iter():
+            if el.tag == 'measure':
+                measEl = el
+                for el in measEl.iter():
+                    if el.tag == 'divisions':
+                        divisionsEl = el
+                        break
+                break
+
+        self.assertIsNotNone(measEl)
+        self.assertIsNotNone(divisionsEl)
+
+        divisionsInt = int(divisionsEl.text)
+        currOffsetQL = 0.
+        for el in measEl.findall('*'):
+            dur = el.find('duration')
+            if dur is not None:
+                durInt = int(dur.text)
+                durQL = common.opFrac(fractions.Fraction(durInt, divisionsInt))
+                if el.tag == 'backup':
+                    currOffsetQL = common.opFrac(currOffsetQL - durQL)
+                else:
+                    currOffsetQL = common.opFrac(currOffsetQL + durQL)
+        self.assertEqual(currOffsetQL, 4.0)
+
     def testOutOfBoundsExpressionDoesNotCreateForward(self):
         '''
         A metronome mark at an offset exceeding the bar duration was causing
@@ -587,6 +803,86 @@ class Test(unittest.TestCase):
         self.assertEqual(
             int(tree.findall('.//direction/offset')[0].text),
             defaults.divisionsPerQuarter)
+
+    def testPedals(self):
+        expectedResults1 = (
+            {
+                'type': 'start',
+                'line': 'yes',
+                'number': '1',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'stop',
+                'line': 'yes',
+                'number': '1',
+            },
+        )
+        s = converter.parse(testPrimitive.pedalLines)
+        x = self.getET(s)
+        mxPart = x.find('part')
+        for i, mxPedal in enumerate(mxPart.findall('.//pedal')):
+            with self.subTest(pedal_index=i):
+                for k in expectedResults1[i]:
+                    self.assertEqual(mxPedal.get(k, ''), expectedResults1[i][k])
+
+        startIdx = len(expectedResults1)
+
+        expectedResults2 = (
+            {
+                'type': 'start',
+                'sign': 'yes',
+                'number': '1',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'discontinue',
+                'line': 'yes',
+            },
+            {
+                'type': 'resume',
+                'line': 'yes',
+            },
+            {
+                'type': 'change',
+                'line': 'yes',
+            },
+            {
+                'type': 'stop',
+                'line': 'yes',
+                'number': '1',
+            },
+        )
+
+        s = converter.parse(testPrimitive.pedalSymLines)
+        x = self.getET(s)
+        mxPart = x.find('part')
+        for i, mxPedal in enumerate(mxPart.findall('.//pedal')):
+            with self.subTest(pedal_index=startIdx + i):
+                for k in expectedResults2[i]:
+                    self.assertEqual(mxPedal.get(k, ''), expectedResults2[i][k])
 
     def testArpeggios(self):
         expectedResults = (
@@ -826,6 +1122,13 @@ class Test(unittest.TestCase):
         self.assertIn('<rest', xmlOut)
         self.assertNotIn('<forward>', xmlOut)
 
+    def test_stem_style_without_direction(self):
+        one_note_tune = converter.parse('tinyNotation: 2/4 c2')
+        half_note = one_note_tune.recurse().notes.first()
+        half_note.style.stemStyle = style.Style()
+        half_note.style.stemStyle.color = 'red'
+        xmlOut = GeneralObjectExporter().parse(one_note_tune).decode('utf-8')
+        self.assertIn('<stem color="#FF0000">up</stem>', xmlOut)
 
 
 class TestExternal(unittest.TestCase):
@@ -865,12 +1168,12 @@ class TestExternal(unittest.TestCase):
         with io.open(fp, encoding='utf-8') as f:
             v2 = f.read()
         differ = list(difflib.ndiff(v.splitlines(), v2.splitlines()))
-        for i, l in enumerate(differ):
-            if l.startswith('-') or l.startswith('?') or l.startswith('+'):
-                if 'id=' in l:
+        for i, line in enumerate(differ):
+            if line.startswith('-') or line.startswith('?') or line.startswith('+'):
+                if 'id=' in line:
                     continue
                 if self.show:
-                    print(l)
+                    print(line)
                     # for j in range(i - 1,i + 1):
                     #    print(differ[j])
                     # print('------------------')

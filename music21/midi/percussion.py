@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         midi/percussion.py
 # Purpose:      music21 classes for representing pitches
@@ -11,6 +10,7 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
+import typing as t
 import unittest
 
 from music21 import pitch
@@ -27,7 +27,7 @@ class PercussionMapper:
     PercussionMapper provides tools to convert between 0-indexed MIDI pitches
     and music21 instruments, based on the official General MIDI Level 1 Percussion Key Map.
     This mapping is conventionally applied to MIDI channel 10;
-    see https://www.midi.org/specifications/item/gm-level-1-sound-set for more info.
+    see https://midi.org/general-midi-level-1 for more info.
 
     Give me the instrument that corresponds to MIDI note 58!
 
@@ -90,9 +90,12 @@ class PercussionMapper:
                                 81: i.Triangle,  # Open Triangle
                                 }
 
-    # MIDI percussion mappings from https://www.midi.org/specifications/item/gm-level-1-sound-set
+    # MIDI percussion mappings from https://midi.org/general-midi-level-1 download at
+    # https://drive.google.com/file/d/1TTM2HI2JAp_XiTJYEJ8gPNvuJpIjJiTP/view?pli=1
+    # formerly at:
+    # https://www.midi.org/specifications/item/gm-level-1-sound-set
 
-    def midiPitchToInstrument(self, midiPitch):
+    def midiPitchToInstrument(self, midiPitch: int|pitch.Pitch) -> instrument.Instrument:
         '''
         Takes a pitch.Pitch object or int ranging from 0-127 and returns
         the corresponding instrument in the GM Percussion Map.
@@ -103,7 +106,7 @@ class PercussionMapper:
         >>> cowbell
         <music21.instrument.Cowbell 'Cowbell'>
 
-        Or it can just take an integer (representing MIDI note) for the pitch instead...
+        Or it can just take an integer (representing MIDI note) for the pitch instead:
 
         >>> moreCowbell = pm.midiPitchToInstrument(56)
         >>> moreCowbell
@@ -125,7 +128,6 @@ class PercussionMapper:
         Traceback (most recent call last):
         music21.midi.percussion.MIDIPercussionException: 69 does not map to a valid instrument!
 
-
         Some music21 Instruments have more than one MidiPitch.  In this case you'll
         get the same Instrument object but with a different modifier
 
@@ -142,7 +144,6 @@ class PercussionMapper:
         <music21.instrument.BassDrum 'Bass Drum'>
         >>> oneBDInstrument.modifier
         '1'
-
         '''
 
         if isinstance(midiPitch, int):
@@ -156,17 +157,18 @@ class PercussionMapper:
         midiInstrumentObject = midiInstrument()
         if (midiInstrumentObject.inGMPercMap is True
                 and hasattr(midiInstrumentObject, '_percMapPitchToModifier')):
-            if midiNumber in midiInstrumentObject._percMapPitchToModifier:
-                modifier = midiInstrumentObject._percMapPitchToModifier[midiNumber]
-                midiInstrumentObject.modifier = modifier
+            midiUnpitchedPercussion = t.cast(
+                instrument.UnpitchedPercussion, midiInstrumentObject)
+            if midiNumber in midiUnpitchedPercussion._percMapPitchToModifier:
+                modifier = midiUnpitchedPercussion._percMapPitchToModifier[midiNumber]
+                midiUnpitchedPercussion.modifier = modifier
 
         return midiInstrumentObject
 
-    def midiInstrumentToPitch(self, midiInstrument):
+    def midiInstrumentToPitch(self, midiInstrument: instrument.Instrument) -> pitch.Pitch:
         '''
         Takes an instrument.Instrument object and returns a pitch object
         with the corresponding 1-indexed MIDI note, according to the GM Percussion Map.
-
 
         >>> pm = midi.percussion.PercussionMapper()
         >>> myCow = instrument.Cowbell()
@@ -191,7 +193,8 @@ class PercussionMapper:
         '''
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
             raise MIDIPercussionException(f'{midiInstrument!r} is not in the GM Percussion Map!')
-        midiPitch = midiInstrument.percMapPitch
+        percInstrument = t.cast(instrument.Percussion, midiInstrument)
+        midiPitch = t.cast(int, percInstrument.percMapPitch)
         pitchObject = pitch.Pitch()
         pitchObject.midi = midiPitch
         return pitchObject
@@ -201,7 +204,7 @@ class PercussionMapper:
 
 class Test(unittest.TestCase):
 
-    def testCopyAndDeepcopy(self):
+    def testCopyAndDeepcopy(self) -> None:
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
 

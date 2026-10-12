@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         capella/__init__.py
 # Purpose:      parses Capella music Notation

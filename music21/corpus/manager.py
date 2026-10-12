@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         corpus/manager.py
 # Purpose:      Manage multiple corpora
 #
 # Authors:      Christopher Ariza
-#               Josiah Wolf Oberholtzer
+#               Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Asato Cuthbert
@@ -38,7 +37,7 @@ if t.TYPE_CHECKING:
     from music21 import stream
 
 
-_metadataBundles: dict[str, bundles.MetadataBundle | None] = {
+_metadataBundles: dict[str, bundles.MetadataBundle|None] = {
     'core': None,
     'local': None,
     # 'virtual': None,
@@ -59,7 +58,6 @@ def fromName(name):
 
     >>> corpus.manager.fromName(None)
     <music21.corpus.corpora.LocalCorpus: 'local'>
-
 
     Note that this corpus probably does not exist on disk, but it's ready to have
     paths added to it and to be stored on disk.
@@ -95,8 +93,8 @@ def iterateCorpora(returnObjects=True):
     <music21.corpus.corpora.CoreCorpus>
     <music21.corpus.corpora.LocalCorpus: 'local'>
 
-    We can also get names instead... Note that the name of the main local corpus is 'local' not
-    None
+    We can also get names instead.
+    (Note that the name of the main local corpus is `"local"` not `None`)
 
     >>> for i, corpusName in enumerate(corpus.manager.iterateCorpora(returnObjects=False)):
     ...     print(corpusName)
@@ -123,11 +121,11 @@ def iterateCorpora(returnObjects=True):
 
 
 def getWork(
-    workName: str | pathlib.Path,
-    movementNumber: int | None = None,
+    workName: str|pathlib.Path,
+    movementNumber: int|None = None,
     *,
     fileExtensions: Iterable[str] = (),
-) -> pathlib.Path | list[pathlib.Path]:
+) -> pathlib.Path|list[pathlib.Path]:
     '''
     this parse function is called from `corpus.parse()` and does nothing differently from it.
 
@@ -178,14 +176,14 @@ def getWork(
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
 def parse(
-    workName: str | pathlib.Path,
+    workName: str|pathlib.Path,
     *,
-    movementNumber: int | None = None,
-    number: int | None = None,
+    movementNumber: int|None = None,
+    number: int|None = None,
     fileExtensions: Iterable[str] = (),
     forceSource: bool = False,
-    format: str | None = None,
-) -> stream.Score | stream.Part | stream.Opus:
+    format: str|None = None,
+) -> stream.Score|stream.Part|stream.Opus:
     filePaths = getWork(
         workName=workName,
         movementNumber=movementNumber,
@@ -202,13 +200,13 @@ def parse(
         number=number,
         format=format
     )
-    _addCorpusFilepathToStreamObject(streamObject, filePath)
+    _addCorpusFilePathToStreamObject(streamObject, filePath)
     return streamObject
 
 
-def _addCorpusFilepathToStreamObject(streamObj, filePath):
+def _addCorpusFilePathToStreamObject(streamObj, filePath):
     '''
-    Adds an entry 'corpusFilepath' to the Stream object.
+    Adds an entry 'corpusFilePpath' to the Stream object.
 
     TODO: this should work for non-core-corpora
     TODO: this should be in the metadata object
@@ -227,17 +225,20 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
         # corpus fix for windows
         dirsEtc = fp2.split(os.sep)
         fp3 = '/'.join(dirsEtc)
-        streamObj.corpusFilepath = fp3
+        streamObj.metadata.corpusFilePath = fp3
     else:
-        streamObj.corpusFilepath = filePath
+        streamObj.metadata.corpusFilePath = filePath
+
+    if isinstance(streamObj.id, int):
+        streamObj.id = streamObj.metadata.corpusFilePath
 
 
 def search(
-    query: str | None = None,
-    field: str | None = None,
+    query: str|None = None,
+    field: str|None = None,
     *,
     corpusNames=None,
-    fileExtensions: Iterable[str] = (),
+    fileExtensions: Iterable[str]|str = (),
     **keywords
 ):
     '''
@@ -273,7 +274,6 @@ def search(
     >>> corpus.search(sourcePath='bach', numberOfParts=4, corpusNames=('core',))  #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {368 entries}>
 
-
     This function is implemented in `corpus.manager` as a method there but also directly
     available in the corpus module for ease of use.
 
@@ -286,13 +286,21 @@ def search(
     ...     )
     <music21.metadata.bundles.MetadataBundle {564 entries}>
 
+    >>> corpus.manager.search(
+    ...     'bach',
+    ...     corpusNames=('core',),
+    ...     fileExtensions=('xml',),
+    ...     )
+    <music21.metadata.bundles.MetadataBundle {412 entries}>
+
     If ``corpusNames`` is None, all corpora known to music21 will be searched.
 
     See usersGuide (chapter 11) for more information on searching
-
     '''
     # >>> corpus.search('coltrane', corpusNames=('virtual',))
     # <music21.metadata.bundles.MetadataBundle {1 entry}>
+    if isinstance(fileExtensions, str):
+        fileExtensions = (fileExtensions,)
 
     readAllMetadataBundlesFromDisk()
     allSearchResults = metadata.bundles.MetadataBundle()
@@ -313,7 +321,7 @@ def search(
     return allSearchResults
 
 
-def getMetadataBundleByCorpus(corpusObject):
+def getMetadataBundleByCorpus(corpusObject: corpora.Corpus) -> bundles.MetadataBundle:
     '''
     Return the metadata bundle for a single Corpus object
 
@@ -329,24 +337,27 @@ def getMetadataBundleByCorpus(corpusObject):
     >>> mdb1 is cc.metadataBundle
     True
 
-    Non-existent corpus...
+    Non-existent corpus:
 
     >>> lc = corpus.corpora.LocalCorpus('junk')
     >>> mdb1 = corpus.manager.getMetadataBundleByCorpus(lc)
     >>> mdb1
     <music21.metadata.bundles.MetadataBundle 'junk': {0 entries}>
-
     '''
     cacheMetadataBundleFromDisk(corpusObject)
     corpusName = corpusObject.name
     if corpusName in _metadataBundles:
-        return _metadataBundles[corpusName]
+        mdb = _metadataBundles[corpusName]
+        if t.TYPE_CHECKING:
+            assert mdb is not None  # cacheMetadataBundleFromDisk makes None impossible
+        return mdb
     else:  # pragma: no cover
-        raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
-            corpusObject, corpusName))
+        raise CorpusException(
+            f'No metadata bundle found for corpus {corpusObject} '
+            f'with name {corpusName}'
+        )
 
-
-def cacheMetadataBundleFromDisk(corpusObject):
+def cacheMetadataBundleFromDisk(corpusObject: corpora.Corpus) -> None:
     r'''
     Update a corpus' metadata bundle from its stored JSON file on disk.
     '''

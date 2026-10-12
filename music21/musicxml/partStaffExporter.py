@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musicxml/partStaffExporter.py
 # Purpose:      Change music21 PartStaff objects to single musicxml parts
@@ -40,10 +39,10 @@ def addStaffTags(
     For a <measure> tag `measure`, add a <staff> grandchild to any instance of
     a child tag of a type in `tagList`.
 
-    >>> from xml.etree.ElementTree import fromstring as El
+    >>> from xml.etree.ElementTree import fromstring as EL
     >>> from music21.musicxml.partStaffExporter import addStaffTags
     >>> from music21.musicxml.helpers import dump
-    >>> elem = El("""
+    >>> elem = EL("""
     ...     <measure number="1">
     ...        <note>
     ...          <rest measure="yes" />
@@ -86,8 +85,8 @@ def addStaffTags(
             mxStaff = Element('staff')
             mxStaff.text = str(staffNumber)
             helpers.insertBeforeElements(tag, mxStaff,
-                                                 tagList=['beam', 'notations', 'lyric', 'play',
-                                                          'sound'])
+                                         tagList=['beam', 'notations', 'lyric', 'play',
+                                                  'sound'])
 
 
 class PartStaffExporterMixin:
@@ -268,13 +267,18 @@ class PartStaffExporterMixin:
         joinable_components_list = flattenList(deduplicatedGroups)
         if len(set(joinable_components_list)) != len(joinable_components_list):
             warnings.warn(
-                MusicXMLWarning('Got overlapping StaffGroups; will not merge ANY groups.'))
+                MusicXMLWarning(
+                    'Got overlapping StaffGroups; will not merge ANY groups.'
+                ),
+                stacklevel=2,
+            )
             return []
 
         # Finally, store a reference to earlier siblings (if any) on PartExporters
         for group in deduplicatedGroups:
             prior_part_staff = None
             for part_staff in group:
+                assert isinstance(part_staff, stream.PartStaff)
                 for part_exporter in self.partExporterList:
                     if part_exporter.stream is not part_staff:
                         continue
@@ -324,7 +328,7 @@ class PartStaffExporterMixin:
           </note>
         </measure>
         '''
-        initialPartStaffRoot: Element | None = None
+        initialPartStaffRoot: Element|None = None
         for i, ps in enumerate(group):
             staffNumber: int = i + 1  # 1-indexed
             thisPartStaffRoot: Element = self.getRootForPartStaff(ps)
@@ -389,7 +393,7 @@ class PartStaffExporterMixin:
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
-        def makeDivider(inner_sourceNumber: int | str) -> Element:
+        def makeDivider(inner_sourceNumber: int|str) -> Element[t.Any]:
             return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(inner_sourceNumber)))
 
         sourceMeasures = iter(source.findall('measure'))
@@ -419,8 +423,8 @@ class PartStaffExporterMixin:
 
             # Or, gap in measure numbers in the subsequent part: keep iterating through target
             if (sourceNumber is not None
-                   and targetNumber is not None
-                   and helpers.measureNumberComesBefore(targetNumber, sourceNumber)):
+                    and targetNumber is not None
+                    and helpers.measureNumberComesBefore(targetNumber, sourceNumber)):
                 continue  # sourceMeasure is not None!
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
@@ -429,8 +433,7 @@ class PartStaffExporterMixin:
                    and helpers.measureNumberComesBefore(sourceNumber, targetNumber)):
                 if i not in insertions:
                     insertions[i] = []
-                if t.TYPE_CHECKING:
-                    assert isinstance(sourceNumber, str)
+                sourceNumber = t.cast(str, sourceNumber)
                 insertions[i] += [makeDivider(sourceNumber), sourceMeasure]
                 try:
                     sourceMeasure = next(sourceMeasures)
@@ -452,8 +455,7 @@ class PartStaffExporterMixin:
             idx = len(target)
             if idx not in insertions:
                 insertions[idx] = []
-            if t.TYPE_CHECKING:
-                assert isinstance(sourceNumber, str)
+            sourceNumber = t.cast(str, sourceNumber)
 
             insertions[idx] += [makeDivider(sourceNumber), remaining]
         return insertions
@@ -549,7 +551,7 @@ class PartStaffExporterMixin:
             in this StaffGroup does not compare to the first instance of that class
             in the earliest staff where found (not necessarily the first) using `comparison`.
             '''
-            initialM21Instance: M21ObjType | None = None
+            initialM21Instance: M21ObjType|None = None
             # noinspection PyShadowingNames
             for ps in group:  # ps okay to reuse.
                 if initialM21Instance is None:
@@ -567,18 +569,17 @@ class PartStaffExporterMixin:
         multiKey: bool = isMultiAttribute(KeySignature)
         multiMeter: bool = isMultiAttribute(TimeSignature, comparison='ratioEqual')
 
-        initialPartStaffRoot: Element | None = None
-        mxAttributes: Element | None = None
+        initialPartStaffRoot: Element|None = None
+        mxAttributes: Element|None = None
         for i, ps in enumerate(group):
             staffNumber: int = i + 1  # 1-indexed
 
             # Initial PartStaff in group: find earliest mxAttributes, set clef #1 and <staves>
             if initialPartStaffRoot is None:
                 initialPartStaffRoot = self.getRootForPartStaff(ps)
-                mxAttributes = initialPartStaffRoot.find('measure/attributes')
-                clef1: Element | None = mxAttributes.find('clef') if mxAttributes else None
-                if clef1 is not None:
-                    clef1.set('number', '1')
+                if (mxAttributes := initialPartStaffRoot.find('measure/attributes')) is not None:
+                    if (clef1 := mxAttributes.find('clef')) is not None:
+                        clef1.set('number', '1')
 
                 mxStaves = Element('staves')
                 mxStaves.text = str(len(group))
@@ -586,22 +587,22 @@ class PartStaffExporterMixin:
                     mxAttributes,
                     mxStaves,
                     tagList=['part-symbol', 'instruments', 'clef', 'staff-details',
-                                'transpose', 'directive', 'measure-style']
+                             'transpose', 'directive', 'measure-style']
                 )
 
                 if multiKey and mxAttributes is not None:
                     key1 = mxAttributes.find('key')
-                    if key1:
+                    if key1 is not None:
                         key1.set('number', '1')
                 if multiMeter and mxAttributes is not None:
                     meter1 = mxAttributes.find('time')
-                    if meter1:
+                    if meter1 is not None:
                         meter1.set('number', '1')
 
             # Subsequent PartStaffs in group: set additional clefs on mxAttributes
             else:
                 thisPartStaffRoot: Element = self.getRootForPartStaff(ps)
-                oldClef: Element | None = thisPartStaffRoot.find('measure/attributes/clef')
+                oldClef: Element|None = thisPartStaffRoot.find('measure/attributes/clef')
                 if oldClef is not None and mxAttributes is not None:
                     clefsInMxAttributesAlready = mxAttributes.findall('clef')
                     if len(clefsInMxAttributesAlready) >= staffNumber:
@@ -631,10 +632,7 @@ class PartStaffExporterMixin:
                     )
 
                 if multiMeter:
-                    oldMeter: Element | None = thisPartStaffRoot.find(
-                        'measure/attributes/time'
-                    )
-                    if oldMeter:
+                    if (oldMeter := thisPartStaffRoot.find('measure/attributes/time')) is not None:
                         oldMeter.set('number', str(staffNumber))
                         helpers.insertBeforeElements(
                             mxAttributes,
@@ -642,8 +640,7 @@ class PartStaffExporterMixin:
                             tagList=['staves']
                         )
                 if multiKey:
-                    oldKey: Element | None = thisPartStaffRoot.find('measure/attributes/key')
-                    if oldKey:
+                    if (oldKey := thisPartStaffRoot.find('measure/attributes/key')) is not None:
                         oldKey.set('number', str(staffNumber))
                         helpers.insertBeforeElements(
                             mxAttributes,
@@ -682,17 +679,17 @@ class PartStaffExporterMixin:
     def moveMeasureContents(measure: Element, otherMeasure: Element, staffNumber: int):
         # noinspection PyShadowingNames
         '''
-        Move the child elements of `measure` into `otherMeasure`;
-        create voice numbers if needed;
-        bump voice numbers if they conflict;
-        account for <backup> and <forward> tags;
-        skip <print> tags;
-        set "number" on midmeasure clef changes;
-        replace existing <barline> tags.
+        Move the child elements of `measure` into `otherMeasure`.
+        Create voice numbers if needed.
+        Bump voice numbers if they conflict.
+        Account for <backup> and <forward> tags.
+        Skip <print> tags.
+        Set "number" on mid-measure clef changes.
+        Replace existing <barline> tags.
 
-        >>> from xml.etree.ElementTree import fromstring as El
-        >>> measure = El('<measure><note /></measure>')
-        >>> otherMeasure = El('<measure><note /></measure>')
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> measure = EL('<measure><note /></measure>')
+        >>> otherMeasure = EL('<measure><note /></measure>')
         >>> SX = musicxml.m21ToXml.ScoreExporter
         >>> SX.moveMeasureContents(measure, otherMeasure, 2)
         >>> SX().dump(otherMeasure)
@@ -705,12 +702,12 @@ class PartStaffExporterMixin:
           </note>
         </measure>
 
-        >>> SX.moveMeasureContents(El('<junk />'), otherMeasure, 2)
+        >>> SX.moveMeasureContents(EL('<junk />'), otherMeasure, 2)
         Traceback (most recent call last):
         music21.musicxml.xmlObjects.MusicXMLExportException:
             moveMeasureContents() called on <Element 'junk'...
 
-        Only one <barline> should be exported per merged measure:
+        Only one `<barline>` should be exported per merged measure:
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.mixedVoices1a)

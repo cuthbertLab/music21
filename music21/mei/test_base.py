@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         mei/test_main.py
 # Purpose:      Tests for mei/base.py
@@ -22,11 +21,6 @@ from __future__ import annotations
 # if we mock many things, this may be triggered
 # pylint: disable=too-many-arguments
 
-# pylint is bad at guessing types in these tests---reasonably so
-# pylint: disable=maybe-no-member
-
-# pylint: disable=ungrouped-imports
-# pylint: disable=import-error
 import unittest
 
 # To have working MagicMock objects, we can't use cElementTree even though it would be faster.
@@ -36,12 +30,13 @@ from xml.etree import ElementTree as ETree
 
 from collections import defaultdict
 from fractions import Fraction
-from unittest import mock  # pylint: disable=no-name-in-module
+from unittest import mock
 
 from music21 import articulations
 from music21 import bar
 from music21 import clef
 from music21 import duration
+from music21 import expressions
 from music21 import instrument
 from music21 import interval
 from music21 import key
@@ -126,7 +121,7 @@ class Test(unittest.TestCase):
         '''
         MeiToM21Converter.run(): that it works
         '''
-        # ha... "test run"... get it?
+        # ha: "test run," get it?
         testConv = base.MeiToM21Converter()
         testConv.documentRoot = mock.MagicMock(spec_set=ETree.Element)
         testConv.documentRoot.find.return_value = 5
@@ -173,7 +168,7 @@ class Test(unittest.TestCase):
 
     def testSafePitch3(self):
         '''
-        safePitch(): when ``name`` is not given, but there are various **keywords
+        safePitch(): when ``name`` is not given, but there are various ``**keywords``
         '''
         expected = pitch.Pitch('D#6')
         actual = base.safePitch(name='D', accidental='#', octave='6')
@@ -1085,9 +1080,9 @@ class Test(unittest.TestCase):
 
     # -----------------------------------------------------------------------------
     # Tests for noteFromElement()
-    # NOTE: For this TestCase, in the unit tests, if you get...
-    #       AttributeError: 'str' object has no attribute 'call_count'
-    #       ... it means a test failure, because the str should have been a MagicMock but was
+    # NOTE: For this TestCase, in the unit tests, if you get
+    #       "AttributeError: 'str' object has no attribute 'call_count'"
+    #       it means a test failure, because the str should have been a MagicMock but was
     #       replaced with a string by the unit under test.
 
     @mock.patch('music21.note.Note')
@@ -1593,8 +1588,8 @@ class Test(unittest.TestCase):
 
     # -----------------------------------------------------------------------------
     # Tests for chordFromElement()
-    # NOTE: For this TestCase, in the unit tests, if you get...
-    #       AttributeError: 'str' object has no attribute 'call_count'
+    # NOTE: For this TestCase, in the unit tests, if you get
+    #       "AttributeError: 'str' object has no attribute 'call_count'"
     #       ... it means a test failure, because the str should have been a MagicMock but was
     #       replaced with a string by the unit under test.
 
@@ -1905,7 +1900,7 @@ class Test(unittest.TestCase):
         actual = base.clefFromElement(elem)
 
         self.assertEqual(expected, actual)
-        # this test fails on Python 3.5.
+        # this test failed starting on Python 3.5 so commented out; have not checked since.
         # mockClefFromString.assert_called_once_with_('theClefShape2', 1)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
         self.assertEqual(0, mockTabClef.call_count)
@@ -2230,6 +2225,64 @@ class Test(unittest.TestCase):
             self.assertEqual(base._MISSING_VOICE_ID, maError.args[0])
 
     # -----------------------------------------------------------------------------
+    # Tests for bTremFromElement()
+
+    def testIntegration1BTremFromElement(self):
+        '''
+        bTremFromElement(): the wrapped <chord> is imported with its notated duration, and a
+        Tremolo expression is attached with the number of marks derived from @unitdur.
+        '''
+        inputXML = '''<bTrem xmlns="http://www.music-encoding.org/ns/mei" form="meas" unitdur="8">
+                          <chord dur="4">
+                              <note pname="E" oct="4" />
+                              <note pname="E" oct="5" />
+                          </chord>
+                      </bTrem>'''
+        elem = ETree.fromstring(inputXML)
+
+        actual = base.bTremFromElement(elem)
+
+        self.assertIsInstance(actual, list)
+        self.assertEqual(1, len(actual))
+        self.assertEqual(1.0, actual[0].quarterLength)
+        self.assertEqual(['E4', 'E5'], [p.nameWithOctave for p in actual[0].pitches])
+        self.assertEqual(1, len(actual[0].expressions))
+        self.assertIsInstance(actual[0].expressions[0], expressions.Tremolo)
+        self.assertEqual(1, actual[0].expressions[0].numberOfMarks)
+
+    def testIntegration2BTremFromElement(self):
+        '''
+        bTremFromElement() within a <layer>: a <bTrem> must not be silently dropped. The tremolo
+        note/chord contributes its notated duration so the onsets of following events do not shift
+        (regression test for https://github.com/cuthbertLab/music21/issues/1994).
+        '''
+        inputXML = '''<layer n="1" xmlns="http://www.music-encoding.org/ns/mei">
+                          <note xml:id="n1" dur="4" oct="4" pname="c" />
+                          <bTrem xml:id="bt1" form="meas" unitdur="8">
+                              <chord xml:id="ch1" dur="4">
+                                  <note xml:id="n2" oct="4" pname="e" />
+                                  <note xml:id="n3" oct="5" pname="e" />
+                              </chord>
+                          </bTrem>
+                          <note xml:id="n4" dur="2" oct="4" pname="g" />
+                      </layer>'''
+        elem = ETree.fromstring(inputXML)
+
+        actual = base.layerFromElement(elem)
+
+        self.assertEqual(3, len(actual))
+        # onsets are not shifted: the tremolo chord keeps its place on beat 2
+        self.assertEqual([0.0, 1.0, 2.0], [obj.offset for obj in actual])
+        self.assertEqual([1.0, 1.0, 2.0], [obj.quarterLength for obj in actual])
+        self.assertEqual('C4', actual[0].nameWithOctave)
+        # the beat-2 element is the E4/E5 chord, imported with a Tremolo expression
+        self.assertEqual(['E4', 'E5'], [p.nameWithOctave for p in actual[1].pitches])
+        self.assertEqual(1, len(actual[1].expressions))
+        self.assertIsInstance(actual[1].expressions[0], expressions.Tremolo)
+        self.assertEqual(1, actual[1].expressions[0].numberOfMarks)
+        self.assertEqual('G4', actual[2].nameWithOctave)
+
+    # -----------------------------------------------------------------------------
     # Tests for staffFromElement()
 
     @mock.patch('music21.mei.base.layerFromElement')
@@ -2536,7 +2589,7 @@ class Test(unittest.TestCase):
                     'clef': mockClef.return_value}
         # attributes on theMockInstrument that should be set by staffDefFromElement()
         # NB: because the part name wasn't recognized by music21, there won't be a part name on the
-        #     Instrument... the only reason we get an Instrument at all is because of @trans.semi
+        #     Instrument.  The only reason we get an Instrument at all is because of @trans.semi
         expectedAttrs = [('transposition', mockTrans.return_value)]  # D3
 
         # 2.) run
@@ -2599,7 +2652,7 @@ class Test(unittest.TestCase):
         '''
         # 1.) prepare
         elem = ETree.Element(f'{MEI_NS}staffDef', attrib={'meter.count': '1',
-                                                                  'meter.unit': '3'})
+                                                          'meter.unit': '3'})
         mockTime.return_value = 'mockTime return'
         mockFromString.side_effect = instrument.InstrumentException
         # otherwise staffDefFromElement() thinks it got a real Instrument
@@ -2617,7 +2670,7 @@ class Test(unittest.TestCase):
         '''
         # 1.) prepare
         elem = ETree.Element(f'{MEI_NS}staffDef', attrib={'meter.count': '1',
-                                                                  'meter.unit': '3'})
+                                                          'meter.unit': '3'})
 
         # 2.) run
         actual = base.staffDefFromElement(elem)
@@ -2633,7 +2686,7 @@ class Test(unittest.TestCase):
         '''
         elem = ETree.Element('staffGrp')
         innerElems = [ETree.Element(f'{MEI_NS}staffDef', attrib={'n': str(n)})
-                                                                    for n in range(4)]
+                      for n in range(4)]
         for eachElem in innerElems:
             elem.append(eachElem)
         mockStaffDefFE.side_effect = lambda x, unused_y: f"processed {x.get('n')}"
@@ -3936,7 +3989,7 @@ class Test(unittest.TestCase):
         # this must match Measure.duration.quarterLength
         # prepare the mock Measure objects returned by mockMeasure
         mockMeasRets = [mock.MagicMock(name=f'Measure {i + 1}') for i in range(4)]
-        expected = mockMeasRets  # finish preparing "expected" below...
+        expected = mockMeasRets  # finish preparing "expected" below
         for meas in mockMeasRets:
             meas.duration = mock.MagicMock(spec_set=duration.Duration)
             meas.duration.quarterLength = 4.0  # must match activeMeter.barDuration.quarterLength
@@ -4061,7 +4114,7 @@ class Test(unittest.TestCase):
 
         # prepare the mock Measure objects returned by mockMeasure
         mockMeasRets = [mock.MagicMock(name=f'Measure {i + 1}') for i in range(4)]
-        expected = mockMeasRets  # finish preparing "expected" below...
+        expected = mockMeasRets  # finish preparing "expected" below
         for meas in mockMeasRets:
             meas.duration = mock.MagicMock(spec_set=duration.Duration)
             meas.duration.quarterLength = base._DUR_ATTR_DICT[None]  # must be _DUR_ATTR_DICT[None]
@@ -4407,7 +4460,7 @@ class Test(unittest.TestCase):
 
         actual = base.scoreFromElement(elem, slurBundle)
 
-        # This is complicated... I'm sorry... but it's a rather detailed test of the whole system,
+        # This is complicated. I'm sorry. But it's a rather detailed test of the whole system,
         # so I hope it's worth it!
         self.assertEqual(2, len(actual.parts))
         self.assertEqual(3, len(actual))  # parts plus "slurBundle"

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musedata.translate.py
 # Purpose:      Translate MuseData into music21 objects
@@ -13,7 +12,6 @@
 **N.B. in Dec. 2014 MuseData access was removed from music21 because the rights conflicted with
 access computationally from music21.  This module is retained for anyone who has such access,
 however it is completely untested now and errors cannot and will not be fixed.**
-
 
 Functions for translating music21 objects and
 :class:`~music21.musedata.base.MuseDataHandler` instances. Mostly,
@@ -45,7 +43,6 @@ def _musedataBeamToBeams(beamSymbol):
 
     >>> translate._musedataBeamToBeams(r']/')  # must escape backslash
     <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>
-
     '''
     from music21 import beam
 
@@ -94,7 +91,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
         post.pitch = records[0].getPitchObject()
     else:
         # environLocal.printDebug(['attempting chord creation: records', len(records)])
-        # can supply a lost of Pitch objects at creation
+        # can supply a list of Pitch objects at creation
         post = chord.Chord([r.getPitchObject() for r in records])
 
     # if a chord, we are assuming that all durations are the same
@@ -115,13 +112,13 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
 
     # get accents and expressions; assumes all on first
     # returns an empty list of None
-    dynamicObjs = []  # stored in stream, not Note
 
     for a in records[0].getArticulationObjects():
         post.articulations.append(a)
     for e in records[0].getExpressionObjects():
         post.expressions.append(e)
 
+    dynamicObjs = []  # stored in stream, not Note
     for d in records[0].getDynamicObjects():
         dynamicObjs.append(d)
 
@@ -230,8 +227,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         pendingRecords = []
 
         # get notes in each record
-        for i in range(len(mdrObjs)):
-            mdr = mdrObjs[i]
+        for mdr in mdrObjs:
             # environLocal.printDebug(['processing:', mdr.src])
 
             if mdr.isBack():
@@ -370,7 +366,7 @@ class Test(unittest.TestCase):
         from music21 import common
 
         fp1 = (common.getSourceFilePath()
-                           / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
+               / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
         mdw = musedata.MuseDataWork()
         mdw.addFile(fp1)
 
@@ -582,7 +578,7 @@ class Test(unittest.TestCase):
     #     # note: this is importing a large work, but this seems to presently
     #     # be the only one with dynamics
     #
-    #     # TODO: Turn back on when a smaller work is found...
+    #     # TODO: Turn back on when a smaller work is found
     #     from music21 import corpus
     #     s = corpus.parse('symphony94', 3)
     #     sFlat = s.flatten()

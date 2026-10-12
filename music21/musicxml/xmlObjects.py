@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musicxml/xmlObjects.py
 # Purpose:      MusicXML objects for conversion to and from music21
@@ -6,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -23,7 +22,7 @@ DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
                  'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff',
                  'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz',
                  'n', 'pf', 'sfzp',  # musicxml 3.1
-                 'other-dynamics'  # non-empty...
+                 'other-dynamics'  # non-empty
                  ]
 
 ARTICULATION_MARKS = OrderedDict(
@@ -67,10 +66,11 @@ TECHNICAL_MARKS = OrderedDict([('up-bow', articulations.UpBow),
                                ('stopped', articulations.Stopped),
                                ('snap-pizzicato', articulations.SnapPizzicato),
                                ('string', articulations.StringIndication),
-                               ('hammer-on', articulations.HammerOn),
-                               ('pull-off', articulations.PullOff),
-                               # bend not implemented because it needs many subcomponents
-                               # ('bend', articulations.FretBend),
+                               # hammer-on and pull-off not implemented because handled
+                               # in method objectAttachedSpannersToTechnicals of m21ToXml.py
+                               # ('hammer-on', articulations.HammerOn),
+                               # ('pull-off', articulations.PullOff),
+                               ('bend', articulations.FretBend),
                                ('tap', articulations.FretTap),
                                ('fret', articulations.FretIndication),
                                ('heel', articulations.OrganHeel),
@@ -90,16 +90,16 @@ TECHNICAL_MARKS_REV[articulations.Harmonic] = 'harmonic'
 # NON-spanner ornaments that go into Expressions
 ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
                   'turn': expressions.Turn,
-                  # TODO: 'delayed-turn'
+                  'delayed-turn': expressions.Turn,
                   'inverted-turn': expressions.InvertedTurn,
-                  # TODO: 'delayed-inverted-turn'
+                  'delayed-inverted-turn': expressions.InvertedTurn,
                   # TODO: 'vertical-turn'
                   'shake': expressions.Shake,
                   'mordent': expressions.Mordent,
                   'inverted-mordent': expressions.InvertedMordent,
                   'schleifer': expressions.Schleifer,
                   'other-ornament': expressions.Ornament
-                  # TODO: 'accidental-mark' -- something else...
+                  # TODO: 'accidental-mark' -- something else
                   }
 
 # ------------------------------------------------------------------------------
@@ -132,7 +132,6 @@ class MusicXMLWarning(UserWarning):
 # ------------------------------------------------------------------------------
 # helpers
 STYLE_ATTRIBUTES_YES_NO_TO_BOOL = ('hideObjectOnPrint', )
-STYLE_ATTRIBUTES_STR_NONE_TO_NONE = ('enclosure', )
 
 
 def yesNoToBoolean(value):
@@ -155,7 +154,6 @@ def booleanToYesNo(value):
 
     >>> musicxml.xmlObjects.booleanToYesNo(5)
     'yes'
-
     '''
     if value:  # purposely not "is True"
         return 'yes'
@@ -170,11 +168,10 @@ def fractionToPercent(value):
     >>> musicxml.xmlObjects.fractionToPercent(0.25)
     '25'
 
-    Only does whole numbers for now...
+    Only does whole numbers for now:
 
     >>> musicxml.xmlObjects.fractionToPercent(0.251)
     '25'
-
     '''
     return str(int(value * 100))
 
@@ -206,7 +203,6 @@ def isValidXSDID(text):
 
     >>> musicxml.xmlObjects.isValidXSDID(12345)
     False
-
     '''
     if not isinstance(text, str):
         return False

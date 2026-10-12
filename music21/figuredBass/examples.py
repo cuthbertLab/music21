@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         examples.py
 # Purpose:      Figured bass test cases
@@ -22,15 +21,19 @@ calling :meth:`~music21.base.Music21Object.show`.
 from __future__ import annotations
 
 import copy
+import typing as t
 import unittest
 
 from music21.figuredBass import realizer
 from music21.figuredBass import rules
 
+if t.TYPE_CHECKING:
+    from music21 import stream
+
 # ------------------------------------------------------------------------------
 
 
-def exampleA():
+def exampleA() -> realizer.FiguredBassLine:
     '''
     This example was a homework assignment for 21M.302: Harmony & Counterpoint II
     at MIT in the fall of 2010, taught by Charles Shadle of the MIT Music Program.
@@ -46,7 +49,6 @@ def exampleA():
     The soprano part is limited to stepwise motion, and the alto and tenor parts are
     limited to motions within a perfect octave.
 
-
     >>> from music21.figuredBass import rules
     >>> fbRules = rules.Rules()
     >>> fbRules.partMovementLimits = [(1, 2), (2, 12), (3, 12)]
@@ -58,16 +60,14 @@ def exampleA():
     .. image:: images/figuredBass/fbExamples_sol1A.*
             :width: 700
 
-
     Now, the restriction on upper parts being within a perfect octave of each other is
     removed, and fbLine is realized again.
-
 
     >>> fbRules.upperPartsMaxSemitoneSeparation = None
     >>> fbRealization2 = fbLine.realize(fbRules)
     >>> fbRealization2.keyboardStyleOutput = False
     >>> fbRealization2.getNumSolutions()
-    3713168
+    3564440
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
 
     .. image:: images/figuredBass/fbExamples_sol2A.*
@@ -80,7 +80,7 @@ def exampleA():
     return realizer.figuredBassFromStream(s)
 
 
-def exampleD():
+def exampleD() -> realizer.FiguredBassLine:
     '''
     This example was a homework assignment for 21M.302: Harmony & Counterpoint II
     at MIT in the fall of 2010, taught by Charles Shadle of the MIT Music Program.
@@ -111,7 +111,6 @@ def exampleD():
     figured bass, and fbLine is realized again. Voice overlap can be seen in the fourth
     measure.
 
-
     >>> fbRules.forbidVoiceOverlap = False
     >>> fbRealization2 = fbLine.realize(fbRules)
     >>> fbRealization2.getNumSolutions()
@@ -124,12 +123,11 @@ def exampleD():
     Now, the restriction on voice overlap is reset, but the restriction on the upper parts
     being within a perfect octave of each other is removed. fbLine is realized again.
 
-
     >>> fbRules.forbidVoiceOverlap = True
     >>> fbRules.upperPartsMaxSemitoneSeparation = None
     >>> fbRealization3 = fbLine.realize(fbRules)
     >>> fbRealization3.getNumSolutions()
-    29629539
+    27445876
     >>> fbRealization3.keyboardStyleOutput = False
     >>> #_DOCS_SHOW fbRealization3.generateRandomRealization().show()
 
@@ -145,7 +143,7 @@ def exampleD():
     return realizer.figuredBassFromStream(s)
 
 
-def exampleB():
+def exampleB() -> realizer.FiguredBassLine:
     '''
     This example was retrieved from page 114 of *The Music Theory Handbook* by Marjorie Merryman.
 
@@ -158,7 +156,6 @@ def exampleB():
 
     First, fbLine is realized with the default rules set.
 
-
     >>> fbRealization1 = fbLine.realize()
     >>> fbRealization1.getNumSolutions()
     422
@@ -167,17 +164,15 @@ def exampleB():
     .. image:: images/figuredBass/fbExamples_sol1B.*
         :width: 700
 
-
     Now, a Rules object is created, and the restriction that the chords
     need to be complete is lifted. fbLine is realized once again.
-
 
     >>> from music21.figuredBass import rules
     >>> fbRules = rules.Rules()
     >>> fbRules.forbidIncompletePossibilities = False
     >>> fbRealization2 = fbLine.realize(fbRules)
     >>> fbRealization2.getNumSolutions()
-    188974
+    159373
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
 
     .. image:: images/figuredBass/fbExamples_sol2B.*
@@ -191,7 +186,7 @@ def exampleB():
     return realizer.figuredBassFromStream(s)
 
 
-def exampleC():
+def exampleC() -> realizer.FiguredBassLine:
     '''
     This example was retrieved from page 114 of *The Music Theory Handbook* by Marjorie Merryman.
 
@@ -211,7 +206,6 @@ def exampleC():
 
     .. image:: images/figuredBass/fbExamples_sol1C.*
         :width: 700
-
 
     Now, parallel fifths are allowed in realizations. The image below
     shows one of them. There is a parallel fifth between the bass and
@@ -237,7 +231,7 @@ def exampleC():
     return realizer.figuredBassFromStream(s)
 
 
-def V43ResolutionExample():
+def V43ResolutionExample() -> realizer.FiguredBassLine:
     '''
     The dominant 4,3 can resolve to either the tonic 5,3 or tonic 6,3. The proper resolution
     is dependent on the bass note of the tonic, and is determined in context, as shown in the
@@ -258,7 +252,7 @@ def V43ResolutionExample():
     return realizer.figuredBassFromStream(s)
 
 
-def viio65ResolutionExample():
+def viio65ResolutionExample() -> realizer.FiguredBassLine:
     '''
     For a fully diminished seventh chord resolving to the tonic, the resolution chord
     can contain either a doubled third (standard resolution) or a doubled tonic (alternate
@@ -267,7 +261,6 @@ def viio65ResolutionExample():
     :attr:`~music21.figuredBass.rules.Rules.doubledRootInDim7`.
     However, when resolving a diminished 6,5, the third is found in the bass and the
     proper resolution is determined in context, regardless of user preference.
-
 
     The following shows both cases involving a diminished 6,5. The resolution of the
     first diminished chord has a doubled D, while that of the second has a doubled F#.
@@ -289,7 +282,7 @@ def viio65ResolutionExample():
     return realizer.figuredBassFromStream(s)
 
 
-def augmentedSixthResolutionExample():
+def augmentedSixthResolutionExample() -> realizer.FiguredBassLine:
     '''
     This example was retrieved from page 61 of *The Music Theory Handbook* by Marjorie Merryman.
 
@@ -319,7 +312,7 @@ def augmentedSixthResolutionExample():
     return realizer.figuredBassFromStream(s)
 
 
-def italianA6ResolutionExample():
+def italianA6ResolutionExample() -> realizer.FiguredBassLine:
     '''
     The Italian augmented sixth chord (It+6) is the only
     augmented sixth chord to consist of only three
@@ -332,7 +325,6 @@ def italianA6ResolutionExample():
     chord could map internally to two different resolutions.
     Every other special resolution in fbRealizer
     consists of a 1:1 mapping of special chords to resolutions.
-
 
     Here, the It+6 chord is resolving to the dominant, minor tonic,
     and major tonic, respectively. In the
@@ -365,7 +357,7 @@ def italianA6ResolutionExample():
     return realizer.figuredBassFromStream(s)
 
 
-def twelveBarBlues():
+def twelveBarBlues() -> realizer.FiguredBassLine:
     '''
     This is a progression in Bb major based on the twelve bar blues. The progression used is:
 
@@ -404,7 +396,10 @@ def twelveBarBlues():
 # Functions that generate Boogie/Blues vamps.
 
 
-def generateBoogieVamp(blRealization=None, numRepeats=5):
+def generateBoogieVamp(
+    blRealization: realizer.Realization | None = None,
+    numRepeats: int = 5,
+) -> stream.Score:
     '''
     Turns whole notes in twelve bar blues bass line to blues boogie woogie bass line. Takes
     in numRepeats, which is the number of times to repeat the bass line. Also, takes in a
@@ -452,7 +447,10 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
     return newScore
 
 
-def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
+def generateTripletBlues(
+    blRealization: realizer.Realization | None = None,
+    numRepeats: int = 5,
+) -> stream.Score:  # 12/8
     '''
     Turns whole notes in twelve bar blues bass line to triplet blues bass line. Takes
     in numRepeats, which is the number of times to repeat the bass line. Also, takes in a

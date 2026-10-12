@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         correlate.py
 # Purpose:      Stream analyzer designed to correlate and graph two properties
@@ -46,7 +45,6 @@ class ActivityMatch:
 
     .. image:: images/ScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
-
     '''
     def __init__(self, streamObj):
         if not hasattr(streamObj, 'classes') or 'Stream' not in streamObj.classes:
@@ -60,7 +58,6 @@ class ActivityMatch:
         Do the analysis, finding correlations of src with dst
         returns an ordered list of dictionaries, in the form
         {'src': obj, 'dst': [objs]}
-
         '''
         if objNameSrc is None:
             objNameSrc = (note.Note, chord.Chord)
@@ -132,7 +129,7 @@ class ActivityMatch:
             dstCheck = self.streamObj.recurse().getElementsByClass(objName)
             if not dstCheck:
                 raise CorrelateException('cannot create correlation: an object '
-                                         + f'that is not found in the Stream: {objName}')
+                                         f'that is not found in the Stream: {objName}')
 
         self._findActive(objNameSrc, objNameDst)
 
@@ -160,7 +157,7 @@ class ActivityMatch:
                     else:
                         pairs.append((x, y))
 
-        # if requesting data points, just return all points
+        # if requesting data points, return all points
         if dataPoints:
             return pairs
 
@@ -174,11 +171,6 @@ class ActivityMatch:
         for key in dictionary:
             pairs.append((key[0], key[1], dictionary[key]))
         return pairs
-
-
-
-
-
 
 
 # ------------------------------------------------------------------------------

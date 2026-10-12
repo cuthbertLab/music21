@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/classTools.py
 # Purpose:      Utilities for classes
@@ -13,8 +12,11 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Collection
 import contextlib
-import numbers
 import typing as t
+
+if t.TYPE_CHECKING:
+    from fractions import Fraction
+
 
 __all__ = [
     'holdsType',
@@ -40,20 +42,13 @@ def isInt(usrData: t.Any) -> t.TypeGuard[int]:
     return isinstance(usrData, int) and usrData is not True and usrData is not False
 
 
-def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
+def isNum(usrData: t.Any) -> t.TypeGuard[t.Union[float, int, Fraction]]:
     '''
-    check if usrData is a number (float, int, long, Decimal),
-    return boolean and if True casts the value as a Rational number
+    check if usrData is a music21 number (float, int, Fraction),
+    return boolean and if True casts the value as a float, int, or Fraction number
 
-    unlike `isinstance(usrData, Rational)` does not return True for `True, False`.
-
-    Does not use `isinstance(usrData, Rational)` which is 2-6 times slower
-    than calling this function (except in the case of Fraction, when
-    it's 6 times faster, but that's rarer).  (6 times slower on Py3.4, now
-    only 2x slower in Python 3.10)
-
-    Runs by adding 0 to the "number" -- so anything that implements
-    add to a scalar works
+    Differs from `isinstance(usrData, Rational)` primarily in that this function
+    does not return True for `True, False`. See below for other differences.
 
     >>> common.isNum(3.0)
     True
@@ -64,14 +59,31 @@ def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
     >>> common.isNum([2, 3, 4])
     False
 
-    True and False are NOT numbers:
+    True and False are not considered numbers by isNum.
 
     >>> common.isNum(True)
     False
     >>> common.isNum(False)
     False
+
+    None is also not a number:
+
     >>> common.isNum(None)
     False
+
+    This function does not use `isinstance(usrData, Rational)` which is 2-6 times slower
+    than calling this function (except in the case of Fraction, when
+    it's 6 times faster, but that's rarer).  (6 times slower on Py3.4, only 2x slower
+    in Python 3.10)
+
+    Runs by adding 0 to the "number" -- so anything that implements
+    adding with a scalar will pass.  Thus, this Decimal number is technically incorrectly typed
+    as being a float, int, or Fraction.  However, since Decimals are not used in
+    music21 it is not really a problem.
+
+    >>> from decimal import Decimal
+    >>> common.isNum(Decimal('2.0'))
+    True
     '''
     # noinspection PyBroadException
     try:
@@ -80,11 +92,11 @@ def isNum(usrData: t.Any) -> t.TypeGuard[numbers.Rational]:
             return True
         else:
             return False
-    except Exception:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-exception-caught
         return False
 
 
-def isListLike(usrData: t.Any) -> t.TypeGuard[list | tuple]:
+def isListLike(usrData: t.Any) -> t.TypeGuard[list|tuple]:
     '''
     Returns True if is a List or Tuple or their subclasses.
 
@@ -123,7 +135,7 @@ def isIterable(usrData: t.Any) -> t.TypeGuard[Iterable]:
     >>> common.isIterable(stream.Stream())
     True
 
-    Ranges are not iterators by python 3, but return True
+    Ranges are not iterators by Python 3, but return True
 
     >>> common.isIterable(range(20))
     True
@@ -132,8 +144,10 @@ def isIterable(usrData: t.Any) -> t.TypeGuard[Iterable]:
 
     >>> common.isIterable(stream.Stream)
     False
+    >>> common.isIterable(list)
+    False
 
-    * Changed in v7.3: Classes (not instances) are not iterable
+    * Changed in v7.3: Classes (not instances) are not iterable.
     '''
     if isinstance(usrData, (str, bytes)):
         return False
@@ -215,7 +229,10 @@ def classToClassStr(classObj: type) -> str:
     return str(classObj).rsplit('.', maxsplit=1)[-1][:-2]
 
 
-def getClassSet(instance, classNameTuple=None):
+def getClassSet(
+    instance: object,
+    classNameTuple: tuple[str, ...]|None = None
+) -> frozenset[str|type]:
     '''
     Return the classSet for an instance (whether a Music21Object or something else).
     See base.Music21Object.classSet for more details.
@@ -265,7 +282,11 @@ TEMP_ATTRIBUTE_SENTINEL = object()
 
 
 @contextlib.contextmanager
-def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
+def tempAttribute(
+    obj: object,
+    attribute: str,
+    new_val: t.Any = TEMP_ATTRIBUTE_SENTINEL
+) -> t.Generator[None, None, None]:
     '''
     Temporarily set an attribute in an object to another value
     and then restore it afterwards.
@@ -294,7 +315,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
         setattr(obj, attribute, tempStorage)
 
 @contextlib.contextmanager
-def saveAttributes(obj, *attributeList: str) -> t.Generator[None, None, None]:
+def saveAttributes(obj: object, *attributeList: str) -> t.Generator[None, None, None]:
     '''
     Save a number of attributes in an object and then restore them afterwards.
 

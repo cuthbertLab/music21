@@ -1,29 +1,69 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/enums.py
 # Purpose:      Music21 Enumerations
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2021-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2021-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-from enum import Enum, EnumMeta
+from enum import Enum, IntEnum, StrEnum as pyStrEnum
+import re
 
 
-class StrEnumMeta(EnumMeta):
-    def __contains__(cls, item):
-        if isinstance(item, str):
-            if item in cls.__members__.values():
-                return True
-            else:
-                return False
-        try:
-            return super().__contains__(item)
-        except TypeError:  # pragma: no cover
-            return False
+class StrEnum(pyStrEnum):
+    '''
+    A StrEnum that de-emphasizes the string representation.  For backwards
+    compatibility.
+
+    >>> from music21.common.enums import StrEnum
+    >>> from music21.style import Enclosure
+    >>> issubclass(Enclosure, StrEnum)
+    True
+    >>> Enclosure.SQUARE
+    <Enclosure.SQUARE>
+    >>> str(Enclosure.SQUARE)
+    'square'
+    >>> 'square' in Enclosure
+    True
+    '''
+    def __repr__(self) -> str:
+        return f'<{self.__class__.__name__}.{self.name}>'
+
+
+class HexEnum(IntEnum):
+    '''
+    An IntEnum that displays its repr in hex.
+
+    >>> from music21.midi import ChannelVoiceMessages
+    >>> ChannelVoiceMessages.NOTE_ON
+    <ChannelVoiceMessages.NOTE_ON: 0x90>
+    >>> ChannelVoiceMessages.NOTE_ON in ChannelVoiceMessages
+    True
+    >>> 0x90 in ChannelVoiceMessages
+    True
+
+    Note: before v11 this was called `ContainsEnum` and had a `hasValue` to check for
+        containment.  Not necessary with Python 3.12 being the minimum version.
+        `ContainsEnum` alias will be removed in v12.
+    '''
+    def __repr__(self) -> str:
+        '''
+        Display the repr in hex.
+        '''
+        val = super().__repr__()
+        return re.sub(r'(\d+)', lambda m: f'0x{int(m.group(1)):X}', val)
+
+    @classmethod
+    def hasValue(cls, item: object|int) -> bool:
+        '''
+        Deprecated -- to be removed in v12.  Just do `item in cls`
+        '''
+        return item in cls
+
+ContainsEnum = HexEnum
 
 
 class BooleanEnum(Enum):
@@ -68,15 +108,13 @@ class BooleanEnum(Enum):
     True
     '''
     @staticmethod
-    def is_bool_tuple(v):
+    def is_bool_tuple(v: object) -> bool:
         if isinstance(v, tuple) and len(v) == 2 and isinstance(v[0], bool):
             return True
         else:
             return False
 
-    # pylint having Enum problems with classes as usual.
-    # pylint: disable=comparison-with-callable
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
             return super().__eq__(other)
         v = self.value
@@ -88,33 +126,14 @@ class BooleanEnum(Enum):
             return v[1] == other
         return False
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         v = self.value
         if self.is_bool_tuple(v):
             return v[0]
         return bool(self.value)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<{self.__class__.__name__}.{self.name}>'
-
-
-class StrEnum(str, Enum, metaclass=StrEnumMeta):
-    '''
-    An enumeration where strings can equal the value.
-
-    See :class:`music21.common.enums.OffsetSpecial` for an
-    example of how these work.
-    '''
-    def __repr__(self):
-        return f'<{self.__class__.__name__}.{self.name}>'
-
-    def __str__(self):
-        '''
-        >>> from music21.common.enums import OffsetSpecial
-        >>> str(OffsetSpecial.AT_END)
-        'highestTime'
-        '''
-        return str(self.value)
 
 
 class ElementSearch(StrEnum):
@@ -141,8 +160,6 @@ class OffsetSpecial(StrEnum):
 
     The enum `AT_END` is equal to the string 'highestTime'
 
-    In version 9, the string comparisons will be removed.
-
     >>> from music21.common.enums import OffsetSpecial
     >>> OffsetSpecial.AT_END
     <OffsetSpecial.AT_END>
@@ -158,10 +175,17 @@ class OffsetSpecial(StrEnum):
     'highestTime'
 
     * New in v7.
+    * Note -- a previous note said that the 'highestTime' == OffsetSpecial.AT_END
+      would be removed in v9 or an upcoming music21 release.  Since then, Python
+      changed direction and in 3.11 added StrEnum to the standard library and in 3.12
+      allows for containment checks of strings in StrEnum (such as
+      `'lowestOffset' in OffsetSpecial` returning True).  Therefore, there is no
+      reason for music21 to ever remove this valuable and backwards compatible
+      tool.
     '''
-    AT_END: str = 'highestTime'
-    LOWEST_OFFSET: str = 'lowestOffset'
-    HIGHEST_OFFSET: str = 'highestOffset'
+    AT_END = 'highestTime'
+    LOWEST_OFFSET = 'lowestOffset'
+    HIGHEST_OFFSET = 'highestOffset'
 
 
 class GatherSpanners(BooleanEnum):
@@ -195,6 +219,38 @@ class GatherSpanners(BooleanEnum):
     ALL = True
     NONE = False
     COMPLETE_ONLY = 'completeOnly'
+
+
+class AppendSpanners(StrEnum):
+    '''
+    An enumeration for how to append related spanners when appending objects to a written file.
+
+    AppendSpanners.NORMAL means append the spanners that start with the object, then append
+        the object, then append the spanners that end with the object.
+    AppendSpanners.RELATED_ONLY means append the spanners that start with the object, then
+        append the spanners that end with the object (i.e. do not append the object).
+    AppendSpanners.NONE means do not append the related spanners at all (i.e. only append
+        the object).
+
+    * New in v9.
+    '''
+    NORMAL = 'normal'
+    RELATED_ONLY = 'related_only'
+    NONE = 'none'
+
+
+class OrnamentDelay(StrEnum):
+    '''
+    An enumeration for the delay in an ornament (e.g. a delayed turn).  The delay for an
+    ornament can be set to one of these values, or to an OffsetQL for a timed delay.
+
+    OrnamentDelay.NO_DELAY means there is no delay (this is equivalent to setting delay to 0.0)
+    OrnamentDelay.DEFAULT_DELAY means the delay is half the duration of the ornamented note.
+
+    * New in v9.
+    '''
+    NO_DELAY = 'noDelay'
+    DEFAULT_DELAY = 'defaultDelay'
 
 
 class MeterDivision(StrEnum):

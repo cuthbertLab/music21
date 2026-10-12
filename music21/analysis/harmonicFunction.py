@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         harmonicFunction.py
 # Purpose:      Mapping between Roman numeral figures and harmonic function labels
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2022-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -102,8 +101,8 @@ functionFigureTuplesMinor = {
 
 
 def functionToRoman(thisHarmonicFunction: HarmonicFunction,
-                    keyOrScale: key.Key | scale.ConcreteScale | str = 'C'
-                    ) -> roman.RomanNumeral | None:
+                    keyOrScale: key.Key|scale.ConcreteScale|str = 'C'
+                    ) -> roman.RomanNumeral|None:
     '''
     Takes harmonic function labels (such as 'T' for major tonic)
     with a key (keyOrScale, default = 'C') and
@@ -179,7 +178,6 @@ def functionToRoman(thisHarmonicFunction: HarmonicFunction,
     >>> rn = roman.RomanNumeral('vi')
     >>> str(analysis.harmonicFunction.romanToFunction(rn))
     'Tp'
-
     '''
     if isinstance(keyOrScale, str):
         keyOrScale = key.Key(keyOrScale)
@@ -197,7 +195,7 @@ def functionToRoman(thisHarmonicFunction: HarmonicFunction,
 
 def romanToFunction(rn: roman.RomanNumeral,
                     onlyHauptHarmonicFunction: bool = False
-                    ) -> HarmonicFunction | None:
+                    ) -> HarmonicFunction|None:
     '''
     Takes a Roman numeral and returns a corresponding harmonic function label.
 

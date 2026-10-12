@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         musicxml/archiveTools.py
 # Purpose:      Tools for compressing and decompressing MusicXML files
@@ -6,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009, 2017, 2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009, 2017-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -47,7 +46,7 @@ def compressAllXMLFiles(*, deleteOriginal=False):
     )
 
 
-def compressXML(filename: str | pathlib.Path,
+def compressXML(filename: str|pathlib.Path,
                 *,
                 deleteOriginal=False,
                 silent=False,
@@ -71,7 +70,6 @@ def compressXML(filename: str | pathlib.Path,
     if not silent:  # pragma: no cover
         environLocal.warn(f'Updating file: {fp}')
     newFilename = str(fp.with_suffix('.mxl'))
-
 
     # contents of container.xml file in META-INF folder
     container = f'''<?xml version="1.0" encoding="UTF-8"?>
@@ -99,9 +97,10 @@ def compressXML(filename: str | pathlib.Path,
     return True
 
 
-def uncompressMXL(filename: str | pathlib.Path,
+def uncompressMXL(filename: str|pathlib.Path,
                   *,
                   deleteOriginal=False,
+                  silent=False,
                   strictMxlCheck=True) -> bool:
     '''
     Takes a filename, and if the filename corresponds to a compressed musicXML
@@ -120,8 +119,9 @@ def uncompressMXL(filename: str | pathlib.Path,
         return False  # not a compressed musicXML file
 
     fp: pathlib.Path = common.pathTools.cleanpath(filename, returnPathlib=True)
-    environLocal.warn(f'Updating file: {fp}')
-    extractPath = str(fp.parent)
+    if not silent:  # pragma: no cover
+        environLocal.warn(f'Updating file: {fp}')
+    extractPath = fp.parent
     unarchivedName = fp.with_suffix('.musicxml').name
     # Export container and original xml file to system as a compressed XML.
     with zipfile.ZipFile(filename, 'r', compression=zipfile.ZIP_DEFLATED) as myZip:
@@ -138,10 +138,9 @@ def uncompressMXL(filename: str | pathlib.Path,
                         continue
                     myZip.extract(member=storedName, path=extractPath)
                     if not found_one_file:
-                        # only rename one file...hope it is the right one.
-                        extractPath_pathlib = pathlib.Path(extractPath)
-                        wrongName = extractPath_pathlib / storedName
-                        correctName = extractPath_pathlib / unarchivedName
+                        # only rename one file: hope it is the right one.
+                        wrongName = extractPath / storedName
+                        correctName = extractPath / unarchivedName
                         wrongName.rename(correctName)
                         found_one_file = True
 

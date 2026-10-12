@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         testDocumentation.py
 # Purpose:      tests from or derived from the Documentation
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -23,9 +22,9 @@ import sys
 import time
 
 # noinspection PyPackageRequirements
-from docutils.core import publish_doctree  # pylint: disable=import-error
+from docutils.core import publish_doctree
 # noinspection PyPackageRequirements
-import docutils.nodes  # pylint: disable=import-error
+import docutils.nodes
 
 
 import nbvalNotebook  # TODO: make into a package and import with .nbvalNotebook
@@ -169,7 +168,7 @@ def getDocumentationFiles(runOne=False):
             fullModulePath = os.path.join(root, module)
             if not module.endswith('.rst'):
                 continue
-            if module.startswith('module'):  # we have this already...
+            if module.startswith('module'):  # we have this already
                 continue
             if module in skipModules:
                 continue
@@ -191,7 +190,7 @@ def getDocumentationFiles(runOne=False):
     return allModules
 
 
-def main(runOne: str | bool = False):
+def main(runOne: str|bool = False):
     if runOne is False:
         nbvalNotebook.runAll()
     elif '.ipynb' in runOne:
@@ -201,10 +200,6 @@ def main(runOne: str | bool = False):
     totalFailures = 0
 
     timeStart = time.time()
-    unused_dtr = doctest.DocTestRunner(doctest.OutputChecker(),
-                                verbose=False,
-                                optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
-
     for mt in getDocumentationFiles(runOne):
         # if 'examples' in mt.module:
         #     continue
@@ -238,7 +233,7 @@ def main(runOne: str | bool = False):
                 print(f'all {testCount} tests ran successfully')
             totalTests += testCount
             totalFailures += failCount
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-exception-caught
             print(f'failed miserably! {e}')
             import traceback
             tb = traceback.format_exc()

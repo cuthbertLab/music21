@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         dynamics.py
 # Purpose:      Module for dealing with dynamics changes.
@@ -6,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -28,35 +27,34 @@ environLocal = environment.Environment('dynamics')
 
 
 shortNames = ['pppppp', 'ppppp', 'pppp', 'ppp', 'pp', 'p', 'mp',
-                  'mf', 'f', 'fp', 'sf', 'ff', 'fff', 'ffff', 'fffff', 'ffffff']
+              'mf', 'f', 'fp', 'sf', 'ff', 'fff', 'ffff', 'fffff', 'ffffff']
 longNames = {'ppp': 'pianississimo',
-              'pp': 'pianissimo',
-              'p': 'piano',
-              'mp': 'mezzopiano',
-              'mf': 'mezzoforte',
-              'f': 'forte',
-              'fp': 'fortepiano',
-              'sf': 'sforzando',
-              'ff': 'fortissimo',
-              'fff': 'fortississimo'}
+             'pp': 'pianissimo',
+             'p': 'piano',
+             'mp': 'mezzopiano',
+             'mf': 'mezzoforte',
+             'f': 'forte',
+             'fp': 'fortepiano',
+             'sf': 'sforzando',
+             'ff': 'fortissimo',
+             'fff': 'fortississimo'}
 
 # could be really useful for automatic description of musical events
 englishNames = {'ppp': 'extremely soft',
-                 'pp': 'very soft',
-                 'p': 'soft',
-                 'mp': 'moderately soft',
-                 'mf': 'moderately loud',
-                 'f': 'loud',
-                 'ff': 'very loud',
-                 'fff': 'extremely loud'}
+                'pp': 'very soft',
+                'p': 'soft',
+                'mp': 'moderately soft',
+                'mf': 'moderately loud',
+                'f': 'loud',
+                'ff': 'very loud',
+                'fff': 'extremely loud'}
 
 
 def dynamicStrFromDecimal(n):
     '''
     Given a decimal from 0 to 1, return a string representing a dynamic
-    with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff')
+    with 0 being the softest (0.01 = 'ppp') and 1 being the loudest (0.9+ = 'fff').
     0 returns "n" (niente), while ppp and fff are the loudest dynamics used.
-
 
     >>> dynamics.dynamicStrFromDecimal(0.25)
     'pp'
@@ -123,12 +121,12 @@ class Dynamic(base.Music21Object):
     'very soft'
 
     Dynamics can also be specified on a 0 to 1 scale with 1 being the
-    loudest (see dynamicStrFromDecimal() above)
+    loudest (see dynamicStrFromDecimal() above).
 
     >>> ppp = dynamics.Dynamic(0.15)  # on 0 to 1 scale
     >>> ppp.value
     'ppp'
-    >>> print('%.2f' % ppp.volumeScalar)
+    >>> print(f'{ppp.volumeScalar:.2f}')
     0.15
 
     Note that we got lucky last time because the dynamic 0.15 exactly corresponds
@@ -139,16 +137,16 @@ class Dynamic(base.Music21Object):
     >>> loud = dynamics.Dynamic(0.98)  # on 0 to 1 scale
     >>> loud.value
     'fff'
-    >>> print('%.2f' % loud.volumeScalar)
+    >>> print(f'{loud.volumeScalar:.2f}')
     0.98
 
     Transferring the .value ('fff') to a new Dynamic object will set the volumeScalar
-    back to 0.9
+    back to 0.9.
 
     >>> loud2 = dynamics.Dynamic(loud.value)
     >>> loud2.value
     'fff'
-    >>> print('%.2f' % loud2.volumeScalar)
+    >>> print(f'{loud2.volumeScalar:.2f}')
     0.90
 
     Custom dynamics are possible:
@@ -164,7 +162,6 @@ class Dynamic(base.Music21Object):
 
     Dynamics can be placed anywhere in a stream.
 
-
     >>> s = stream.Stream()
     >>> s.insert(0, note.Note('E-4', type='half'))
     >>> s.insert(2, note.Note('F#5', type='half'))
@@ -175,7 +172,6 @@ class Dynamic(base.Music21Object):
 
     .. image:: images/dynamics_simple.*
         :width: 344
-
     '''
     classSortOrder = 10
     _styleClass = style.TextStyle
@@ -240,23 +236,9 @@ class Dynamic(base.Music21Object):
     def _reprInternal(self):
         return str(self.value)
 
-    def _getValue(self):
-        return self._value
-
-    def _setValue(self, value):
-        self._value = value
-        if self._value in longNames:
-            self.longName = longNames[self._value]
-        else:
-            self.longName = None
-
-        if self._value in englishNames:
-            self.englishName = englishNames[self._value]
-        else:
-            self.englishName = None
-
-    value = property(_getValue, _setValue,
-                     doc='''
+    @property
+    def value(self):
+        '''
         Get or set the value of this dynamic, which sets the long and
         English names of this Dynamic. The value is a string specification.
 
@@ -275,9 +257,56 @@ class Dynamic(base.Music21Object):
         'loud'
         >>> p.longName
         'forte'
-        ''')
+        '''
+        return self._value
 
-    def _getVolumeScalar(self):
+    @value.setter
+    def value(self, value):
+        self._value = value
+        if self._value in longNames:
+            self.longName = longNames[self._value]
+        else:
+            self.longName = None
+
+        if self._value in englishNames:
+            self.englishName = englishNames[self._value]
+        else:
+            self.englishName = None
+
+    @property
+    def volumeScalar(self):
+        r'''
+        Get or set the volume scalar for this dynamic. If not explicitly set, a
+        default volume scalar will be provided. Any number between 0 and 1 can be
+        used to set the volume scalar, overriding the expected behavior.
+
+        As mezzo is at 0.5, the unit interval range is doubled for
+        generating final output. The default output is 0.5.
+
+        >>> d = dynamics.Dynamic('mf')
+        >>> d.volumeScalar
+        0.55...
+
+        >>> d.volumeScalar = 0.1
+        >>> d.volumeScalar
+        0.1
+        >>> d.value
+        'mf'
+
+        int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag
+
+        >>> xmlOut = musicxml.m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
+        >>> print(xmlOut)
+        <?xml...
+        <direction>
+            <direction-type>
+              <dynamics default-x="-36" default-y="-80">
+                <mf />
+              </dynamics>
+            </direction-type>
+            <sound dynamics="12" />
+        </direction>...
+        '''
         if self._volumeScalar is not None:
             return self._volumeScalar
         # use default
@@ -296,47 +325,13 @@ class Dynamic(base.Music21Object):
             else:
                 return dynamicStrToScalar[None]
 
-    def _setVolumeScalar(self, value):
+    @volumeScalar.setter
+    def volumeScalar(self, value):
         # we can manually set this to be anything, overriding defaults
         if common.isNum(value) and 0 <= value <= 1:
             self._volumeScalar = value
         else:
             raise DynamicException(f'cannot set as volume scalar to: {value}')
-
-    volumeScalar = property(_getVolumeScalar, _setVolumeScalar, doc=r'''
-        Get or set the volume scalar for this dynamic. If not explicitly set, a
-        default volume scalar will be provided. Any number between 0 and 1 can be
-        used to set the volume scalar, overriding the expected behavior.
-
-        As mezzo is at 0.5, the unit interval range is doubled for
-        generating final output. The default output is 0.5.
-
-
-        >>> d = dynamics.Dynamic('mf')
-        >>> d.volumeScalar
-        0.55...
-
-        >>> d.volumeScalar = 0.1
-        >>> d.volumeScalar
-        0.1
-        >>> d.value
-        'mf'
-
-
-        int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag
-
-        >>> xmlOut = musicxml.m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
-        >>> print(xmlOut)
-        <?xml...
-        <direction>
-            <direction-type>
-              <dynamics default-x="-36" default-y="-80">
-                <mf />
-              </dynamics>
-            </direction-type>
-            <sound dynamics="12" />
-        </direction>...
-        ''')
 
 
 # ------------------------------------------------------------------------------
@@ -348,8 +343,11 @@ class DynamicWedge(spanner.Spanner):
     def __init__(self, *spannedElements, **keywords):
         super().__init__(*spannedElements, **keywords)
 
+        # from music21 import note
+        # self.fillElementTypes = [note.GeneralNote]
+
         self.type = None  # crescendo or diminuendo
-        self.placement = 'below'  # can above or below, after musicxml
+        self.placement = 'below'  # can be above or below, after musicxml
         self.spread = 15  # this unit is in tenths
         self.niente = False
 
@@ -431,13 +429,12 @@ class Test(unittest.TestCase):
 
     def testCorpusDynamicsWedge(self):
         from music21 import corpus
-        from music21 import dynamics
 
         a = corpus.parse('opus41no1/movement2')  # has dynamics!
-        b = a.parts[0].flatten().getElementsByClass(dynamics.Dynamic)
+        b = a.parts[0].flatten().getElementsByClass(Dynamic)
         self.assertEqual(len(b), 35)
 
-        b = a.parts[0].flatten().getElementsByClass(dynamics.DynamicWedge)
+        b = a.parts[0].flatten().getElementsByClass(DynamicWedge)
         self.assertEqual(len(b), 2)
 
     def testMusicxmlOutput(self):

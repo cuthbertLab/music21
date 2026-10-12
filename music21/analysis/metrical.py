@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         metrical.py
 # Purpose:      Tools for metrical analysis
@@ -44,7 +43,7 @@ def labelBeatDepth(streamIn):
     >>> sOut = []
     >>> for n in s.flatten().notes:
     ...     stars = "".join([l.text for l in n.lyrics])
-    ...     sOut.append("{0:8s} {1}".format(n.beatStr, stars))
+    ...     sOut.append(f'{n.beatStr:8s} {stars}')
     >>> print("\n".join(sOut))
     1        ****
     1 1/2    *
@@ -115,7 +114,6 @@ def thomassenMelodicAccent(streamIn: stream.Stream):
     ('E4', 0.5561)
     ('D4', 0.17)
     ('D4', 0.0)
-
     '''
     # we use .ps instead of Intervals for speed, since
     # we just need perceived contours

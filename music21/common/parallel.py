@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/parallel.py
 # Purpose:      Utilities for parallel computing
@@ -11,18 +10,26 @@
 from __future__ import annotations
 
 __all__ = [
+    'cpus',
     'runParallel',
     'runNonParallel',
-    'cpus',
+    'safeToParallize',
 ]
 
+from collections.abc import Callable, Sequence
 import multiprocessing
+import os
+import typing as t
 import unittest
 
 
-def runParallel(iterable, parallelFunction, *,
-                updateFunction=None, updateMultiply=3,
-                unpackIterable=False, updateSendsIterable=False):
+def runParallel(iterable: Sequence[t.Any],
+                parallelFunction: Callable[..., t.Any],
+                *,
+                updateFunction: Callable[..., t.Any]|bool|None = None,
+                updateMultiply: int = 3,
+                unpackIterable: bool = False,
+                updateSendsIterable: bool = False) -> list[t.Any]:
     '''
     runs parallelFunction over iterable in parallel, optionally calling updateFunction after
     each common.cpus * updateMultiply calls.
@@ -71,7 +78,7 @@ def runParallel(iterable, parallelFunction, *,
     With a custom updateFunction that gets each output:
 
     >>> def yak(position, length, output):
-    ...     print("%s:%s %s is a lot of notes!" % (position, length, output))
+    ...     print(f'{position}:{length} {output} is a lot of notes!')
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes, updateFunction=yak)
     >>> outputs = common.runNonParallel(files, countNotes, updateFunction=yak) #_DOCS_HIDE
     0:3 165 is a lot of notes!
@@ -81,7 +88,7 @@ def runParallel(iterable, parallelFunction, *,
     Or with updateSendsIterable, we can get the original files data as well:
 
     >>> def yik(position, length, output, fn):
-    ...     print("%s:%s (%s) %s is a lot of notes!" % (position, length, fn, output))
+    ...     print(f'{position}:{length} ({fn}) {output} is a lot of notes!')
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes, updateFunction=yik,
     >>> outputs = common.runNonParallel(files, countNotes, updateFunction=yik, #_DOCS_HIDE
     ...             updateSendsIterable=True)
@@ -104,17 +111,14 @@ def runParallel(iterable, parallelFunction, *,
     >>> outputs
     [99, 11, 123]
     '''
-    # multiprocessing has trouble with introspection
-    # pylint: disable=not-callable
-    numCpus = cpus()
-
-    if numCpus == 1 or multiprocessing.current_process().daemon:
+    if not safeToParallize():
         return runNonParallel(iterable, parallelFunction,
                               updateFunction=updateFunction,
                               updateMultiply=updateMultiply,
                               unpackIterable=unpackIterable,
                               updateSendsIterable=updateSendsIterable)
 
+    numCpus = cpus()
     iterLength = len(iterable)
     totalRun = 0
     if updateFunction is None:
@@ -122,13 +126,13 @@ def runParallel(iterable, parallelFunction, *,
         # if there is no need for updates, run at max speed
         #    -- do the whole list at once.
 
-    resultsList = []
+    resultsList: list[t.Any] = []
 
-    def callUpdate(ii):
+    def callUpdate(ii: int) -> None:
         if updateFunction is True:
             tasksDone = min([ii, iterLength])
             print(f'Done {tasksDone} tasks of {iterLength}')
-        elif updateFunction not in (False, None):
+        elif callable(updateFunction):
             for thisPosition in range(ii - (updateMultiply * numCpus), ii):
                 if thisPosition < 0:
                     continue
@@ -138,7 +142,7 @@ def runParallel(iterable, parallelFunction, *,
                 else:
                     thisResult = resultsList[thisPosition]
 
-                if updateSendsIterable is False:
+                if not updateSendsIterable:
                     updateFunction(thisPosition, iterLength, thisResult)
                 else:
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
@@ -164,9 +168,13 @@ def runParallel(iterable, parallelFunction, *,
     return resultsList
 
 
-def runNonParallel(iterable, parallelFunction, *,
-                   updateFunction=None, updateMultiply=3,
-                   unpackIterable=False, updateSendsIterable=False):
+def runNonParallel(iterable: Sequence[t.Any],
+                   parallelFunction: Callable[..., t.Any],
+                   *,
+                   updateFunction: Callable[..., t.Any]|bool|None = None,
+                   updateMultiply: int = 3,
+                   unpackIterable: bool = False,
+                   updateSendsIterable: bool = False) -> list[t.Any]:
     '''
     This is intended to be a perfect drop in replacement for runParallel, except that
     it runs on one core only, and not in parallel.
@@ -174,16 +182,16 @@ def runNonParallel(iterable, parallelFunction, *,
     Used automatically if we're already in a parallelized function.
     '''
     iterLength = len(iterable)
-    resultsList = []
+    resultsList: list[t.Any] = []
 
-    def callUpdate(ii):
+    def callUpdate(ii: int) -> None:
         if ii % updateMultiply != 0:
             return
 
         if updateFunction is True:
             tasksDone = min([ii, iterLength])
             print(f'Done {tasksDone} tasks of {iterLength}')
-        elif updateFunction not in (False, None):
+        elif callable(updateFunction):
             for thisPosition in range(ii - updateMultiply, ii):
                 if thisPosition < 0:
                     continue
@@ -193,7 +201,7 @@ def runNonParallel(iterable, parallelFunction, *,
                 else:
                     thisResult = resultsList[thisPosition]
 
-                if updateSendsIterable is False:
+                if not updateSendsIterable:
                     updateFunction(thisPosition, iterLength, thisResult)
                 else:
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
@@ -212,7 +220,7 @@ def runNonParallel(iterable, parallelFunction, *,
     return resultsList
 
 
-def cpus():
+def cpus() -> int:
     '''
     Returns the number of CPUs or if >= 3, one less (to leave something out for multiprocessing)
     '''
@@ -221,6 +229,22 @@ def cpus():
         return cpuCount - 1
     else:
         return cpuCount
+
+def safeToParallize() -> bool:
+    '''
+    Check to see if it is safe or even useful to start a parallel process.
+
+    Will return False if we are in a multiprocessing child process or if
+    there is only one CPU or if pytest's x-dist worker flag is in the environment.
+
+    * New in v10.
+    '''
+    return (
+        cpus() > 1
+        and not multiprocessing.parent_process()
+        and 'PYTEST_XDIST_WORKER' not in os.environ
+    )
+
 
 # Not shown to work.
 # def pickleCopy(obj):
@@ -233,46 +257,48 @@ def cpus():
 
 # pickleable testing functions.
 
-def _countN(fn):
+def _countN(filename: str) -> int:
     from music21 import corpus
-    c = corpus.parse(fn)
+    c = corpus.parse(filename)
     return len(c.recurse().notes)
 
 
-def _countUnpacked(i, fn):
+def _countUnpacked(i: int, filename: str) -> bool:
     if i >= 3:
         return False
-    if fn not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
+    if filename not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
         return False
     return True
 
 
 class Test(unittest.TestCase):
-    # pylint: disable=redefined-outer-name
-    def x_figure_out_segfault_testMultiprocess(self):
+    def x_figure_out_segfault_testMultiprocess(self) -> None:
         files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
-        # for importing into testSingleCoreAll we need the full path to the modules
-        from music21.common.parallel import _countN, _countUnpacked
         output = runParallel(files, _countN)
         self.assertEqual(output, [165, 50, 131])
-        runParallel(files, _countN,
+        runParallel(files,
+                    _countN,
                     updateFunction=self._customUpdate1)
-        runParallel(files, _countN,
+        runParallel(files,
+                    _countN,
                     updateFunction=self._customUpdate2,
                     updateSendsIterable=True)
-        passed = runParallel(list(enumerate(files)), _countUnpacked,
+        passed = runParallel(list(enumerate(files)),
+                             _countUnpacked,
                              unpackIterable=True)
         self.assertEqual(len(passed), 3)
         self.assertNotIn(False, passed)
 
     # testing functions
-    def _customUpdate1(self, i, total, output):
+    def _customUpdate1(self, i: int, total: int, output: int) -> None:
         self.assertEqual(total, 3)
         self.assertLess(i, 3)
         self.assertIn(output, [165, 50, 131])
 
-    def _customUpdate2(self, i, unused_total, unused_output, fn):
-        self.assertIn(fn, ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel'])
+    def _customUpdate2(
+        self, i: int, unused_total: int, unused_output: int, filename: str
+    ) -> None:
+        self.assertIn(filename, ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel'])
 
 
 if __name__ == '__main__':

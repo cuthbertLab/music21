@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         articulations.py
 # Purpose:      music21 classes for representing articulations
@@ -76,17 +75,17 @@ A longer test showing the utility of the module:
 '''
 from __future__ import annotations
 
-import typing as t
 import unittest
 
 from music21 import base
 from music21 import common
 from music21.common.classTools import tempAttribute
+from music21.common.types import OffsetQL
 from music21 import environment
+from music21 import interval
+from music21 import spanner
 from music21 import style
 
-if t.TYPE_CHECKING:
-    from music21 import interval
 
 
 environLocal = environment.Environment('articulations')
@@ -95,7 +94,7 @@ environLocal = environment.Environment('articulations')
 # ------------------------------------------------------------------------------
 class Articulation(base.Music21Object):
     '''
-    Base class for all Articulation sub-classes.
+    Base class for all Articulation subclasses.
 
     >>> x = articulations.Articulation()
     >>> x.placement = 'below'
@@ -147,7 +146,7 @@ class Articulation(base.Music21Object):
         self._volumeShift: float = 0.0
         self.lengthShift: float = 1.0
         self.tieAttach: str = 'first'  # attach to first or last or all notes after split
-        self.displayText: str | None = None
+        self.displayText: str|None = None
 
     def _reprInternal(self):
         return ''
@@ -155,7 +154,7 @@ class Articulation(base.Music21Object):
     @property
     def name(self) -> str:
         '''
-        returns the name of the articulation, which is generally the
+        Returns the name of the articulation, which is generally the
         class name without the leading letter lowercase.
 
         Subclasses can override this as necessary.
@@ -171,26 +170,26 @@ class Articulation(base.Music21Object):
         className = self.__class__.__name__
         return common.camelCaseToHyphen(className, replacement=' ')
 
-    def _getVolumeShift(self):
+    @property
+    def volumeShift(self):
+        '''
+        Get or set the volumeShift of this Articulation. This value, between -1 and 1,
+        that is used to shift the final Volume of the object it is attached to.
+
+        >>> at1 = articulations.StrongAccent()
+        >>> at1.volumeShift > 0.1
+        True
+        '''
         return self._volumeShift
 
-    def _setVolumeShift(self, value):
+    @volumeShift.setter
+    def volumeShift(self, value):
         # value should be between 0 and 1
         if value > 1:
             value = 1
         elif value < -1:
             value = -1
         self._volumeShift = value
-
-    volumeShift = property(_getVolumeShift, _setVolumeShift, doc='''
-        Get or set the volumeShift of this Articulation. This value, between -1 and 1,
-        that is used to shift the final Volume of the object it is attached to.
-
-
-        >>> at1 = articulations.StrongAccent()
-        >>> at1.volumeShift > 0.1
-        True
-        ''')
 
 # ------------------------------------------------------------------------------
 class LengthArticulation(Articulation):
@@ -220,7 +219,6 @@ class TimbreArticulation(Articulation):
 # ------------------------------------------------------------------------------
 class Accent(DynamicArticulation):
     '''
-
     >>> a = articulations.Accent()
     '''
     def __init__(self, **keywords):
@@ -231,7 +229,7 @@ class Accent(DynamicArticulation):
 class StrongAccent(Accent):
     '''
     Like an accent but even stronger.  Has an extra
-    attribute of pointDirection
+    attribute of pointDirection.
 
     >>> a = articulations.StrongAccent()
     >>> a.pointDirection
@@ -247,7 +245,6 @@ class StrongAccent(Accent):
 
 class Staccato(LengthArticulation):
     '''
-
     >>> a = articulations.Staccato()
     '''
     def __init__(self, **keywords):
@@ -269,7 +266,7 @@ class Staccatissimo(Staccato):
 
 class Spiccato(Staccato, Accent):
     '''
-    A staccato note + accent in one
+    A staccato note + accent in one.
 
     >>> spiccato = articulations.Spiccato()
     >>> staccato = articulations.Staccato()
@@ -282,7 +279,7 @@ class Spiccato(Staccato, Accent):
     def __init__(self, **keywords):
         Staccato.__init__(self)
         with tempAttribute(self, 'lengthShift'):
-            Accent.__init__(self)  # order matters...
+            Accent.__init__(self)  # order matters!
 
 
 class Tenuto(LengthArticulation):
@@ -310,14 +307,14 @@ class IndeterminateSlide(PitchArticulation):
     of an indeterminate pitch amount (scoops, plops, etc.)
 
     All these have style information of .style.lineShape
-    .style.lineType, .style.dashLength, and .style.spaceLength
+    .style.lineType, .style.dashLength, and .style.spaceLength.
     '''
     _styleClass = style.LineStyle
 
 
 class Scoop(IndeterminateSlide):
     '''
-    An indeterminateSlide coming before the main note and going up
+    An indeterminateSlide coming before the main note and going up.
 
     >>> a = articulations.Scoop()
     '''
@@ -404,7 +401,7 @@ class TechnicalIndication(Articulation):
 
 class Harmonic(TechnicalIndication):
     '''
-    A general harmonic indicator -- StringHarmonic is probably what you want...
+    A general harmonic indicator -- StringHarmonic is probably what you want.
     '''
 
 class Bowing(TechnicalIndication):
@@ -420,7 +417,7 @@ class Fingering(TechnicalIndication):
     a note (in a guitar/fret context, this covers the fret finger,
     see FrettedPluck for that).
 
-    Converts the MusicXML -- <fingering> object
+    Converts the MusicXML -- <fingering> object.
 
     >>> f = articulations.Fingering(5)
     >>> f
@@ -523,7 +520,7 @@ class StringFingering(StringIndication, Fingering):
 
 class Pizzicato(Bowing):
     '''
-    in MusicXML, Pizzicato is an element of every note.
+    In MusicXML, Pizzicato is an element of every note.
     Here we represent pizzicatos along with all bowing marks.
 
     For pluck, see FrettedPluck.
@@ -535,7 +532,7 @@ class SnapPizzicato(Pizzicato):
 
 class NailPizzicato(Pizzicato):
     '''
-    Does not exist in MusicXML
+    Does not exist in MusicXML.
     '''
     pass
 
@@ -562,23 +559,76 @@ class FretIndication(TechnicalIndication):
 
 class FrettedPluck(FretIndication, Fingering):
     '''
-    specifies plucking fingering for fretted instruments
+    Specifies plucking fingering for fretted instruments.
 
     pluck in musicxml
     '''
     pass
 
-class HammerOn(FretIndication):
+class HammerOn(spanner.Spanner, TechnicalIndication):
+    '''
+    A hammer-on represented as a spanner between two Notes.
+    '''
     pass
 
-class PullOff(FretIndication):
+class PullOff(spanner.Spanner, TechnicalIndication):
+    '''
+    A pull-off represented as a spanner between two Notes.
+    '''
     pass
 
 class FretBend(FretIndication):
-    bendAlter: interval.IntervalBase | None = None
-    preBend: t.Any = None
-    release: t.Any = None
-    withBar: t.Any = None
+    '''
+    Bend indication for fretted instruments.
+
+    Bend in musicxml
+
+    `number` is an identifier for the articulation. Defaults to 0.
+
+    `bendAlter` is the interval defined by the bend,
+    bend-alter in musicxml. Defaults to `None`.
+
+    `preBend` indicates if the string is bent before
+    the onset of the note. Defaults to `False`.
+
+    `release` is the quarterLength value from the start
+    of the note for releasing the bend, if any. Defaults to `None`.
+
+    `withBar` indicates what whammy bar movement is used, if any.
+    MusicXML supports 'scoop' or 'dip'. Defaults to `None`.
+
+    >>> fb = articulations.FretBend(1, bendAlter=interval.ChromaticInterval(-2),  release=0.5)
+    >>> fb
+    <music21.articulations.FretBend 1>
+    >>> fb.preBend
+    False
+    >>> fb.withBar is None
+    True
+    >>> fb.bendAlter
+    <music21.interval.ChromaticInterval -2>
+    >>> fb.release
+    0.5
+    '''
+    bendAlter: interval.Interval | interval.ChromaticInterval | None
+    preBend: bool
+    release: OffsetQL | None
+    withBar: str | None
+
+    def __init__(
+        self,
+        number: int = 0,
+        *,
+        bendAlter: interval.Interval | interval.ChromaticInterval | None = None,
+        preBend: bool = False,
+        release: OffsetQL | None = None,
+        withBar: str | None = None,
+        **keywords
+    ):
+        super().__init__(number=number, **keywords)
+        self.bendAlter = bendAlter
+        self.preBend = preBend
+        self.release = release
+        self.withBar = withBar
 
 class FretTap(FretIndication):
     pass
@@ -681,4 +731,3 @@ _DOC_ORDER = [Articulation]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

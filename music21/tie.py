@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         tie.py
 # Purpose:      music21 classes for representing ties (visual and conceptual)
@@ -6,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -95,11 +94,11 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
             The tie type, can be 'start', 'stop', 'continue', 'let-ring', or 'continue-let-ring'.
             ''',
         'style': '''
-            The style of the tie.  Currently can be 'normal', 'dotted', 'dashed' or 'hidden'
+            The style of the tie.  Currently can be 'normal', 'dotted', 'dashed' or 'hidden'.
             ''',
         'placement': '''
             Whether the tie should go up or down. Can be None, meaning
-            it is unknown or should be determined from context, or 'above' or 'below.
+            it is unknown or should be determined from context, or 'above' or 'below'.
             ''',
     }
 
@@ -113,10 +112,10 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
                 f'Type must be one of {self.VALID_TIE_TYPES}, not {type}')
         # naming this 'type' was a mistake, because cannot create a property of this name.
 
-        # this is not the correct way we want to do this, I don't think...
+        # this is not the correct way we want to do this, I don't think
         self.id = id(self)
         self.type = type
-        self.style = 'normal'
+        self.style = 'normal'  # or dashed
         self.placement = None  # = unknown, can be 'above' or 'below'
 
     # SPECIAL METHODS #
@@ -148,7 +147,6 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def _reprInternal(self):
         return self.type
-
 
 class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):

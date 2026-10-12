@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         testSerialization.py
 # Purpose:      tests for serializing music21 objects
@@ -159,7 +158,7 @@ class Test(unittest.TestCase):
     def testSpannerSerializationOfNotesNotInPickle(self):
         '''
         test to see if spanners serialize properly if they
-        contain notes not in the pickle...
+        contain notes not in the pickle
         '''
         from music21 import stream
         from music21 import spanner
@@ -181,7 +180,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         from music21 import converter
         # import time
-        # print(time.time())  # 8.3 sec from pickle; 10.3 sec for forceSource...
+        # print(time.time())  # 8.3 sec from pickle; 10.3 sec for forceSource
         # s = corpus.parse('beethoven/opus133') #, forceSource = True)
         # print(time.time())  # purePython: 33! sec; cPickle: 25 sec
         # data = converter.freezeStr(s, fmt='pickle')

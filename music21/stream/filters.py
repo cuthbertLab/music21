@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         stream/filters.py
 # Purpose:      Classes for filtering iterators of streams
@@ -64,7 +63,6 @@ class StreamFilter(prebase.ProtoM21Object):
     True
     >>> sf.classes
     ('StreamFilter', 'ProtoM21Object', 'object')
-
     '''
     derivationStr = 'streamFilter'
 
@@ -74,7 +72,7 @@ class StreamFilter(prebase.ProtoM21Object):
     def reset(self):
         pass
 
-    def __call__(self, item, iterator: StreamIteratorType | None = None):
+    def __call__(self, item, iterator: StreamIteratorType|None = None):
         return True
 
 class IsFilter(StreamFilter):
@@ -96,7 +94,6 @@ class IsFilter(StreamFilter):
 
     `.numToFind` is used so that once all elements are found, the iterator can short circuit.
 
-
     >>> for el in s.iter().addFilter(isFilter):
     ...     print(el is n)
     True
@@ -117,7 +114,6 @@ class IsFilter(StreamFilter):
     ...     print(el)
     <music21.note.Note C#>
     <music21.note.Rest quarter>
-
     '''
     derivationStr = 'is'
 
@@ -134,7 +130,7 @@ class IsFilter(StreamFilter):
 
     def __call__(self, item, iterator=None):
         if self.numToFind == 0:  # short circuit -- we already have
-            raise StopIteration
+            raise StopIteration()
 
         if item in self.target:
             # would popping the item be faster? No: then can't use for IsNotFilter
@@ -157,15 +153,14 @@ class IsNotFilter(IsFilter):
     <music21.key.KeySignature of 3 flats>
     <music21.note.Rest quarter>
 
-    test that resetting works...
+    test that resetting works:
 
     >>> for el in s.iter().addFilter(stream.filters.IsNotFilter(n)):
     ...     el
     <music21.key.KeySignature of 3 flats>
     <music21.note.Rest quarter>
 
-
-    multiple...
+    Using multiple filters:
 
     >>> s = stream.Stream()
     >>> s.insert(0, key.KeySignature(-3))
@@ -196,7 +191,6 @@ class IdFilter(StreamFilter):
     No corresponding iterator call.
 
     Only a single ID can be passed in.  Always returns a single item.
-
     '''
     derivationStr = 'getElementById'
 
@@ -244,7 +238,6 @@ class ClassFilter(StreamFilter):
     ...     print(x)
     <music21.note.Note C>
     <music21.note.Note D>
-
     '''
     derivationStr = 'getElementsByClass'
 
@@ -364,15 +357,13 @@ class OffsetFilter(StreamFilter):
         super().__init__()
 
         self.offsetStart = opFrac(offsetStart)
+        self.zeroLengthSearch: bool = True
         if offsetEnd is None:
             self.offsetEnd = offsetStart
-            self.zeroLengthSearch = True
         else:
             self.offsetEnd = opFrac(offsetEnd)
             if offsetEnd > offsetStart:
                 self.zeroLengthSearch = False
-            else:
-                self.zeroLengthSearch = True
 
         self.mustFinishInSpan = mustFinishInSpan
         self.mustBeginInSpan = mustBeginInSpan
@@ -415,8 +406,8 @@ class OffsetFilter(StreamFilter):
         if offset > self.offsetEnd:  # anything that begins after the span is definitely out
             if stopAfterEnd:
                 # if sorted, optimize by breaking after exceeding offsetEnd
-                # eventually we could do a binary search to speed up...
-                raise StopIteration
+                # eventually we could do a binary search to speed up
+                raise StopIteration()
             return False
 
         dur = e.duration
@@ -435,35 +426,35 @@ class OffsetFilter(StreamFilter):
         else:
             elementIsZeroLength = False
 
-        if self.zeroLengthSearch is True and elementIsZeroLength is True:
+        if self.zeroLengthSearch and elementIsZeroLength:
             # zero Length Searches -- include all zeroLengthElements
             return True
 
 
-        if self.mustFinishInSpan is True:
+        if self.mustFinishInSpan:
             if elementEnd > self.offsetEnd:
                 # environLocal.warn([elementEnd, offsetEnd, e])
                 return False
-            if self.includeEndBoundary is False:
+            if not self.includeEndBoundary:
                 # we include the end boundary if the search is zeroLength --
                 # otherwise nothing can be retrieved
                 if elementEnd == self.offsetEnd:
                     return False
 
-        if self.mustBeginInSpan is True:
+        if self.mustBeginInSpan:
             if offset < self.offsetStart:
                 return False
-            if self.includeEndBoundary is False and offset == self.offsetEnd:
+            if not self.includeEndBoundary and offset == self.offsetEnd:
                 return False
-        elif (elementIsZeroLength is False
+        elif (not elementIsZeroLength
                 and elementEnd == self.offsetEnd
-                and self.zeroLengthSearch is True):
+                and self.zeroLengthSearch):
             return False
 
-        if self.includeEndBoundary is False and offset == self.offsetEnd:
+        if not self.includeEndBoundary and offset == self.offsetEnd:
             return False
 
-        if self.includeElementsThatEndAtStart is False and elementEnd == self.offsetStart:
+        if not self.includeElementsThatEndAtStart and elementEnd == self.offsetStart:
             return False
 
         return True
@@ -476,7 +467,7 @@ class OffsetHierarchyFilter(OffsetFilter):
 
     Finds elements that match a given offset range in the hierarchy.
 
-    Do not call .stream() afterwards or unstable results can occur.
+    Do not call .stream() afterward or unstable results can occur.
     '''
     derivationStr = 'getElementsByOffsetInHierarchy'
 
@@ -490,7 +481,7 @@ class OffsetHierarchyFilter(OffsetFilter):
         if not hasattr(iterator, 'iteratorStartOffsetInHierarchy'):
             raise FilterException('Can only run OffsetHierarchyFilter on a RecursiveIterator')
 
-        offset = s.elementOffset(e) + iterator.iteratorStartOffsetInHierarchy
+        offset = opFrac(s.elementOffset(e) + iterator.iteratorStartOffsetInHierarchy)
         return self.isElementOffsetInRange(e, offset, stopAfterEnd=False)
 
 

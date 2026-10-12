@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/plots.py
 # Purpose:      Classes for plotting music21 graphs based on Streams.
@@ -7,7 +6,7 @@
 #               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert,
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -136,11 +135,15 @@ class PlotStreamMixin(prebase.ProtoM21Object):
                 allAxesList.append(getattr(self, axisName))
         return allAxesList
 
-    def run(self):
+    def run(self, *, callProcess: bool = True, **keywords):
         '''
         main routine to extract data, set axis labels, run process() on the underlying
         Graph object, and if self.doneAction is not None, either write or show the graph.
         '''
+        if t.TYPE_CHECKING:
+            from music21.graph.primitives import Graph
+            assert isinstance(self, Graph) and isinstance(self, PlotStreamMixin)
+
         self.setAxisKeywords()
         self.extractData()
         if hasattr(self, 'axisY') and self.axisY:
@@ -150,7 +153,8 @@ class PlotStreamMixin(prebase.ProtoM21Object):
             self.setTicks('x', self.axisX.ticks())
             self.setAxisLabel('x', self.axisX.label)
 
-        self.process()
+        if callProcess:
+            self.process()
 
     # --------------------------------------------------------------------------
     def setAxisKeywords(self):
@@ -231,7 +235,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         '''
         elementValues: list[list[t.Any]] = [[] for _ in range(len(self.allAxes))]
         formatDict: dict[t.Any, t.Any] = {}
-        # should be two for most things...
+        # should be two for most things
 
         if not isinstance(el, chord.Chord):
             for i, thisAxis in enumerate(self.allAxes):
@@ -570,10 +574,13 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
         if 'alpha' not in keywords:
             self.alpha = 1.0
 
-    def run(self):
+    def run(self, *, callProcess: bool = True, **keywords):
         '''
         Override run method to remap X data into individual bins.
         '''
+        if t.TYPE_CHECKING:
+            assert hasattr(self, 'axisX') and hasattr(self, 'axisY')
+
         self.setAxisKeywords()
         self.extractData()
         self.setTicks('y', self.axisY.ticks())
@@ -582,7 +589,8 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
         self.setAxisLabel('y', self.axisY.label)
         self.setAxisLabel('x', self.axisX.label)
 
-        self.process()
+        if callProcess:
+            self.process()
 
     def remapXTicksData(self):
         '''
@@ -663,7 +671,6 @@ class HistogramPitchClass(Histogram):
 
     .. image:: images/HistogramPitchClass.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **Histogram.axesClasses,
@@ -691,7 +698,6 @@ class HistogramQuarterLength(Histogram):
 
     .. image:: images/HistogramQuarterLength.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **Histogram.axesClasses,
@@ -771,7 +777,6 @@ class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
 
     .. image:: images/ScatterWeightedPitchClassQuarterLength.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **ScatterWeighted.axesClasses,
@@ -806,7 +811,6 @@ class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
 
     .. image:: images/ScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **ScatterWeighted.axesClasses,
@@ -882,12 +886,12 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         if not self.processorClass:
             return None
         if not self._processor:
-            self._processor = self.processorClass(self.streamObj)  # pylint: disable=not-callable
+            self._processor = self.processorClass(self.streamObj)
         return self._processor
 
-    def run(self, **keywords):
+    def run(self, *, callProcess: bool = True, **keywords):
         '''
-        actually create the graph...
+        Actually creates the graph.
         '''
         if self.title == 'Music21 Graph' and self.processor:
             self.title = (self.processor.name
@@ -908,7 +912,8 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         self.setAxisLabel('x', f'Windows ({self.axisX.label} Span)')
 
         self.graphLegend = self._getLegend()
-        self.process()
+        if callProcess:
+            self.process()
 
         # uses self.processor
 
@@ -981,7 +986,6 @@ class WindowedKey(WindowedAnalysis):
     Stream plotting of windowed version of Krumhansl-Schmuckler analysis routine.
     See :class:`~music21.analysis.discrete.KrumhanslSchmuckler` for more details.
 
-
     >>> s = corpus.parse('bach/bwv66.6')
     >>> p = graph.plot.WindowedKey(s.parts[0])
     >>> p.doneAction = None #_DOCS_HIDE
@@ -1001,7 +1005,6 @@ class WindowedKey(WindowedAnalysis):
     >>> p.processorClass = analysis.discrete.TemperleyKostkaPayne
     >>> p.doneAction = None #_DOCS_HIDE
     >>> p.run()
-
     '''
     processorClassDefault = discrete.KrumhanslSchmuckler
 
@@ -1019,7 +1022,6 @@ class WindowedAmbitus(WindowedAnalysis):
         :width: 600
 
     .. image:: images/legend-WindowedAmbitus.*
-
     '''
     processorClassDefault = discrete.Ambitus
 
@@ -1041,7 +1043,7 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
 
     def __init__(
         self,
-        streamObj: stream.Stream | None = None,
+        streamObj: stream.Stream|None = None,
         *,
         colorByPart=False,
         **keywords
@@ -1056,13 +1058,13 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
 
         self.axisY.hideUnused = False
 
-    def run(self):
+    def run(self, *, callProcess: bool = True, **keywords):
         '''
         Optionally assign colors to Part objects and then do the normal run.
         '''
         if self.colorByPart:
             self.assignColorsToParts()
-        super().run()
+        super().run(callProcess=callProcess, **keywords)
 
     def assignColorsToParts(self) -> dict[stream.Part, str]:
         '''
@@ -1128,6 +1130,8 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
             # sort these tuples, ignoring unhashable dict.
             v.sort(key=lambda point: (point[0], point[1]))
 
+
+        # seen_numericValues = set()
         for numericValue, label in yTicks:
             # make sure there is an entry for each yTick, regardless
             # of whether we have any data for it or not.
@@ -1137,6 +1141,18 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
                                 dictOfFormatDicts[numericValue]])
             else:
                 newData.append([label, [], {}])
+            # seen_numericValues.add(numericValue)
+
+        # # now find anything in pitchSpanDict that wasn't in the yTicks, for
+        # # instance, microtones!
+        # for numericValue, data_triplet in pitchSpanDict.items():
+        #     if numericValue not in seen_numericValues:
+        #         newData.append([
+        #             '',  # no label
+        #             data_triplet,
+        #             dictOfFormatDicts[numericValue],
+        #         ])
+
         self.data = newData
 
 
@@ -1152,7 +1168,6 @@ class HorizontalBarPitchClassOffset(HorizontalBar):
 
     .. image:: images/HorizontalBarPitchClassOffset.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **HorizontalBar.axesClasses,
@@ -1258,7 +1273,6 @@ class Dolan(HorizontalBarWeighted):
     Numerous parameters can be configured based on functionality encoded in
     the :class:`~music21.analysis.reduction.PartReduction` object.
 
-
     If the `fillByMeasure` parameter is True, and if measures are available, each part
     will segment by Measure divisions, and look for the target activity only once per
     Measure. If more than one target is found in the Measure, values will be averaged.
@@ -1284,7 +1298,6 @@ class Dolan(HorizontalBarWeighted):
 
     .. image:: images/Dolan.*
         :width: 600
-
     '''
 
     def __init__(self, streamObj=None, **keywords):
@@ -1427,7 +1440,7 @@ class MultiStream(primitives.GraphGroupedVerticalBar, PlotStreamMixin):
     Approaches to plotting and graphing multiple Streams.
     A base class from which Stream plotting Classes inherit.
 
-    Not yet integrated into the new 2017 system, unfortunately...
+    Not yet integrated into the 2017 system, unfortunately.
 
     Provide a list of Streams as an argument. Optionally
     provide an additional list of labels for each list.
@@ -1502,7 +1515,7 @@ class Features(MultiStream):
         if 'title' not in keywords:
             self.title = None
 
-    def run(self):
+    def run(self, *, callProcess: bool = True, **keywords):
         # will use self.fx and self.fxTick to extract data
         self.setAxisKeywords()
 
@@ -1512,7 +1525,9 @@ class Features(MultiStream):
 
         self.setTicks('x', xTicks)
         self.setTicks('y', yTicks)
-        self.process()
+
+        if callProcess:
+            self.process()
 
     def extractData(self):
         if len(self.labelList) != len(self.streamList):
@@ -1581,7 +1596,7 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
 
         a = corpus.parse('bach/bwv57.8')
         b = HorizontalBarPitchClassOffset(a.parts[0].measures(3, 6),
-                                              title='Bach (soprano voice, mm 3-6)')
+                                          title='Bach (soprano voice, mm 3-6)')
         b.run()
 
     def testScatterWeightedPitchSpaceQuarterLength(self):
@@ -1776,17 +1791,18 @@ class Test(unittest.TestCase):
                         minWindow=1, windowStep=windowStep,
                         doneAction=doneAction, dpi=300)
         b.run()
-        self.assertEqual(b.graphLegend.data,
+        self.assertEqual(
+            b.graphLegend.data,
             [
                 ['Major',
-                    [('C#', '#f0727a'), ('D', '#ffd752'), ('E', '#eeff9a'),
-                     ('F#', '#b9f0ff'), ('A', '#bb9aff'), ('B', '#ffb5ff')
-                     ]
+                 [('C#', '#f0727a'), ('D', '#ffd752'), ('E', '#eeff9a'),
+                  ('F#', '#b9f0ff'), ('A', '#bb9aff'), ('B', '#ffb5ff')
+                  ]
                  ],
                 ['Minor',
-                    [('c#', '#8c0e16'), ('', '#ffffff'), ('', '#ffffff'),
-                     ('f#', '#558caa'), ('', '#ffffff'), ('b', '#9b519b')
-                     ]
+                 [('c#', '#8c0e16'), ('', '#ffffff'), ('', '#ffffff'),
+                  ('f#', '#558caa'), ('', '#ffffff'), ('b', '#9b519b')
+                  ]
                  ]
             ]
         )

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         alpha/analysis/ornamentRecognizer.py
 # Purpose:      Identifies expanded ornaments
@@ -48,7 +47,7 @@ class OrnamentRecognizer:
     def calculateOrnamentTotalQl(
         self,
         busyNotes: list[note.GeneralNote],
-        simpleNotes: list[note.GeneralNote] | None = None
+        simpleNotes: list[note.GeneralNote]|None = None
     ) -> OffsetQL:
         '''
         Returns total length of trill assuming busy notes are all an expanded trill.
@@ -77,7 +76,7 @@ class TrillRecognizer(OrnamentRecognizer):
         self.acceptableInterval = 3
         self.minimumLengthForNachschlag = 5
 
-    def recognize(self, busyNotes, simpleNotes=None) -> bool | expressions.Trill:
+    def recognize(self, busyNotes, simpleNotes=None) -> bool|expressions.Trill:
         '''
         Tries to identify the busy notes as a trill.
 
@@ -131,14 +130,19 @@ class TrillRecognizer(OrnamentRecognizer):
             else:
                 return False
 
-        # set up trill
-        trill = expressions.Trill()
-        trill.quarterLength = self.calculateOrnamentNoteQl(busyNotes, simpleNotes)
-        if isNachschlag:
-            trill.nachschlag = True
-
         if not simpleNotes:
-            trill.size = interval.Interval(noteStart=n1, noteEnd=n2)
+            # set up trill (goes up) or inverted trill (goes down)
+            if n1.pitch.midi <= n2.pitch.midi:
+                trill = expressions.Trill()
+            else:
+                trill = expressions.InvertedTrill()
+            trill.quarterLength = self.calculateOrnamentNoteQl(busyNotes, simpleNotes)
+            if isNachschlag:
+                trill.nachschlag = True
+
+            if n2.pitch.accidental is not None:
+                trill.accidental = n2.pitch.accidental
+            trill.resolveOrnamentalPitches(n1)
             return trill
 
         # currently ignore other notes in simpleNotes
@@ -153,8 +157,19 @@ class TrillRecognizer(OrnamentRecognizer):
         if simpleNote.pitch.midi == n2.pitch.midi:
             endNote = n1
             startNote = n2
-        distance = interval.Interval(noteStart=startNote, noteEnd=endNote)
-        trill.size = distance
+
+        # set up trill (goes up) or inverted trill (goes down)
+        if startNote.pitch.midi <= endNote.pitch.midi:
+            trill = expressions.Trill()
+        else:
+            trill = expressions.InvertedTrill()
+        trill.quarterLength = self.calculateOrnamentNoteQl(busyNotes, simpleNotes)
+        if isNachschlag:
+            trill.nachschlag = True
+
+        if endNote.pitch.accidental is not None:
+            trill.accidental = endNote.pitch.accidental
+        trill.resolveOrnamentalPitches(startNote)
         return trill
 
 class TurnRecognizer(OrnamentRecognizer):
@@ -177,7 +192,7 @@ class TurnRecognizer(OrnamentRecognizer):
         self,
         busyNotes,
         simpleNotes=None,
-    ) -> bool | expressions.Turn | expressions.InvertedTurn:
+    ) -> bool|expressions.Turn|expressions.InvertedTurn:
         '''
         Tries to identify the busy notes as a turn or inverted turn.
 
@@ -528,7 +543,7 @@ class Test(unittest.TestCase):
         t3Notes = stream.Stream()  # C B C B C D E F
         t3Notes.append(
             [t3n1, t3n2, deepcopy(t3n1), deepcopy(t3n2), deepcopy(t3n1),
-            nachschlagN1, nachschlagN2, nachschlagN3]
+             nachschlagN1, nachschlagN2, nachschlagN3]
         )
 
         testConditions.append(
@@ -619,13 +634,23 @@ class Test(unittest.TestCase):
                 # ensure trill is correct
                 self.assertEqual(trill.nachschlag, cond.isNachschlag, cond.name)
                 if cond.ornamentSize:
-                    self.assertEqual(trill.size, cond.ornamentSize, cond.name)
+                    if cond.simpleNotes:
+                        if cond.simpleNotes[0].pitch.midi == cond.busyNotes[1].pitch.midi:
+                            size = trill.getSize(cond.busyNotes[1])
+                        else:
+                            size = trill.getSize(cond.busyNotes[0])
+                    else:
+                        size = trill.getSize(cond.busyNotes[0])
+                    self.assertEqual(size, cond.ornamentSize, cond.name)
             else:
                 self.assertFalse(trill, cond.name)
 
 
-def calculateTrillNoteDuration(numTrillNotes, totalDuration):
-    return totalDuration.quarterLength / numTrillNotes
+def calculateTrillNoteDuration(
+    numTrillNotes: int,
+    totalDuration: duration.Duration
+) -> OffsetQL:
+    return opFrac(totalDuration.quarterLength / numTrillNotes)
 
 
 if __name__ == '__main__':

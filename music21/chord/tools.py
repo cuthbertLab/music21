@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         chord/tools.py
 # Purpose:      Chord utilities too obscure to go on the Chord object
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2022-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         corpus/chorales.py
 # Purpose:      Access to the chorale collection
@@ -1068,15 +1067,15 @@ class Iterator:
                   'titleList', 'numberList', 'returnType', 'iterationType']
 
     def __init__(self,
-                 currentNumber: int | None = None,
-                 highestNumber: int | None = None,
+                 currentNumber: int|None = None,
+                 highestNumber: int|None = None,
                  *,
                  numberingSystem: str = 'riemenschneider',
                  returnType: str = 'stream',
                  iterationType: str = 'number',
                  analysis: bool = False,
-                 numberList: list[int] | None = None,
-                 titleList: list[str] | None = None,
+                 numberList: list[int]|None = None,
+                 titleList: list[str]|None = None,
                  ):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1,
@@ -1111,11 +1110,11 @@ class Iterator:
         self.iterationType = iterationType
 
         if numberList is not None:
-            # TODO: overly complex order of setting...
+            # TODO: overly complex order of setting
             self.numberList = numberList
 
         if titleList is not None:
-            # TODO: overly complex order of setting...
+            # TODO: overly complex order of setting
             self.titleList = titleList
 
         # These assignments must come after .iterationType
@@ -1169,7 +1168,7 @@ class Iterator:
         _currentIndex becomes higher than the _highestIndex, the iteration stops.
         '''
         if self._currentIndex > self._highestIndex:
-            raise StopIteration
+            raise StopIteration()
         nextChorale = self._returnChorale()
         self._currentIndex += 1
         return nextChorale
@@ -1196,7 +1195,6 @@ class Iterator:
         >>> riemenschneider371 = BCI._returnChorale()
         >>> riemenschneider371.metadata.title
         'Christ lag in Todesbanden'
-
 
         >>> BCI.numberingSystem = 'title'
         >>> BCI._returnChorale()
@@ -1274,11 +1272,11 @@ class Iterator:
                 try:
                     nextIndex = self._currentIndex + 1
                     riemenschneiderName = ('bach/choraleAnalyses/'
-                                           + f'riemenschneider{nextIndex:03d}.rntxt')
+                                           f'riemenschneider{nextIndex:03d}.rntxt')
                     analysis = corpus.parse(riemenschneiderName)
                     if analysis is not None:
                         chorale.insert(0, analysis.parts[0])
-                except Exception:  # pylint: disable=broad-except
+                except Exception:  # pylint: disable=broad-exception-caught
                     pass  # fail silently
             # Store the correct title in metadata (replacing the chorale number as it is parsed)
             if chorale.metadata is None:
@@ -1290,7 +1288,7 @@ class Iterator:
         elif self._returnType == 'filename':
             return filename
         else:
-            raise Exception(
+            raise ValueError(
                 f'An unexpected returnType {self._returnType} was introduced. '
                 + 'This should not happen.'
             )
@@ -1396,12 +1394,25 @@ class Iterator:
 
     # ---Properties
     # - Numbering System
-    def _getNumberingSystem(self):
+    @property
+    def numberingSystem(self):
+        '''
+        This property determines which numbering
+        system to iterate through chorales with.
+        It can be set to 'bwv', 'kalmus', 'baerenreiter',
+        'budapest', or 'riemenschneider'.
+        It can also be set to 'title' in which case the
+        iterator needs to be given a list
+        of chorale titles in .titleList. At this time,
+        the titles need to be exactly as they
+        appear in the dictionary it queries.
+        '''
         if self._numberingSystem is None:
             raise BachException('Numbering System not set.')
         return self._numberingSystem
 
-    def _setNumberingSystem(self, value):
+    @numberingSystem.setter
+    def numberingSystem(self, value):
         if value in ['bwv', 'kalmus', 'baerenreiter', 'budapest', 'riemenschneider']:
             self._numberingSystem = value
             # initializes the number list and sets current and highest numbers / indices
@@ -1411,18 +1422,6 @@ class Iterator:
             self.titleList = []
         else:
             raise BachException(f'{value} is not a valid numbering system for Bach Chorales.')
-
-    numberingSystem = property(_getNumberingSystem, _setNumberingSystem,
-                               doc='''
-                                    This property determines which numbering
-                                    system to iterate through chorales with.
-                                    It can be set to 'bwv', 'kalmus', 'baerenreiter',
-                                    'budapest', or 'riemenschneider'.
-                                    It can also be set to 'title' in which case the
-                                    iterator needs to be given a list
-                                    of chorale titles in .titleList. At this time,
-                                    the titles need to be exactly as they
-                                    appear in the dictionary it queries.''')
 
     # - Title List
 
@@ -1554,7 +1553,7 @@ class Iterator:
     @currentNumber.setter
     def currentNumber(self, value):
         if self._numberingSystem is None:
-            raise Exception('Numbering System is not set.')
+            raise ValueError('Numbering System is not set.')
         if self._iterationType == 'number':
             if self._numberingSystem == 'title':
                 if not self._titleList:
@@ -1583,7 +1582,7 @@ class Iterator:
                 else:
                     raise BachException(
                         f'{value} does not correspond to a chorale in the '
-                        + f'{self.numberingSystem} numbering system'
+                        f'{self.numberingSystem} numbering system'
                     )
 
         elif self._iterationType == 'index':
@@ -1639,7 +1638,7 @@ class Iterator:
     @highestNumber.setter
     def highestNumber(self, value):
         if self._numberingSystem is None:
-            raise Exception('Numbering System is not set.')
+            raise ValueError('Numbering System is not set.')
         if self.iterationType == 'number':
             if self._numberingSystem == 'title':
                 if not self._titleList:
@@ -1700,7 +1699,7 @@ class Iterator:
                 else:
                     raise BachException(
                         f'{value} does not correspond to a chorale in the '
-                        + f'{self.numberingSystem} numbering system'
+                        f'{self.numberingSystem} numbering system'
                     )
 
     # - Return Type

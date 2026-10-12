@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         clercqTemperley.py
 # Purpose:      Routines to parse the popular music
@@ -13,7 +12,7 @@
 '''
 Parses the de Clercq-Temperley popular music flavor of RomanText.
 The Clercq-Temperley file format and additional rock corpus analysis
-information may be located at http://rockcorpus.midside.com
+information may be located at https://rockcorpus.midside.com
 '''
 from __future__ import annotations
 
@@ -21,6 +20,7 @@ import copy
 import io
 import pathlib
 import re
+import typing as t
 import unittest
 
 from collections import OrderedDict
@@ -36,6 +36,9 @@ from music21 import prebase
 from music21 import roman
 from music21 import stream
 from music21 import tie
+
+if t.TYPE_CHECKING:
+    from music21 import chord
 
 environLocal = environment.Environment('romanText.clercqTemperley')
 
@@ -108,10 +111,24 @@ class CTSong(prebase.ProtoM21Object):
     # noinspection PyShadowingNames
     r"""
     This parser is an object-oriented approach to parsing clercqTemperley text files into music.
+    It is an advanced method.  Most people should just run:
 
-    Create a CTSong object one of two ways:
-    1) by passing in the string, with newline characters (\\n) at the end of each line
-    2) by passing in the text file as a string, and have python open the file and read the text
+    >>> #_DOCS_SHOW p = converter.parse('clercqTemperley/dt/BrownEyedGirl.cttxt')
+
+    or if the file ends in .txt then give the format explicitly as either 'clerqTemperley'
+    or 'cttxt':
+
+    >>> #_DOCS_SHOW p = converter.parse('BrownEyedGirl.txt', format='clercqTemperley')
+
+    Advanced: if you want access to a CTSong object itself (for manipulating the input before
+    converting to a string, etc. then create a CTSong object with one of the following inputs:
+
+    1. by passing in the string, with newline characters (\\n) at the end of each line
+
+    2. by passing in the filename as a string or path, and have Python
+       open the file and read the text
+
+    Given this file, you could create a CTSong object with:
 
     >>> exampleClercqTemperley = '''
     ... % Brown-Eyed Girl
@@ -123,26 +140,50 @@ class CTSong(prebase.ProtoM21Object):
     ... S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2
     ... '''
 
-    >>> exCT = romanText.clercqTemperley.exampleClercqTemperley
+    >>> exCT = romanText.clercqTemperley.exampleClercqTemperley  #_DOCS_HIDE
     >>> s = romanText.clercqTemperley.CTSong(exCT)  #_DOCS_HIDE
+
+    Or:
+
     >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/Brown-Eyed_Girl.txt')
 
-    When you call the .toScore() method on the newly created CTSong object,
+    When you call the .toPart() method on the newly created CTSong object,
     the code extracts meaningful properties (such as title, text, comments,
     year, rules, home time Signature, and home Key Signature) from the text file
-    and makes these accessible as below.
+    and returns a new Part object.  It also makes these properties available on the
+    CTSong object.
 
-    The toScore() method has two optional labeling parameters, labelRomanNumerals and
+    The toPart() method has two optional labeling parameters, labelRomanNumerals and
     labelSubsectionsOnScore. Both are set to True by default. Thus, the created score
     will have labels (on the chord's lyric) for each roman numeral as well as for each
     section in the song (LHS). In case of a recursive definition (a rule contains a reference
     to another rule), both labels are printed, with the deepest
     reference on the smallest lyric line.
 
-    >>> #_DOCS_SHOW s.toScore().show()
+    >>> p = s.toPart()
+    >>> #_DOCS_SHOW p.show()
 
     .. image:: images/ClercqTemperleyExbrown-eyed_girl.png
        :width: 500
+
+    >>> firstRN = p[roman.RomanNumeral][0]
+    >>> firstRN.lyric
+    'I\nVP\nIn'
+
+    All roman numerals mark which formal division they are in:
+
+    >>> 'formalDivision' in firstRN.editorial
+    True
+    >>> firstRN.editorial.formalDivision
+    ['VP', 'In']
+
+    The second RomanNumeral is at the start of no formal divisions
+
+    >>> secondRN = p[roman.RomanNumeral][1]
+    >>> secondRN.lyric
+    'IV'
+    >>> secondRN.editorial.formalDivision
+    []
 
     >>> s.title
     'Brown-Eyed Girl'
@@ -150,7 +191,7 @@ class CTSong(prebase.ProtoM21Object):
     >>> s.homeTimeSig
     <music21.meter.TimeSignature 4/4>
 
-    >>> s.homeKeySig
+    >>> s.homeKey
     <music21.key.Key of G major>
 
     >>> s.comments
@@ -163,22 +204,22 @@ class CTSong(prebase.ProtoM21Object):
     >>> s.year
     1967
 
-    Upon calling toScore(), CTRule objects are also created. CTRule objects are
+    Upon calling toPart(), CTRule objects are also created. CTRule objects are
     the individual rules that make up the song object. For example,
 
     >>> s.rules
-    OrderedDict([('VP', <music21.romanText.clercqTemperley.CTRule
-                         text='VP: I | IV | I | V |'>),
-                 ('In', <music21.romanText.clercqTemperley.CTRule text='In: $VP*2'>),
-                 ('Vr', <music21.romanText.clercqTemperley.CTRule
+    OrderedDict({'VP': <music21.romanText.clercqTemperley.CTRule
+                         text='VP: I | IV | I | V |'>,
+                 'In': <music21.romanText.clercqTemperley.CTRule text='In: $VP*2'>,
+                 'Vr': <music21.romanText.clercqTemperley.CTRule
                          text='Vr: $VP*4 IV | V | I | vi | IV | V | I | V |
-                                     % Second half could be called chorus'>),
-                 ('Ch', <music21.romanText.clercqTemperley.CTRule
-                         text='Ch: V | | $VP*2 I |*4'>),
-                 ('Ch2', <music21.romanText.clercqTemperley.CTRule
-                         text='Ch2: V | | $VP*3     % Fadeout'>),
-                 ('S', <music21.romanText.clercqTemperley.CTRule
-                         text='S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'>)])
+                                     % Second half could be called chorus'>,
+                 'Ch': <music21.romanText.clercqTemperley.CTRule
+                         text='Ch: V | | $VP*2 I |*4'>,
+                 'Ch2': <music21.romanText.clercqTemperley.CTRule
+                         text='Ch2: V | | $VP*3     % Fadeout'>,
+                 'S': <music21.romanText.clercqTemperley.CTRule
+                         text='S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'>})
 
     The parser extracts meaningful properties to each rule, such as sectionName,
     home time signature of that rule, home key of that rule, and of course the individual
@@ -193,7 +234,6 @@ class CTSong(prebase.ProtoM21Object):
 
     >>> rule.sectionName
     'Introduction'
-
 
     With this object-oriented approach to parsing the clercq-temperley text file format,
     we now have the ability to analyze a large corpus (200 files) of popular music
@@ -214,8 +254,6 @@ class CTSong(prebase.ProtoM21Object):
     ... S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
     ... '''
 
-    OMIT_FROM_DOCS
-
     Another example using a different Clercq-Temperley file
 
     RockClockCT =
@@ -227,8 +265,8 @@ class CTSong(prebase.ProtoM21Object):
     S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf    % 3rd and 6th verses are instrumental
 
     >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.RockClockCT)
-    >>> score = s.toScore()
-    >>> score.highestTime
+    >>> part = s.toPart()
+    >>> part.highestTime
     376.0
 
     >>> s.title
@@ -237,7 +275,7 @@ class CTSong(prebase.ProtoM21Object):
     >>> s.homeTimeSig
     <music21.meter.TimeSignature 4/4>
 
-    >>> s.homeKeySig
+    >>> s.homeKey
     <music21.key.Key of A major>
 
     >>> s.comments
@@ -250,16 +288,15 @@ class CTSong(prebase.ProtoM21Object):
     1952
 
     >>> s.rules
-    OrderedDict([('In', <music21.romanText.clercqTemperley.CTRule
-                            text='In: I | | | | | | V | |'>),
-                 ('Vr', <music21.romanText.clercqTemperley.CTRule
-                         text='Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse'>),
-                 ('Vrf', <music21.romanText.clercqTemperley.CTRule
-                         text='Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |'>),
-                 ('S', <music21.romanText.clercqTemperley.CTRule
+    OrderedDict({'In': <music21.romanText.clercqTemperley.CTRule
+                            text='In: I | | | | | | V | |'>,
+                 'Vr': <music21.romanText.clercqTemperley.CTRule
+                         text='Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse'>,
+                 'Vrf': <music21.romanText.clercqTemperley.CTRule
+                         text='Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |'>,
+                 'S': <music21.romanText.clercqTemperley.CTRule
                          text='S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf
-                                     % 3rd and 6th verses are instrumental'>)])
-
+                                     % 3rd and 6th verses are instrumental'>})
 
     >>> rule = s.rules['In']
     >>> rule.text
@@ -268,7 +305,9 @@ class CTSong(prebase.ProtoM21Object):
     >>> rule.sectionName
     'Introduction'
 
-    one more example...the bane of this parser's existence...::
+    OMIT_FROM_DOCS
+
+    one more example, which is the bane of this parser's existence::
 
         % Ring Of Fire
 
@@ -284,10 +323,8 @@ class CTSong(prebase.ProtoM21Object):
         Fadeout: I . . V | I . . V | I . . V |
         Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
         S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
-
-
     """
-    _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
+    _DOC_ORDER = ['text', 'toPart', 'title', 'homeTimeSig', 'homeKey', 'comments', 'rules']
     _DOC_ATTR: dict[str, str] = {
         'year': '''
             The year of the CTSong; not formally defined
@@ -295,44 +332,65 @@ class CTSong(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, textFile: str | pathlib.Path = '', **keywords):
-        self._title = None
+    def __init__(self, textFile: str|pathlib.Path = '', **keywords: t.Any) -> None:
+        self._title: str|None = None
         self.text = ''
         self.lines: list[str] = []
         # Dictionary of all component rules of the type CTRule
         self._rules: dict[str, CTRule] = OrderedDict()
-        # keeps a list of all key signatures in the Score -- avoids duplicates
-        self.ksList: list[key.KeySignature] = []
+        # keeps a list of all keys in the Score -- avoids duplicates
+        self.keyObjList: list[key.Key] = []
         # same for time signatures
         self.tsList: list[meter.TimeSignature] = []
 
-        self._scoreObj = None
-        self.year = None
+        self._partObj = stream.Part()
+        self.year: int|None = None
 
-        self._homeTimeSig = None
-        self._homeKeySig = None
+        self._homeTimeSig: meter.TimeSignature|None = None
+        self._homeKey: key.Key|None = None
 
         self.labelRomanNumerals = True
         self.labelSubsectionsOnScore = True
 
-        for kw in keywords:
+        for kw, value in keywords.items():
             if kw == 'title':
-                self._title = kw
-            if kw == 'year':
-                self.year = kw
+                self._title = value
+            elif kw == 'year':
+                self.year = value
 
         self.parse(textFile)
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile: str | pathlib.Path):
+    def parse(self, textFile: str|pathlib.Path) -> None:
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file
         and removes all blank lines, and adds in new line characters
-        returns pieceString that CTSong can parse.
+        returns pieceString that CTSong can call .expand() on.
+
+        >>> exCT = romanText.clercqTemperley.exampleClercqTemperley
+
+        This calls parse implicitly:
+
+        >>> s = romanText.clercqTemperley.CTSong(exCT)
+
+        >>> print(s.text)
+        % Brown-Eyed Girl
+        VP: I | IV | I | V |
+        In: $VP*2
+        Vr: $VP*4 IV | V | I | vi | IV | V | I | V |       % Second half could be called chorus
+        Ch: V | | $VP*2 I |*4
+        Ch2: V | | $VP*3     % Fadeout
+        S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2
+
+        >>> s.lines[0]
+        '% Brown-Eyed Girl'
+
+        >>> s.lines[-1]
+        'S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'
         '''
         if isinstance(textFile, str) and '|' in textFile and 'S:' in textFile:
             lines = textFile.split('\n')
@@ -346,16 +404,14 @@ class CTSong(prebase.ProtoM21Object):
                 raise CTSongException(
                     f'Invalid File Format; must be string or text file: {textFile}')
 
-        lines = [e for e in lines if len(e) != 0]
-        for i in range(len(lines)):
-            lines[i] = lines[i].strip()
+        lines = [e.strip() for e in lines if len(e) != 0]
         self.lines = lines
         pieceString = '\n'.join(lines)
 
         self.text = pieceString
 
     @property
-    def title(self):
+    def title(self) -> str|None:
         '''
         Get or set the title of the CTSong. If not specified
         explicitly but the clercq-Temperley text exists,
@@ -375,7 +431,7 @@ class CTSong(prebase.ProtoM21Object):
         return title
 
     @property
-    def comments(self):
+    def comments(self) -> list[list[str]]:
         r"""
         Get the comments list of all CTRule objects.
 
@@ -402,7 +458,7 @@ class CTSong(prebase.ProtoM21Object):
         >>> s.comments
         [['A wonderful shaker melody'], ['Vr:', 'incomplete verse'], ['S:', 'Not quite finished!']]
         """
-        comments = []
+        comments: list[list[str]] = []
         for line in self.lines[1:]:
             if '%' in line:
                 if line.split()[0].endswith(':'):
@@ -413,7 +469,7 @@ class CTSong(prebase.ProtoM21Object):
         return comments
 
     @property
-    def rules(self):
+    def rules(self) -> dict[str, CTRule]:
         # noinspection PyShadowingNames
         '''
         Get the rules of a CTSong. the Rules is an OrderedDict of
@@ -439,6 +495,12 @@ class CTSong(prebase.ProtoM21Object):
                     text='Co: R |*4 I |*4'>)
         ('S', <music21.romanText.clercqTemperley.CTRule
                     text='S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co'>)
+
+        Rules S is where we begin:
+
+        >>> s.rules['S']
+        <music21.romanText.clercqTemperley.CTRule
+            text='S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co'>
         '''
         if self._rules:
             return self._rules
@@ -452,7 +514,7 @@ class CTSong(prebase.ProtoM21Object):
         return self._rules
 
     @property
-    def homeTimeSig(self):
+    def homeTimeSig(self) -> meter.TimeSignature|None:
         r'''
         gets the initial, or 'home', time signature in a song by looking at the 'S' substring
         and returning the provided time signature. If not present, returns a default music21
@@ -468,6 +530,9 @@ class CTSong(prebase.ProtoM21Object):
         >>> change.homeTimeSig.beatSequence
         <music21.meter.core.MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
         '''
+        if self._homeTimeSig:
+            return self._homeTimeSig
+
         # look at 'S' Rule and grab the home time Signature
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
@@ -485,60 +550,79 @@ class CTSong(prebase.ProtoM21Object):
         return self._homeTimeSig
 
     @property
-    def homeKeySig(self):
+    def homeKey(self) -> key.Key|None:
         '''
-        gets the initial, or 'home', key signature by looking at the music text and locating
+        gets the initial, or 'home', Key by looking at the music text and locating
         the key signature at the start of the S: rule.
 
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
-        >>> s.homeKeySig
+        >>> s.homeKey
         <music21.key.Key of A major>
         '''
-        # look at 'S' Rule and grab the home key Signature
+        if self._homeKey:
+            return self._homeKey
+
+        # look at 'S' Rule and grab the home key
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
             for line in lines:
                 if line.startswith('S:'):
                     for atom in line.split()[1:3]:
                         if '[' not in atom:
-                            self._homeKeySig = key.Key('C')
-                            return self._homeKeySig
+                            self._homeKey = key.Key('C')
+                            return self._homeKey
                         elif '/' not in atom:
                             m21keyStr = key.convertKeyStringToMusic21KeyString(atom[1:-1])
-                            self._homeKeySig = key.Key(m21keyStr)
-                            return self._homeKeySig
+                            self._homeKey = key.Key(m21keyStr)
+                            return self._homeKey
                         else:
                             pass
-        return self._homeKeySig
+        return self._homeKey
 
-    def toScore(self, labelRomanNumerals=True, labelSubsectionsOnScore=True):
+    def toPart(
+        self,
+        labelRomanNumerals: bool = True,
+        labelSubsectionsOnScore: bool = True,
+    ) -> stream.Part:
         # noinspection PyShadowingNames
         '''
-        creates Score object out of a from CTSong...also creates CTRule objects in the process,
+        creates a Part object out of a from CTSong and also creates CTRule objects in the process,
         filling their .streamFromCTSong attribute with the corresponding smaller inner stream.
         Individual attributes of a rule are defined by the entire CTSong, such as
         meter and time signature, so creation of CTRule objects typically occurs
         only from this method and directly from the clercqTemperley text.
 
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
-        >>> scoreObj = s.toScore()
-        >>> scoreObj.highestOffset
+        >>> partObj = s.toPart()
+        >>> partObj.highestOffset
         380.0
         '''
         self.labelRomanNumerals = labelRomanNumerals
         self.labelSubsectionsOnScore = labelSubsectionsOnScore
-        if self._scoreObj is not None:
-            return self._scoreObj
-        scoreObj = stream.Part()
-        measures = self.rules['S'].expand()
-        scoreObj.append(measures)
+        if self._partObj[stream.Measure].first():
+            return self._partObj
+        partObj = stream.Part()
+        startRule = self.rules['S']
+        measures = startRule.expand()
+        for i, m in enumerate(measures):
+            m.number = i + 1
+        partObj.append(measures)
 
-        scoreObj.insert(0, metadata.Metadata())
-        scoreObj.metadata.title = self.title
+        partObj.insert(0, metadata.Metadata(title=self.title))
 
-        self._scoreObj = scoreObj
-        return scoreObj
+        self._partObj = partObj
+        return partObj
 
+    def toScore(
+        self,
+        labelRomanNumerals: bool = True,
+        labelSubsectionsOnScore: bool = True,
+    ) -> stream.Part:
+        '''
+        DEPRECATED: use .toPart() instead.  This method will be removed in v.10
+        '''
+        return self.toPart(labelRomanNumerals=labelRomanNumerals,
+                           labelSubsectionsOnScore=labelSubsectionsOnScore)
 
 class CTRuleException(exceptions21.Music21Exception):
     pass
@@ -548,12 +632,14 @@ class CTRule(prebase.ProtoM21Object):
     '''
     CTRule objects correspond to the individual lines defined in a
     :class:`~music21.romanText.clercqTemperley.CTSong` object. They are typically
-    created by the parser after a CTSong object has been created and the .toScore() method
+    created by the parser after a CTSong object has been created and the .toPart() method
     has been called on that object. The usefulness of each CTRule object is that each
     has a :meth:`~music21.romanText.clercqTemperley.CTRUle.streamFromCTSong` attribute,
     which is the stream from the entire score that the rule corresponds to.
+
+    To parse, put the text into the
     '''
-    _DOC_ORDER = ['LHS', 'sectionName', 'musicText', 'homeTimeSig', 'homeKeySig', 'comments']
+    _DOC_ORDER = ['LHS', 'sectionName', 'musicText', 'homeTimeSig', 'homeKey', 'comments']
     _DOC_ATTR: dict[str, str] = {
         'text': '''
             The full text of the CTRule, including the LHS, chords, and comments.''',
@@ -562,120 +648,72 @@ class CTRule(prebase.ProtoM21Object):
     SPLITMEASURES = re.compile(r'(\|\*?\d*)')
     REPETITION = re.compile(r'\*(\d+)')
 
-    def __init__(self, text='', parent=None):
-        self._parent = None
+    def __init__(self, text: str = '', parent: CTSong|None = None) -> None:
+        self._parent: t.Any = None
         if parent is not None:
             self.parent = parent
 
-        self._musicText = None  # just the text above without the rule string or comments
-        self._LHS = None  # rule name string, such as "In"
-        self.text = text  # FULL TEXT OF CTRULE (includes LHS, chords, and comments
+        self.ts = (self.parent.homeTimeSig if self.parent else None) or meter.TimeSignature('4/4')
+        self.keyObj = (self.parent.homeKey if self.parent else None) or key.Key('C')
 
-    def _reprInternal(self):
+        self.text = text  # full text of CTRule input (includes LHS, chords, and comments)
+        self._musicText = ''  # just the text above without the rule string or comments
+        self._LHS = ''  # left hand side: rule name string, such as "In"
+
+        self.measures: list[stream.Measure] = []
+        self.lastRegularAtom: str = ''
+        self.lastChord: chord.Chord|None = None
+        self._lastChordIsInSameMeasure: bool = False
+
+
+    def _reprInternal(self) -> str:
         return f'text={self.text!r}'
 
     # --------------------------------------------------------------------------
-    def _getParent(self):
+    @property
+    def parent(self) -> CTSong|None:
+        r'''
+        A reference to the CTSong object housing the CTRule if any.
+        '''
         return common.unwrapWeakref(self._parent)
 
-    def _setParent(self, parent):
+    @parent.setter
+    def parent(self, parent: CTSong) -> None:
         self._parent = common.wrapWeakref(parent)
 
-    parent = property(_getParent, _setParent, doc=r'''
-    A reference to the CTSong object housing the CTRule if any.
-    ''')
     # --------------------------------------------------------------------------
 
-    def expand(self, ts=None, ks=None):
+    def expand(
+        self,
+        tsContext: meter.TimeSignature|None = None,
+        keyContext: key.Key|None = None,
+    ) -> list[stream.Measure]:
         '''
         The meat of it all -- expand one rule completely and return a list of Measure objects.
-        '''
-        if ts is None:
-            ts = meter.TimeSignature('4/4')
-        if ks is None:
-            ks = key.Key('C')
-        measures = []
 
-        lastRegularAtom = None
-        lastChord = None
+        Parses within the local time signature context and key context.
+        '''
+        saveTs = self.ts
+        saveKey = self.keyObj
+
+        if tsContext:
+            self.ts = tsContext
+        if keyContext:
+            self.keyObj = keyContext
+
+        self.measures.clear()
 
         for content, sep, numReps in self._measureGroups():
-            lastChordIsInSameMeasure = False
             if sep == '$':
-                if content not in self.parent.rules:
-                    raise CTRuleException(f'Cannot expand rule {content} in {self}')
-                rule = self.parent.rules[content]
-                for i in range(numReps):
-                    returnedMeasures = rule.expand(ts, ks)
-                    self.insertKsTs(returnedMeasures[0], ts, ks)
-                    for returnedTs in [m.getElementsByClass(meter.TimeSignature)
-                                        for m in returnedMeasures]:
-                        if returnedTs is not ts:
-                            # the TS changed mid-rule; create a new one for return.
-                            ts = copy.deepcopy(ts)
-
-                    measures.extend(returnedMeasures)
+                self.expandExpansionContent(content, numReps)
             elif sep == '|':
-                m = stream.Measure()
-                atoms = content.split()
-                # key/timeSig pass...
-                regularAtoms = []
-                for atom in atoms:
-                    if atom.startswith('['):
-                        atomContent = atom[1:-1]
-                        if atomContent == '0':
-                            ts = meter.TimeSignature('4/4')
-                            # irregular meter.  Cannot fully represent;
-                            # TODO: replace w/ senza misura when possible.
-
-                        elif '/' in atomContent:  # only one key / ts per measure.
-                            ts = meter.TimeSignature(atomContent)
-                        else:
-                            ks = key.Key(key.convertKeyStringToMusic21KeyString(atomContent))
-
-                    elif atom == '.':
-                        if lastRegularAtom is None:
-                            raise CTRuleException(f' . w/o previous atom: {self}')
-                        regularAtoms.append(lastRegularAtom)
-                    elif atom in ('', None):
-                        pass
-                    else:
-                        regularAtoms.append(atom)
-                        lastRegularAtom = atom
-                numAtoms = len(regularAtoms)
-                if numAtoms == 0:
-                    continue  # maybe just ts and ks setting
-
-                self.insertKsTs(m, ts, ks)
-
-                atomLength = common.opFrac(ts.barDuration.quarterLength / numAtoms)
-                for atom in regularAtoms:
-                    if atom == 'R':
-                        rest = note.Rest(quarterLength=atomLength)
-                        lastChord = None
-                        lastChordIsInSameMeasure = False
-                        m.append(rest)
-                    else:
-                        atom = self.fixupChordAtom(atom)
-                        rn = roman.RomanNumeral(atom, ks)
-                        if self.isSame(rn, lastChord) and lastChordIsInSameMeasure:
-                            lastChord.duration.quarterLength += atomLength
-                            m.coreElementsChanged()
-                        else:
-                            rn.duration.quarterLength = atomLength
-                            self.addOptionalTieAndLyrics(rn, lastChord)
-                            lastChord = rn
-                            lastChordIsInSameMeasure = True
-                            m.append(rn)
-                measures.append(m)
-                for i in range(1, numReps):
-                    measures.append(copy.deepcopy(m))
+                self.expandSimpleContent(content, numReps)
             else:
                 environLocal.warn(
                     f'Rule found without | or $, ignoring: {content!r},{sep!r}: in {self.text!r}')
                 # pass
-        if measures:
-            for m in measures:
+        if self.measures:
+            for m in self.measures:
                 noteIter = m.recurse().notes
                 if (noteIter
                         and (self.parent is None
@@ -684,23 +722,120 @@ class CTRule(prebase.ProtoM21Object):
                     rn = noteIter[0]
                     lyricNum = len(rn.lyrics) + 1
                     rn.lyrics.append(note.Lyric(self.LHS, number=lyricNum))
+                    rn.editorial.formalDivision.append(self.LHS)
                     break
 
-        return measures
+        self.ts = saveTs
+        self.keyObj = saveKey
 
-    def _measureGroups(self):
+        return self.measures
+
+    def expandExpansionContent(
+        self,
+        content: str,
+        numReps: int,
+    ) -> None:
         '''
-        Returns content, "|" (normal) or "$" (expansion), and number of repetitions.
+        Expand a rule that contains an expansion (i.e., a $) in it.
 
-        >>> rs = ('In: [A] [4/4] $Vr $BP*3 I IV | I | ' +
-        ...          '$BP*3 I IV | I | | R |*4 I |*4 % This is a comment')
+        Requires CTSong parent to be set.
+        '''
+        if not self.parent or content not in self.parent.rules:
+            raise CTRuleException(f'Cannot expand rule {content} in {self}')
+        rule = self.parent.rules[content]
+        for i in range(numReps):
+            returnedMeasures = rule.expand(self.ts, self.keyObj)
+            self.insertKsTs(returnedMeasures[0], self.ts, self.keyObj)
+            for returnedTs in [m.getElementsByClass(meter.TimeSignature)
+                               for m in returnedMeasures]:
+                if returnedTs is not self.ts:
+                    # the TS changed mid-rule; create a new one for return.
+                    self.ts = copy.deepcopy(self.ts)
+
+            self.measures.extend(returnedMeasures)
+
+    def expandSimpleContent(
+        self,
+        content: str,
+        numReps: int,
+    ) -> None:
+        lastChordIsInSameMeasure = False
+
+        m = stream.Measure()
+        atoms = content.split()
+        # key/timeSig pass
+        regularAtoms: list[str] = []
+        for atom in atoms:
+            if atom.startswith('['):
+                atomContent = atom[1:-1]
+                if atomContent == '0':
+                    self.ts = meter.TimeSignature('4/4')
+                    # irregular meter.  Cannot fully represent;
+                    # TODO: replace w/ senza misura when possible.
+
+                elif '/' in atomContent:  # only one key / ts per measure.
+                    self.ts = meter.TimeSignature(atomContent)
+                else:
+                    self.keyObj = key.Key(key.convertKeyStringToMusic21KeyString(atomContent))
+
+            elif atom == '.':
+                if not self.lastRegularAtom:
+                    raise CTRuleException(f' . w/o previous atom: {self}')
+                regularAtoms.append(self.lastRegularAtom)
+            elif not atom:
+                pass
+            else:
+                regularAtoms.append(atom)
+                self.lastRegularAtom = atom
+        numAtoms = len(regularAtoms)
+        if numAtoms == 0:
+            return  # maybe just ts and keyObj setting
+
+        self.insertKsTs(m, self.ts, self.keyObj)
+
+        atomLength = common.opFrac(self.ts.barDuration.quarterLength / numAtoms)
+        for atom in regularAtoms:
+            if atom == 'R':
+                rest = note.Rest(quarterLength=atomLength)
+                rest.editorial.formalDivision = []
+                self.lastChord = None
+                lastChordIsInSameMeasure = False
+                m.append(rest)
+            else:
+                atom = self.fixupChordAtom(atom)
+                rn = roman.RomanNumeral(atom, self.keyObj)
+                rn.editorial.formalDivision = []
+                if self.isSame(rn, self.lastChord) and lastChordIsInSameMeasure:
+                    if t.TYPE_CHECKING:
+                        assert self.lastChord is not None  # isSame asserted this.
+                    self.lastChord.duration.quarterLength += atomLength
+                    m.coreElementsChanged()
+                else:
+                    rn.duration.quarterLength = atomLength
+                    self.addOptionalTieAndLyrics(rn, self.lastChord)
+                    self.lastChord = rn
+                    lastChordIsInSameMeasure = True
+                    m.append(rn)
+        self.measures.append(m)
+        for i in range(1, numReps):
+            newM = copy.deepcopy(m)
+            newM.removeByClass([meter.TimeSignature, key.Key])
+            self.measures.append(newM)
+
+    def _measureGroups(self) -> list[tuple[str, str, int]]:
+        '''
+        Returns a list of 3-tuples where each tuple consists of the
+        str content, either "|" (a normal measure ) or "$" (an expansion),
+        and the number of repetitions.  Comments are stripped.
+
+        >>> rs = ('In: [A] [4/4] $Vr $BP*3 I IV | I | '
+        ...           '$BP*3 I IV | I | | R |*4 I |*4 % This is a comment')
         >>> s = romanText.clercqTemperley.CTRule(rs)
         >>> s._measureGroups()
         [('[A] [4/4]', '|', 1),
          ('Vr', '$', 1), ('BP', '$', 3), ('I IV', '|', 1), ('I', '|', 1),
          ('BP', '$', 3), ('I IV', '|', 1), ('I', '|', 1), ('.', '|', 1),
          ('R', '|', 4), ('I', '|', 4)]
-
 
         >>> r = romanText.clercqTemperley.CTRule('In: $IP*3 I | | | $BP*2')
         >>> r._measureGroups()
@@ -730,10 +865,10 @@ class CTRule(prebase.ProtoM21Object):
         >>> measures[3][-1].quarterLength
         2.0
         '''
-        measureGroups1 = []
-        measureGroups2 = []
-        measureGroups3 = []
-        measureGroupTemp = self.SPLITMEASURES.split(self.musicText)
+        measureGroups1: list[tuple[str, str]] = []
+        measureGroups2: list[tuple[str, str, int]] = []
+        measureGroups3: list[tuple[str, str, int]] = []
+        measureGroupTemp: list[str] = self.SPLITMEASURES.split(self.musicText)
         # first pass -- separate by | or |*3, etc.
         for i in range(0, len(measureGroupTemp), 2):
             content = measureGroupTemp[i].strip()
@@ -746,7 +881,7 @@ class CTRule(prebase.ProtoM21Object):
         # second pass -- filter out expansions.
         for content, sep in measureGroups1:
             contentList = content.split()
-            contentOut = []
+            contentOut: list[str] = []
 
             for atom in contentList:
                 if atom.startswith('$'):  # $BP or $Vr*3, etc.
@@ -790,7 +925,11 @@ class CTRule(prebase.ProtoM21Object):
         return measureGroups3
 
     # --------------------------------------------------------------------------
-    def isSame(self, rn, lastChord):
+    def isSame(self, rn: roman.RomanNumeral, lastChord: chord.Chord|None) -> bool:
+        '''
+        Returns True if the pitches of the RomanNumeral are the same as the pitches
+        of lastChord.  Returns False if lastChord is None.
+        '''
         if lastChord is None:
             same = False
         else:
@@ -802,7 +941,11 @@ class CTRule(prebase.ProtoM21Object):
                 same = False
         return same
 
-    def addOptionalTieAndLyrics(self, rn, lastChord):
+    def addOptionalTieAndLyrics(
+        self,
+        rn: roman.RomanNumeral,
+        lastChord: chord.Chord|None
+    ) -> None:
         '''
         Adds ties to chords that are the same.  Adds lyrics to chords that change.
         '''
@@ -822,24 +965,27 @@ class CTRule(prebase.ProtoM21Object):
     def insertKsTs(self,
                    m: stream.Measure,
                    ts: meter.TimeSignature,
-                   ks: key.KeySignature):
+                   keyObj: key.Key) -> None:
         '''
-        Insert a new time signature or key signature into measure m, if it's
+        Insert a new time signature or Key into measure m, if it's
         not already in the stream somewhere.
+
+        Note that the name "ks" is slightly misnamed.  It requires a Key,
+        not KeySignature object.
         '''
         if self.parent is None:
             m.timeSignature = ts
-            m.keySignature = ks
+            m.keySignature = keyObj
             return
 
         if ts not in self.parent.tsList:
             m.timeSignature = ts
             self.parent.tsList.append(ts)
-        if ks not in self.parent.ksList:
-            m.keySignature = ks
-            self.parent.tsList.append(ks)
+        if keyObj not in self.parent.keyObjList:
+            m.keySignature = keyObj
+            self.parent.keyObjList.append(keyObj)
 
-    def fixupChordAtom(self, atom):
+    def fixupChordAtom(self, atom: str) -> str:
         '''
         changes some CT values into music21 values
 
@@ -850,7 +996,6 @@ class CTRule(prebase.ProtoM21Object):
         'vii/o7'
         >>> s.fixupChordAtom('iia')
         'ii+'
-
         '''
         if 'x' in atom:
             atom = atom.replace('x', 'o')
@@ -861,11 +1006,19 @@ class CTRule(prebase.ProtoM21Object):
         return atom
     # --------------------------------------------------------------------------
 
-    def _setMusicText(self, value):
-        self._musicText = str(value)
+    @property
+    def musicText(self) -> str:
+        '''
+        Gets just the music text of the CTRule, excluding the left hand side and comments
 
-    def _getMusicText(self):
-        if self._musicText not in (None, ''):
+        >>> rs = 'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
+        >>> s = romanText.clercqTemperley.CTRule(rs)
+        >>> s.text
+        'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
+        >>> s.musicText
+        '$BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4'
+        '''
+        if self._musicText:
             return self._musicText
 
         if not self.text:
@@ -879,19 +1032,12 @@ class CTRule(prebase.ProtoM21Object):
         self._musicText = text.strip()
         return self._musicText
 
-    musicText = property(_getMusicText, _setMusicText, doc='''
-        Gets just the music text of the CTRule, excluding the left hand side and comments
-
-        >>> rs = 'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
-        >>> s = romanText.clercqTemperley.CTRule(rs)
-        >>> s.text
-        'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
-        >>> s.musicText
-        '$BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4'
-        ''')
+    @musicText.setter
+    def musicText(self, value: str) -> None:
+        self._musicText = str(value)
 
     @property
-    def comment(self):
+    def comment(self) -> str|None:
         '''
         Get the comment of a CTRule object.
 
@@ -902,14 +1048,21 @@ class CTRule(prebase.ProtoM21Object):
         '''
         if '%' in self.text:
             return self.text[self.text.index('%') + 1:].strip()
-        else:
-            return None
+        return None
 
-    def _setLHS(self, value):
-        self._LHS = str(value)
+    @property
+    def LHS(self) -> str:
+        '''
+        Get the LHS (Left Hand Side) of the CTRule.
+        If not specified explicitly but CTtext present, searches
+        first characters up until ':' for rule and returns string)
 
-    def _getLHS(self):
-        if self._LHS not in (None, ''):
+        >>> rs = 'In: $BP*3 I IV | R |*4 I |*4 % This is a comment'
+        >>> s = romanText.clercqTemperley.CTRule(rs)
+        >>> s.LHS
+        'In'
+        '''
+        if self._LHS:
             return self._LHS
 
         LHS = ''
@@ -919,22 +1072,17 @@ class CTRule(prebase.ProtoM21Object):
                     self._LHS = LHS.strip()
                     return self._LHS
                 LHS = LHS + char
+            # no colon found -- will not happen; it's in self.text
+            return ''  # pragma: no cover
         else:
             return ''
 
-    LHS = property(_getLHS, _setLHS, doc='''
-        Get the LHS (Left Hand Side) of the CTRule.
-        If not specified explicitly but CTtext present, searches
-        first characters up until ':' for rule and returns string)
-
-        >>> rs = 'In: $BP*3 I IV | R |*4 I |*4 % This is a comment'
-        >>> s = romanText.clercqTemperley.CTRule(rs)
-        >>> s.LHS
-        'In'
-        ''')
+    @LHS.setter
+    def LHS(self, value: str) -> None:
+        self._LHS = str(value)
 
     @property
-    def sectionName(self):
+    def sectionName(self) -> str:
         '''
         Returns the expanded version of the Left-hand side (LHS) such as
         Introduction, Verse, etc. if
@@ -975,20 +1123,28 @@ class CTRule(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    pass
+
+    def testTitleAndYear(self) -> None:
+        '''
+        The title and year keywords passed to CTSong should be stored on the
+        object itself (rather than the keyword names being stored by mistake).
+        '''
+        s = CTSong(BlitzkriegBopCT, title="Someday We'll Be Together", year=1969)
+        # the title keyword overrides the "% Blitzkrieg Bop" comment in the text
+        self.assertEqual(s.title, "Someday We'll Be Together")
+        self.assertEqual(s.year, 1969)
 
 
 class TestExternal(unittest.TestCase):
     show = True
 
-    def testB(self):
-        from music21.romanText import clercqTemperley
-        s = clercqTemperley.CTSong(BlitzkriegBopCT)
-        scoreObj = s.toScore()
+    def testB(self) -> None:
+        s = CTSong(BlitzkriegBopCT)
+        partObj = s.toPart()
         if self.show:
-            scoreObj.show()
+            partObj.show()
 
-    def x_testA(self):
+    def x_testA(self) -> None:
         pass
         # from music21.romanText import clercqTemperley
         #
@@ -1001,7 +1157,7 @@ class TestExternal(unittest.TestCase):
         #     txt = f.read()
         #
         #     s = clercqTemperley.CTSong(txt)
-        #     for chord in s.toScore().flatten().getElementsByClass(chord.Chord):
+        #     for chord in s.toPart().flatten().getElementsByClass(chord.Chord):
         #         try:
         #             x = chord.pitches
         #         except:
@@ -1012,12 +1168,12 @@ class TestExternal(unittest.TestCase):
         #     try:
         #         fileName = 'C:\\dt\\' + num + '.txt'
         #         s = clercqTemperley.CTSong(fileName)
-        #         print(s.toScore().highestOffset, 'Success', num)
+        #         print(s.toPart().highestOffset, 'Success', num)
         #     except:
         #         print('ERROR', num)
         # s = clercqTemperley.CTSong(exampleClercqTemperley)
 
-        # sc = s.toScore()
+        # sc = s.toPart()
         # print(sc.highestOffset)
         # sc.show()
 

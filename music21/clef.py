@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         clef.py
 # Purpose:      Objects for representing clefs
@@ -7,7 +6,7 @@
 #               Christopher Ariza
 #               Michael Bodenbach
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -35,6 +34,8 @@ if t.TYPE_CHECKING:
 
 environLocal = environment.Environment('clef')
 
+TREBLE_MID_LINE_DNN = 35
+
 
 class ClefException(exceptions21.Music21Exception):
     pass
@@ -44,7 +45,7 @@ class ClefException(exceptions21.Music21Exception):
 class Clef(base.Music21Object):
     '''
     A Clef is a basic `music21` object for representing musical clefs
-    (Treble, Bass, etc.)
+    (Treble, Bass, etc.).
 
     Some clefs only represent the graphical element of the clef,
     such as G clef, which is subclassed by TrebleClef() and FrenchViolinClef().
@@ -106,7 +107,6 @@ class Clef(base.Music21Object):
             True
             >>> clef.NoClef().sign
             'none'
-
             ''',
         'line': '''
             The line, counting from the bottom up, that the clef resides on.
@@ -128,9 +128,9 @@ class Clef(base.Music21Object):
 
     def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
-        self.sign: str | None = None
+        self.sign: str|None = None
         # line counts start from the bottom up, the reverse of musedata
-        self.line: int | None = None
+        self.line: int|None = None
         self._octaveChange: int = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
@@ -185,7 +185,7 @@ class Clef(base.Music21Object):
 
     def getStemDirectionForPitches(
         self,
-        pitches: pitch.Pitch | Sequence[pitch.Pitch],
+        pitches: pitch.Pitch|Sequence[pitch.Pitch],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -252,7 +252,7 @@ class Clef(base.Music21Object):
         if isinstance(self, (PercussionClef, PitchClef)) and self.lowestLine is not None:
             midLine = self.lowestLine + 4  # pylint: disable=no-member
         else:
-            midLine = 35  # assume TrebleClef-like.
+            midLine = TREBLE_MID_LINE_DNN  # assume TrebleClef-like.
 
         for p in relevantPitches:
             distanceFromMidLine = p.diatonicNoteNum - midLine
@@ -271,12 +271,12 @@ class Clef(base.Music21Object):
 
 class PitchClef(Clef):
     '''
-    superclass for all other clef subclasses that use pitches...
+    Superclass for all other clef subclasses that use pitches.
     '''
     _DOC_ATTR: dict[str, str] = {
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
-            (Can be none...)
+            (Can be `None`)
 
             >>> clef.TrebleClef().lowestLine
             31
@@ -298,7 +298,7 @@ class PitchClef(Clef):
         >>> clef.Treble8vbClef().octaveChange
         -1
 
-        Changing octaveChange changes lowestLine (but not vice-versa)
+        Changing octaveChange changes lowestLine (but not vice versa)
 
         >>> tc.lowestLine
         31
@@ -321,7 +321,7 @@ class PitchClef(Clef):
 
 class PercussionClef(Clef):
     '''
-    represents a Percussion clef.
+    Represents a Percussion clef.
 
     >>> pc = clef.PercussionClef()
     >>> pc.sign
@@ -337,8 +337,7 @@ class PercussionClef(Clef):
     >>> pc.lowestLine == clef.TrebleClef().lowestLine
     True
 
-    * Changed in v7.3: setting `octaveChange` no longer affects
-      `lowestLine`
+    * Changed in v7.3: setting `octaveChange` no longer affects `lowestLine`.
     '''
     _DOC_ATTR: dict[str, str] = {}
 
@@ -350,7 +349,7 @@ class PercussionClef(Clef):
 
 class NoClef(Clef):
     '''
-    represents the absence of a Clef.
+    Represents the absence of a Clef.
 
     >>> nc = clef.NoClef()
     >>> nc.sign
@@ -385,7 +384,7 @@ class JianpuClef(NoClef):
 
 class TabClef(PitchClef):
     '''
-    represents a Tablature clef.
+    Represents a Tablature clef.
 
     >>> a = clef.TabClef()
     >>> a.sign
@@ -399,7 +398,7 @@ class TabClef(PitchClef):
 
     def getStemDirectionForPitches(
         self,
-        pitchList: pitch.Pitch | Iterable[pitch.Pitch],
+        pitchList: pitch.Pitch|Iterable[pitch.Pitch],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -414,13 +413,13 @@ class TabClef(PitchClef):
 
 class GClef(PitchClef):
     '''
-    A generic G Clef
+    A generic G Clef.
 
     >>> a = clef.GClef()
     >>> a.sign
     'G'
 
-    If not defined, the lowestLine is set as a Treble Clef (E4 = 31)
+    If not defined, the lowestLine is set as a Treble Clef (E4 = 31).
 
     >>> a.lowestLine
     31
@@ -490,7 +489,7 @@ class Treble8vbClef(TrebleClef):
 
 class Treble8vaClef(TrebleClef):
     '''
-    A treble clef an octave up (such as for piccolos)
+    A treble clef an octave up (such as for piccolos).
 
     >>> a = clef.Treble8vaClef()
     >>> a.sign
@@ -527,7 +526,7 @@ class GSopranoClef(GClef):
 
 class CClef(PitchClef):
     '''
-    A generic C Clef, with no line set
+    A generic C Clef, with no line set.
 
     >>> a = clef.CClef()
     >>> a.sign
@@ -542,7 +541,7 @@ class CClef(PitchClef):
 class SopranoClef(CClef):
     '''
     A soprano clef, with C on the lowest line
-    (found in Bach often)
+    (found in Bach often).
 
     >>> a = clef.SopranoClef()
     >>> a.sign
@@ -560,7 +559,7 @@ class SopranoClef(CClef):
 class MezzoSopranoClef(CClef):
     '''
     A C clef with C on the second line.  Perhaps
-    the rarest of the C clefs
+    the rarest of the C clefs.
 
     >>> a = clef.MezzoSopranoClef()
     >>> a.sign
@@ -602,7 +601,6 @@ class TenorClef(CClef):
     'C'
     >>> a.line
     4
-
     '''
 
     def __init__(self, **keywords):
@@ -613,7 +611,7 @@ class TenorClef(CClef):
 
 class CBaritoneClef(CClef):
     '''
-    A Baritone C clef (as opposed to an F Baritone Clef)
+    A Baritone C clef (as opposed to an F Baritone Clef).
 
     >>> a = clef.CBaritoneClef()
     >>> a.sign
@@ -631,7 +629,7 @@ class CBaritoneClef(CClef):
 # ------------------------------------------------------------------------------
 class FClef(PitchClef):
     '''
-    A generic F-Clef, like a Bass clef
+    A generic F-Clef, like a Bass clef.
 
     >>> a = clef.FClef()
     >>> a.sign
@@ -645,7 +643,7 @@ class FClef(PitchClef):
 
 class FBaritoneClef(FClef):
     '''
-    an F Baritone Clef
+    An F Baritone Clef.
 
     >>> a = clef.FBaritoneClef()
     >>> a.sign
@@ -730,7 +728,7 @@ class SubBassClef(FClef):
 
 
 # ------------------------------------------------------------------------------
-CLASS_FROM_TYPE: dict[str, list[type[Clef] | None]] = {
+CLASS_FROM_TYPE: dict[str, list[type[Clef]|None]] = {
     'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
     'F': [None, None, None, FBaritoneClef, BassClef, SubBassClef],
@@ -743,7 +741,6 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
     Returns a Clef object given a string like "G2" or "F4" etc.
 
     Does not refer to a violin/guitar string.
-
 
     >>> tc = clef.clefFromString('G2')
     >>> tc
@@ -760,7 +757,6 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
     'D'
     >>> nonStandard2.line
     4
-
 
     >>> tc8vb = clef.clefFromString('G2', -1)
     >>> tc8vb
@@ -792,7 +788,6 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
     Traceback (most recent call last):
     music21.clef.ClefException: line number (second character) must be 1-5;
                 do not use this function for clefs on special staves such as 'F6'
-
 
     Can find any clef in the module
 
@@ -827,16 +822,12 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
         else:
             lineNum = False
     elif len(xnStr) > 2:
-        from music21 import clef as myself
         xnLower = xnStr.lower()
-        for x in dir(myself):
-            if 'Clef' not in x:
+        for className, classObj in globals().items():
+            if not isinstance(classObj, type) or not issubclass(classObj, Clef):
                 continue
-            if xnLower != x.lower() and xnLower + 'clef' != x.lower():
-                continue
-            objType = getattr(myself, x)
-            if isinstance(objType, type):
-                return objType()
+            if className.lower() in (xnLower, xnLower + 'clef'):
+                return classObj()
 
         raise ClefException('Could not find clef ' + xnStr)
     else:
@@ -859,7 +850,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
 
     if lineNum < 1 or lineNum > 5:
         raise ClefException('line number (second character) must be 1-5; do not use this '
-                            + f'function for clefs on special staves such as {xnStr!r}')
+                            f'function for clefs on special staves such as {xnStr!r}')
 
     clefObj: Clef
     if thisType in CLASS_FROM_TYPE:
@@ -942,7 +933,6 @@ def bestClef(streamObj: stream.Stream,
     >>> clef.bestClef(c, recurse=True)
     <music21.clef.TrebleClef>
 
-
     Notes around middle C can get Treble8vb if the setting is allowed:
 
     >>> clef.bestClef(stream.Stream([note.Note('D4')]))
@@ -967,7 +957,7 @@ def bestClef(streamObj: stream.Stream,
         return height
     # environLocal.printDebug(['calling bestClef()'])
 
-    totalNotes = 0
+    totalPitches = 0
     totalHeight = 0
 
     sIter = streamObj.recurse() if recurse else streamObj.iter()
@@ -975,19 +965,13 @@ def bestClef(streamObj: stream.Stream,
     notes = sIter.notesAndRests
 
     for n in notes:
-        if n.isRest:
-            pass
-        elif n.isNote:
-            totalNotes += 1
-            totalHeight += findHeight(n.pitch)
-        elif n.isChord:
-            for p in n.pitches:
-                totalNotes += 1
-                totalHeight += findHeight(p)
-    if totalNotes == 0:
+        for p in n.pitches:
+            totalPitches += 1
+            totalHeight += findHeight(p)
+    if totalPitches == 0:
         averageHeight = 29.0
     else:
-        averageHeight = totalHeight / totalNotes
+        averageHeight = totalHeight / totalPitches
 
     # environLocal.printDebug(['average height', averageHeight])
     if averageHeight > 49:  # value found with experimentation; revise

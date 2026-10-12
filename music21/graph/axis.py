@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/axis.py
 # Purpose:      Classes for extracting one dimensional data for graphs
@@ -7,7 +6,7 @@
 #               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,6 +18,7 @@ from __future__ import annotations
 import collections
 import math
 import re
+import typing as t
 import unittest
 
 from music21.graph.utilities import accidentalLabelToUnicode, GraphException
@@ -33,6 +33,10 @@ from music21 import stream
 
 from music21.analysis import elements as elementAnalysis
 from music21.analysis import pitchAnalysis
+
+
+if t.TYPE_CHECKING:
+    from music21 import note
 
 
 USE_GRACE_NOTE_SPACING = -1
@@ -117,7 +121,6 @@ class Axis(prebase.ProtoM21Object):
         >>> axStream = graph.axis.DynamicsAxis(s, axisName='y')
         >>> axStream
         <music21.graph.axis.DynamicsAxis: y axis for Part>
-
         '''
         c = self.client
         if c is not None:
@@ -180,9 +183,9 @@ class Axis(prebase.ProtoM21Object):
         else:
             return c.streamObj
 
-    def extractOneElement(self, n, formatDict):
+    def extractOneElement(self, n: note.GeneralNote, formatDict: dict[str, t.Any]) -> t.Any:
         '''
-        Override in subclasses...
+        Override in subclasses
         '''
         return 1
 
@@ -311,15 +314,15 @@ class PitchAxis(Axis):
     labelDefault = 'Pitch'
     quantities: tuple[str, ...] = ('pitchGeneric', )
 
-    def __init__(self, client=None, axisName='x'):
+    def __init__(self, client=None, axisName='x') -> None:
         super().__init__(client, axisName)
-        self.showOctaves = 'few'
+        self.showOctaves: bool|t.Literal['few'] = 'few'
         self.showEnharmonic = True
         self.blankLabelUnused = True
         self.hideUnused = True
 
     @staticmethod
-    def makePitchLabelsUnicode(ticks):
+    def makePitchLabelsUnicode(ticks: list[tuple[t.Any, str]]) -> list[tuple[t.Any, str]]:
         # noinspection PyShadowingNames
         '''
         Given a list of ticks, replace all labels with alternative/unicode symbols where necessary.
@@ -407,7 +410,7 @@ class PitchAxis(Axis):
             label = None
             if not weights:  # get a default
                 if self.hideUnused:
-                    continue  # don't append any ticks...
+                    continue  # don't append any ticks
                 if not self.blankLabelUnused:
                     label = getattr(p, attributeCounter)
                 else:  # use an empty label to maintain spacing
@@ -421,7 +424,7 @@ class PitchAxis(Axis):
                     sub.append(accidentalLabelToUnicode(name))
                 label = '/'.join(sub)
 
-            if self.showOctaves is False:
+            if not self.showOctaves:
                 label = re.sub(r'\d', '', label)
             elif self.showOctaves == 'few':
                 matchOctave = re.search(r'\d', label)
@@ -446,15 +449,16 @@ class PitchClassAxis(PitchAxis):
     labelDefault = 'Pitch Class'
     quantities: tuple[str, ...] = ('pitchClass', 'pitchclass', 'pc')
 
-    def __init__(self, client=None, axisName='x'):
-        self.showOctaves = False
+    def __init__(self, client=None, axisName='x') -> None:
+        self.showOctaves: bool|t.Literal['few'] = False
         super().__init__(client, axisName)
         self.minValue = 0
         self.maxValue = 11
 
-    def extractOneElement(self, n, formatDict):
+    def extractOneElement(self, n, formatDict) -> int|None:
         if hasattr(n, 'pitch'):
             return n.pitch.pitchClass
+        return None
 
     def ticks(self):
         '''
@@ -487,7 +491,6 @@ class PitchClassAxis(PitchAxis):
         7 G
         9 A
         11 B
-
 
         >>> s = corpus.parse('bach/bwv281.xml')
         >>> plotS = graph.plot.PlotStream(s)
@@ -524,7 +527,7 @@ class PitchClassAxis(PitchAxis):
         10 B♭
         11 B
 
-        .showEnharmonic will change here...
+        `.showEnharmonic` will change here:
 
         >>> s.append(note.Note('A#4'))
         >>> s.append(note.Note('G#4'))
@@ -563,11 +566,10 @@ class PitchClassAxis(PitchAxis):
         10 B♭
         11 B
 
-
         OMIT_FROM_DOCS
 
         TODO: this ultimately needs to look at key signature/key to determine
-        defaults for undefined notes where blankLabelUnused is False...
+            defaults for undefined notes where blankLabelUnused is False.
         '''
         # keys are integers
         # name strings are keys, and enharmonic are thus different
@@ -576,7 +578,7 @@ class PitchClassAxis(PitchAxis):
 
 class PitchSpaceAxis(PitchAxis):
     '''
-    Axis subclass for dealing with PitchSpace (MIDI numbers...)
+    Axis subclass for dealing with PitchSpace (MIDI numbers)
     '''
     labelDefault = 'Pitch'
     quantities: tuple[str, ...] = ('pitchSpace', 'pitch', 'pitchspace', 'ps')
@@ -787,7 +789,7 @@ class OffsetAxis(PositionAxis):
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
         self.useMeasures = None
-        # self.displayMeasureNumberZero = False  # not used...
+        # self.displayMeasureNumberZero = False  # not used
         self.offsetStepSize = 10
         self.mostMeasureTicksToShow = 20
         self.minMaxMeasureOnly = False
@@ -852,7 +854,6 @@ class OffsetAxis(PositionAxis):
         >>> ax.ticks()
         [(0.0, '0'), (9.0, '3'), (21.0, '6'), (29.0, '8')]
 
-
         We can also plot on a part:
 
         >>> soprano = bach.parts.first()
@@ -869,7 +870,6 @@ class OffsetAxis(PositionAxis):
         >>> ax.ticks()
         [(0.0, '0'), (29.0, '8')]
 
-
         Only show ticks between minValue and maxValue (in offsets):
 
         >>> ax.minMaxMeasureOnly = False
@@ -877,7 +877,6 @@ class OffsetAxis(PositionAxis):
         >>> ax.maxValue = 12
         >>> ax.ticks()
         [(9.0, '3')]
-
 
         Double bars and other heavy bars always show up.
         (Let's get a new axis object to see.)
@@ -947,8 +946,8 @@ class OffsetAxis(PositionAxis):
                 #     continue  # skip
                 # if key == sorted(offsetMap.keys())[-1]:
                 #    continue  # skip last
-                # assume we can get the first Measure in the lost if
-                # measurers; this may not always be True
+                # assume we can get the first Measure in the list if
+                # there are measures; this may not always be True
                 mNoToUse.append(key)
         # environLocal.printDebug(['ticksOffset():', 'mNotToUse', mNoToUse])
 
@@ -1011,10 +1010,10 @@ class OffsetAxis(PositionAxis):
         >>> ax = graph.axis.OffsetAxis(p, 'x')
         >>> om = ax.getOffsetMap()
         >>> om
-        OrderedDict([(0.0, [<music21.stream.Measure 0 offset=0.0>]),
-                     (1.0, [<music21.stream.Measure 1 offset=1.0>]),
-                     (5.0, [<music21.stream.Measure 2 offset=5.0>]),
-                     ...])
+        OrderedDict({0.0: [<music21.stream.Measure 0 offset=0.0>],
+                     1.0: [<music21.stream.Measure 1 offset=1.0>],
+                     5.0: [<music21.stream.Measure 2 offset=5.0>],
+                     ...})
 
         Same if called on a single part:
 
@@ -1022,10 +1021,10 @@ class OffsetAxis(PositionAxis):
         >>> ax = graph.axis.OffsetAxis(p, 'x')
         >>> om2 = ax.getOffsetMap()
         >>> om2
-        OrderedDict([(0.0, [<music21.stream.Measure 0 offset=0.0>]),
-                     (1.0, [<music21.stream.Measure 1 offset=1.0>]),
-                     (5.0, [<music21.stream.Measure 2 offset=5.0>]),
-                     ...])
+        OrderedDict({0.0: [<music21.stream.Measure 0 offset=0.0>],
+                     1.0: [<music21.stream.Measure 1 offset=1.0>],
+                     5.0: [<music21.stream.Measure 2 offset=5.0>],
+                     ...})
 
         But empty if called on a single Measure ...
 
@@ -1034,7 +1033,6 @@ class OffsetAxis(PositionAxis):
         >>> om3 = ax.getOffsetMap()
         >>> om3
         {}
-
         '''
         s = self.stream
         if s is None:
@@ -1127,9 +1125,9 @@ class QuarterLengthAxis(PositionAxis):
                                    'duration',
                                    )
 
-    def __init__(self, client=None, axisName='x'):
+    def __init__(self, client=None, axisName='x') -> None:
         super().__init__(client, axisName)
-        self.useLogScale = True
+        self.useLogScale: bool|int = True
         self.useDurationNames = False
 
     def extractOneElement(self, n, formatDict):
@@ -1322,14 +1320,13 @@ class DynamicsAxis(Axis):
         >>> ax.maxValue = 6
         >>> ax.ticks()
         [(3, '$ppp$'), (4, '$pp$'), (5, '$p$'), (6, '$mp$')]
-
         '''
         ticks = []
         if self.minValue is None:
             self.setBoundariesFromData()
         for i in range(self.minValue, self.maxValue + 1):
             # place string in tex format for italic display
-            ticks.append((i, r'$%s$' % dynamics.shortNames[i]))
+            ticks.append((i, f'${dynamics.shortNames[i]}$'))
         return ticks
 
 # -----------------------------------------------------------------------------

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         reduction.py
 # Purpose:      Tools for creating a score reduction.
@@ -212,7 +211,20 @@ class ScoreReduction:
         self._chordReduction = None  # store a chordal reduction of available
 
 
-    def _setScore(self, value):
+    @property
+    def score(self):
+        '''
+        Get or set the Score. Setting the score set a deepcopy of the score; the score
+        set here will not be altered.
+
+        >>> s = corpus.parse('bwv66.6')
+        >>> sr = analysis.reduction.ScoreReduction()
+        >>> sr.score = s
+        '''
+        return self._score
+
+    @score.setter
+    def score(self, value):
         if not isinstance(value, stream.Stream):
             raise ScoreReductionException('cannot set a non Stream')
         if value.hasPartLikeStreams:
@@ -224,20 +236,16 @@ class ScoreReduction:
             self._score = s
         self._score.setDerivationMethod('ScoreReduction', recurse=True)
 
-    def _getScore(self):
-        return self._score
+    @property
+    def chordReduction(self):
+        '''
+        Get or set a Chord reduction as a Stream or Score. Setting the this values
+        set a deepcopy of the reduction; the reduction set here will not be altered.
+        '''
+        return self._chordReduction
 
-    score = property(_getScore, _setScore, doc='''
-        Get or set the Score. Setting the score set a deepcopy of the score; the score
-        set here will not be altered.
-
-        >>> s = corpus.parse('bwv66.6')
-        >>> sr = analysis.reduction.ScoreReduction()
-        >>> sr.score = s
-        ''')
-
-
-    def _setChordReduction(self, value):
+    @chordReduction.setter
+    def chordReduction(self, value):
         if not isinstance(value, stream.Stream):
             raise ScoreReductionException('cannot set a non Stream')
         if value.hasPartLikeStreams():
@@ -247,14 +255,6 @@ class ScoreReduction:
             s = stream.Score()
             s.insert(0, copy.deepcopy(value))
             self._chordReduction = s
-
-    def _getChordReduction(self):
-        return self._chordReduction
-
-    chordReduction = property(_getChordReduction, _setChordReduction, doc='''
-        Get or set a Chord reduction as a Stream or Score. Setting the this values
-        set a deepcopy of the reduction; the reduction set here will not be altered.
-        ''')
 
 
 
@@ -286,23 +286,23 @@ class ScoreReduction:
             return
 
         removalIndices = []
-        if m.hasElement(n):
+        if n in m:
             offset = n.getOffsetBySite(m)
         else:  # it is in a Voice
             offset = 0.0
             for v in m.voices:
-                if v.hasElement(n):
+                if n in v:
                     offset = n.getOffsetBySite(v)
 
 
         # a list of Lyric objects
-        for k, l in enumerate(n.lyrics):
+        for k, lyr in enumerate(n.lyrics):
             # store measure index
-            rn = ReductiveNote(l.text, n, infoDict['measureIndex'], offset)
+            rn = ReductiveNote(lyr.text, n, infoDict['measureIndex'], offset)
             if rn.isParsed():
                 # environLocal.printDebug(['parsing reductive note', rn])
                 # use id, lyric text as hash
-                key = str(id(n)) + l.text
+                key = str(id(n)) + lyr.text
                 self._reductiveNotes[key] = rn
                 removalIndices.append(k)
         if removeAfterParsing:
@@ -463,12 +463,11 @@ class PartReduction:
     of all parts. The default is True.
 
     If the `normalize` parameter is False, no normalization will take place. The default is True.
-
     '''
     def __init__(self,
                  srcScore=None,
                  *,
-                 partGroups: list[dict[str, t.Any]] | None = None,
+                 partGroups: list[dict[str, t.Any]]|None = None,
                  fillByMeasure: bool = True,
                  segmentByTarget: bool = True,
                  normalize: bool = True,
@@ -484,7 +483,7 @@ class PartReduction:
         # TODO: typed dict
         self._partBundles: list[dict[str, t.Any]] = []
         # a dictionary of part id to a list of events
-        self._eventSpans: dict[str | int, list[t.Any]] = {}
+        self._eventSpans: dict[str|int, list[t.Any]] = {}
 
         # define how parts are grouped
         # a list of dictionaries, with keys for name, color, and a match list
@@ -616,11 +615,10 @@ class PartReduction:
                     #         eLast = partMeasures[0][i]
                     #     # use duration, not barDuration.quarterLength
                     #     # as want filled duration?
-                    #     eEnd = (eLast.getOffsetBySite(
-                    #             partMeasures[0]) +
-                    #             eLast.barDuration.quarterLength)
-                    #     ds = {'eStart':eStart, 'span':eEnd-eStart,
-                    #           'weight':None, 'color':pColor}
+                    #     eEnd = (eLast.getOffsetBySite(partMeasures[0])
+                    #             + eLast.barDuration.quarterLength)
+                    #     ds = {'eStart': eStart, 'span': eEnd - eStart,
+                    #           'weight': None, 'color': pColor}
                     #     dataEvents.append(ds)
                     #     eStart = None
 #                    eLast = partMeasures[0][i]
@@ -735,9 +733,14 @@ class PartReduction:
                     offsetEnd = offsetStart + ds['span']
                     # get all targets within the contiguous region
                     # e.g., Dynamics objects
-                    match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
-                        includeEndBoundary=True, mustFinishInSpan=False,
-                        mustBeginInSpan=True).getElementsByClass(target).stream()
+                    inRegion = flatRef.getElementsByOffset(
+                        offsetStart,
+                        offsetEnd,
+                        includeEndBoundary=True,
+                        mustFinishInSpan=False,
+                        mustBeginInSpan=True,
+                    )
+                    match = inRegion.getElementsByClass(target).stream()
                     # environLocal.printDebug(['matched elements', target, match])
                     # extend duration of all found dynamics
                     match.extendDuration(target, inPlace=True)
@@ -1096,7 +1099,7 @@ class Test(unittest.TestCase):
                     dataMatch[2],
                     dataTarget[2],
                     msg=(f'for partId {partId}, entry {i}: '
-                         + f'should be {dataMatch[2]} <-> was {dataTarget[2]}')
+                         f'should be {dataMatch[2]} <-> was {dataTarget[2]}')
                 )
 
     def testPartReductionB(self, show=False):
@@ -1123,7 +1126,7 @@ class Test(unittest.TestCase):
             s.insert(0, p)
             pCount += 1
 
-        if show is True:
+        if show:
             s.show()
 
         pr = analysis.reduction.PartReduction(s, normalize=False)
@@ -1142,7 +1145,7 @@ class Test(unittest.TestCase):
 
         self._matchWeightedData(match, target)
 
-        if show is True:
+        if show:
             p = graph.plot.Dolan(s, title='Dynamics')
             p.run()
 
@@ -1253,7 +1256,7 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
         # s.show()
         pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
-                    segmentByTarget=False, normalize=False)
+                                              segmentByTarget=False, normalize=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         match = [(0, [[0.0, 4.0, 0.178571428571, '#666666'],
@@ -1266,7 +1269,7 @@ class Test(unittest.TestCase):
         self._matchWeightedData(match, target)
 
         pr = analysis.reduction.PartReduction(s, fillByMeasure=False,
-                    segmentByTarget=True, normalize=False)
+                                              segmentByTarget=True, normalize=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         match = [(0, [[0.0, 2.0, 0.05, '#666666'],
@@ -1283,7 +1286,7 @@ class Test(unittest.TestCase):
 
 
         pr = analysis.reduction.PartReduction(s, fillByMeasure=False,
-                    segmentByTarget=False)
+                                              segmentByTarget=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         # print(target)
@@ -1297,7 +1300,7 @@ class Test(unittest.TestCase):
 
 
         pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
-                    segmentByTarget=True)
+                                              segmentByTarget=True)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         match = [(0, [[0.0, 2.0, 0.3888888888888, '#666666'],

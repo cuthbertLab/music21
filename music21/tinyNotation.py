@@ -1,20 +1,18 @@
-# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------
 # Name:         tinyNotation.py
 # Purpose:      A simple notation input format.
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
 tinyNotation is a simple way of specifying single line melodies
-that uses a notation somewhat similar to Lilypond but with WAY fewer
+that uses a notation somewhat similar to LilyPond but with WAY fewer
 options.  It was originally developed to notate trecento (medieval Italian)
 music, but it is pretty useful for a lot of short examples, so we have
 made it a generally supported music21 format.
-
 
 N.B.: TinyNotation is not meant to expand to cover every single case.  Instead,
 it is meant to be subclassable to extend to the cases *your* project needs.
@@ -102,8 +100,6 @@ Changing time signatures are supported:
     {0.0} <music21.note.Note C>
     {1.0} <music21.bar.Barline type=final>
 
-
-
 Here is an equivalent way of doing the example above, but using the lower level
 :class:`music21.tinyNotation.Converter` object:
 
@@ -161,7 +157,6 @@ The supported modifiers are:
     * `(data)` (`modifierParens`, no default action)
     * `*data*` (`modifierStar`, no default action)
 
-
 Another example: TinyNotation does not support key signatures -- well, no problem! Let's
 create a new Token type and add it to the tokenMap
 
@@ -183,7 +178,6 @@ create a new Token type and add it to the tokenMap
     {0.0} <music21.key.Key of f# minor>
     {0.0} <music21.note.Note A>
     {4.0} <music21.bar.Barline type=final>
-
 
 TokenMap should be passed a string, representing a regular expression with exactly one
 group (which can be the entire expression), and a subclass of :class:`~music21.tinyNotation.Token`
@@ -273,41 +267,47 @@ class State:
     2
     '''
     # expires after N tokens or never.
-    autoExpires: typing.Literal[False] | int = False
+    autoExpires: typing.Literal[False]|int = False
 
-    def __init__(self, parent=None, stateInfo=None):
-        self.affectedTokens = []
-        self.parent = parent
-        self.stateInfo = stateInfo
+    def __init__(self, parent: Converter|None = None, stateInfo: str|None = None):
+        self.affectedTokens: list[Music21Object] = []
+        self.parent: Converter|None = parent
+        self.stateInfo: str|None = stateInfo
         # print('Adding state', self, parent.activeStates)
 
     def start(self):
         '''
-        called when the state is initiated
+        Called when the state is initiated.
         '''
         pass
 
-    def end(self) -> Music21Object | None:
+    def end(self) -> Music21Object|None:
         '''
-        called just after removing state
+        Called just after removing state.
         '''
         return None
 
-    def affectTokenBeforeParse(self, tokenStr):
+    def affectTokenBeforeParse(self, tokenStr: str) -> str:
         '''
-        called to modify the string of a token.
+        Called to modify the string of a token.
         '''
         return tokenStr
 
-    def affectTokenAfterParseBeforeModifiers(self, m21Obj):
+    def affectTokenAfterParseBeforeModifiers(
+        self,
+        m21Obj: Music21Object
+    ) -> Music21Object:
         '''
-        called after the object has been acquired but before modifiers have been applied.
+        Called after the object has been acquired but before modifiers have been applied.
         '''
         return m21Obj
 
-    def affectTokenAfterParse(self, m21Obj):
+    def affectTokenAfterParse(
+        self,
+        m21Obj: Music21Object
+    ) -> Music21Object:
         '''
-        called to modify the tokenObj after parsing
+        Called to modify the tokenObj after parsing.
 
         tokenObj may be None if another
         state has deleted it.
@@ -316,8 +316,10 @@ class State:
         if self.autoExpires is not False:
             if len(self.affectedTokens) == self.autoExpires:
                 self.end()
-                # this is a hack that should be done away with...
+                # this is a hack that should be done away with
                 p = self.parent
+                if p is None:
+                    return m21Obj
 
                 # I thought this was potentially O(n^2) but it's actually
                 # just O(n) on activeStates and on pop() operation.
@@ -340,7 +342,7 @@ class TieState(State):
 
     def end(self):
         '''
-        end the tie state by applying tie ties to the appropriate notes
+        End the tie state by applying tie ties to the appropriate notes.
         '''
         if self.affectedTokens[0].tie is None:
             self.affectedTokens[0].tie = tie.Tie('start')
@@ -352,7 +354,7 @@ class TieState(State):
 
 class TupletState(State):
     '''
-    a tuplet state applies tuplets to notes while parsing and sets 'start' and 'stop'
+    A tuplet state applies tuplets to notes while parsing and sets 'start' and 'stop'
     on the first and last note when end is called.
     '''
     actual = 3
@@ -360,7 +362,7 @@ class TupletState(State):
 
     def end(self):
         '''
-        end a tuplet by putting start on the first note and stop on the last.
+        End a tuplet by putting start on the first note and stop on the last.
         '''
         if not self.affectedTokens:
             return None
@@ -370,7 +372,7 @@ class TupletState(State):
 
     def affectTokenAfterParse(self, n):
         '''
-        puts a tuplet on the note
+        Puts a tuplet on the note.
         '''
         super().affectTokenAfterParse(n)
         newTup = duration.Tuplet()
@@ -384,7 +386,7 @@ class TupletState(State):
 
 class TripletState(TupletState):
     '''
-    a 3:2 tuplet
+    A 3:2 tuplet.
     '''
     actual = 3
     normal = 2
@@ -392,7 +394,7 @@ class TripletState(TupletState):
 
 class QuadrupletState(TupletState):
     '''
-    a 4:3 tuplet
+    A 4:3 tuplet.
     '''
     actual = 4
     normal = 3
@@ -400,7 +402,7 @@ class QuadrupletState(TupletState):
 
 class Modifier:
     '''
-    a modifier is something that changes the current
+    A modifier is something that changes the current
     token, like setting the `.id` or Lyric.
     '''
 
@@ -411,15 +413,15 @@ class Modifier:
 
     def preParse(self, tokenString):
         '''
-        called before the tokenString has been
-        turned into an object
+        Called before the tokenString has been
+        turned into an object.
         '''
         pass
 
     def postParse(self, m21Obj):
         '''
-        called after the tokenString has been
-        turned into an m21Obj.  m21Obj may be None
+        Called after the tokenString has been
+        turned into an m21Obj.  m21Obj may be None.
 
         Important: must return the m21Obj, or a different object!
         '''
@@ -428,7 +430,7 @@ class Modifier:
 
 class IdModifier(Modifier):
     '''
-    sets the .id of the m21Obj, called with = by default
+    Sets the .id of the m21Obj, called with = by default.
     '''
 
     def postParse(self, m21Obj):
@@ -438,7 +440,7 @@ class IdModifier(Modifier):
 
 class LyricModifier(Modifier):
     '''
-    sets the .lyric of the m21Obj, called with _ by default
+    Sets the .lyric of the m21Obj, called with _ by default.
     '''
 
     def postParse(self, m21Obj):
@@ -460,17 +462,16 @@ class Token:
 
     def parse(self, parent):
         '''
-        do NOT store parent -- probably
-        too slow
+        Do NOT store parent -- probably
+        too slow.
         '''
         return None
 
 
 class TimeSignatureToken(Token):
     '''
-    Represents a single time signature, like 1/4
+    Represents a single time signature, like 1/4.
     '''
-
     def parse(self, parent):
         tsObj = meter.TimeSignature(self.token)
         parent.stateDict['currentTimeSignature'] = tsObj
@@ -479,22 +480,19 @@ class TimeSignatureToken(Token):
 
 class NoteOrRestToken(Token):
     '''
-    represents a Note or Rest.  Chords are represented by Note objects
+    Represents a Note or Rest.  Chords are represented by Note objects.
     '''
-
     def __init__(self, token=''):
         super().__init__(token)
         self.durationMap = [
             (r'(\d+)', 'durationType'),
             (r'(\.+)', 'dots'),
         ]  # tie will be dealt with later.
-
-
         self.durationFound = False
 
     def applyDuration(self, n, t, parent):
         '''
-        takes the information in the string `t` and creates a Duration object for the
+        Takes the information in the string `t` and creates a Duration object for the
         note or rest `n`.
         '''
         for pm, method in self.durationMap:
@@ -519,6 +517,8 @@ class NoteOrRestToken(Token):
         self.durationFound = True
         typeNum = int(search.group(1))
         if typeNum == 0:
+            # NOTE: using 0 to mean full-bar + fermata was never fully documented.
+            #    it is considered deprecated.
             if parent.stateDict['currentTimeSignature'] is not None:
                 element.duration = copy.deepcopy(
                     parent.stateDict['currentTimeSignature'].barDuration
@@ -536,7 +536,7 @@ class NoteOrRestToken(Token):
 
     def dots(self, element, search, pm, t, parent):
         '''
-        adds the appropriate number of dots to the right place.
+        Adds the appropriate number of dots to the right place.
 
         Subclassed in TrecentoNotation where two dots has a different meaning.
         '''
@@ -549,8 +549,7 @@ class RestToken(NoteOrRestToken):
     '''
     A token starting with 'r', representing a rest.
     '''
-
-    def parse(self, parent=None):
+    def parse(self, parent: Converter|None = None):
         r = note.Rest()
         self.applyDuration(r, self.token, parent)
         return r
@@ -558,7 +557,7 @@ class RestToken(NoteOrRestToken):
 
 class NoteToken(NoteOrRestToken):
     '''
-    A NoteToken represents a single Note with pitch
+    A NoteToken represents a single Note with pitch.
 
     >>> c3 = tinyNotation.NoteToken('C')
     >>> c3
@@ -577,7 +576,6 @@ class NoteToken(NoteOrRestToken):
     <music21.note.Note B->
     >>> n.nameWithOctave
     'B-6'
-
     '''
     pitchMap = collections.OrderedDict([
         ('lowOctave', r'([A-G]+)'),
@@ -592,7 +590,7 @@ class NoteToken(NoteOrRestToken):
         super().__init__(token)
         self.isEditorial = False
 
-    def parse(self, parent=None):
+    def parse(self, parent: Converter|None = None):
         '''
         Extract the pitch from the note and then returns the Note.
         '''
@@ -606,7 +604,7 @@ class NoteToken(NoteOrRestToken):
 
     def processPitchMap(self, n, t):
         '''
-        processes the pitchMap on the object.
+        Processes the pitchMap on the object.
         '''
         for method, pm in self.pitchMap.items():
             searchSuccess = re.search(pm, t)
@@ -617,7 +615,7 @@ class NoteToken(NoteOrRestToken):
 
     def editorialAccidental(self, n, search, pm, t):
         '''
-        indicates that the accidental is in parentheses, so set it up to be stored in ficta.
+        Indicates that the accidental is in parentheses, so set it up to be stored in ficta.
         '''
         self.isEditorial = True
         t = search.group(1) + search.group(2)
@@ -626,7 +624,7 @@ class NoteToken(NoteOrRestToken):
     def _addAccidental(self, n, alter, pm, t):
         # noinspection PyShadowingNames
         r'''
-        helper function for all accidental types.
+        Helper function for all accidental types.
 
         >>> nToken = tinyNotation.NoteToken('BB--')
         >>> n = note.Note('B')
@@ -658,7 +656,7 @@ class NoteToken(NoteOrRestToken):
     def sharps(self, n, search, pm, t):
         # noinspection PyShadowingNames
         r'''
-        called when one or more sharps have been found and adds the appropriate accidental to it.
+        Called when one or more sharps have been found and adds the appropriate accidental to it.
 
         >>> import re
         >>> tStr = 'C##'
@@ -678,7 +676,7 @@ class NoteToken(NoteOrRestToken):
     def flats(self, n, search, pm, t):
         # noinspection PyShadowingNames
         '''
-        called when one or more flats have been found and calls adds
+        Called when one or more flats have been found and calls adds
         the appropriate accidental to it.
 
         >>> import re
@@ -699,7 +697,7 @@ class NoteToken(NoteOrRestToken):
     def natural(self, n, search, pm, t):
         # noinspection PyShadowingNames
         '''
-        called when an explicit natural has been found.  All pitches are natural without
+        Called when an explicit natural has been found.  All pitches are natural without
         being specified, so not needed. Adds a natural accidental to it.
 
         >>> import re
@@ -768,67 +766,67 @@ def _getDefaultTokenMap() -> list[tuple[str, type[Token]]]:
     Returns the default tokenMap for TinyNotation.
 
     Based on the following grammar (in Extended Backus-Naur form)
-    (https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
+    (https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)::
 
-    (* Items in parentheses are grouped *)
-    (* Items in curly braces appear zero or more times *)
-    (* Items in square brackets may appear exactly zero or one time *)
-    (* Items in double quotes are literal strings *)
-    (* Items between question marks should be interpreted as English *)
-    (* Each rule is ended by a semicolon *)
+        (* Items in parentheses are grouped *)
+        (* Items in curly braces appear zero or more times *)
+        (* Items in square brackets may appear exactly zero or one time *)
+        (* Items in double quotes are literal strings *)
+        (* Items between question marks should be interpreted as English *)
+        (* Each rule is ended by a semicolon *)
 
-    TINY-NOTATION = TOKEN, { WHITESPACE, TOKEN } ;
-    WHITESPACE = ( " " | ? Carriage return ? ) , { " " | ? Carriage return ? } ;
-    TOKEN = ( TIME-SIGNATURE | TUPLET | REST | NOTE );
-    TIME-SIGNATURE = INTEGER, "/", INTEGER ;
-    INTEGER = DIGIT, { DIGIT } ;
-    DIGIT = ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ) ;
-    TUPLET = ( "trip" | "quad" | ALPHANUMERIC ), "{",
-        [ WHITESPACE ],
-        ( REST | NOTE ),
-        { WHITESPACE, ( REST | NOTE ) },
-        [ WHITESPACE ],
-    "}" ;
-    REST = "r", [ DURATION ], [ MODIFIER ] ;
-    DURATION = ( EVEN-NUMBER, { "." } | { "." }, EVEN-NUMBER | ".", { "." } ) ;
-    EVEN-NUMBER = { INTEGER }, ( "0" | "2" | "4" | "6" | "8" ) ;
-    NOTE = PITCH, [ DURATION ], [ TIE ], { MODIFIER } ;
-    PITCH = (
-        ( LOW-A | LOW-B | LOW-C | LOW-D | LOW-E | LOW-F | LOW-G ), [ ACCIDENTAL ] |
-        ( "a" | "b" | "c" | "d" | "e" | "f" | "g" ), [ ACCIDENTAL ], { "'" } |
-        ( "a" | "b" | "c" | "d" | "e" | "f" | "g" ), { "'" }, [ ACCIDENTAL ]
-    ) ;
-    LOW-A = "A", { "A" } ;
-    LOW-B = "B", { "B" } ;
-    LOW-C = "C", { "C" } ;
-    LOW-D = "D", { "D" } ;
-    LOW-E = "E", { "E" } ;
-    LOW-F = "F", { "F" } ;
-    LOW-G = "G", { "G" } ;
-    ACCIDENTAL = ( EDITORIAL | SHARPS | FLATS | NATURAL ) ;
-    EDITORIAL = "(", ( SHARPS | FLATS | NATURAL ), ")" ;
-    SHARPS = "#", { "#" } ;
-    FLATS = "-", { "-" } ;
-    NATURAL = "n" ;
-    TIE = "~" ;
-    MODIFIER = (
-        EQUALS-MODIFIER |
-        UNDERSCORE-MODIFIER |
-        SQUARE-MODIFIER |
-        ANGLE-MODIFIER |
-        PARENS-MODIFIER |
-        STAR-MODIFIER
-    ) ;
-    EQUALS-MODIFIER = "=", EQUALS-DATA ;
-    UNDERSCORE-MODIFIER = "_", UNDERSCORE-DATA ;
-    SQUARE-MODIFIER = "[", ALPHANUMERIC, "]" ;
-    ANGLE-MODIFIER = "<", ALPHANUMERIC, ">" ;
-    PARENS-MODIFIER = "(", ALPHANUMERIC, ")" ;
-    STAR-MODIFIER = "*", ALPHANUMERIC, "*" ;
-    (* The following is just shorthand. *)
-    ALPHANUMERIC = ? At least one alphanumeric character. So "a-z", "A-Z", or "0-9" ? ;
-    EQUALS-DATA = ? At least one non-whitespace, non-"_" character. ? ;
-    UNDERSCORE-DATA = ? At least one non-whitespace, non-"=" character. ? ;
+        TINY-NOTATION = TOKEN, { WHITESPACE, TOKEN } ;
+        WHITESPACE = ( " " | ? Carriage return ? ) , { " " | ? Carriage return ? } ;
+        TOKEN = ( TIME-SIGNATURE | TUPLET | REST | NOTE );
+        TIME-SIGNATURE = INTEGER, "/", INTEGER ;
+        INTEGER = DIGIT, { DIGIT } ;
+        DIGIT = ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ) ;
+        TUPLET = ( "trip" | "quad" | ALPHANUMERIC ), "{",
+            [ WHITESPACE ],
+            ( REST | NOTE ),
+            { WHITESPACE, ( REST | NOTE ) },
+            [ WHITESPACE ],
+        "}" ;
+        REST = "r", [ DURATION ], [ MODIFIER ] ;
+        DURATION = ( EVEN-NUMBER, { "." } | { "." }, EVEN-NUMBER | ".", { "." } ) ;
+        EVEN-NUMBER = { INTEGER }, ( "0" | "2" | "4" | "6" | "8" ) ;
+        NOTE = PITCH, [ DURATION ], [ TIE ], { MODIFIER } ;
+        PITCH = (
+            ( LOW-A | LOW-B | LOW-C | LOW-D | LOW-E | LOW-F | LOW-G ), [ ACCIDENTAL ] |
+            ( "a" | "b" | "c" | "d" | "e" | "f" | "g" ), [ ACCIDENTAL ], { "'" } |
+            ( "a" | "b" | "c" | "d" | "e" | "f" | "g" ), { "'" }, [ ACCIDENTAL ]
+        ) ;
+        LOW-A = "A", { "A" } ;
+        LOW-B = "B", { "B" } ;
+        LOW-C = "C", { "C" } ;
+        LOW-D = "D", { "D" } ;
+        LOW-E = "E", { "E" } ;
+        LOW-F = "F", { "F" } ;
+        LOW-G = "G", { "G" } ;
+        ACCIDENTAL = ( EDITORIAL | SHARPS | FLATS | NATURAL ) ;
+        EDITORIAL = "(", ( SHARPS | FLATS | NATURAL ), ")" ;
+        SHARPS = "#", { "#" } ;
+        FLATS = "-", { "-" } ;
+        NATURAL = "n" ;
+        TIE = "~" ;
+        MODIFIER = (
+            EQUALS-MODIFIER |
+            UNDERSCORE-MODIFIER |
+            SQUARE-MODIFIER |
+            ANGLE-MODIFIER |
+            PARENS-MODIFIER |
+            STAR-MODIFIER
+        ) ;
+        EQUALS-MODIFIER = "=", EQUALS-DATA ;
+        UNDERSCORE-MODIFIER = "_", UNDERSCORE-DATA ;
+        SQUARE-MODIFIER = "[", ALPHANUMERIC, "]" ;
+        ANGLE-MODIFIER = "<", ALPHANUMERIC, ">" ;
+        PARENS-MODIFIER = "(", ALPHANUMERIC, ")" ;
+        STAR-MODIFIER = "*", ALPHANUMERIC, "*" ;
+        (* The following is just shorthand. *)
+        ALPHANUMERIC = ? At least one alphanumeric character. So "a-z", "A-Z", or "0-9" ? ;
+        EQUALS-DATA = ? At least one non-whitespace, non-"_" character. ? ;
+        UNDERSCORE-DATA = ? At least one non-whitespace, non-"=" character. ? ;
     '''
     sharpsFlatsOrNaturalRegex = r'#+|-+|n'
     editorialRegex = fr'\((?:{sharpsFlatsOrNaturalRegex})\)'
@@ -878,6 +876,7 @@ _stateDictDefault = {
 }
 
 class Converter:
+    # noinspection GrazieInspection
     '''
     Main conversion object for TinyNotation.
 
@@ -936,7 +935,6 @@ class Converter:
         {1.6667} <music21.note.Note D>
         {2.0} <music21.note.Note C>
         {4.0} <music21.bar.Barline type=final>
-
 
     Or, breaking down what Parse does bit by bit:
 
@@ -1137,7 +1135,7 @@ class Converter:
         self.modifierSquare = None
         self.modifierUnderscore = LyricModifier
 
-        self.makeNotation = makeNotation
+        self.makeNotation: bool = makeNotation
         self.raiseExceptions = raiseExceptions
         # will be filled by self.setupRegularExpressions()
         self._tokenMapRe: list[tuple[typing.Pattern, type]] = []
@@ -1176,7 +1174,7 @@ class Converter:
         Right now just splits on spaces, but might be smarter to ignore spaces in
         quotes, etc. later.
         '''
-        self.preTokens = self.stringRep.split()  # do something better alter.
+        self.preTokens = self.stringRep.split()  # do something better later.
 
     def setupRegularExpressions(self):
         '''
@@ -1214,7 +1212,7 @@ class Converter:
 
     def parseOne(self, i: int, t: str):
         '''
-        parse a single token at position i, with
+        Parse a single token at position i, with
         text t, possibly adding it to the stream.
 
         Checks for state changes, modifiers, tokens, and end-state brackets.
@@ -1317,7 +1315,6 @@ class Converter:
         >>> quadState.stateInfo
         'quad{'
 
-
         Note that the affected tokens haven't yet been added:
 
         >>> tripState.affectedTokens
@@ -1411,9 +1408,9 @@ class Converter:
         '''
         Called after all the tokens have been run.
 
-        Currently runs `.makeMeasures` on `.stream` unless `.makeNotation` is `False`.
+        It currently runs `.makeMeasures()` on `.stream` unless `.makeNotation` is `False`.
         '''
-        if self.makeNotation is not False:
+        if self.makeNotation:
             self.stream.makeMeasures(inPlace=True)
 
 
@@ -1521,7 +1518,7 @@ class Test(unittest.TestCase):
                 validTokenTypeCounts,
                 (
                     'Found unexpected token type in default token map:'
-                    + f'{tokenType.__class__.__name__}.'
+                    f'{tokenType.__class__.__name__}.'
                 )
             )
 
@@ -1532,8 +1529,8 @@ class Test(unittest.TestCase):
                 0,
                 (
                     'Should provide a non-empty string for the regular '
-                    + 'expression in the default token map for tokens of type '
-                    + f'{tokenType.__class__.__name__}.'
+                    'expression in the default token map for tokens of type '
+                    f'{tokenType.__class__.__name__}.'
                 )
             )
 

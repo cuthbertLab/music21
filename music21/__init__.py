@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2022 Michael Scott Asato Cuthbert.
+The music21 Framework is Copyright © 2006-2026 Michael Scott Asato Cuthbert.
 
 Some Rights Reserved
 Released under the BSD (3-clause) license.  See license.txt.
@@ -20,13 +19,13 @@ and the developers are credited.
 
 The development of music21 was supported by grants
 from the Seaver Institute and the NEH/Digging into Data Challenge,
-with the support of the MIT
-Music and Theater Arts section and the School of Humanities, Arts,
-and Social Sciences.  Portions of music21 were originally part of
-the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
+with the support of the MIT Music and Theater Arts section
+and the School of Humanities, Arts, and Social Sciences.
+Portions of music21 were originally part of the PMusic (Perl) library,
+developed by Cuthbert prior to arriving at MIT.
 
 music21 outputs a subset of XML data defined by the MusicXML 4.0
-standard, Copyright © 2004-2022 the Contributors to the MusicXML Specification.
+standard, Copyright © 2004-2022 W3C, open source.
 
 The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
@@ -35,12 +34,12 @@ from __future__ import annotations
 
 import sys
 
-minPythonVersion = (3, 10)
+minPythonVersion = (3, 12)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     # DO NOT CHANGE THIS TO AN f-String -- it needs to run on old python.
     raise ImportError('''
-    Music21 v9.0+ is a Python {}+ only library.
+    Music21 v11+ is a Python {}+ only library.
     Use music21 v1 to run on Python 2.1-2.6.
     Use music21 v4 to run on Python 2.7.
     Use music21 v5.1 to run on Python 3.4.
@@ -48,11 +47,13 @@ if sys.version_info < minPythonVersion:
     Use music21 v6.7 to run on Python 3.6.
     Use music21 v7.3 to run on Python 3.7
     Use music21 v8.1 to run on Python 3.8/3.9
+    Use music21 v9.9 to run on Python 3.10.
+    Use music21 v10.5 to run on Python 3.11.
 
     If you have the wrong version there are several options for getting
     the right one.
 
-    - 1. (Best) Upgrade to Python 3, latest (currently 3.10).
+    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.14).
 
          The great features there will more
          than make up for the headache of downloading
@@ -62,7 +63,9 @@ if sys.version_info < minPythonVersion:
          Try running "python3" instead of "python"
 
     - 2. Upgrade pip and setuptools to the latest version
-         and then "upgrade" music21 to an earlier version.
+         and then use "upgrade" to downgrade music21 to
+         an earlier version.
+
          For instance to install version 4 you'd run:
 
          $ pip install --upgrade pip setuptools
@@ -83,7 +86,7 @@ __all__ = [
     'mainTest',
 
     'prebase',  # before all
-    'base',  # top...
+    'base',  # top
     'sites',  # important
 
     # sub folders
@@ -118,11 +121,10 @@ __all__ = [
     'stream',
     'test',
     'tree',
-    'vexflow',
 
     # individual modules
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
-    # put a note.  Keep one letter per line.
+    # put a note.
 
     'articulations',
     'bar',
@@ -165,6 +167,16 @@ __all__ = [
     'voiceLeading',
     'volpiano',
     'volume',
+
+    'Music21Exception',
+    'SitesException',
+    'Music21ObjectException',
+    'ElementException',
+
+    'Groups',
+    'Music21Object',
+    'ElementWrapper',
+    'VERSION',
 ]
 
 # ------------------------------------------------------------------------------
@@ -227,7 +239,6 @@ from music21 import search  # noqa: E402
 from music21 import stream  # noqa: E402
 from music21 import test  # noqa: E402
 from music21 import tree  # noqa: E402
-from music21 import vexflow  # noqa: E402
 
 # individual modules
 from music21 import articulations  # noqa: E402
@@ -271,4 +282,3 @@ from music21 import variant  # noqa: E402
 from music21 import voiceLeading  # noqa: E402
 from music21 import volpiano  # noqa: E402
 from music21 import volume  # noqa: E402
-

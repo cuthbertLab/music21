@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 # pylint: disable=line-too-long
@@ -94,7 +93,7 @@ strangeWTCOpening = re.sub(r'\s\s\s\s+', '\t',
                            )
 
 ojibway = re.sub(r'\s\s\s\s+', '\t',
-                  r'''
+                 r'''
 !! Ojibway Indian Song
 !! Transcribed by Frances Densmore
 !! No. 84 "The Sioux Follow Me"
@@ -116,7 +115,7 @@ ojibway = re.sub(r'\s\s\s\s+', '\t',
 '''
                  )
 
-# Tests the two kinds of flavors of JRP
+# Tests the two kinds of flavors of parsing dotted tuplets, regular and JRP
 dottedTuplet = re.sub(r'\s\s\s\s+', '\t',
                       r'''
 **kern

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         harmony.py
 # Purpose:      music21 classes for representing harmonies and chord symbols
@@ -8,7 +7,7 @@
 #               Jacob Tyler Walls
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2022, Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -30,7 +29,6 @@ from music21 import common
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
-from music21.figuredBass import realizerScale
 from music21 import interval
 from music21 import key
 from music21 import pitch
@@ -39,8 +37,8 @@ from music21 import style
 
 environLocal = environment.Environment('harmony')
 
-T = t.TypeVar('T', bound='ChordSymbol')
-NCT = t.TypeVar('NCT', bound='NoChord')
+if t.TYPE_CHECKING:
+    from music21.figuredBass import realizerScale
 
 # --------------------------------------------------------------------------
 
@@ -110,7 +108,7 @@ CHORD_TYPES = collections.OrderedDict([
     ('suspended-second', ['1,2,5', ['sus2']]),  # Y
     ('suspended-fourth', ['1,4,5', ['sus', 'sus4']]),  # Y
     ('suspended-fourth-seventh', ['1,4,5,-7', ['7sus', '7sus4']]),  # Y
-    ('Neapolitan', ['1,2-,3,5-', ['N6']]),  # Y
+    ('Neapolitan', ['1,-2,3,-5', ['N6']]),  # Y
     ('Italian', ['1,#4,-6', ['It+6', 'It']]),  # Y
     ('French', ['1,2,#4,-6', ['Fr+6', 'Fr']]),  # Y
     ('German', ['1,-3,#4,-6', ['Gr+6', 'Ger']]),  # Y
@@ -173,10 +171,10 @@ class Harmony(chord.Chord):
     >>> h = harmony.ChordSymbol()
     >>> h.root('B-3')
     >>> h.bass('D', allow_add=True)
-    >>> h.inversion(1, transposeOnSet=False)
+    >>> h.setInversion(1, transpose=False, inPlace=True)
     >>> h.addChordStepModification(harmony.ChordStepModification('add', 4))
     >>> h
-    <music21.harmony.ChordSymbol B-/D add 4>
+    <music21.harmony.ChordSymbol B- add 4/D>
 
     >>> h = harmony.ChordSymbol('C7/E')
     >>> h.root()
@@ -200,6 +198,17 @@ class Harmony(chord.Chord):
 
     Accepts a keyword 'updatePitches'. By default, it
     is `True`, but can be set to `False` to initialize faster if pitches are not needed.
+
+    The `placement` attribute controls where the symbol appears relative to the staff,
+    matching the MusicXML `placement` attribute on `<harmony>`. Valid values are
+    ``'above'``, ``'below'``, or ``None`` (let the notation software decide):
+
+    >>> cs = harmony.ChordSymbol('G7')
+    >>> cs.placement is None
+    True
+    >>> cs.placement = 'below'
+    >>> cs.placement
+    'below'
     '''
     # sort harmony just before notes and chords and other default objects
     classSortOrder = base.Music21Object.classSortOrder - 1
@@ -208,10 +217,10 @@ class Harmony(chord.Chord):
     # INITIALIZER #
 
     def __init__(self,
-                 figure: str | None = None,
-                 root: str | pitch.Pitch | None = None,
-                 bass: str | pitch.Pitch | None = None,
-                 inversion: int | None = None,
+                 figure: str|None = None,
+                 root: str|pitch.Pitch|None = None,
+                 bass: str|pitch.Pitch|None = None,
+                 inversion: int|None = None,
                  updatePitches: bool = True,
                  **keywords
                  ):
@@ -224,8 +233,9 @@ class Harmony(chord.Chord):
         #       data inconsistency.
 
         # a romanNumeral numeral object, musicxml stores this within a node
-        # called <function> which might conflict with the Harmony...
+        # called <function> which might conflict with the Harmony
         self._roman = None
+        self.placement: str|None = None
         # specify an array of degree alteration objects
         self.chordStepModifications: list[ChordStepModification] = []
         self._degreesList: list[str] = []
@@ -245,9 +255,10 @@ class Harmony(chord.Chord):
             self.bass(self._overrides['root'], allow_add=True)
 
         if (updatePitches
-                and self._figure  # == '' or is not None
-                or 'root' in self._overrides
-                or 'bass' in self._overrides):
+                and (
+                    self._figure  # == '' or is not None
+                    or 'root' in self._overrides
+                    or 'bass' in self._overrides)):
             self._updatePitches()
         self._updateFromParameters(root=root, bass=bass, inversion=inversion)
 
@@ -260,38 +271,47 @@ class Harmony(chord.Chord):
             summary += ' '.join([p.name for p in self.pitches])
         return summary
 
-    # PRIVATE METHODS #
+    # PROTECTED METHODS #
     def _parseFigure(self):
         '''
-        subclass this in extensions (SO WHY IS IT PRIVATE???)
+        Subclass this in extensions (protected in TypeScript/Java speak).
         '''
         return
 
     def _updatePitches(self):
         '''
-        subclass this in extensions (SO WHY IS IT PRIVATE???)
+        Subclass this in extensions (protected in TypeScript/Java speak).
         '''
         return
 
-    def _updateFromParameters(self, root, bass, inversion: int | None = None):
+    def _updateFromParameters(
+        self,
+        root: str|pitch.Pitch|None,
+        bass: str|pitch.Pitch|None,
+        inversion: int|None = None
+    ) -> None:
         '''
         This method must be called twice, once before the pitches
         are rendered, and once after. This is because after the pitches
-        are rendered, the root() and bass() becomes reset by the chord class,
+        are rendered, the root() and bass() become reset by the chord class,
         but we want the objects to retain their initial root, bass, and inversion.
         '''
         if root and isinstance(root, str):
-            root = common.cleanedFlatNotation(root)
-            self.root(pitch.Pitch(root, octave=3))
+            root_str = common.cleanedFlatNotation(root)
+            self.root(pitch.Pitch(root_str, octave=3))
         elif root is not None:
             self.root(root)
+
+        # set inversion first...
+        if inversion is not None:
+            self.setInversion(inversion, inPlace=True)
+
+        # and then bass.
         if bass and isinstance(bass, str):
-            bass = common.cleanedFlatNotation(bass)
-            self.bass(pitch.Pitch(bass, octave=3), allow_add=True)
+            bass_str = common.cleanedFlatNotation(bass)
+            self.bass(pitch.Pitch(bass_str, octave=3), allow_add=True)
         elif bass is not None:
             self.bass(bass, allow_add=True)
-        if inversion is not None:
-            self.inversion(inversion, transposeOnSet=True)
 
     # PUBLIC PROPERTIES #
 
@@ -323,6 +343,22 @@ class Harmony(chord.Chord):
         >>> h.bass(note.Note('E'))
         >>> h.figure
         'CM'
+
+        OMIT_FROM_DOCS
+
+        Fixed storing deduced figures by avoiding duplicate chordStepModifications:
+
+        >>> h = harmony.ChordSymbol('CM7omit5')
+        >>> h.addChordStepModification(harmony.ChordStepModification(modType='add', degree=4))
+        >>> h.findFigure()
+        'Cmaj7 subtract 5 add 4'
+
+        >>> h.figure
+        'CM7omit5'
+
+        >>> h.figure = h.findFigure()
+        >>> h.figure
+        'Cmaj7 subtract 5 add 4'
         '''
         if self._figure is None:
             return self.findFigure()
@@ -366,7 +402,6 @@ class Harmony(chord.Chord):
         >>> h1.key = 'CM'  # = C-Major
         >>> [str(p) for p in h1.pitches]
         ['D-2', 'F-2', 'A-2', 'C-3', 'E-3', 'G-3']
-
 
         But it should change the .romanNumeral object:
 
@@ -496,7 +531,7 @@ class Harmony(chord.Chord):
         >>> h.pitches
         (<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>)
 
-        * Changed in v7: updatePitches is True by default
+        * Changed in v7: updatePitches is True by default.
         '''
         if not isinstance(degree, ChordStepModification):
             # TODO: possibly create ChordStepModification objects from other
@@ -504,7 +539,8 @@ class Harmony(chord.Chord):
             raise HarmonyException(
                 f'cannot add this object as a degree: {degree}')
 
-        self.chordStepModifications.append(degree)
+        if degree not in self.chordStepModifications:
+            self.chordStepModifications.append(degree)
         if updatePitches:
             self._updatePitches()
 
@@ -546,7 +582,8 @@ class ChordStepModification(prebase.ProtoM21Object):
 
     >>> hd = harmony.ChordStepModification('add', 4)
     >>> hd
-    <music21.harmony.ChordStepModification modType=add degree=4 interval=None>
+    <music21.harmony.ChordStepModification modType=add
+        degree=4 interval=<music21.interval.Interval P1>>
 
     >>> hd = harmony.ChordStepModification('alter', 3, 1)
     >>> hd
@@ -580,17 +617,19 @@ class ChordStepModification(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, modType=None, degree=None, intervalObj=None):
-        self._modType = None  # add, alter, subtract
-        self._interval = None  # alteration of degree, alter ints in mxl
-        self._degree = None  # the degree number, where 3 is the third
-        # use properties if defined
+    def __init__(self, modType=None, degree=None, intervalObj=None) -> None:
+        self._modType: str|None = None  # add, alter, subtract
+        self._interval: interval.Interval  # alteration of degree, alter ints in mxl
+        self._degree: int|None = None  # the degree number, where 3 is the third
+        # use properties if defined: runs certain type conversions
         if modType is not None:
             self.modType = modType
         if degree is not None:
             self.degree = degree
         if intervalObj is not None:
             self.interval = intervalObj
+        else:
+            self.interval = interval.Interval('P1')
 
     # SPECIAL METHODS #
 
@@ -886,13 +925,12 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('Fob9', 'diminished-minor-ninth')
 
-    This harmony can either be CmaddD or Csus2addE-. music21 prefers the former.
+    This harmony can either be Cmadd9 or Csus2addb3. music21 prefers the former.
     Change the ordering of harmony.CHORD_TYPES to switch the preference. From Bach BWV380
 
     >>> c = chord.Chord(['C3', 'D4', 'G4', 'E-5'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
-    ('CmaddD', 'minor')
-
+    ('Cmadd9', 'minor')
 
     ELEVENTHS
 
@@ -929,7 +967,8 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     ('E-o11', 'diminished-11th')
 
     THIRTEENTHS
-    these are so tricky...music21 needs to be told what the root is in these cases
+
+    These are so tricky: music21 needs to be told what the root is in these cases
     all tests here are 'C' chords, but any root will work:
 
     >>> c = chord.Chord(['C3', 'E3', 'G3', 'B3', 'D4', 'F4', 'A4'])
@@ -977,8 +1016,8 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     * eleventh chords: third and/or fifth
     * thirteenth chords: fifth, eleventh, ninth
 
-
-    This Chord could be minor 7th with a C4, but because this 5th isn't present, not identified
+    This chord could be minor 7th with a C4, but because this 5th is not present,
+    it is not identified.
 
     >>> c = chord.Chord(['F3', 'A-3', 'E-4'])
     >>> harmony.chordSymbolFigureFromChord(c)
@@ -1033,7 +1072,7 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     Chord Symbol Cannot Be Identified
     B-/D
     B-7
-    CmaddD
+    Cmadd9
     Cm/D
     E-+M7/D
     Cm/E-
@@ -1054,7 +1093,6 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     <music21.pitch.Pitch C3>
     >>> c.bass()
     <music21.pitch.Pitch C3>
-
 
     >>> c = chord.Chord(['C3', 'F3', 'G3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
@@ -1083,9 +1121,9 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('CGr+6', 'German')
 
-    >>> c = chord.Chord(['C3'])
-    >>> harmony.chordSymbolFigureFromChord(c, True)
-    ('Cpedal', 'pedal')
+    >>> eflat = chord.Chord(['E-3'])
+    >>> harmony.chordSymbolFigureFromChord(eflat, True)
+    ('E-pedal', 'pedal')
 
     >>> c = chord.Chord(['C3', 'G3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
@@ -1112,8 +1150,8 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
         although certain subtractions are permitted for example a 9th chord will
         still be identified correctly even if it is missing the 5th
     5. the type with the most identical matches is used, and if no type matches,
-        "Chord Type Cannot Be Identified" is returned
-    6. the output format for the chord symbol figure is the chord's root (with 'b' instead of '-'),
+        "Chord Symbol Cannot Be Identified" is returned
+    6. the output format for the chord symbol figure is the chord's root,
         the chord type's Abbreviation (saved in CHORD_TYPES dictionary),
         a '/' if the chord is in an inversion, and the chord's bass
 
@@ -1124,7 +1162,7 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     Thus, by default the returned symbol is the first (element 0) in the CHORD_TYPES list.
     For example (Eb minor eleventh chord, second inversion):
 
-        root + chord-type-str + '/' + bass = 'Ebmin11/Bb'
+        root + chord-type-str + '/' + bass = 'E-min11/B-'
 
     Users who wish to change these defaults can simply change that
     entry in the CHORD_TYPES dictionary.
@@ -1139,8 +1177,12 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
     OMIT_FROM_DOCS
 
     >>> harmony.changeAbbreviationFor('major', '')
-
     '''
+    # TODO: known misses to fix in this routine:
+    #   E2 B2 G#3 D4 G4 (E7#9 with the #9 spelled G natural) gives 'E7addb3', which reads
+    #       back as E G B D, since 'add' on a degree the chord already has replaces it.
+    #   D3 F#3 C4 E4 G#4 B4 (D13#11 without its 5th) gives 'C+M9add#11/D': root found as C.
+    #   A2 G3 C#4 D#4 (A7#11 without its 5th) gives 'Chord Symbol Cannot Be Identified'.
     if not inChord.pitches:
         return ''
 
@@ -1151,9 +1193,9 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
 
     if len(inChord.pitches) == 1:
         if includeChordType:
-            return (inChord.root().name.replace('-', 'b') + 'pedal', 'pedal')
+            return (inChord.root().name + 'pedal', 'pedal')
         else:
-            return inChord.root().name.replace('-', 'b') + 'pedal'
+            return inChord.root().name + 'pedal'
 
     d3 = inChord.semitonesFromChordStep(3)  # 4  triad
     d5 = inChord.semitonesFromChordStep(5)  # 7  triad
@@ -1170,11 +1212,10 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
         '''
         inChord is the chord the user submits to analyze,
         givenChordNum is the chord type that the method is currently looking at
-        to determine if it could be a match for inChord
+        to determine if it could be a match for inChord.
 
-        the corresponding semitones are compared, and if they do not match it is determined
+        The corresponding semitones are compared, and if they do not match it is determined
         whether this is a permitted omission, etc.
-
         '''
         m = len(givenChordNums)
         if m > len(inChordNums):
@@ -1297,38 +1338,77 @@ def chordSymbolFigureFromChord(inChord: chord.Chord, includeChordType=False):
                         kindStr = chordKindStr[0]
 
     if kind:
+        slashBass = ''
         # new algorithm makes sus chord be a sus2 in inversion:
         if inChord.inversion():
             if kindStr == 'sus2':
                 inChord.root(inChord.bass())
                 kindStr = 'sus'
                 kind = 'suspended-fourth'
-                cs = inChord.root().name + kindStr
             else:
-                cs = inChord.root().name + kindStr + '/' + inChord.bass().name
-        else:
-            cs = inChord.root().name + kindStr
-        perfect = {p.name for p in ChordSymbol(cs).pitches}
+                slashBass = '/' + inChord.bass().name
+        cs = inChord.root().name + kindStr
+        perfect = {p.name for p in ChordSymbol(cs + slashBass).pitches}
         inPitches = {p.name for p in inChord.pitches}
 
-        if not perfect.issuperset(inPitches):  # must be subtraction or deletion....
-            additions = inPitches.difference(perfect)
-            subtractions = perfect.difference(inPitches)
-            if additions:
-                cs += 'add'
-                for a in additions:
-                    cs += (a + ',')
-            if subtractions:
-                cs += 'omit'
-                for s in subtractions:
-                    cs += (s + ',')
-            cs = cs[:-1]
+        if not perfect.issuperset(inPitches):  # must be subtraction or deletion.
+            from music21 import scale
+            # using G B D F A♭ C E♭ as example (a type of G13)
+            # start with cs = G7 since it just deals with simple strings
+            # as on lead sheets, alterations are from the major scale on the root (over G, F is b7)
+            majorScale = scale.MajorScale(inChord.root())
+            # for G7 would be {1, 3, 5, 7},
+            # note that kind ninth adds a 9. Only suspended-fourth would have 4, etc.
+            kindDegrees = {int(d.strip('-#A'))  # A = Altered, currently unused
+                           for d in getNotationStringGivenChordType(kind).split(',')}
+
+            def degreeAndAlter(name: str) -> tuple[int, int]:
+                degree, accidental = majorScale.getScaleDegreeAndAccidentalFromPitch(
+                    pitch.Pitch(name))
+                assert degree is not None  # a major scale has every letter name
+                # omit must match the kind's own number: Db F# Ab is Db sus4 omit4, not omit11
+                if degree in (2, 4, 6) and degree not in kindDegrees:
+                    degree += 7
+                return (degree, int(accidental.alter) if accidental is not None else 0)
+
+            # pitches that are not included in the simple, perfect version, in this case, Ab C Eb
+            # returned as a tuple of (degree, alter) so [(9, -1), (11, 0), (13, -1)].
+            missing_pitches = inPitches.difference(perfect)
+            additions = sorted(degreeAndAlter(name) for name in missing_pitches)
+
+            # same thing for omitted pitches
+            omitted_pitches = perfect.difference(inPitches)
+            subtractions = sorted(degreeAndAlter(name) for name in omitted_pitches)
+
+            for degree, alter in additions:
+                cs += 'add' + alterToChordSymbolString(alter) + str(degree)
+            for degree, unused_alter in subtractions:
+                cs += 'omit' + str(degree)
+        cs += slashBass  # bass comes last: Am7add11/C
     else:
         cs = 'Chord Symbol Cannot Be Identified'
     if includeChordType:
         return (cs, kind)
     else:
         return cs
+
+
+def alterToChordSymbolString(alter: int) -> str:
+    '''
+    Return the chord-symbol spelling of an alteration in semitones.
+
+    >>> harmony.alterToChordSymbolString(-1)
+    'b'
+    >>> harmony.alterToChordSymbolString(2)
+    '##'
+    >>> harmony.alterToChordSymbolString(0)
+    ''
+
+    * New in v11.
+    '''
+    if alter < 0:
+        return 'b' * -alter
+    return '#' * alter
 
 
 def chordSymbolFromChord(inChord: chord.Chord) -> ChordSymbol:
@@ -1355,33 +1435,30 @@ def getAbbreviationListGivenChordType(chordType):
 
     >>> harmony.getAbbreviationListGivenChordType('minor-major-13th')
     ['mM13', 'minmaj13']
-
     '''
     return CHORD_TYPES[chordType][1]
 
 
-def getCurrentAbbreviationFor(chordType):
+def getCurrentAbbreviationFor(chordType: str) -> str:
     '''
     Return the current Abbreviation for a given
     :class:`music21.harmony.ChordSymbol` chordType:
 
     >>> harmony.getCurrentAbbreviationFor('dominant-seventh')
     '7'
-
     '''
     return getAbbreviationListGivenChordType(chordType)[0]
 
 
-def getNotationStringGivenChordType(chordType):
+def getNotationStringGivenChordType(chordType: str) -> str:
     '''
     Get the notation string (fb-notation style) associated with this
     :class:`music21.harmony.ChordSymbol` chordType
 
     >>> harmony.getNotationStringGivenChordType('German')
     '1,-3,#4,-6'
-
     '''
-    return CHORD_TYPES[chordType][0]
+    return t.cast(str, CHORD_TYPES[chordType][0])
 
 
 def removeChordSymbols(chordType):
@@ -1400,7 +1477,7 @@ realizerScaleCache: dict[tuple[str, str], realizerScale.FiguredBassScale] = {}
 
 class ChordSymbol(Harmony):
     # noinspection SpellCheckingInspection
-    '''
+    r'''
     Class representing the Chord Symbols commonly found on lead sheets.
     Chord Symbol objects can be instantiated one of two main ways:
 
@@ -1456,7 +1533,8 @@ class ChordSymbol(Harmony):
     ...     chordSymbolName = 'C' + s
     ...     h = harmony.ChordSymbol(chordSymbolName)
     ...     pitchNames = [str(p) for p in h.pitches]
-    ...     print('%-10s%s' % (chordSymbolName, '[' + (', '.join(pitchNames)) + ']'))
+    ...     print(f'{chordSymbolName:<10}', end='[')
+    ...     print(*pitchNames, sep=', ', end=']\n')
     C         [C3, E3, G3]
     Cm        [C3, E-3, G3]
     C+        [C3, E3, G#3]
@@ -1495,7 +1573,8 @@ class ChordSymbol(Harmony):
 
     You can also create a Chord Symbol by writing out each degree,
     and any alterations to that degree:
-    You must explicitly indicate EACH degree (a triad is NOT necessarily implied)
+
+    You must explicitly indicate EACH degree (a triad is NOT necessarily implied).
 
     >>> [str(p) for p in harmony.ChordSymbol('C35b7b9#11b13').pitches]
     ['C2', 'E2', 'G2', 'D-3', 'F#3', 'A-3', 'B-3']
@@ -1503,10 +1582,8 @@ class ChordSymbol(Harmony):
     >>> [str(p) for p in harmony.ChordSymbol('C35911').pitches]
     ['C2', 'E2', 'G2', 'D3', 'F3']
 
-    to prevent ambiguity in notation...
-
-    ...and in accordance with the rest of music21, if a root or bass is flat,
-    the '-' must be used, and NOT 'b'. However, alterations and chord
+    To prevent ambiguity in notation and in accordance with the rest of music21,
+    if a root or bass is flat, the '-' must be used, and NOT 'b'. However, alterations and chord
     abbreviations are specified normally with the 'b' and '#' signs.
 
     >>> dFlat = harmony.ChordSymbol('D-35')
@@ -1515,6 +1592,8 @@ class ChordSymbol(Harmony):
 
     >>> [str(p) for p in harmony.ChordSymbol('Db35').pitches]
     ['D3', 'F3', 'A3']
+
+    (Note that this would be much better expressed just as 'Dm'.)
 
     >>> [str(p) for p in harmony.ChordSymbol('D,35b7b9#11b13').pitches]
     ['D2', 'F#2', 'A2', 'E-3', 'G#3', 'B-3', 'C4']
@@ -1553,13 +1632,12 @@ class ChordSymbol(Harmony):
     >>> cs.figure
     'Eo7/C'
 
-    And now, and example of parsing in the wild:
+    And now, an example of parsing in the wild:
 
     >>> s = corpus.parse('leadsheet/fosterBrownHair')
     >>> initialSymbols = s.flatten().getElementsByClass(harmony.ChordSymbol)[0:5]
     >>> [[str(c.name) for c in c.pitches] for c in initialSymbols]
     [['F', 'A', 'C'], ['B-', 'D', 'F'], ['F', 'A', 'C'], ['C', 'E', 'G'], ['F', 'A', 'C']]
-
 
     Test creating an empty chordSymbol:
 
@@ -1572,7 +1650,7 @@ class ChordSymbol(Harmony):
     important: we are not asking for transposition, merely specifying the inversion that
     the chord should be read in (transposeOnSet = False)
 
-    >>> cs.inversion(2, transposeOnSet=False)
+    >>> cs.setInversion(2, transpose=False, inPlace=True)
 
     >>> cs.romanNumeral = 'I64'
     >>> cs.chordKind = 'major'
@@ -1584,10 +1662,10 @@ class ChordSymbol(Harmony):
     # INITIALIZER #
 
     def __init__(self,
-                 figure=None,
-                 root: pitch.Pitch | str | None = None,
-                 bass: pitch.Pitch | str | None = None,
-                 inversion: int | None = None,
+                 figure: str|None = None,
+                 root: pitch.Pitch|str|None = None,
+                 bass: pitch.Pitch|str|None = None,
+                 inversion: int|None = None,
                  kind='',
                  kindStr='',
                  **keywords
@@ -1607,7 +1685,7 @@ class ChordSymbol(Harmony):
         if not isinstance(pitches, list):
             pitches = list(pitches)
 
-        # do this for all ninth, thirteenth, and eleventh chords...
+        # do this for all ninth, thirteenth, and eleventh chords
         # this must be done to get octave spacing right
         # possibly rewrite figured bass function with this integrated?
         ninths = ['dominant-ninth', 'major-ninth', 'minor-ninth']
@@ -1632,7 +1710,9 @@ class ChordSymbol(Harmony):
 
         return list(c.pitches)
 
-    def _adjustPitchesForChordStepModifications(self, pitches):
+    def _adjustPitchesForChordStepModifications(
+        self, pitches: t.Iterable[pitch.Pitch]
+    ) -> list[pitch.Pitch]:
         '''
         degree-value element: indicates degree in chord, positive integers only
 
@@ -1644,7 +1724,6 @@ class ChordSymbol(Harmony):
                 intervals except for a minor seventh)
             if `alter` or `subtract`:
                 degree-alter is relative to degree already in the chord based on its kind element
-
 
         FROM XML DOCUMENTATION
 
@@ -1684,14 +1763,21 @@ class ChordSymbol(Harmony):
 
         def typeAdd(hD):
             '''
-            change the pitches list based on this chordStepModification, adding
-            a pitch
+            Change the pitches list based on this chordStepModification, adding
+            a pitch.
             '''
             pitchToAppend = sc.pitchFromDegree(hD.degree, rootPitch)
             if hD.interval and hD.interval.semitones != 0:
                 # added degrees are relative to dominant chords, which have all major degrees
-                # except for the seventh which is minor, thus the transposition down one half step
-                if hD.degree == 7 and self.chordKind is not None and self.chordKind != '':
+                # except for the seventh which is minor, thus the transposition down one half step.
+                # Don't do this for flatted transformations:
+                # C7addb7 is a redundancy, not a double-flatted seventh.
+                if (
+                    hD.degree == 7
+                    and hD.interval.semitones > 0
+                    and self.chordKind is not None
+                    and self.chordKind != ''
+                ):
                     pitchToAppend = pitchToAppend.transpose(-1)
                 pitchToAppend = pitchToAppend.transpose(hD.interval)
             if hD.degree >= 7:
@@ -1714,7 +1800,7 @@ class ChordSymbol(Harmony):
                 # if hD.degree == 7 and self.chordKind is not None and self.chordKind != '':
                 #     # don't know why anyone would want
                 #     # to add a seventh to a dominant chord already
-                #     # ...but according to documentation
+                #     # however, according to documentation
                 #     # added degrees are relative to dominant chords, which have all major degrees
                 #     # except for the seventh which is minor, thus the transposition down
                 #     # one half step
@@ -1733,7 +1819,7 @@ class ChordSymbol(Harmony):
 
         def typeSubtract(hD):
             '''
-            change the pitches list based on this chordStepModification, removing a pitch
+            Change the pitches list based on this chordStepModification, removing a pitch.
             '''
             degrees = self._degreesList
             if not degrees:
@@ -1741,9 +1827,7 @@ class ChordSymbol(Harmony):
 
             pitchFound = False
             for p, degree in zip(pitches, degrees):
-                degree = degree.replace('-', '')
-                degree = degree.replace('#', '')
-                degree = degree.replace('A', '')  # A is for 'Altered'
+                degree = degree.strip('-#A')  # A is for 'Altered', currently unused
                 if hD.degree == int(degree):
                     pitches.remove(p)
                     pitchFound = True
@@ -1767,9 +1851,7 @@ class ChordSymbol(Harmony):
             degrees = self._degreesList
 
             for p, degree in zip(pitches, degrees):
-                degree = degree.replace('-', '')
-                degree = degree.replace('#', '')
-                degree = degree.replace('A', '')  # A is for 'Altered'
+                degree = degree.strip('-#A')  # A is for 'Altered', currently unused
                 if hD.degree == int(degree):
                     # transpose by semitones (positive for up, negative for down)
                     p = p.transpose(hD.interval, inPlace=True)
@@ -1779,7 +1861,7 @@ class ChordSymbol(Harmony):
                     #     if str(hD.degree) in degreeString:
                     #         self._degreesList = self._degreesList.replace(
                     #                    degreeString, ('A' + str(hD.degree)))
-                    #         # the 'A' stands for altered...
+                    #         # the 'A' stands for altered
                     #         break
                     # # if hD.degree not in string:
                     # # should we throw an exception???? for now yes, but maybe later we should.
@@ -1787,16 +1869,21 @@ class ChordSymbol(Harmony):
                 raise ChordStepModificationException(
                     f'Degree not in specified chord: {hD.degree}')
 
-        # main routines...
+        # main routines
         for chordStepModification in chordStepModifications:
             if chordStepModification.modType == 'add':
                 typeAdd(chordStepModification)
             elif chordStepModification.modType == 'subtract':
                 typeSubtract(chordStepModification)
             elif chordStepModification.modType == 'alter':
-                typeAlter(chordStepModification)
+                try:
+                    typeAlter(chordStepModification)
+                except ChordStepModificationException:
+                    # fix it in place
+                    chordStepModification.modType = 'add'
+                    typeAdd(chordStepModification)
 
-        return tuple(pitches)
+        return pitches
 
     def _parseAddAlterSubtract(self, remaining: str, modType: str) -> str:
         '''
@@ -1817,11 +1904,8 @@ class ChordSymbol(Harmony):
         # Remove modType
         remaining = remaining[startIndex:]
 
-        if remaining[:1] == 'b':
-            alter = -1
-            remaining = remaining[1:]
-        elif remaining[:1] == '#':
-            alter = 1
+        while remaining[:1] in ('b', '-', '#'):
+            alter += 1 if remaining[0] == '#' else -1
             remaining = remaining[1:]
         # 11, 13, etc.
         if remaining[:2].isnumeric():
@@ -1858,7 +1942,7 @@ class ChordSymbol(Harmony):
             for charString in getAbbreviationListGivenChordType(chordKind):
                 if sH == charString:
                     self.chordKind = chordKind
-                    return originalsH.replace(charString, '')
+                    return originalsH[len(sH):]
         return originalsH
 
     def _hasPitchAboveC4(self, pitches):
@@ -1875,7 +1959,7 @@ class ChordSymbol(Harmony):
 
     def _notationString(self):
         '''
-        returns NotationString of ChordSymbolObject which dictates which scale
+        Returns NotationString of ChordSymbolObject which dictates which scale
         degrees and how those scale degrees are altered in this chord.
 
         >>> h = harmony.ChordSymbol('F-dim7')
@@ -1905,8 +1989,8 @@ class ChordSymbol(Harmony):
         kindStr.
         '''
         if self.figure == 'Chord Symbol Cannot Be Identified':
-            return self.figure
-        # remove spaces from prelim Figure...
+            return
+        # remove spaces from prelim Figure
         prelimFigure = self.figure
         prelimFigure = re.sub(r'\s', '', prelimFigure)
         # Get Root:
@@ -2080,6 +2164,8 @@ class ChordSymbol(Harmony):
         if 'root' not in self._overrides or 'bass' not in self._overrides or self.chordKind is None:
             return
 
+        from music21.figuredBass import realizerScale
+
         # create figured bass scale with root as scale
         scaleInitTuple = (self._overrides['root'].name, 'major')
         if scaleInitTuple in realizerScaleCache:
@@ -2117,10 +2203,10 @@ class ChordSymbol(Harmony):
                 self._overrides['bass'].octave = 2
                 pitches.append(self._overrides['bass'])
         else:
-            self.inversion(None, transposeOnSet=False)
+            self.setInversion(None, inPlace=True)
             inversionNum = None
 
-        pitches = list(self._adjustPitchesForChordStepModifications(pitches))
+        pitches = self._adjustPitchesForChordStepModifications(pitches)
 
         if inversionNum not in (0, None):
             for p in pitches[0:inversionNum]:
@@ -2169,7 +2255,7 @@ class ChordSymbol(Harmony):
         >>> h.figure
         'FN6/D-'
 
-        Thanks to Norman Schmidt for code sample and helping fix a bug
+        Thanks to Norman Schmidt for code sample and helping fix a bug.
 
         >>> foster = corpus.parse('leadsheet/fosterBrownHair.xml')
         >>> foster = foster.parts[0].getElementsByClass(stream.Measure)
@@ -2208,14 +2294,16 @@ class ChordSymbol(Harmony):
         <music21.pitch.Pitch E3>
         <music21.pitch.Pitch G3>
 
+        * Changed in v11: the bass comes last, after any additions, as in 'C add 2/B-'.
+
         OMIT_FROM_DOCS
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
-        >>> elStr = (r'<harmony><root><root-step>C</root-step></root><kind>dominant</kind>' +
-        ...           '<degree><degree-value>9</degree-value><degree-alter>-1</degree-alter>' +
-        ...           '        <degree-type>add</degree-type></degree></harmony>')
+        >>> elStr = ('<harmony><root><root-step>C</root-step></root><kind>dominant</kind>'
+        ...          '<degree><degree-value>9</degree-value><degree-alter>-1</degree-alter>'
+        ...          '        <degree-type>add</degree-type></degree></harmony>')
         >>> mxHarmony = EL(elStr)
 
         >>> cs = MP.xmlToChordSymbol(mxHarmony)
@@ -2229,15 +2317,15 @@ class ChordSymbol(Harmony):
          <music21.pitch.Pitch B-3>,
          <music21.pitch.Pitch D-4>)
 
-        >>> elStr = (r'<harmony><root><root-step>C</root-step></root><kind>major</kind>' +
-        ...           '<bass><bass-step>B</bass-step><bass-alter>-1</bass-alter></bass>' +
-        ...           '<degree><degree-value>2</degree-value><degree-alter>0</degree-alter>' +
-        ...           '        <degree-type>add</degree-type></degree></harmony>')
+        >>> elStr = ('<harmony><root><root-step>C</root-step></root><kind>major</kind>'
+        ...          '<bass><bass-step>B</bass-step><bass-alter>-1</bass-alter></bass>'
+        ...          '<degree><degree-value>2</degree-value><degree-alter>0</degree-alter>'
+        ...          '        <degree-type>add</degree-type></degree></harmony>')
         >>> mxHarmony = EL(elStr)
 
         >>> cs = MP.xmlToChordSymbol(mxHarmony)
         >>> print(cs.figure)
-        C/B- add 2
+        C add 2/B-
 
         >>> cs.pitches
         (<music21.pitch.Pitch B-2>,
@@ -2260,22 +2348,17 @@ class ChordSymbol(Harmony):
 
             if kind in CHORD_TYPES:
                 figure += getAbbreviationListGivenChordType(kind)[0]
-            if self.bass() is not None:
-                if self.root().name != self.bass().name:
-                    figure += '/' + self.bass().name
 
             for csMod in self.chordStepModifications:
                 if csMod.interval is not None:
-                    numAlter = csMod.interval.semitones
-                    if numAlter > 0:
-                        s = '#'
-                    else:
-                        s = 'b'
-                    prefix = s * abs(numAlter)
-
+                    prefix = alterToChordSymbolString(csMod.interval.semitones)
                     figure += ' ' + csMod.modType + ' ' + prefix + str(csMod.degree)
                 else:
                     figure += ' ' + csMod.modType + ' ' + str(csMod.degree)
+
+            if self.bass() is not None:
+                if self.root().name != self.bass().name:
+                    figure += '/' + self.bass().name
 
             return figure
         else:
@@ -2344,7 +2427,7 @@ class ChordSymbol(Harmony):
         else:
             return False
 
-    def transpose(self: T, value, *, inPlace=False) -> T | None:
+    def transpose(self, value, *, inPlace=False) -> t.Self|None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
         `figure` is appropriately cleared afterward.
@@ -2432,7 +2515,13 @@ class NoChord(ChordSymbol):
     >>> nc2.pitches
     ()
     '''
-    def __init__(self, figure=None, kind='none', kindStr=None, **keywords):
+    def __init__(
+        self,
+        figure: str|None = None,
+        kind: str|None = 'none',
+        kindStr: str|None = None,
+        **keywords
+    ):
         super().__init__(figure, kind=kind, kindStr=kindStr or figure or 'N.C.', **keywords)
 
         if self._figure is None:
@@ -2450,7 +2539,7 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(self: NCT, _value, *, inPlace=False) -> NCT | None:
+    def transpose(self, _value, *, inPlace=False) -> t.Self|None:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 
@@ -2468,7 +2557,6 @@ class NoChord(ChordSymbol):
 
 
 # ------------------------------------------------------------------------------
-
 
 def realizeChordSymbolDurations(piece):
     '''
@@ -2575,8 +2663,7 @@ def realizeChordSymbolDurations(piece):
 class Test(unittest.TestCase):
 
     def testChordAttributes(self):
-        from music21 import harmony
-        cs = harmony.ChordSymbol('Cm')
+        cs = ChordSymbol('Cm')
         self.assertEqual(str(cs), '<music21.harmony.ChordSymbol Cm>')
         self.assertEqual(
             str(cs.pitches),
@@ -2585,18 +2672,16 @@ class Test(unittest.TestCase):
         self.assertTrue(cs.isConsonant())
 
     def testBasic(self):
-        from music21 import harmony
-        h = harmony.Harmony()
-        hd = harmony.ChordStepModification('add', 4)
+        h = Harmony()
+        hd = ChordStepModification('add', 4)
         h.addChordStepModification(hd)
         self.assertEqual(len(h.chordStepModifications), 1)
 
     def testChordKindSetting(self):
-        from music21 import harmony
-        cs = harmony.ChordSymbol()
+        cs = ChordSymbol()
         cs.root('E-')
         cs.bass('B-', allow_add=True)
-        cs.inversion(2, transposeOnSet=False)
+        cs.setInversion(2, transpose=False, inPlace=True)
         cs.romanNumeral = 'I64'
         cs.chordKind = 'major'
         cs.chordKindStr = 'M'
@@ -2614,6 +2699,18 @@ class Test(unittest.TestCase):
         self.assertEqual(root.nameWithOctave, 'C4')
         b = d.bass()
         self.assertEqual(b.nameWithOctave, 'E-3')
+
+    def testHarmonyPreservesInversionAndBass(self):
+        '''
+        Test that bass is preserved even when both bass and inversion are given.
+        '''
+        explicitFm6 = ChordSymbol(root='F', bass='A-', inversion=1, kind='minor')
+        self.assertEqual(explicitFm6.inversion(), 1)
+        self.assertEqual(explicitFm6.bass(find=False).name, 'A-')
+        self.assertEqual(explicitFm6.root(find=False).name, 'F')
+        fm6bassOctave = explicitFm6.bass(find=False).octave
+        fm6rootOctave = explicitFm6.root(find=False).octave
+        self.assertLess(fm6bassOctave, fm6rootOctave)
 
     def testClassSortOrderHarmony(self):
         '''
@@ -2642,38 +2739,37 @@ class Test(unittest.TestCase):
         self.assertIs(n.getContextByClass('ChordSymbol'), cs)
 
     def testNoChord(self):
-        from music21 import harmony
-        nc = harmony.NoChord()
+        nc = NoChord()
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('N.C.', nc.chordKindStr)
         self.assertEqual('N.C.', nc.figure)
 
-        nc = harmony.NoChord('NC')
+        nc = NoChord('NC')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('NC', nc.chordKindStr)
         self.assertEqual('NC', nc.figure)
 
-        nc = harmony.NoChord('None')
+        nc = NoChord('None')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('None', nc.chordKindStr)
         self.assertEqual('None', nc.figure)
 
-        nc = harmony.NoChord(kind='none')
+        nc = NoChord(kind='none')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('N.C.', nc.chordKindStr)
         self.assertEqual('N.C.', nc.figure)
 
-        nc = harmony.NoChord(kindStr='No Chord')
+        nc = NoChord(kindStr='No Chord')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('No Chord', nc.chordKindStr)
         self.assertEqual('No Chord', nc.figure)
 
-        nc = harmony.NoChord('NC', kindStr='No Chord')
+        nc = NoChord('NC', kindStr='No Chord')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('No Chord', nc.chordKindStr)
         self.assertEqual('NC', nc.figure)
 
-        nc = harmony.NoChord(root='C', bass='E', kind='none')
+        nc = NoChord(root='C', bass='E', kind='none')
         self.assertEqual('N.C.', nc.chordKindStr)
         self.assertEqual('N.C.', nc.figure)
 
@@ -2686,9 +2782,8 @@ class Test(unittest.TestCase):
         self.assertEqual(0, len(nc.pitches))
 
     def testInvalidRoots(self):
-        from music21 import harmony
         with self.assertRaises(ValueError) as context:
-            harmony.ChordSymbol('H-7')
+            ChordSymbol('H-7')
 
         self.assertEqual(
             str(context.exception),
@@ -2697,7 +2792,7 @@ class Test(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             # noinspection SpellCheckingInspection
-            harmony.ChordSymbol('Garg7')
+            ChordSymbol('Garg7')
 
         self.assertEqual(
             str(context.exception),
@@ -2707,9 +2802,8 @@ class Test(unittest.TestCase):
         )
 
     def testInvalidSymbol(self):
-        from music21 import harmony
         c = chord.Chord(('A#', 'C', 'E'))
-        cs = harmony.chordSymbolFromChord(c)
+        cs = chordSymbolFromChord(c)
         self.assertEqual(cs.figure, 'Chord Symbol Cannot Be Identified')
 
     def testRegexEdgeCases(self):
@@ -2766,7 +2860,6 @@ class Test(unittest.TestCase):
         self.assertEqual(cs1.bass(), cs3.bass())
 
     def testChordWithBass(self):
-
         xmlString = '''
           <harmony>
             <root>
@@ -2803,6 +2896,10 @@ class Test(unittest.TestCase):
         pitches = ('A1', 'C2', 'E2', 'G#3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
         self.assertEqual(pitches, ChordSymbol('Am#7').pitches)
+
+        pitches = ('C2', 'F2', 'G2', 'B-3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+        self.assertEqual(pitches, ChordSymbol('Csusaddb7').pitches)
 
     def testRootBassParsing(self):
         '''
@@ -3125,9 +3222,15 @@ class Test(unittest.TestCase):
 
         self.assertEqual(ch1.pitches, ch2.pitches)
 
+    def testDoubledCharacters(self):
+        ch1 = ChordSymbol('Co omit5')
+        ch2 = ChordSymbol('Cdim omit5')
+
+        self.assertEqual(ch1.pitches, ch2.pitches)
+
     def x_testPower(self):
         '''
-        power chords should not have inversions
+        Power chords should not have inversions.
         '''
         pitches = ('E2', 'A2', 'E3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
@@ -3163,19 +3266,59 @@ class Test(unittest.TestCase):
         realizeChordSymbolDurations(m)
         self.assertEqual(cs.quarterLength, 3.0)
 
+    def testUpdatePitchesFalse(self):
+        bass_note = pitch.Pitch('C3')
+        h = Harmony(bass=bass_note, updatePitches=False)
+        # No other pitches are created
+        self.assertEqual(h.pitches, (bass_note,))
+
+    def testFigureFromChordAddOmit(self):
+        for pitchString, expected in [
+            ('G3 B3 D4 F4 A-4 C5 E-5', 'G7addb9add11addb13'),
+            ('E2 B2 G#3 D4 F##4', 'E7add#9'),
+            ('B-2 F3 A3 D4 E4', 'B-maj7add#11'),
+            ('A-2 E-3 G-3 C4 D4 B-4', 'A-9add#11'),
+            ('A2 E3 A3 B3 C4 E4', 'Amadd9'),
+            # a 2nd is 9 whether close or wide
+            ('D4 E4 F#4 A4', 'Dadd9'),
+            ('D3 A3 F#4 E5', 'Dadd9'),
+            # a full stack of thirds from C#: C# E G B D F A
+            ('G B D F A C# E', 'C#øb9addb11addb13'),
+            ('C E G B- D- F#', 'C7addb9add#11'),
+            # C6/9 is read as Am7 over C, so D is the 11 of A
+            ('C E G A D', 'Am7add11/C'),
+            # Db is the root respelled (bb9), and the sus4 has no 5th
+            ('C# F# B D-', 'C#susaddb7addbb9omit5'),
+            # Sounds like Db sus4 (F# = Gb), so the chord type is sus4.  F# is spelled as a
+            # raised 3rd (add#3), and the sus4's own Gb is omitted as omit4, not omit11,
+            # because omit must use the number the chord type gives that tone.
+            ('D-3 F#3 A-3', 'D-susadd#3omit4'),
+            # Likewise F#m6 with its D# spelled Eb (a doubly flat 7th): omit6, not omit13.
+            ('F#2 C#3 E-3 A3', 'F#m6addbb7omit6'),
+        ]:
+            c = chord.Chord(pitchString)
+            figure = chordSymbolFigureFromChord(c)
+            self.assertEqual(figure, expected)
+            self.assertEqual({p.name for p in ChordSymbol(figure).pitches},
+                             {p.name for p in c.pitches})
+
+    def testParseAddAccidentals(self):
+        for figure in ('G7addb9', 'G7add-9'):
+            self.assertIn('A-', [p.name for p in ChordSymbol(figure).pitches])
+        self.assertIn('A--', [p.name for p in ChordSymbol('G7addbb9').pitches])
+
 
 class TestExternal(unittest.TestCase):
 
     def testReadInXML(self):
-        from music21 import harmony
         from music21 import corpus
         from music21 import stream
         testFile = corpus.parse('leadSheet/fosterBrownHair.xml')
 
         # testFile.show('text')
-        testFile = harmony.realizeChordSymbolDurations(testFile)
+        testFile = realizeChordSymbolDurations(testFile)
         # testFile.show()
-        chordSymbols = testFile.flatten().getElementsByClass(harmony.ChordSymbol)
+        chordSymbols = testFile.flatten().getElementsByClass(ChordSymbol)
         s = stream.Stream()
 
         for cS in chordSymbols:
@@ -3187,19 +3330,18 @@ class TestExternal(unittest.TestCase):
         # self.assertEqual(len(csChords), 40)
 
     def testChordRealization(self):
-        from music21 import harmony
         from music21 import corpus
         from music21 import note
         from music21 import stream
         # There is a test file under demos called ComprehensiveChordSymbolsTestFile.xml
         # that should contain a complete iteration of tests of chord symbol objects
         # this test makes sure that no error exists, and checks that 57 chords were
-        # created out of that file....feel free to add to file if you find missing
+        # created out of that file.  Feel free to add to file if you find missing
         # tests, and adjust 57 accordingly
         testFile = corpus.parse('demos/ComprehensiveChordSymbolsTestFile.xml')
 
-        testFile = harmony.realizeChordSymbolDurations(testFile)
-        chords = testFile.flatten().getElementsByClass(harmony.ChordSymbol)
+        testFile = realizeChordSymbolDurations(testFile)
+        chords = testFile.flatten().getElementsByClass(ChordSymbol)
         # testFile.show()
         s = stream.Stream()
         # i = 0

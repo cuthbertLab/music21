@@ -46,7 +46,7 @@ class Test(unittest.TestCase):
         self.assertEqual(matchStr, outStr)
         i = 0
         for thisNote in note1.splitAtDurations():
-            matchSub = matchStr.split('\n')[i]  # pylint: disable=use-maxsplit-arg
+            matchSub = matchStr.split('\n')[i]
             conv = LilypondConverter()
             conv.appendM21ObjectToContext(thisNote)
             outStr = str(conv.context).replace(' ', '').strip()
@@ -105,10 +105,10 @@ class Test(unittest.TestCase):
              [0.75] * 6],
 
             ['5/4', 1, 5, [1.0, 2.0, 3.0, 4.0, 5.0],
-             [1.] * 5],
+             [1.0] * 5],
 
             ['2/8+3/8+2/8', 0.5, 6, [1.0, 1.5, 2.0, 2.33333, 2.66666, 3.0],
-             [1., 1., 1.5, 1.5, 1.5, 1.]],
+             [1.0, 1.0, 1.5, 1.5, 1.5, 1.0]],
 
         ]
 
@@ -246,7 +246,7 @@ class Test(unittest.TestCase):
               articulations.StrongAccent()]
 
         for a, b, c, d, match in [(n1, n4, a1, a1, True),
-                                      (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
+                                  (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
                                   # same pitch different orderings
                                   (n1, n4, a2, a3, True), (n1, n4, a4, a5, True),
                                   # different pitch same orderings

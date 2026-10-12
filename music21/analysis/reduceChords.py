@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert
@@ -15,6 +14,7 @@ Automatically reduce a MeasureStack to a single chord or group of chords.
 from __future__ import annotations
 
 import collections
+from collections.abc import Sequence
 import itertools
 import unittest
 
@@ -166,16 +166,28 @@ class ChordReducer:
                 )
 
     @staticmethod
-    def _getIntervalClassSet(pitches):
-        result = set()
-        pitches = [pitch.Pitch(x) for x in pitches]
+    def _getIntervalClassSet(pitches_in: Sequence[pitch.Pitch|str|int]) -> frozenset[int]:
+        '''
+        Return a frozenset of all the interval classes (1-6) in the given
+        Sequence (list, tuple, etc.) of pitches or
+        things like strings/ints that can be passed to the Pitch constructor.
+        '''
+        result: set[int] = set()
+        pitches: list[pitch.Pitch] = []
+        for p in pitches_in:
+            if isinstance(p, pitch.Pitch):
+                pitches.append(p)
+            else:
+                pitches.append(pitch.Pitch(p))
+
+        interval_int: int
         for i, x in enumerate(pitches):
             for y in pitches[i + 1:]:
-                interval = int(abs(x.ps - y.ps))
-                interval %= 12
-                if interval >= 6:
-                    interval = 12 - interval
-                result.add(interval)
+                interval_int = int(abs(x.ps - y.ps))
+                interval_int %= 12
+                if interval_int >= 6:
+                    interval_int = 12 - interval_int
+                result.add(interval_int)
         if 0 in result:
             result.remove(0)
         return frozenset(result)
@@ -250,7 +262,7 @@ class ChordReducer:
         >>> excerpt_tree = s.parts.first().asTimespans()
         >>> cr2.collapseArpeggios(excerpt_tree)
         >>> excerpt_tree
-        <TimespanTree {162} (0.0 to 124.0) <music21.stream.Part Soprano I>>
+        <TimespanTree {163} (0.0 to 124.0) <music21.stream.Part Soprano I>>
         '''
         for verticalities in scoreTree.iterateVerticalitiesNwise(n=2):
             one, two = verticalities
@@ -262,10 +274,13 @@ class ChordReducer:
                 continue
             elif one.measureNumber != two.measureNumber:
                 continue
-            bothPitches = set()
-            bothPitches.update([x.nameWithOctave for x in onePitches])
-            bothPitches.update([x.nameWithOctave for x in twoPitches])
-            bothPitches = sorted([pitch.Pitch(x) for x in bothPitches])
+
+            # # is this used?
+            # bothPitches = set()
+            # bothPitches.update([x.nameWithOctave for x in onePitches])
+            # bothPitches.update([x.nameWithOctave for x in twoPitches])
+            # bothPitches = sorted([pitch.Pitch(x) for x in bothPitches])
+
             # if not timespanStream.Verticality.pitchesAreConsonant(bothPitches):
             #    intervalClasses = self._getIntervalClassSet(bothPitches)
             #    if intervalClasses not in (
@@ -275,6 +290,7 @@ class ChordReducer:
             #        frozenset([2, 4, 6]),
             #        ):
             #        continue
+
             horizontalities = scoreTree.unwrapVerticalities(verticalities)
             for unused_part, timespanList in horizontalities.items():
                 if len(timespanList) < 2:
@@ -304,7 +320,7 @@ class ChordReducer:
         >>> cr = analysis.reduceChords.ChordReducer()
         >>> cws = cr.computeMeasureChordWeights(s)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
             (0, 4, 7)  3.0
         (0, 11, 4, 5)  1.0
 
@@ -313,7 +329,7 @@ class ChordReducer:
         >>> cws = cr.computeMeasureChordWeights(s,
         ...     weightAlgorithm=cr.quarterLengthBeatStrength)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
             (0, 4, 7)  2.2
         (0, 11, 4, 5)  0.5
 
@@ -322,7 +338,7 @@ class ChordReducer:
         >>> cws = cr.computeMeasureChordWeights(s,
         ...     weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
             (0, 4, 7)  3.0
         (0, 11, 4, 5)  0.5
 
@@ -331,7 +347,7 @@ class ChordReducer:
         >>> cws = cr.computeMeasureChordWeights(s,
         ...     weightAlgorithm=cr.qlbsmpConsonance)
         >>> for pcs in sorted(cws):
-        ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
+        ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
              (0, 4, 7)  3.0
          (0, 11, 4, 5)  0.1
         '''
@@ -342,10 +358,7 @@ class ChordReducer:
         self.numberOfElementsInMeasure = len(measureObject)
         for i, c in enumerate(measureObject):
             self.positionInMeasure = i
-            if c.isNote:
-                p = tuple(c.pitch.pitchClass)
-            else:
-                p = tuple({x.pitchClass for x in c.pitches})
+            p = tuple({x.pitchClass for x in c.pitches})
             if p not in presentPCs:
                 presentPCs[p] = 0.0
             presentPCs[p] += weightAlgorithm(c)
@@ -360,8 +373,8 @@ class ChordReducer:
 
         for unused_part, subtree in partwiseTrees.items():
             timespanList = list(subtree)
-            for bassTimespan, group in itertools.groupby(timespanList, procedure):
-                group = list(group)
+            for bassTimespan, group_generator in itertools.groupby(timespanList, procedure):
+                group = list(group_generator)
 
                 if bassTimespan is None:
                     continue
@@ -384,8 +397,7 @@ class ChordReducer:
                             )
                             print(msg)
                             # raise ChordReducerException(msg)
-                        if offset < previousTimespan.endTime:
-                            offset = previousTimespan.endTime
+                        offset = max(offset, previousTimespan.endTime)
                     scoreTree.removeTimespan(group[0])
                     subtree.removeTimespan(group[0])
                     newTimespan = group[0].new(offset=offset)
@@ -425,10 +437,10 @@ class ChordReducer:
         for unused_part, subtree in partwiseTrees.items():
             toRemove = set()
             toInsert = set()
-            for unused_measureNumber, group in itertools.groupby(
+            for unused_measureNumber, group_generator in itertools.groupby(
                 subtree, lambda x: x.measureNumber
             ):
-                group = list(group)
+                group = list(group_generator)
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
                     if (timespanOne.pitches == timespanTwo.pitches
@@ -542,8 +554,7 @@ class ChordReducer:
             measureObject.flatten().notes,
             weightAlgorithm,
         )
-        if maximumNumberOfChords > len(chordWeights):
-            maximumNumberOfChords = len(chordWeights)
+        maximumNumberOfChords = min(maximumNumberOfChords, len(chordWeights))
         sortedChordWeights = sorted(
             chordWeights,
             key=chordWeights.get,
@@ -567,13 +578,8 @@ class ChordReducer:
         currentGreedyChord = None
         currentGreedyChordPCs = None
         currentGreedyChordNewLength = 0.0
-        for c in measureObject:
-            if isinstance(c, note.Note):
-                p = tuple(c.pitch.pitchClass)
-            elif isinstance(c, chord.Chord):
-                p = tuple({x.pitchClass for x in c.pitches})
-            else:
-                continue
+        for c in measureObject.getElementsByClass(note.NotRest):
+            p = tuple({x.pitchClass for x in c.pitches})
             if p in trimmedMaxChords and p != currentGreedyChordPCs:
                 # keep this chord
                 if currentGreedyChord is None and c.offset != 0.0:
@@ -594,8 +600,9 @@ class ChordReducer:
                 measureObject.remove(c)
         if currentGreedyChord is not None:
             currentGreedyChord.quarterLength = currentGreedyChordNewLength
-            currentGreedyChordNewLength = 0.0
-        # even chord lengths...
+            # not read later - no need to clean up.
+            # currentGreedyChordNewLength = 0.0
+        # even chord lengths
         for i in range(1, len(measureObject)):
             c = measureObject[i]
             cOffsetCurrent = c.offset

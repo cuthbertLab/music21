@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         noteGrouping.py
 # Purpose:      Transcribes note groupings into Braille
@@ -25,7 +24,7 @@ environRules = environment.Environment('braille/noteGrouping.py')
 
 class NoteGroupingTranscriber:
     '''
-    Object that can transcribe note groupings...
+    Object that can transcribe note groupings.
     '''
     def __init__(self, brailleElementGrouping=None):
         self.showLeadingOctave = True
@@ -33,7 +32,7 @@ class NoteGroupingTranscriber:
         self._upperFirstInFingering = None
         self._showClefSigns = None
 
-        # duplicate of reset...
+        # duplicate of reset
         self.previousNote = None
         self.previousElement = None
         self.trans = []
@@ -87,7 +86,7 @@ class NoteGroupingTranscriber:
         should the highest be listed first (default True) or last?
 
         If not set but self.brailleElementGrouping.upperFirstInNoteFingering
-        is set, uses that instead. (note the slight difference in names... NoteFingering)
+        is set, uses that instead. (note the slight difference in names: NoteFingering)
 
         >>> ngt = braille.noteGrouping.NoteGroupingTranscriber()
         >>> ngt.upperFirstInFingering
@@ -119,7 +118,6 @@ class NoteGroupingTranscriber:
         transcribe a group of notes, possibly excluding certain attributes.
 
         Returns a (unicode) string of brailleElementGrouping transcribed.
-
         '''
         self.reset()
         if brailleElementGrouping is not None:
@@ -236,7 +234,7 @@ class NoteGroupingTranscriber:
         1. self.previousElement exists
         2. the last character in the current transcription (self.trans) fits the criteria for
            basic.yieldDots()
-        3. one of these three.  PreviousElement was...:
+        3. one of these three.  PreviousElement was:
             a. a Dynamic.
             b. a Clef and clef signs are being transcribed
             c. a TextExpression not ending in "."
@@ -261,7 +259,7 @@ class NoteGroupingTranscriber:
                 # TE is an abbreviation, no extra dot 3 necessary
                 and prev.content[-1] != '.')):
             for dot in basic.yieldDots(self.trans[-1][0]):
-                self.trans.insert(-1, dot)  # insert one before the end, not append...
+                self.trans.insert(-1, dot)  # insert one before the end, not append
                 prev.editorial.brailleEnglish.append(f'Dot 3 {dot}')
                 return True  # only append max one dot.
 

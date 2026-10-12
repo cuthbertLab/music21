@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         corpus/__init__.py
 # Purpose:      Shortcuts to the corpus collection
@@ -24,7 +23,7 @@ Use `corpus.parse` if you know the name of a file in the corpus:
 
 >>> b = corpus.parse('bwv66.6')
 >>> b
-<music21.stream.Score 0x1050ce920>
+<music21.stream.Score bach/bwv66.6.mxl>
 
 And use `corpus.search` if you do not:
 
@@ -34,13 +33,15 @@ And use `corpus.search` if you do not:
 >>> cb[0]
 <music21.metadata.bundles.MetadataEntry 'airdsAirs_book1_abc_191'>
 >>> cb[0].parse()
-<music21.stream.Score 0x1050ce940>
+<music21.stream.Score airdsAirs/book1.abc>
 '''
+
 from __future__ import annotations
 from collections.abc import Iterable
 import typing as t
 
 from music21 import common
+from music21.exceptions21 import CorpusException
 from music21 import metadata
 
 from music21.corpus import chorales
@@ -48,28 +49,28 @@ from music21.corpus import corpora
 from music21.corpus import manager
 from music21.corpus import virtual
 from music21.corpus import work
-
 from music21.corpus.manager import search
 from music21 import environment
-from music21.exceptions21 import CorpusException
 
 __all__ = [
-    'chorales', 'corpora', 'manager',
-    # virtual
-    'work',
-    'parse',
-    'getCorePaths',
-    # 'getVirtualPaths',
-    'getLocalPaths',
+    'CorpusException',
     'addPath',
-    'getPaths',
     'cacheMetadata',
+    'chorales',
+    'corpora',
     'getComposer',
-    'noCorpus',
+    'getCorePaths',
+    'getLocalPaths',
+    'getPaths',
+    # 'getVirtualPaths',
     'getWork',
-
+    'manager',
+    'noCorpus',
+    'parse',
+    'virtual',
+    'search',
+    'work',
 ]
-
 
 if t.TYPE_CHECKING:
     import pathlib
@@ -81,9 +82,13 @@ environLocal = environment.Environment('corpus')
 # -----------------------------------------------------------------------------
 
 
-def getCorePaths(*, fileExtensions: Iterable[str] = (), expandExtensions=True):
+def getCorePaths(
+    *,
+    fileExtensions: Iterable[str] = (),
+    expandExtensions=True
+) -> list[pathlib.Path]:
     '''
-    Get all paths in the corpus that match a known extension, or an extenion
+    Get all paths in the corpus that match a known extension, or an extension
     provided by an argument.
 
     If `expandExtensions` is True, a format for an extension, and related
@@ -104,7 +109,6 @@ def getCorePaths(*, fileExtensions: Iterable[str] = (), expandExtensions=True):
     >>> abcFilePaths = corpus.getCorePaths(fileExtensions=('abc',))
     >>> len(abcFilePaths) >= 100
     True
-
     '''
     return corpora.CoreCorpus().getPaths(
         fileExtensions=fileExtensions,
@@ -131,7 +135,7 @@ def getLocalPaths(
     *,
     fileExtensions: Iterable[str] = (),
     expandExtensions: bool = True,
-):
+) -> list[pathlib.Path]:
     '''
     Access files in additional directories supplied by the user and defined in
     environment settings in the 'localCorpusSettings' list.
@@ -262,7 +266,6 @@ def noCorpus():
 
     >>> corpus.noCorpus()
     False
-
     '''
     return corpora.CoreCorpus().noCorpus
 
@@ -272,10 +275,10 @@ def noCorpus():
 
 def getWork(
     workName: str,
-    movementNumber: int | None = None,
+    movementNumber: int|None = None,
     *,
     fileExtensions: Iterable[str] = ()
-) -> pathlib.Path | list[pathlib.Path]:
+) -> pathlib.Path|list[pathlib.Path]:
     '''
     Search all Corpora for a work, and return a file path.
     N.B. does not parse the work: but it's suitable for passing
@@ -316,13 +319,13 @@ def getWork(
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
 def parse(
-    workName: str | pathlib.Path,
-    movementNumber: int | None = None,
+    workName: str|pathlib.Path,
+    movementNumber: int|None = None,
     *,
-    number: int | None = None,
+    number: int|None = None,
     fileExtensions: Iterable[str] = (),
     forceSource: bool = False,
-    format: str | None = None
+    format: str|None = None
 ):
     '''
     The most important method call for corpus.
@@ -354,10 +357,12 @@ def parse(
     4
 
     After parsing, the file path within the corpus is stored as
-    `.corpusFilePath`
+    `.metadata.corpusFilePath`
 
-    >>> bachChorale.corpusFilepath
+    >>> bachChorale.metadata.corpusFilePath
     'bach/bwv66.6.mxl'
+
+    * Changed in v9: corpusFilePath is stored in metadata and now has a capital 'P'.
     '''
     return manager.parse(
         workName=workName,

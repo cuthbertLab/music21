@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph.py
 # Purpose:      Classes for graphing in matplotlib and/or other graphing tools.
@@ -7,7 +6,7 @@
 #               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2023 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -40,8 +39,12 @@ From highest level to lowest level usage, ways of graphing are as follows:
 from __future__ import annotations
 
 __all__ = [
-    'axis', 'findPlot', 'plot', 'primitives', 'utilities',
+    'axis',
+    'findPlot',
+    'plot',
     'plotStream',
+    'primitives',
+    'utilities',
 ]
 
 import typing as t
@@ -66,7 +69,7 @@ environLocal = environment.Environment('graph')
 
 def plotStream(
     streamObj: stream.Stream,
-    graphFormat: str | None = None,
+    graphFormat: str|None = None,
     xValue=None,
     yValue=None,
     zValue=None,
@@ -116,7 +119,6 @@ def plotStream(
     * :class:`~music21.graph.plot.WindowedAmbitus`
     * :class:`~music21.graph.plot.Dolan`
 
-
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> thePlot = s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -125,7 +127,6 @@ def plotStream(
     .. image:: images/HistogramPitchSpace.*
         :width: 600
 
-
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> thePlot = s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -133,7 +134,6 @@ def plotStream(
 
     .. image:: images/HorizontalBarPitchSpaceOffset.*
         :width: 600
-
     '''
     plotMake = findPlot.getPlotsToMake(graphFormat, xValue, yValue, zValue)
     # environLocal.printDebug(['plotClassName found', plotMake])
@@ -152,8 +152,7 @@ def plotStream(
                 setattr(obj, attrName, axisClass(obj, axisName))
         obj.run()
 
-    if obj:
-        return obj  # just first one...
+    return obj  # just last one
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

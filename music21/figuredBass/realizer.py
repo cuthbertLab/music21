@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         realizer.py
 # Purpose:      figured bass lines, consisting of notes
@@ -28,11 +27,9 @@ from start to finish. See :class:`~music21.figuredBass.realizer.FiguredBassLine`
     .. image:: images/figuredBass/fbRealizer_intro.*
         :width: 500
 
-
 The same can be accomplished by taking the notes and notations
 from a :class:`~music21.stream.Stream`.
 See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details.
-
 
 >>> s = converter.parse('tinynotation: C4 D4_4,3 C2', makeNotation=False)
 >>> fbLine = realizer.figuredBassFromStream(s)
@@ -48,22 +45,24 @@ import random
 import typing as t
 import unittest
 
+from music21 import base
 from music21 import chord
 from music21 import clef
 from music21 import exceptions21
+from music21 import harmony
 from music21 import key
 from music21 import meter
 from music21 import note
 from music21 import pitch
+from music21 import roman
 from music21 import stream
+from music21.common.types import OffsetQL
 from music21.figuredBass import checker
 from music21.figuredBass import notation
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
-
-if t.TYPE_CHECKING:
-    from music21.stream.iterator import StreamIterator
+from music21.figuredBass.possibility import Possibility
 
 
 def figuredBassFromStream(streamPart: stream.Stream) -> FiguredBassLine:
@@ -164,7 +163,7 @@ def figuredBassFromStream(streamPart: stream.Stream) -> FiguredBassLine:
     return fb
 
 
-def addLyricsToBassNote(bassNote, notationString=None):
+def addLyricsToBassNote(bassNote: note.Note, notationString: str = '') -> None:
     '''
     Takes in a bassNote and a corresponding notationString as arguments.
     Adds the parsed notationString as lyrics to the bassNote, which is
@@ -186,10 +185,7 @@ def addLyricsToBassNote(bassNote, notationString=None):
     n = notation.Notation(notationString)
     if not n.figureStrings:
         return
-    maxLength = 0
-    for fs in n.figureStrings:
-        if len(fs) > maxLength:
-            maxLength = len(fs)
+    maxLength = max([len(fs) for fs in n.figureStrings])
     for fs in n.figureStrings:
         spacesInFront = ''
         for i in range(maxLength - len(fs)):
@@ -203,7 +199,6 @@ class FiguredBassLine:
     Currently, only 1:1 realization is supported, meaning that every bassNote is realized and the
     :attr:`~music21.note.GeneralNote.quarterLength` or duration of a realization above a bassNote
     is identical to that of the bassNote.
-
 
     `inKey` defaults to C major.
 
@@ -230,7 +225,9 @@ class FiguredBassLine:
             ''',
     }
 
-    def __init__(self, inKey=None, inTime=None):
+    def __init__(self,
+                 inKey: key.Key|None = None,
+                 inTime: meter.TimeSignature|None = None) -> None:
         if inKey is None:
             inKey = key.Key('C')
         if inTime is None:
@@ -238,16 +235,22 @@ class FiguredBassLine:
 
         self.inKey = inKey
         self.inTime = inTime
-        self._paddingLeft = 0.0
+        self._paddingLeft: OffsetQL = 0.0
         self._overlaidParts = stream.Part()
-        self._fbScale = realizerScale.FiguredBassScale(inKey.pitchFromDegree(1), inKey.mode)
-        self._fbList = []
+        tonic = t.cast(pitch.Pitch, inKey.pitchFromDegree(1))
+        self._fbScale = realizerScale.FiguredBassScale(tonic, inKey.mode)
+        self._fbList: list[
+            tuple[note.Note, str|None] | harmony.ChordSymbol | roman.RomanNumeral
+        ] = []
 
-    def addElement(self, bassObject: note.Note, notationString=None):
+    def addElement(
+        self,
+        bassObject: note.Note|harmony.ChordSymbol|roman.RomanNumeral,
+        notationString: str|None = None,
+    ) -> None:
         '''
         Use this method to add (bassNote, notationString) pairs to the bass line. Elements
         are realized in the order they are added.
-
 
         >>> from music21.figuredBass import realizer
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
@@ -270,19 +273,19 @@ class FiguredBassLine:
         >>> fbLine.addElement(roman.RomanNumeral('V'))
         '''
         bassObject.editorial.notationString = notationString
-        c = bassObject.classes
-        if 'Note' in c:
+        if isinstance(bassObject, note.Note):
             self._fbList.append((bassObject, notationString))  # a bass note, and a notationString
-            addLyricsToBassNote(bassObject, notationString)
+            addLyricsToBassNote(bassObject, notationString or '')
         # ---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects ---
-        elif 'RomanNumeral' in c or 'ChordSymbol' in c:
+        elif isinstance(bassObject, (roman.RomanNumeral, harmony.ChordSymbol)):
             self._fbList.append(bassObject)  # a roman Numeral object
         else:
             raise FiguredBassLineException(
                 'Not a valid bassObject (only note.Note, '
-                + f'harmony.ChordSymbol, and roman.RomanNumeral supported) was {bassObject!r}')
+                f'harmony.ChordSymbol, and roman.RomanNumeral supported) was {bassObject!r}'
+            )
 
-    def generateBassLine(self):
+    def generateBassLine(self) -> stream.Part:
         '''
         Generates the bass line as a :class:`~music21.stream.Score`.
 
@@ -295,7 +298,6 @@ class FiguredBassLine:
 
         .. image:: images/figuredBass/fbRealizer_bassLine.*
             :width: 200
-
 
         >>> sBach = corpus.parse('bach/bwv307')
         >>> sBach.parts.last().measure(0).show('text')
@@ -323,7 +325,9 @@ class FiguredBassLine:
             r = note.Rest(quarterLength=self._paddingLeft)
             bassLine.append(r)
 
-        for (bassNote, unused_notationString) in self._fbList:
+        # generateBassLine is only used for note/notationString pairs, not harmony objects
+        fbPairs = t.cast('list[tuple[note.Note, str|None]]', self._fbList)
+        for (bassNote, unused_notationString) in fbPairs:
             bassLine.append(bassNote)
 
         bl2 = bassLine.makeNotation(inPlace=False, cautionaryNotImmediateRepeat=False)
@@ -333,7 +337,12 @@ class FiguredBassLine:
             m0.padAsAnacrusis()
         return bl2
 
-    def retrieveSegments(self, fbRules=None, numParts=4, maxPitch=None):
+    def retrieveSegments(
+        self,
+        fbRules: rules.Rules|None = None,
+        numParts: int = 4,
+        maxPitch: pitch.Pitch|None = None,
+    ) -> list[segment.Segment]:
         '''
         generates the segmentList from an fbList, including any overlaid Segments
 
@@ -345,7 +354,7 @@ class FiguredBassLine:
             fbRules = rules.Rules()
         if maxPitch is None:
             maxPitch = pitch.Pitch('B5')
-        segmentList = []
+        segmentList: list[segment.Segment] = []
         bassLine = self.generateBassLine()
         if len(self._overlaidParts) >= 1:
             self._overlaidParts.append(bassLine)
@@ -353,27 +362,27 @@ class FiguredBassLine:
         else:
             currentMapping = checker.createOffsetMapping(bassLine)
         allKeys = sorted(currentMapping.keys())
-        bassLine = bassLine.flatten().notes
+        bassNotes = bassLine.flatten().notes
         bassNoteIndex = 0
-        previousBassNote = bassLine[bassNoteIndex]
-        bassNote = currentMapping[allKeys[0]][-1]
+        previousBassNote = bassNotes[bassNoteIndex]
+        bassNote = t.cast(note.Note, currentMapping[allKeys[0]][-1])
         previousSegment = segment.OverlaidSegment(bassNote, bassNote.editorial.notationString,
-                                                   self._fbScale,
-                                                   fbRules, numParts, maxPitch)
+                                                  self._fbScale,
+                                                  fbRules, numParts, maxPitch)
         previousSegment.quarterLength = previousBassNote.quarterLength
         segmentList.append(previousSegment)
         for k in allKeys[1:]:
             (startTime, unused_endTime) = k
-            bassNote = currentMapping[k][-1]
+            bassNote = t.cast(note.Note, currentMapping[k][-1])
             currentSegment = segment.OverlaidSegment(bassNote, bassNote.editorial.notationString,
-                                                      self._fbScale,
-                                                      fbRules, numParts, maxPitch)
+                                                     self._fbScale,
+                                                     fbRules, numParts, maxPitch)
             for partNumber in range(1, len(currentMapping[k])):
-                upperPitch = currentMapping[k][partNumber - 1]
+                upperPitch = t.cast(note.Note, currentMapping[k][partNumber - 1])
                 currentSegment.fbRules._partPitchLimits.append((partNumber, upperPitch))
             if startTime == previousBassNote.offset + previousBassNote.quarterLength:
                 bassNoteIndex += 1
-                previousBassNote = bassLine[bassNoteIndex]
+                previousBassNote = bassNotes[bassNoteIndex]
                 currentSegment.quarterLength = previousBassNote.quarterLength
             else:
                 for partNumber in range(len(currentMapping[k]), numParts + 1):
@@ -385,10 +394,15 @@ class FiguredBassLine:
             previousSegment = currentSegment
         return segmentList
 
-    def overlayPart(self, music21Part):
+    def overlayPart(self, music21Part: stream.Part) -> None:
         self._overlaidParts.append(music21Part)
 
-    def realize(self, fbRules=None, numParts=4, maxPitch=None):
+    def realize(
+        self,
+        fbRules: rules.Rules|None = None,
+        numParts: int = 4,
+        maxPitch: pitch.Pitch|None = None,
+    ) -> Realization:
         # noinspection PyShadowingNames
         '''
         Creates a :class:`~music21.figuredBass.segment.Segment`
@@ -442,40 +456,38 @@ class FiguredBassLine:
         >>> r4 = fbLine4.realize()
         >>> r4.getNumSolutions()
         13
-
         '''
         if fbRules is None:
             fbRules = rules.Rules()
         if maxPitch is None:
             maxPitch = pitch.Pitch('B5')
 
-        segmentList = []
+        segmentList: list[segment.Segment] = []
 
         listOfHarmonyObjects = False
         for item in self._fbList:
-            try:
-                c = item.classes
-            except AttributeError:
+            if isinstance(item, tuple):
+                # a (bassNote, notationString) pair, not a harmony object
                 continue
-            if 'Note' in c:
-                break
             # Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects
-            if 'RomanNumeral' in c or 'ChordSymbol' in c:
+            if isinstance(item, (roman.RomanNumeral, harmony.ChordSymbol)):
                 listOfHarmonyObjects = True
                 break
 
         if listOfHarmonyObjects:
-            for harmonyObject in self._fbList:
+            harmonyObjects = t.cast(
+                'list[harmony.ChordSymbol | roman.RomanNumeral]', self._fbList)
+            for harmonyObject in harmonyObjects:
                 listOfPitchesJustNames = []
                 for thisPitch in harmonyObject.pitches:
                     listOfPitchesJustNames.append(thisPitch.name)
-                # remove duplicates just in case...
+                # remove duplicates just in case
                 d = {}
                 for x in listOfPitchesJustNames:
                     d[x] = x
                 outputList = d.values()
 
-                def g(y):
+                def g(y: float) -> float:
                     return y if y != 0.0 else 1.0
 
                 passedNote = note.Note(harmonyObject.bass().nameWithOctave,
@@ -512,7 +524,7 @@ class FiguredBassLine:
                            inTime=self.inTime, overlaidParts=self._overlaidParts[0:-1],
                            paddingLeft=self._paddingLeft)
 
-    def _trimAllMovements(self, segmentList):
+    def _trimAllMovements(self, segmentList: list[segment.Segment]) -> bool|None:
         '''
         Each :class:`~music21.figuredBass.segment.Segment` which resolves to another
         defines a list of movements, nextMovements. Keys for nextMovements are correct
@@ -527,8 +539,8 @@ class FiguredBassLine:
             return True
         elif len(segmentList) >= 3:
             segmentList.reverse()
-            # gets this wrong...  # pylint: disable=cell-var-from-loop
-            movementsAB = None
+            # gets this wrong  # pylint: disable=cell-var-from-loop
+            movementsAB: dict[Possibility, list[Possibility]] = {}
             for segmentIndex in range(1, len(segmentList) - 1):
                 movementsAB = segmentList[segmentIndex + 1].movements
                 movementsBC = segmentList[segmentIndex].movements
@@ -554,7 +566,6 @@ class Realization:
     :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`. Allows for the
     generation of realizations as a :class:`~music21.stream.Score`.
 
-
     * See the :mod:`~music21.figuredBass.examples` module for examples on the generation
       of realizations.
     * A possibility progression is a valid progression through a string of
@@ -573,7 +584,16 @@ class Realization:
             where n is the number of parts. SATB if n = 4.''',
     }
 
-    def __init__(self, **fbLineOutputs):
+    # Populated in __init__ from FiguredBassLine.realize()'s keyword outputs.
+    # Declared here for typing; **fbLineOutputs stays untyped for Sphinx's sake.
+    _segmentList: list[segment.Segment]
+    _inKey: key.Key
+    _keySig: key.KeySignature
+    _inTime: meter.TimeSignature
+    _overlaidParts: list[base.Music21Object]
+    _paddingLeft: OffsetQL
+
+    def __init__(self, **fbLineOutputs: t.Any) -> None:
         # fbLineOutputs always will have three elements, checks are for sphinx documentation only.
         if 'realizedSegmentList' in fbLineOutputs:
             self._segmentList = fbLineOutputs['realizedSegmentList']
@@ -588,7 +608,7 @@ class Realization:
             self._paddingLeft = fbLineOutputs['paddingLeft']
         self.keyboardStyleOutput = True
 
-    def getNumSolutions(self):
+    def getNumSolutions(self) -> int:
         '''
         Returns the number of solutions (unique realizations) to a Realization by calculating
         the total number of paths through a string of :class:`~music21.figuredBass.segment.Segment`
@@ -609,10 +629,10 @@ class Realization:
             return len(self._segmentList[0].correctA)
         # What if there's only one (bassNote, notationString)?
         self._segmentList.reverse()
-        pathList = {}
+        pathList: dict[Possibility, int] = {}
         for segmentIndex in range(1, len(self._segmentList)):
             segmentA = self._segmentList[segmentIndex]
-            newPathList = {}
+            newPathList: dict[Possibility, int] = {}
             if not pathList:
                 for possibA in segmentA.movements:
                     newPathList[possibA] = len(segmentA.movements[possibA])
@@ -630,11 +650,10 @@ class Realization:
         self._segmentList.reverse()
         return numSolutions
 
-    def getAllPossibilityProgressions(self):
+    def getAllPossibilityProgressions(self) -> list[list[Possibility]]:
         '''
         Compiles each unique possibility progression, adding
         it to a master list. Returns the master list.
-
 
         .. warning:: This method is unoptimized, and may take a prohibitive amount
             of time for a Realization which has more than 200,000 solutions.
@@ -663,11 +682,11 @@ class Realization:
 
         return progressions
 
-    def getRandomPossibilityProgression(self):
+    def getRandomPossibilityProgression(self) -> list[Possibility]:
         '''
         Returns a random unique possibility progression.
         '''
-        progression = []
+        progression: list[Possibility] = []
         if len(self._segmentList) == 1:
             possibA = random.sample(self._segmentList[0].correctA, 1)[0]
             progression.append(possibA)
@@ -676,7 +695,7 @@ class Realization:
         currMovements = self._segmentList[0].movements
         if self.getNumSolutions() == 0:
             raise FiguredBassLineException('Zero solutions')
-        prevPossib = random.sample(currMovements.keys(), 1)[0]
+        prevPossib = random.sample(list(currMovements.keys()), 1)[0]
         progression.append(prevPossib)
 
         for segmentIndex in range(len(self._segmentList) - 1):
@@ -687,7 +706,10 @@ class Realization:
 
         return progression
 
-    def generateRealizationFromPossibilityProgression(self, possibilityProgression):
+    def generateRealizationFromPossibilityProgression(
+        self,
+        possibilityProgression: list[Possibility],
+    ) -> stream.Score:
         '''
         Generates a realization as a :class:`~music21.stream.Score` given a possibility progression.
         '''
@@ -723,8 +745,8 @@ class Realization:
                 rightHand[0].padAsAnacrusis()
 
         else:  # Chorale-style output
-            upperParts = []
-            for partNumber in range(len(possibilityProgression[0]) - 1):
+            upperParts: list[stream.Part] = []
+            for _partNumber in range(len(possibilityProgression[0]) - 1):
                 fbPart = stream.Part()
                 sol.insert(0.0, fbPart)
                 fbPart.append([copy.deepcopy(self._keySig), copy.deepcopy(self._inTime)])
@@ -758,10 +780,9 @@ class Realization:
         sol.insert(0.0, bassLine)
         return sol
 
-    def generateAllRealizations(self):
+    def generateAllRealizations(self) -> stream.Score:
         '''
         Generates all unique realizations as a :class:`~music21.stream.Score`.
-
 
         .. warning:: This method is unoptimized, and may take a prohibitive amount
             of time for a Realization which has more than 100 solutions.
@@ -783,17 +804,16 @@ class Realization:
 
         return allSols
 
-    def generateRandomRealization(self):
+    def generateRandomRealization(self) -> stream.Score:
         '''
         Generates a random unique realization as a :class:`~music21.stream.Score`.
         '''
         possibilityProgression = self.getRandomPossibilityProgression()
         return self.generateRealizationFromPossibilityProgression(possibilityProgression)
 
-    def generateRandomRealizations(self, amountToGenerate=20):
+    def generateRandomRealizations(self, amountToGenerate: int = 20) -> stream.Score:
         '''
         Generates *amountToGenerate* unique realizations as a :class:`~music21.stream.Score`.
-
 
         .. warning:: This method is unoptimized, and may take a prohibitive amount
             of time if amountToGenerate is more than 100.
@@ -826,7 +846,7 @@ class FiguredBassLineException(exceptions21.Music21Exception):
 
 
 class Test(unittest.TestCase):
-    def testMultipleFiguresInLyric(self):
+    def testMultipleFiguresInLyric(self) -> None:
         from music21 import converter
 
         s = converter.parse('tinynotation: 4/4 C4 F4 G4_64 G4 C1', makeNotation=False)

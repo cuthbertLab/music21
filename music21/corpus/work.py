@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         corpus/work.py
 # Purpose:      Manage one work
@@ -46,14 +45,14 @@ class DirectoryInformation(prebase.ProtoM21Object):
         return str(self.directoryName)
 
     def findWorks(self):
-        '''
+        r'''
         Populate other information about the directory such as
         files and filenames.
 
         >>> di = corpus.work.DirectoryInformation('schoenberg',
         ...             corpusObject=corpus.corpora.CoreCorpus())
         >>> di.findWorks()
-        OrderedDict([('opus19', CorpusWork(title='Opus 19',
+        OrderedDict({'opus19': CorpusWork(title='Opus 19',
                                     files=[CorpusFile(path='schoenberg...opus19...movement2.mxl',
                                                         title='Movement 2',
                                                         filename='movement2.mxl',
@@ -64,7 +63,10 @@ class DirectoryInformation(prebase.ProtoM21Object):
                                                         filename='movement6.mxl',
                                                         format='musicxml',
                                                         ext='.mxl')],
-                                    virtual=False))])
+                                    virtual=False)})
+
+        (The ellipses in the documentation above represent '/' on Mac/Unix systems and
+        '\' on Windows.)
         '''
         self.works.clear()
         works = self.corpusObject.getComposer(self.directoryName)
@@ -72,7 +74,13 @@ class DirectoryInformation(prebase.ProtoM21Object):
         for path in works:
             # split by the composer dir to get relative path
             # environLocal.printDebug(['dir composer', composerDirectory, path])
-            junk, fileStub = str(path).split(self.directoryName)
+            try:
+                # only split once in case a composer name appears in the path and filename.
+                junk, fileStub = str(path).split(self.directoryName, 1)
+            except ValueError:  # too many/few values to unpack
+                print('Error in processing path:', path, 'directoryName:', self.directoryName)
+                continue
+
             if fileStub.startswith(os.sep):
                 fileStub = fileStub[len(os.sep):]
             # break into file components

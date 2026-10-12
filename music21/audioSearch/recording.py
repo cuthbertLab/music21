@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         audioSearch.recording.py
 # Purpose:      routines for making recordings from microphone input
@@ -6,19 +5,21 @@
 # Authors:      Jordi Bartolome
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-25 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 modules for audio searching that directly record from the microphone.
 
-Requires PyAudio and portaudio to be installed (http://www.portaudio.com/download.html)
+Requires PyAudio and portaudio to be installed (https://portaudio.com/download.html)
 
-To download pyaudio for windows 64-bit go to https://www.lfd.uci.edu/~gohlke/pythonlibs/
+Windows users will get pyaudio and portaudio with `pip install pyaudio`
 
-users of 64-bit windows but 32-bit python should download the win32 port
+macOS users should have Homebrew installed and run `brew install portaudio`
+before running `pip install pyaudio`
 
-users of 64-bit windows and 64-bit python should download the amd64 port
+There is no official support for Linux/BSD etc. in music21, but package managers like `apt`
+tend to have libraries like `portaudio19` and `python3-pyaudio`.
 '''
 from __future__ import annotations
 
@@ -32,19 +33,13 @@ from music21 import exceptions21
 
 environLocal = environment.Environment('audioSearch.recording')
 
-
-###
-# to download pyaudio for windows 64-bit go to https://www.lfd.uci.edu/~gohlke/pythonlibs/
-# users of 64-bit windows but 32-bit python should download the win32 port
-# users of 64-bit windows and 64-bit python should download the amd64 port
-# requires portaudio to be installed http://www.portaudio.com/download.html
-
 default_recordChannels = 1
 default_recordSampleRate = 44100
 default_recordChunkLength = 1024
 
 
-def samplesFromRecording(seconds=10.0, storeFile=True,
+def samplesFromRecording(seconds=10.0,
+                         storeFile: bool|str = True,
                          recordFormat=None,
                          recordChannels=default_recordChannels,
                          recordSampleRate=default_recordSampleRate,
@@ -80,11 +75,10 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     for i in range(recordingLength):
         data = st.read(recordChunkLength)
         storedWaveSampleList.append(data)
-    # print('Time elapsed: %.3f s\n' % (time.time() - time_start))
     st.close()
     p_audio.terminate()
 
-    if storeFile is not False:
+    if storeFile:
         if isinstance(storeFile, str):
             waveFilename = storeFile
         else:
@@ -92,7 +86,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         # write recording to disk
         data = b''.join(storedWaveSampleList)
         try:
-            # wave.open does not take a path-like object as of 3.10
+            # wave.open does not take a path-like object until Python 3.15
             wf = wave.open(waveFilename, 'wb')
             wf.setnchannels(recordChannels)
             wf.setsampwidth(p_audio.get_sample_size(recordFormat))
@@ -111,9 +105,6 @@ class RecordingException(exceptions21.Music21Exception):
 # -----------------------------------------
 class Test(unittest.TestCase):
     pass
-
-
-
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
     loader = find_spec('pyaudio')

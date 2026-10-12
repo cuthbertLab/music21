@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/decorators.py
 # Purpose:      Decorators for functions
@@ -11,23 +10,41 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import wraps
+import typing as t
 import warnings
 
 from music21 import exceptions21
 
 __all__ = ['optional_arg_decorator', 'deprecated', 'cacheMethod']
 
+
+class _DeprecatedCallInfo(t.TypedDict):
+    calledAlready: bool
+    message: str
+
+
+class _HasCache(t.Protocol):
+    '''An object exposing the `._cache` dict that :func:`cacheMethod` reads and writes.'''
+    _cache: dict[str, t.Any]
+
+
+_CacheP = t.ParamSpec('_CacheP')
+_CacheReturn = t.TypeVar('_CacheReturn')
+_CacheInstance = t.TypeVar('_CacheInstance', bound=_HasCache)
+
+
 # from Ryne Everett
 # http://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
 
 
-def optional_arg_decorator(fn):
+def optional_arg_decorator(fn: Callable[..., t.Any]) -> Callable[..., t.Any]:
     '''
     a decorator for decorators.  Allows them to either have or not have arguments.
     '''
     @wraps(fn)
-    def wrapped_decorator(*arguments, **keywords):
+    def wrapped_decorator(*arguments: t.Any, **keywords: t.Any) -> t.Any:
         is_bound_method = hasattr(arguments[0], fn.__name__) if arguments else False
         klass = None
 
@@ -35,7 +52,7 @@ def optional_arg_decorator(fn):
             klass = arguments[0]
             arguments = arguments[1:]
 
-        # If no arguments were passed...
+        # If no arguments were passed
         if len(arguments) == 1 and not keywords and callable(arguments[0]):
             if is_bound_method:
                 return fn(klass, arguments[0])
@@ -43,7 +60,7 @@ def optional_arg_decorator(fn):
                 return fn(arguments[0])
 
         else:
-            def real_decorator(toBeDecorated):
+            def real_decorator(toBeDecorated: Callable[..., t.Any]) -> t.Any:
                 if is_bound_method:
                     return fn(klass, toBeDecorated, *arguments, **keywords)
                 else:
@@ -53,7 +70,12 @@ def optional_arg_decorator(fn):
 
 
 @optional_arg_decorator
-def deprecated(method, startDate=None, removeDate=None, message=None):
+def deprecated(
+    method: Callable[..., t.Any],
+    startDate: str|None = None,
+    removeDate: str|None = None,
+    message: str|None = None
+) -> Callable[..., t.Any]:
     '''
     Decorator that marks a function as deprecated and should not be called.
 
@@ -64,8 +86,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 
     Use without arguments for a simple case:
 
-
-    For demonstrating I need to screw with stderr...
+    For demonstrating I need to screw with stderr:
 
     >>> import sys
     >>> saveStdErr = sys.stderr
@@ -75,7 +96,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     ... def hi(msg):
     ...     print(msg)
 
-    (I'm printing "/" at the beginning because message begins with the filename and that is
+    (I'm printing "/" at the beginning because the message begins with the filepath which is
     different on each system, but you can't use ellipses at the beginning of a doctest)
 
     >>> print('/'); hi('myke')
@@ -89,30 +110,28 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     >>> hi('myke')
     myke
 
-
     Now a new function demonstrating the argument form.
 
-    >>> @common.deprecated('February 1972', 'September 2099', 'You should be okay...')
+    >>> @common.deprecated('February 1972', 'September 2099', 'You should be okay.')
     ... def bye(msg):
     ...     print(msg)
 
     >>> print('/'); bye('world')
     /...Music21DeprecationWarning: bye was deprecated on February 1972
-            and will disappear at or after September 2099. You should be okay...
+            and will disappear at or after September 2099. You should be okay.
     ...
     world
 
     Restore stderr at the end.
 
     >>> sys.stderr = saveStdErr
-
     '''
     if hasattr(method, '__qualname__'):
         funcName = method.__qualname__
     else:
         funcName = method.__name__
 
-    method._isDeprecated = True
+    method.__dict__['_isDeprecated'] = True
 
     if startDate is not None:
         startDate = ' on ' + startDate
@@ -128,11 +147,11 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
         message = 'Find alternative methods.'
 
     m = f'{funcName} was deprecated{startDate} and will disappear {removeDate}. {message}'
-    callInfo = {'calledAlready': False,
-                'message': m}
+    callInfo: _DeprecatedCallInfo = {'calledAlready': False,
+                                     'message': m}
 
     @wraps(method)
-    def func_wrapper(*arguments, **keywords):
+    def func_wrapper(*arguments: t.Any, **keywords: t.Any) -> t.Any:
         if len(arguments) > 1 and arguments[1] in (
             '_ipython_canary_method_should_not_exist_',
             '_repr_mimebundle_',
@@ -156,7 +175,9 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     return func_wrapper
 
 
-def cacheMethod(method):
+def cacheMethod(
+    method: Callable[t.Concatenate[_CacheInstance, _CacheP], _CacheReturn]
+) -> Callable[t.Concatenate[_CacheInstance, _CacheP], _CacheReturn]:
     '''
     A decorator for music21Objects or other objects that
     assumes that there is a ._cache Dictionary in the instance
@@ -179,7 +200,11 @@ def cacheMethod(method):
         funcName = method.__name__
 
     @wraps(method)
-    def inner(instance, *arguments, **keywords):
+    def inner(
+        instance: _CacheInstance,
+        *arguments: _CacheP.args,
+        **keywords: _CacheP.kwargs
+    ) -> _CacheReturn:
         if funcName in instance._cache:
             return instance._cache[funcName]
 

@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         documentation/library/documenters.py
 # Purpose:      music21 documentation helper classes for proper formatting
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
@@ -380,6 +379,7 @@ class ClassDocumenter(ObjectDocumenter):
     Methods inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
        :columns: 3
+       - :meth:`~music21.base.Music21Object.__eq__`
        - :meth:`~music21.base.Music21Object.clearCache`
        - :meth:`~music21.base.Music21Object.containerHierarchy`
        - :meth:`~music21.base.Music21Object.contextSites`
@@ -387,10 +387,6 @@ class ClassDocumenter(ObjectDocumenter):
        - :meth:`~music21.base.Music21Object.splitAtQuarterLength`
        - :meth:`~music21.base.Music21Object.splitByQuarterLengths`
        - :meth:`~music21.base.Music21Object.write`
-    Methods inherited from :class:`~music21.prebase.ProtoM21Object`:
-    .. hlist::
-       :columns: 3
-       - :meth:`~music21.prebase.ProtoM21Object.isClassOrSubclass`
     .. rubric:: :class:`~music21.articulations.Caesura` instance variables
     Instance variables inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
@@ -539,8 +535,11 @@ class ClassDocumenter(ObjectDocumenter):
         for classDocumenter in self.baseClassDocumenters:
             if classDocumenter not in mapping:
                 continue
-            result.append(banner.format(
-                classDocumenter.rstCrossReferenceString))
+            result.append(
+                banner.format(
+                    classDocumenter.rstCrossReferenceString
+                )
+            )
             result.append('')
             memberDocumenters = mapping[classDocumenter]
             result.append('.. hlist::')
@@ -652,7 +651,7 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         # if one of the _DOC_ATTRs is exactly the same as the previous base class,
         # only show it once.
-        # TODO: do this on an attribute by attribute basis...
+        # TODO: do this on an attribute by attribute basis
         seenBaseClassDocAttrs = []
 
         if self._inheritedDocAttrMapping is None:
@@ -696,12 +695,12 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.stream.base.Stream.beatDuration
         - music21.stream.base.Stream.beatStr
         - music21.stream.base.Stream.beatStrength
-        - music21.stream.base.Stream.flat
         - music21.stream.base.Stream.highestOffset
         - music21.stream.base.Stream.highestTime
         - music21.stream.base.Stream.isGapless
         - music21.stream.base.Stream.lowestOffset
         - music21.stream.base.Stream.notes
+        - music21.stream.base.Stream.notesAndRests
         music21.stream.core.StreamCore:
         - music21.stream.core.StreamCore.spannerBundle
         '''
@@ -729,14 +728,12 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.contextSites
         - music21.base.Music21Object.getAllContextsByClass
         - music21.base.Music21Object.getContextByClass
-        music21.prebase.ProtoM21Object:
-        - music21.prebase.ProtoM21Object.isClassOrSubclass
         music21.stream.base.Stream:
+        - music21.stream.base.Stream.__eq__
         - music21.stream.base.Stream.__getitem__
         - music21.stream.base.Stream.activateVariants
         - music21.stream.base.Stream.addGroupForElements
         - music21.stream.base.Stream.allPlayingWhileSounding
-        - music21.stream.base.Stream.analyze
         music21.stream.core.StreamCore:
         - music21.stream.core.StreamCore.asTimespans
         - music21.stream.core.StreamCore.asTree
@@ -758,10 +755,9 @@ class ClassDocumenter(ObjectDocumenter):
         >>> mapping = documenter.inheritedReadwritePropertiesMapping
         >>> sortBy = lambda x: x.referentPackageSystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
-        ...     print('{0}:'.format(classDocumenter.referentPackageSystemPath))
+        ...     print(f'{classDocumenter.referentPackageSystemPath}:')
         ...     for attributeDocumenter in mapping[classDocumenter][:10]:
-        ...         print('- {0}'.format(attributeDocumenter.referentPackageSystemPath))
-        ...
+        ...         print(f'- {attributeDocumenter.referentPackageSystemPath}')
         music21.base.Music21Object:
         - music21.base.Music21Object.activeSite
         - music21.base.Music21Object.derivation
@@ -792,6 +788,8 @@ class ClassDocumenter(ObjectDocumenter):
         ...     method
         ...
         <docbuild.documenters.MethodDocumenter:
+            music21.stream.base.Stream.__eq__>
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.base.Stream.__getitem__>
         <docbuild.documenters.MethodDocumenter:
             music21.stream.base.Stream.activateVariants>
@@ -809,8 +807,6 @@ class ClassDocumenter(ObjectDocumenter):
             music21.stream.base.Stream.attachMelodicIntervals>
         <docbuild.documenters.MethodDocumenter:
             music21.stream.base.Stream.augmentOrDiminish>
-        <docbuild.documenters.MethodDocumenter:
-            music21.stream.base.Stream.beatAndMeasureFromOffset>
         '''
         return self._methods
 
@@ -829,7 +825,6 @@ class ClassDocumenter(ObjectDocumenter):
         <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.beatDuration>
         <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.beatStr>
         <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.beatStrength>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.flat>
         ...
         '''
         return self._readonlyProperties
@@ -941,13 +936,10 @@ class ClassDocumenter(ObjectDocumenter):
                 result.append('.. hlist::')
                 result.append('   :columns: 3')
                 result.append('')
-                formatString = '   - :attr:`~{0}.{1}`'
+                basePath = baseDocumenter.referentPackageSystemPath
                 for attrName in attrNames:
                     result.append(
-                        formatString.format(
-                            baseDocumenter.referentPackageSystemPath,
-                            attrName,
-                        )
+                        f'   - :attr:`~{basePath}.{attrName}`'
                     )
                 result.append('')
         return result
@@ -976,6 +968,7 @@ class ClassDocumenter(ObjectDocumenter):
         '.. hlist::'
         '   :columns: 3'
         ''
+        '   - :meth:`~music21.note.GeneralNote.__eq__`'
         '   - :meth:`~music21.note.GeneralNote.addLyric`'
         '   - :meth:`~music21.note.GeneralNote.augmentOrDiminish`'
         '   - :meth:`~music21.note.GeneralNote.getGrace`'
@@ -991,7 +984,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :meth:`~music21.base.Music21Object.contextSites`'
         ...
         ''
-
         '''
         mapping = self.inheritedMethodsMapping
         banner = 'Methods inherited from {0}:'
@@ -1053,6 +1045,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.note.NotRest.noteheadFill`'
         '   - :attr:`~music21.note.NotRest.noteheadParenthesis`'
         '   - :attr:`~music21.note.NotRest.stemDirection`'
+        '   - :attr:`~music21.note.NotRest.storedInstrument`'
         '   - :attr:`~music21.note.NotRest.volume`'
         ''
         'Read/write properties inherited from :class:`~music21.note.GeneralNote`:'
@@ -1133,14 +1126,6 @@ class ClassDocumenter(ObjectDocumenter):
         ...
         '   - :meth:`~music21.base.Music21Object.splitByQuarterLengths`'
         ''
-        'Methods inherited from :class:`~music21.prebase.ProtoM21Object`:'
-        ''
-        '.. hlist::'
-        '   :columns: 3'
-        ''
-        '   - :meth:`~music21.prebase.ProtoM21Object.isClassOrSubclass`'
-        ''
-
         '''
         result = []
         if self.methods:
@@ -1501,7 +1486,7 @@ class CorpusDocumenter(Documenter):
         result.extend(self.makeHeading(self.headingText, 1))
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstCorpusIntroductionFormat)
-        # TODO: use... common.getCorpusContentDirs to make sure nothing is missed.
+        # TODO: use common.getCorpusContentDirs to make sure nothing is missed.
         for directoryInformation in corpus.corpora.CoreCorpus().getWorkReferences():
             result.extend(self.getRstComposerDictFormat(directoryInformation))
         return result
@@ -1579,13 +1564,13 @@ class CorpusDocumenter(Documenter):
         # worksAreVirtual = corpusWork.virtual
         # if worksAreVirtual:
         #     workTitle += ' (*virtual*)'
-        if isSingleWork is False:
+        if not isSingleWork:
             result.append(workTitle)
             result.append('')
         procedure = self.getRstWorkFileDictFormat
         # if worksAreVirtual:
         #     procedure = self.getRstVirtualWorkFileDictFormat
-        if isSingleWork is False:
+        if not isSingleWork:
             for corpusFile in corpusWork.files:
                 result.extend(['- ' + procedure(corpusFile), ''])
         else:
@@ -1595,14 +1580,15 @@ class CorpusDocumenter(Documenter):
 
     # def getRstVirtualWorkFileDictFormat(self, corpusFile):
     #     result = []
-    #     result.append('- {0} *({1})*: `{2}`'.format(
-    #         str(corpusFile.title),
-    #         str(corpusFile.format),
-    #         str(corpusFile.path),
-    #         ))
+    #     result.append(
+    #         f'- {corpusFile.title} '
+    #         f'*({corpusFile.format})*: '
+    #         f'`{corpusFile.path}`'
+    #     )
     #     result.append('')
-    #     result.append('  Source: {0}'.format(
-    #         str(corpusFile.url)))
+    #     result.append(
+    #         f'  Source: {corpusFile.url}'
+    #     )
     #     result.append('')
     #     return result
 

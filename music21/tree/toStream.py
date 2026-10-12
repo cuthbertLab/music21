@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         tree/toStream.py
 # Purpose:      Tools for recreating streams from trees
 #
-# Authors:      Josiah Wolf Oberholtzer
+# Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2013-2015 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -96,7 +94,8 @@ def chordified(timespans, templateStream=None):  # pragma: no cover
             if quarterLength < 0:
                 raise TreeException(
                     'Something is wrong with the verticality '
-                    + f'{vert!r} its endTime {endTime:f} is less than its offset {offset:f}')
+                    f'{vert!r} its endTime {endTime:f} is less than its offset {offset:f}'
+                )
             element = vert.makeElement(quarterLength)
             measureList[measureIndex].append(element)
         return outputStream
@@ -109,7 +108,8 @@ def chordified(timespans, templateStream=None):  # pragma: no cover
             if quarterLength < 0:
                 raise TreeException(
                     'Something is wrong with the verticality '
-                    + f'{vert!r}, its endTime {endTime:f} is less than its offset {offset:f}')
+                    f'{vert!r}, its endTime {endTime:f} is less than its offset {offset:f}'
+                )
             element = vert.makeElement(quarterLength)
             elements.append(element)
 

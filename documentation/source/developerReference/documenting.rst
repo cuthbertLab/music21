@@ -288,7 +288,7 @@ To document a property do something like this:
 
     def _setName(self, newName):
        if newName == 'Cuthbert':
-           raise Exception("what a dumb name!")
+           raise ValueError("what a dumb name!")
        else:
            self._storedName = newName
 

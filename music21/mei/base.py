@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         mei/base.py
 # Purpose:      Public interfaces for the MEI module
@@ -70,7 +69,7 @@ this snippet, ``<note pname="C"/>`` as an example:
 - the letter ``C`` is a *value*.
 
 Because Python also uses "attributes," an XML attribute is always preceded by an "at sign," as in
-@pname, whereas a Python attribute is set as :attr:`pname`.
+@pname, whereas a Python attribute is set as ``pname``.
 
 **Ignored Elements**
 
@@ -189,6 +188,7 @@ from music21 import clef
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
+from music21 import expressions
 from music21 import instrument
 from music21 import interval
 from music21 import key
@@ -273,6 +273,21 @@ _MISSED_DATE = 'Unable to decipher the composition date "{}"'
 _BAD_VERSE_NUMBER = 'Verse number must be an int (got "{}")'
 
 
+# Mapping from an MEI <bTrem> @unitdur (the note value of one tremolo repetition) to the number of
+# tremolo marks used by :class:`~music21.expressions.Tremolo`: an eighth-note unit is one mark, a
+# sixteenth two, and so on (log2(unitdur) - 2).  Durations outside this table produce no marks.
+_MEI_UNITDUR_TO_TREMOLO_MARKS = {
+    '8': 1,
+    '16': 2,
+    '32': 3,
+    '64': 4,
+    '128': 5,
+    '256': 6,
+    '512': 7,
+    '1024': 8,
+}
+
+
 # Module-level Functions
 # -----------------------------------------------------------------------------
 class MeiToM21Converter:
@@ -308,8 +323,8 @@ class MeiToM21Converter:
 
             if isinstance(self.documentRoot, ElementTree):
                 # pylint warns that :class:`Element` doesn't have a getroot() method, which is
-                # true enough, but...
-                self.documentRoot = self.documentRoot.getroot()  # pylint: disable=maybe-no-member
+                # true enough, but it seems to work.
+                self.documentRoot = self.documentRoot.getroot()
 
             if f'{MEI_NS}mei' != self.documentRoot.tag:
                 raise MeiElementError(_WRONG_ROOT_ELEMENT.format(self.documentRoot.tag))
@@ -353,8 +368,8 @@ class MeiToM21Converter:
 # -----------------------------------------------------------------------------
 def safePitch(
     name: str,
-    accidental: str | None = None,
-    octave: str | int = ''
+    accidental: str|None = None,
+    octave: str|int = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`~music21.pitch.Pitch` from a string.
@@ -392,7 +407,7 @@ def safePitch(
 
 
 def makeDuration(
-    base: float | int | Fraction = 0.0,
+    base: float|int|Fraction = 0.0,
     dots: int = 0
 ) -> duration.Duration:
     '''
@@ -411,7 +426,7 @@ def makeDuration(
     3.0
     >>> mei.base.makeDuration(base=2, dots=2).quarterLength  # 'base' can be an int or float
     3.5
-    >>> mei.base.makeDuration(2.0, 10).quarterLength  # you want ridiculous dots? Sure...
+    >>> mei.base.makeDuration(2.0, 10).quarterLength  # you want ridiculous dots? Sure!
     3.998046875
     >>> mei.base.makeDuration(0.33333333333333333333, 0).quarterLength  # works with fractions too
     Fraction(1, 3)
@@ -419,7 +434,7 @@ def makeDuration(
     0.5
     '''
     returnDuration = duration.Duration(base)
-    returnDuration.dots = dots  # pylint: disable=assigning-non-slot
+    returnDuration.dots = dots
     return returnDuration
 
 
@@ -448,8 +463,8 @@ def allPartsPresent(scoreElem) -> tuple[str, ...]:
     ...         <!-- ... some music ... -->
     ...     </section>
     ... </score>"""
-    >>> import xml.etree.ElementTree as ETree
-    >>> meiDoc = ETree.fromstring(meiDoc)
+    >>> from xml.etree.ElementTree import fromstring as EL
+    >>> meiDoc = EL(meiDoc)
     >>> mei.base.allPartsPresent(meiDoc)
     ('1', '2')
 
@@ -628,7 +643,7 @@ def _makeArticList(attr):
     return articList
 
 
-def _getOctaveShift(dis: t.Literal['8', '15', '22'] | None,
+def _getOctaveShift(dis: t.Literal['8', '15', '22']|None,
                     disPlace: str) -> int:
     '''
     Use :func:`_getOctaveShift` to calculate the :attr:`octaveShift` attribute for a
@@ -1000,7 +1015,7 @@ def _processEmbeddedElements(
 
     If debugging is enabled for the previous example, this warning would be displayed:
 
-    ``mei.base: Found an unprocessed <rest> element in a <doctest>.
+    ``mei.base: Found an unprocessed <rest> element in a <doctest>.``
 
     The "beam" element holds "note" elements. All elements appear in a single level of the list:
 
@@ -1038,7 +1053,7 @@ def _timeSigFromAttrs(elem):
     return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
-def _keySigFromAttrs(elem: Element) -> key.Key | key.KeySignature:
+def _keySigFromAttrs(elem: Element) -> key.Key|key.KeySignature:
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.
@@ -1083,7 +1098,7 @@ def _transpositionFromAttrs(elem):
     # noinspection PyTypeChecker
     transSemi = int(elem.get('trans.semi', 0))
 
-    # If the difference between transSemi and transDiat is greater than five per octave...
+    # If the difference between transSemi and transDiat is greater than five per octave
     # noinspection SpellCheckingInspection
     if abs(transSemi - transDiat) > 5 * (abs(transSemi) // 12 + 1):
         # ... we need to add octaves to transDiat so it's the proper size. Otherwise,
@@ -1220,7 +1235,8 @@ def addSlurs(elem, obj, slurBundle):
 
 def beamTogether(someThings):
     '''
-    Beam some things together. The function beams every object that has a :attr:`beams` attribute,
+    Beam some things together. The function beams every object that has a
+    :attr:`~music21.note.NotRest.beams` attribute,
     leaving the other objects unmodified.
 
     :param someThings: An iterable of things to beam together.
@@ -1405,12 +1421,14 @@ def scaleToTuplet(objs, elem):
     "search" for a tuplet near the end of the import process, which involves scaling the durations
     of all objects discovered between those with the "start" and "end" search values.
 
-    The @m21TupletType attribute is set directly as the :attr:`type` attribute of the music21
-    object's :class:`Tuplet` object. If @m21TupletType is not set, the @tuplet attribute will be
+    The @m21TupletType attribute is set directly as the :attr:`~music21.duration.Tuplet.type`
+    attribute of the music21 object's :class:`Tuplet` object.
+    If @m21TupletType is not set, the @tuplet attribute will be
     consulted. Note that this attribute is ignored if the @m21TupletSearch attribute is present,
     since the ``type`` will be set later by the tuplet-finding algorithm.
 
-    .. note:: Objects without a :attr:`duration` attribute will be skipped silently, unless they
+    .. note:: Objects without a :attr:`~music21.base.Music21Object.duration` attribute will be
+        skipped silently, unless they
         will be given the @m21TupletSearch attribute.
 
     :param objs: The object(s) whose durations will be scaled.
@@ -1521,7 +1539,7 @@ def _guessTuplets(theLayer):
 
 # Element-Based Converter Functions
 # -----------------------------------------------------------------------------
-def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
+def scoreDefFromElement(elem, slurBundle=None):
     '''
     <scoreDef> Container for score meta-information.
 
@@ -1529,7 +1547,7 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     This function returns a dictionary with objects that may relate to the entire score, to all
     parts at a particular moment, or only to a specific part at a particular moment. The dictionary
-    keys determine the object's scope. If the key is...
+    keys determine the object's scope. If the key is:
 
     * ``'whole-score objects'``, it applies to the entire score (e.g., page size);
     * ``'all-part objects'``, it applies to all parts at the moment this <scoreDef> appears;
@@ -1561,9 +1579,9 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> len(result)
     5
     >>> result['1']
-    {'instrument': <music21.instrument.Clarinet '1: Clarinet: Clarinet'>}
+    {'instrument': <music21.instrument.Clarinet '1: Clarinet'>}
     >>> result['3']
-    {'instrument': <music21.instrument.Violin '3: Violin: Violin'>}
+    {'instrument': <music21.instrument.Violin '3: Violin'>}
     >>> result['all-part objects']
     [<music21.meter.TimeSignature 3/4>]
     >>> result['whole-score objects']
@@ -1694,7 +1712,7 @@ def staffGrpFromElement(elem, slurBundle=None, staffDefDict=None):
     return staffDefDict
 
 
-def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
+def staffDefFromElement(elem, slurBundle=None):
     '''
     <staffDef> Container for staff meta-information.
 
@@ -1727,7 +1745,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> len(result)
     1
     >>> result
-    {'instrument': <music21.instrument.Clarinet '1: Clarinet: Clarinet'>}
+    {'instrument': <music21.instrument.Clarinet '1: Clarinet'>}
     >>> result['instrument'].partId
     '1'
     >>> result['instrument'].partName
@@ -1747,7 +1765,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> len(result)
     3
     >>> result['instrument']
-    <music21.instrument.Tuba '2: Tuba: Tuba'>
+    <music21.instrument.Tuba '2: Tuba'>
     >>> result['clef']
     <music21.clef.BassClef>
     >>> result['key']
@@ -2630,7 +2648,7 @@ def beamFromElement(elem, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <clef>, <chord>, <note>, <rest>, <space>, <tuplet>, <beam>, <barLine>
+    - <clef>, <chord>, <note>, <rest>, <space>, <tuplet>, <beam>, <bTrem>, <barLine>
 
     **Attributes/Elements Ignored:**
 
@@ -2658,7 +2676,7 @@ def beamFromElement(elem, slurBundle=None):
 
     **Contained Elements not Implemented:**
 
-    - MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
+    - MEI.cmn: beatRpt fTrem halfmRpt meterSig meterSigGrp
     - MEI.critapp: app
     - MEI.edittrans: (all)
     - MEI.mensural: ligature mensur proport
@@ -2675,6 +2693,7 @@ def beamFromElement(elem, slurBundle=None):
         f'{MEI_NS}rest': restFromElement,
         f'{MEI_NS}tuplet': tupletFromElement,
         f'{MEI_NS}beam': beamFromElement,
+        f'{MEI_NS}bTrem': bTremFromElement,
         f'{MEI_NS}space': spaceFromElement,
         f'{MEI_NS}barLine': barLineFromElement,
     }
@@ -2751,7 +2770,7 @@ def tupletFromElement(elem, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <space>, <barLine>
+    - <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <bTrem>, <space>, <barLine>
     - @num and @numbase
 
     **Attributes/Elements in Testing:** none
@@ -2780,7 +2799,7 @@ def tupletFromElement(elem, slurBundle=None):
 
     **Contained Elements not Implemented:**
 
-    - MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
+    - MEI.cmn: beatRpt fTrem halfmRpt meterSig meterSigGrp
     - MEI.critapp: app
     - MEI.edittrans: (all)
     - MEI.mensural: ligature mensur proport
@@ -2794,6 +2813,7 @@ def tupletFromElement(elem, slurBundle=None):
         f'{MEI_NS}rest': restFromElement,
         f'{MEI_NS}chord': chordFromElement,
         f'{MEI_NS}clef': clefFromElement,
+        f'{MEI_NS}bTrem': bTremFromElement,
         f'{MEI_NS}space': spaceFromElement,
         f'{MEI_NS}barLine': barLineFromElement,
     }
@@ -2833,6 +2853,87 @@ def tupletFromElement(elem, slurBundle=None):
     return tuple(tupletMembers)
 
 
+def bTremFromElement(elem, slurBundle=None):
+    '''
+    <bTrem> A measured tremolo on a single note or chord (also called a bowed tremolo), in which
+    the enclosed note or chord is rapidly repeated in performance.
+
+    In MEI 2013 (MEI.cmn module).
+
+    :param elem: The ``<bTrem>`` element to process.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :returns: An iterable of the objects contained within the ``<bTrem>`` container. The wrapped
+        ``<note>`` or ``<chord>`` is imported with its notated duration, so that the onsets of
+        following events are not shifted.
+    :rtype: list of :class:`~music21.base.Music21Object`
+
+    **Example**
+
+    A quarter-note chord notated as a measured tremolo of eighth notes (``@unitdur="8"``, one
+    tremolo mark). The function returns the chord itself, carrying its notated duration and a
+    :class:`~music21.expressions.Tremolo` expression.
+
+    >>> from xml.etree import ElementTree as ET
+    >>> meiSnippet = """<bTrem xmlns="http://www.music-encoding.org/ns/mei" unitdur="8">
+    ...     <chord dur="4">
+    ...         <note pname="E" oct="4"/>
+    ...         <note pname="E" oct="5"/>
+    ...     </chord>
+    ... </bTrem>"""
+    >>> meiSnippet = ET.fromstring(meiSnippet)
+    >>> result = mei.base.bTremFromElement(meiSnippet)
+    >>> len(result)
+    1
+    >>> result[0]
+    <music21.chord.Chord E4 E5>
+    >>> result[0].quarterLength
+    1.0
+    >>> result[0].expressions
+    [<music21.expressions.Tremolo>]
+    >>> result[0].expressions[0].numberOfMarks
+    1
+
+    **Attributes/Elements Implemented:**
+
+    - <note>, <chord>
+    - @unitdur (mapped to :attr:`~music21.expressions.Tremolo.numberOfMarks`)
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:**
+
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight)
+    - att.bTrem.log (att.tremmeasured (@num, @numbase))
+    - att.bTrem.vis (all)
+    - att.bTrem.ges (att.duration.performed (@dur.ges))
+    - att.bTrem.anl (all)
+
+    **Contained Elements not Implemented:** none
+    '''
+    # mapping from tag name to our converter function
+    tagToFunction = {
+        f'{MEI_NS}chord': chordFromElement,
+        f'{MEI_NS}note': noteFromElement,
+    }
+
+    # Import the wrapped <note>/<chord> as an ordinary note/chord so its notated duration survives;
+    # otherwise the tremolo (and every onset after it in the layer) would be silently dropped.
+    tremoloStuff = _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle)
+
+    # Attach a measured Tremolo, deriving the number of marks from @unitdur when it is a usable
+    # duration; timing correctness is preserved even when @unitdur is absent or unrecognized.
+    numberOfMarks = _MEI_UNITDUR_TO_TREMOLO_MARKS.get(elem.get('unitdur', ''))
+    if numberOfMarks is not None:
+        for eachObj in tremoloStuff:
+            if isinstance(eachObj, note.NotRest):
+                tremolo = expressions.Tremolo()
+                tremolo.numberOfMarks = numberOfMarks
+                eachObj.expressions.append(tremolo)
+
+    return tremoloStuff
+
+
 def layerFromElement(elem, overrideN=None, slurBundle=None):
     '''
     <layer> An independent stream of events on a staff.
@@ -2858,7 +2959,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <clef>, <chord>, <note>, <rest>, <mRest>, <beam>, <tuplet>, <space>, <mSpace> , and
+    - <clef>, <chord>, <note>, <rest>, <mRest>, <beam>, <tuplet>, <bTrem>, <space>, <mSpace> , and
       <barLine> contained within
     - @n, from att.common
 
@@ -2879,7 +2980,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
 
     **Contained Elements not Implemented:**
 
-    - MEI.cmn: arpeg bTrem beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
+    - MEI.cmn: arpeg beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
                harpPedal mRpt mRpt2 meterSig meterSigGrp multiRest multiRpt octave pedal
                reh slur tie tuplet tupletSpan
     - MEI.cmnOrnaments: mordent trill turn
@@ -2904,6 +3005,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
         f'{MEI_NS}mRest': mRestFromElement,
         f'{MEI_NS}beam': beamFromElement,
         f'{MEI_NS}tuplet': tupletFromElement,
+        f'{MEI_NS}bTrem': bTremFromElement,
         f'{MEI_NS}space': spaceFromElement,
         f'{MEI_NS}mSpace': mSpaceFromElement,
         f'{MEI_NS}barLine': barLineFromElement,
@@ -3023,7 +3125,7 @@ def _correctMRestDurs(staves, targetLength):
                     del eachObject.m21wasMRest
 
 
-def _makeBarlines(elem, staves):
+def _makeBarlines(elem: Element, staves: dict) -> dict:
     '''
     This is a helper function for :func:`measureFromElement`, made independent only to improve
     that function's ease of testing.
@@ -3032,11 +3134,10 @@ def _makeBarlines(elem, staves):
     been processed, change the barlines of the :class:`Measure` objects in accordance with the
     element's @left and @right attributes.
 
-    :param :class:`~xml.etree.ElementTree.Element` elem: The ``<measure>`` tag to process.
-    :param dict staves: Dictionary where keys are @n attributes and values are corresponding
-        :class:`~music21.stream.Measure` objects.
-    :returns: The ``staves`` dictionary with properly-set barlines.
-    :rtype: dict
+    elem is the ``<measure>`` tag to process; staves maps @n attributes to their corresponding
+    :class:`~music21.stream.Measure` objects.
+
+    Returns the ``staves`` dictionary with properly-set barlines.
     '''
     if elem.get('left') is not None:
         bars = _barlineFromAttr(elem.get('left'))

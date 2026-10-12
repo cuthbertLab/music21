@@ -1,22 +1,23 @@
-# -*- coding: utf-8 -*-
+
 '''
 This file contains Music21's version number information.
 
 As of v2.0.0, Music21 uses something close to the principles of Semantic Versioning, we'll
 try very hard so that X.Y.Z have meanings about changes to the system.
 Changes in X represent changes that will break old features.
-New Y numbers add new features; Z -- bug fixes.  The X number change about once per year.
+New Y numbers add new features; Z -- bug fixes.  The X number used to change
+about once per year, now that the program is mature it's a little smaller.
 
 Differences with strict semantic versioning: I won't make 100% guarantees that we'll never
 break anything without a change in the major number, esp. if the change affects a tiny
-number of users or possibly none.  A new feature added in the previous Y release can be tweaked
+number of users or possibly none or was not documented.
+A new feature added in the previous Y release can be tweaked
 or removed in the next few releases if the feature itself is marked beta.
 
-Even numbered Ys will be beta releases. Zero Ys 2.0, 3.0, etc. are development releases: they
-CAN change functionality until 2.1, 3.1, etc. is released.  This is against the semver standard,
+Even-numbered Ys are alpha or beta releases. Zero Ys 2.0, 3.0, etc. are development releases: they
+can change functionality until 2.1, 3.1, etc. is released.  This is against the semver standard,
 but I don't want to have lots of 2.0.0-alpha2, etc., I'd rather call it 2.0.2, and tell users
 to wait for 2.1.  Even numbered first decimal releases (e.g. 5.4) are also beta.
-
 
 Q: Why is this here and not in music21/__init__.py?
 
@@ -30,9 +31,7 @@ of Music21 makes installation cleaner, and also helps other software - like
 package managers in various Linux distributions - work with Music21 without
 complaint.
 
-
 Thanks to Andrew Hankinson for suggesting this way of dealing with versions to begin with.
-
 
 Changing Versions
 ==================
@@ -43,12 +42,12 @@ updated along with it.
 
 When changing, update the single test case in base.py.
 
-Changing this number invalidates old pickles -- do it if the old pickles create a problem.
+Changing this number invalidates old pickles (cached parsed versions of files),
+so change it if a bug or new feature creates a problem with using old pickles.
 '''
 from __future__ import annotations
 
-__version__ = '9.0.0a6'
-
+__version__ = '11.0.0b12'
 
 def get_version_tuple(vv):
     v = vv.split('.')

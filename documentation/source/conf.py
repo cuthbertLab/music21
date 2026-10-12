@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
 #
 # music21 documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun 14 16:48:40 2013.
+#
+# conf.py
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -15,8 +16,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
+from datetime import date
 import os
 import sys
+import sphinx.util.logging as _sxl
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration -----------------------------------------------------
@@ -28,15 +31,38 @@ sys.path.insert(0, os.path.abspath('..'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
-    # 'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.viewcode',
     'docbuild.extensions',
 ]
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'numpy': ('https://numpy.org/doc/stable', None),
+    'matplotlib': ('https://matplotlib.org/stable', None),
+}
+
+# Filter noisy ambiguous cross-reference warnings for bare `type`.
+# Sphinx's py-domain resolver partial-matches the four music21 `.type`
+# instance attributes (Barline.type, Tie.type, Duration.type, Ottava.type)
+# before consulting intersphinx, so every `type[X]` annotation triggers a
+# false-positive ambiguity warning. Suppress just that specific message.
+_orig_warning = _sxl.SphinxLoggerAdapter.warning
+def _filtered_warning(self, msg, *args, **kw):
+    if (
+        'more than one target found for cross-reference' in str(msg)
+        and args
+        and args[0] == 'type'
+    ):
+        return
+    return _orig_warning(self, msg, *args, **kw)
+_sxl.SphinxLoggerAdapter.warning = _filtered_warning
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = {'.rst': 'restructuredtext'}
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
@@ -48,7 +74,7 @@ master_doc = 'index'
 project = 'music21'
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-copyright = '2006-2022, Michael Scott Asato Cuthbert'
+copyright = f'2006-{date.today().year} Michael Scott Asato Cuthbert'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -79,7 +105,8 @@ language = 'en'
 exclude_patterns = []
 
 # The reST default role (used for this markup: `text`) to use for all documents.
-# default_role = None
+# 'literal' makes single backticks render as inline code, like Markdown.
+default_role = 'literal'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 # add_function_parentheses = True
@@ -234,6 +261,22 @@ latex_documents = [
 # If false, no module index is generated.
 # latex_domain_indices = True
 
+
+# -- Options for linkcheck -----------------------------------------------------
+# requires downloading whole document, but also many anchors only load after
+# javascript these days.
+linkcheck_anchors = False
+
+linkcheck_ignore = [
+    r'http://www.musicxml.org/dtds/partwise.dtd',  # dtd is not a URL.
+    r'https://easyabc.sourceforge.net',  # works 2025-10
+    # does not find anchor immediately.  should wait longer
+    r'https://github.com/cuthbertLab/music21/blob/master/README.md#community-code-of-conduct',
+    r'https://docutils.sourceforge.io/rst.html',  # anti bot?
+    r'https://id.loc.gov/vocabulary/relators.html',  # LOC + captcha? Shame!
+    r'https://musescore.com/',  # being picky:
+
+]
 
 # -- Options for manual page output --------------------------------------------
 

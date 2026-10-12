@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         alpha/analysis/aligner.py
 # Purpose:      A general aligner that tries its best to align two streams
@@ -14,6 +13,7 @@ from collections import Counter
 import enum
 import operator
 import unittest
+from typing import cast
 
 from music21 import base
 from music21 import exceptions21
@@ -176,7 +176,6 @@ class StreamAligner:
         >>> sa2.hashedSourceStream
         [NoteHashWithReference(Pitch=69, Duration=1.0, Offset=0.0),
          NoteHashWithReference(Pitch=67, Duration=1.0, Offset=1.0)]
-
         '''
         if not self.preHashed:
             self.hashedTargetStream = self.hasher.hashStream(self.targetStream)
@@ -199,7 +198,6 @@ class StreamAligner:
 
         >>> target0 = converter.parse('tinyNotation: C4 D C E')
         >>> source0 = converter.parse('tinyNotation: C4 D C')
-
 
         >>> sa0 = alpha.analysis.aligner.StreamAligner(target0, source0)
         >>> sa0.setupDistanceMatrix()
@@ -231,7 +229,6 @@ class StreamAligner:
         Traceback (most recent call last):
         music21.alpha.analysis.aligner.AlignerException:
             Cannot perform alignment with empty source stream.
-
         '''
         if not self.hashedTargetStream:
             self.makeHashedStreams()
@@ -245,6 +242,7 @@ class StreamAligner:
         if self.m == 0:
             raise AlignerException('Cannot perform alignment with empty source stream.')
 
+        # noinspection PyProtectedMember
         if 'numpy' in base._missingImport:
             raise AlignerException('Cannot run Aligner without numpy.')
         import numpy as np
@@ -306,7 +304,6 @@ class StreamAligner:
            [2, 2, 2, 4],
            [4, 4, 3, 3],
            [6, 6, 5, 3]])
-
         '''
 
         # calculate insert and delete costs based on the first tuple in the Source S
@@ -328,15 +325,15 @@ class StreamAligner:
                                                   self.hashedSourceStream[j - 1])
 
                 previousValues = [self.distanceMatrix[i - 1][j] + insertCost,
-                                   self.distanceMatrix[i][j - 1] + deleteCost,
-                                   self.distanceMatrix[i - 1][j - 1] + substCost]
+                                  self.distanceMatrix[i][j - 1] + deleteCost,
+                                  self.distanceMatrix[i - 1][j - 1] + substCost]
 
                 self.distanceMatrix[i][j] = min(previousValues)
 
     def getPossibleMovesFromLocation(self, i, j):
         # noinspection PyShadowingNames
         '''
-        i and j are current row and column index in self.distanceMatrix
+        i and j are current row and column indices in self.distanceMatrix
         returns all possible moves (0 up to 3)
         vertical, horizontal, diagonal costs of adjacent entries in self.distMatrix
 
@@ -381,11 +378,10 @@ class StreamAligner:
 
         >>> sa.getPossibleMovesFromLocation(3, 0)
         [0, None, None]
-
         '''
-        verticalCost = self.distanceMatrix[i - 1][j] if i >= 1 else None
-        horizontalCost = self.distanceMatrix[i][j - 1] if j >= 1 else None
-        diagonalCost = self.distanceMatrix[i - 1][j - 1] if (i >= 1 and j >= 1) else None
+        verticalCost = int(self.distanceMatrix[i - 1][j]) if i >= 1 else None
+        horizontalCost = int(self.distanceMatrix[i][j - 1]) if j >= 1 else None
+        diagonalCost = int(self.distanceMatrix[i - 1][j - 1]) if (i >= 1 and j >= 1) else None
 
         possibleMoves = [verticalCost, horizontalCost, diagonalCost]
         return possibleMoves
@@ -422,7 +418,6 @@ class StreamAligner:
                [4, 2, 0, 2],
                [6, 4, 2, 0],
                [8, 6, 4, 2]])
-
 
         >>> sa.getOpFromLocation(4, 3)
         <ChangeOps.Insertion: 0>
@@ -737,7 +732,6 @@ class StreamAligner:
 
         >>> sa.tupleEqualityWithoutReference(nhwr1, nhwr3)
         False
-
         '''
         for val in tup1.hashItemsKeys:
             if getattr(tup1, val) != getattr(tup2, val):
@@ -746,7 +740,7 @@ class StreamAligner:
 
     def calculateChangesList(self):
         '''
-        Traverses through self.distanceMatrix from bottom right corner to top left looking at
+        Traverses through self.distanceMatrix from the bottom right corner to top left looking at
         bestOp at every move to determine which change was most likely at any point. Compiles
         the list of changes in self.changes. Also calculates some metrics like self.similarityScore
         and self.changesCount.
@@ -829,7 +823,6 @@ class StreamAligner:
         1
         >>> saD.similarityScore
         0.5
-
         '''
         i = self.n
         j = self.m
@@ -862,12 +855,12 @@ class StreamAligner:
             raise AlignmentTracebackException('Traceback of best alignment did not end properly')
 
         self.changesCount = Counter(elem[2] for elem in self.changes)
-        self.similarityScore = float(self.changesCount[ChangeOps.NoChange]) / len(self.changes)
+        self.similarityScore = self.changesCount[ChangeOps.NoChange] / len(self.changes)
 
     def showChanges(self, show=False):
         '''
         Visual and debugging feature to display which notes are changed.
-        Will open in musescore, unless show is set to False
+        Will open in MuseScore, unless show is set to False
         '''
         for (idx, (midiNoteRef, omrNoteRef, change)) in enumerate(self.changes):
             if change == ChangeOps.NoChange:
@@ -1047,15 +1040,16 @@ class Test(unittest.TestCase):
 
         sa = StreamAligner(target, source)
         sa.align()
-        self.assertEqual(sa.similarityScore, 1.)
+        self.assertEqual(sa.similarityScore, 1.0)
 
     def testShowInsertion(self):
         '''
-        two streams:
-        MIDI is CCCB
-        OMR is CCC
+        Given two streams:
 
-        Therefore there needs to be an insertion to get from OMR to MIDI
+        MIDI is `C C C B`
+        OMR is `C C C`
+
+        Therefore, there needs to be an insertion to get from OMR to MIDI
         '''
         from music21 import stream
         from music21 import note
@@ -1078,20 +1072,27 @@ class Test(unittest.TestCase):
         sa.align()
         sa.showChanges()
 
-        self.assertEqual(target.getElementById(sa.changes[3][0].id).style.color, 'green')
-        self.assertEqual(target.getElementById(sa.changes[3][0].id).lyric, '3')
-        self.assertEqual(source.getElementById(sa.changes[3][1].id).style.color, 'green')
-        self.assertEqual(source.getElementById(sa.changes[3][1].id).lyric, '3')
+        n0 = target.getElementById(sa.changes[3][0].id)
+        self.assertIsNotNone(n0)
+        n0 = cast(note.Note, n0)
+        self.assertEqual(n0.style.color, 'green')
+        self.assertEqual(n0.lyric, '3')
+
+        n1 = source.getElementById(sa.changes[3][1].id)
+        self.assertIsNotNone(n1)
+        n1 = cast(note.Note, n1)
+        self.assertEqual(n1.style.color, 'green')
+        self.assertEqual(n1.lyric, '3')
 
     def testShowDeletion(self):
         '''
-        two streams:
+        Given two streams:
 
-        MIDI is `CCC`
+        MIDI is `C C C`
 
-        OMR is `CCCB`
+        OMR is `C C C B`
 
-        Therefore there needs to be a deletion to get from OMR to MIDI.
+        Therefore, there needs to be a deletion to get from OMR to MIDI.
         '''
         from music21 import stream
         from music21 import note
@@ -1114,18 +1115,25 @@ class Test(unittest.TestCase):
         sa.align()
         sa.showChanges()
 
-        self.assertEqual(target.getElementById(sa.changes[3][0].id).style.color, 'red')
-        self.assertEqual(target.getElementById(sa.changes[3][0].id).lyric, '3')
-        self.assertEqual(source.getElementById(sa.changes[3][1].id).style.color, 'red')
-        self.assertEqual(source.getElementById(sa.changes[3][1].id).lyric, '3')
+        n0 = target.getElementById(sa.changes[3][0].id)
+        self.assertIsNotNone(n0)
+        n0 = cast(note.Note, n0)
+        self.assertEqual(n0.style.color, 'red')
+        self.assertEqual(n0.lyric, '3')
+
+        n1 = source.getElementById(sa.changes[3][1].id)
+        self.assertIsNotNone(n1)
+        n1 = cast(note.Note, n1)
+        self.assertEqual(n1.style.color, 'red')
+        self.assertEqual(n1.lyric, '3')
 
     def testShowSubstitution(self):
         '''
         two streams:
-        MIDI is CCC
-        OMR is CCB
+        MIDI is `C C C`
+        OMR is `C C B`
 
-        Therefore there needs to be a substitution to get from OMR to MIDI
+        Therefore, there needs to be a substitution to get from OMR to MIDI
         '''
         from music21 import stream
         from music21 import note
@@ -1147,10 +1155,18 @@ class Test(unittest.TestCase):
         sa.align()
         sa.showChanges()
 
-        self.assertEqual(target.getElementById(sa.changes[2][0].id).style.color, 'purple')
-        self.assertEqual(target.getElementById(sa.changes[2][0].id).lyric, '2')
-        self.assertEqual(source.getElementById(sa.changes[2][1].id).style.color, 'purple')
-        self.assertEqual(source.getElementById(sa.changes[2][1].id).lyric, '2')
+
+        n0 = target.getElementById(sa.changes[2][0].id)
+        self.assertIsNotNone(n0)
+        n0 = cast(note.Note, n0)
+        self.assertEqual(n0.style.color, 'purple')
+        self.assertEqual(n0.lyric, '2')
+
+        n1 = source.getElementById(sa.changes[2][1].id)
+        self.assertIsNotNone(n1)
+        n1 = cast(note.Note, n1)
+        self.assertEqual(n1.style.color, 'purple')
+        self.assertEqual(n1.lyric, '2')
 
 
 if __name__ == '__main__':

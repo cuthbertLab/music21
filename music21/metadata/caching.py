@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         caching.py
 # Purpose:      music21 classes for representing score and work metadata
@@ -6,8 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -132,7 +130,7 @@ class MetadataCachingJob:
                 parsedObject = converter.parse(self.filePath, forceSource=True)
             else:
                 parsedObject = corpus.parse(str(self.filePath), forceSource=True)
-        except Exception as e:  # wide catch is fine. pylint: disable=broad-except
+        except Exception as e:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.printDebug(f'parse failed: {self.filePath}, {e}')
             environLocal.printDebug(traceback.format_exc())
             self.filePathErrors.append(self.filePath)
@@ -159,17 +157,19 @@ class MetadataCachingJob:
             else:
                 environLocal.printDebug(
                     'addFromPaths: got stream without metadata, '
-                    'creating stub: {0}'.format(
-                        common.relativepath(str(self.cleanFilePath))))
+                    f'creating stub: {common.relativepath(str(self.cleanFilePath))}'
+                )
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=None,
                     corpusName=self.corpusName,
                 )
                 self.results.append(metadataEntry)
-        except Exception:  # wide catch is fine. pylint: disable=broad-except
-            environLocal.warn('Had a problem with extracting metadata '
-                              'for {0}, piece ignored'.format(self.filePath))
+        except Exception:  # wide catch is fine. pylint: disable=broad-exception-caught
+            environLocal.warn(
+                'Had a problem with extracting metadata '
+                f'for {self.filePath}, piece ignored'
+            )
             environLocal.warn(traceback.format_exc())
 
     def parseOpus(self, parsedObject):
@@ -182,11 +182,12 @@ class MetadataCachingJob:
             for scoreNumber, score in enumerate(parsedObject.scores):
                 self.parseScoreInsideOpus(score, scoreNumber)
                 del score  # for memory conservation
-        except Exception as exception:  # wide catch is fine. pylint: disable=broad-except
+        except Exception as exception:  # wide catch is fine. pylint: disable=broad-exception-caught
             environLocal.warn(
-                'Had a problem with extracting metadata for score {0} '
-                'in {1}, whole opus ignored: {2}'.format(
-                    scoreNumber, self.filePath, str(exception)))
+                'Had a problem with extracting metadata for score '
+                f'{scoreNumber} in {self.filePath}, whole opus ignored: '
+                f'{exception}'
+            )
             environLocal.printDebug(traceback.format_exc())
         # Create a dummy metadata entry, representing the entire opus.
         # This lets the metadata bundle know it has already processed this
@@ -210,8 +211,9 @@ class MetadataCachingJob:
             if score.metadata is None or score.metadata.number is None:
                 environLocal.printDebug(
                     'addFromPaths: got Opus that contains '
-                    'Streams that do not have work numbers: '
-                    '{0}'.format(self.filePath))
+                    + 'Streams that do not have work numbers: '
+                    + str(self.filePath)
+                )
             else:
                 # update path to include work number
                 corpusPath = metadata.bundles.MetadataBundle.corpusPathToKey(
@@ -226,12 +228,11 @@ class MetadataCachingJob:
                     metadataPayload=richMetadata,
                 )
                 self.results.append(metadataEntry)
-        except Exception as exception:  # pylint: disable=broad-except
+        except Exception as exception:  # pylint: disable=broad-exception-caught
             environLocal.warn(
-                'Had a problem with extracting metadata '
-                'for score {0} in {1}, whole opus ignored: '
-                '{2}'.format(
-                    scoreNumber, self.filePath, str(exception)))
+                f'Had a problem with extracting metadata for score {scoreNumber} '
+                f'in {self.filePath}, whole opus ignored: {exception}'
+            )
             environLocal.printDebug(traceback.format_exc())
 
     # PUBLIC METHODS #
@@ -296,11 +297,11 @@ class JobProcessor:
         '''
         Report on the current job status.
         '''
-        message = 'updated {0} of {1} files; total errors: {2} ... last file: {3}'.format(
-            totalJobs - remainingJobs,
-            totalJobs,
-            filePathErrorCount,
-            filePath,
+        completedJobs = totalJobs - remainingJobs
+        message = (
+            f'updated {completedJobs} of {totalJobs} files; '
+            f'total errors: {filePathErrorCount} ... '
+            f'last file: {filePath}'
         )
         return message
 
@@ -315,11 +316,10 @@ class JobProcessor:
         available cores.
 
         jobs is a list of :class:`~music21.metadata.MetadataCachingJob` objects.
-
         '''
         processCount = processCount or common.cpus()
         processCount = max(processCount, 1)
-        # do not start more processes than jobs...
+        # do not start more processes than jobs
         remainingJobs = len(jobs)
         processCount = min(processCount, remainingJobs)
 
@@ -346,7 +346,7 @@ class JobProcessor:
                     'filePath': job.filePath,
                     'remainingJobs': remainingJobs,
                 }
-        for worker in workers:
+        for _worker in workers:
             job_queue.put(None)
         job_queue.join()
         result_queue.close()
@@ -356,12 +356,11 @@ class JobProcessor:
         # end generator
 
     @staticmethod
-    def process_serial(jobs):
+    def process_serial(jobs: list[MetadataCachingJob]):
         '''
         Process jobs serially.
         '''
         remainingJobs = len(jobs)
-        results = []
         for job in jobs:
             results, errors = job.run()
             remainingJobs -= 1
@@ -377,7 +376,7 @@ class JobProcessor:
 # -----------------------------------------------------------------------------
 
 
-class WorkerProcess(multiprocessing.Process):  # pylint: disable=inherit-non-class
+class WorkerProcess(multiprocessing.Process):
     '''
     A worker process for use by the multithreaded metadata-caching job
     processor.

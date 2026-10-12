@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         volume.py
 # Purpose:      Objects for representing volume, amplitude, and related
@@ -7,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2012, 2015, 2017
+# Copyright:    Copyright © 2011-2012, 2015, 2017, 2024
 #               Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
@@ -34,19 +33,27 @@ environLocal = environment.Environment('volume')
 
 
 # ------------------------------------------------------------------------------
-
-
 class VolumeException(exceptions21.Music21Exception):
     pass
 
 
 # ------------------------------------------------------------------------------
-
-
 class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
     The Volume object lives on NotRest objects and subclasses. It is not a
     Music21Object subclass.
+
+    Generally, just assume that a Note has a volume object and don't worry
+    about creating this class directly:
+
+    >>> n = note.Note('C5')
+    >>> v = n.volume
+    >>> v.velocity = 20
+    >>> v.client is n
+    True
+
+    But if you want to create it yourself, you can specify the client, velocity,
+    velocityScalar, and
 
     >>> v = volume.Volume(velocity=90)
     >>> v
@@ -54,11 +61,8 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     >>> v.velocity
     90
 
-    >>> n = note.Note('C5')
-    >>> v = n.volume
-    >>> v.velocity = 20
-    >>> v.client is n
-    True
+    * Changed in v9: all constructor attributes are keyword only.
+        (client as first attribute was confusing)
     '''
     # CLASS VARIABLES #
     __slots__ = (
@@ -70,26 +74,27 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def __init__(
         self,
-        client: note.NotRest | None = None,
-        velocity=None,
-        velocityScalar=None,
-        velocityIsRelative=True,
+        *,
+        client: note.NotRest|None = None,
+        velocity: int|None = None,
+        velocityScalar: float|None = None,
+        velocityIsRelative: bool = True,
     ):
         # store a reference to the client, as we use this to do context
         # will use property; if None will leave as None
         self.client = client
-        self._velocityScalar = None
+        self._velocityScalar: float|None = None
         if velocity is not None:
-            self.velocity = velocity
+            self.velocity = int(velocity)
         elif velocityScalar is not None:
-            self.velocityScalar = velocityScalar
+            self.velocityScalar = float(velocityScalar)
         self._cachedRealized = None
         self.velocityIsRelative = velocityIsRelative
 
     # SPECIAL METHODS #
     def __deepcopy__(self, memo=None):
         '''
-        Don't copy the client; set to current
+        Don't copy the client; set to current.
         '''
         new = common.defaultDeepcopy(self, memo, ignoreAttributes={'client'})
         new.client = self.client
@@ -103,8 +108,14 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Return the dynamic context of this Volume, based on the position of the
         client of this object.
+
+        >>> n = note.Note()
+        >>> n.volume.velocityScalar = 0.9
+        >>> s = stream.Measure([dynamics.Dynamic('ff'), n])
+        >>> n.volume.getDynamicContext()
+        <music21.dynamics.Dynamic ff>
         '''
-        # TODO: find wedges and crescendi too  and demo/test.
+        # TODO: find wedges and crescendi too and demo/test.
         return self.client.getContextByClass('Dynamic')
 
     def mergeAttributes(self, other):
@@ -113,9 +124,8 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         Values are always copied, not passed by reference.
 
         >>> n1 = note.Note()
-        >>> v1 = volume.Volume()
+        >>> v1 = n1.volume
         >>> v1.velocity = 111
-        >>> v1.client = n1
 
         >>> v2 = volume.Volume()
         >>> v2.mergeAttributes(v1)
@@ -129,12 +139,13 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext: dynamics.Dynamic | bool = True,
+                       useDynamicContext: dynamics.Dynamic|bool = True,
                        useVelocity=True,
-                       useArticulations: t.Union[bool,
-                                                 articulations.Articulation,
-                                                 Iterable[articulations.Articulation]
-                                                 ] = True,
+                       useArticulations: (
+                           bool
+                           | articulations.Articulation
+                           | Iterable[articulations.Articulation]
+                       ) = True,
                        baseLevel=0.5,
                        clip=True):
         '''
@@ -153,11 +164,13 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def getRealized(
         self,
-        useDynamicContext: bool | dynamics.Dynamic = True,
+        useDynamicContext: bool|dynamics.Dynamic = True,
         useVelocity=True,
-        useArticulations: t.Union[
-            bool, articulations.Articulation, Iterable[articulations.Articulation]
-        ] = True,
+        useArticulations: (
+            bool
+            | articulations.Articulation
+            | Iterable[articulations.Articulation]
+        ) = True,
         baseLevel=0.5,
         clip=True,
     ):
@@ -207,18 +220,17 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> s.notes[7].volume.getRealized()
         0.99212...
 
-        velocity, if set, will be scaled by dynamics
+        velocity, if set, will be scaled by dynamics:
 
         >>> s.notes[7].volume.velocity = 20
         >>> s.notes[7].volume.getRealized()
         0.22047...
 
-        unless we set the velocity to not be relative...
+        Unless we set the velocity to not be relative:
 
         >>> s.notes[7].volume.velocityIsRelative = False
         >>> s.notes[7].volume.getRealized()
         0.1574803...
-
         '''
         # velocityIsRelative might be best set at import. e.g., from MIDI,
         # velocityIsRelative is False, but in other applications, it may not
@@ -249,8 +261,10 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
                 elif self.client is not None:
                     dm = self.getDynamicContext()  # dm may be None
                 else:
-                    environLocal.printDebug(['getRealized():',
-                    'useDynamicContext is True but no dynamic supplied or found in context'])
+                    environLocal.printDebug([
+                        'getRealized():',
+                        'useDynamicContext is True but no dynamic supplied or found in context',
+                    ])
                 if dm is not None:
                     # double scalar (so range is between 0 and 1) and scale
                     # the current val (around the base)
@@ -314,7 +328,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         return self.getRealized()
 
     @property
-    def velocity(self):
+    def velocity(self) -> int|None:
         '''
         Get or set the velocity value, a numerical value between 0 and 127 and
         available setting amplitude on each Note or Pitch in chord.
@@ -338,18 +352,20 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         return round(v)
 
     @velocity.setter
-    def velocity(self, value):
-        if not common.isNum(value):
+    def velocity(self, value: int|float|None):
+        if value is None:
+            self._velocityScalar = None
+        elif not common.isNum(value):
             raise VolumeException(f'value provided for velocity must be a number, not {value}')
-        if value < 0:
+        elif value <= 0:
             self._velocityScalar = 0.0
-        elif value > 127:
+        elif value >= 127:
             self._velocityScalar = 1.0
         else:
             self._velocityScalar = value / 127.0
 
     @property
-    def velocityScalar(self):
+    def velocityScalar(self) -> float|None:
         '''
         Get or set the velocityScalar value, a numerical value between 0
         and 1 and available setting amplitude on each Note or Pitch in
@@ -371,7 +387,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> n.volume.velocityScalar
         1.0
 
-        If velocity is not set, then this will return None
+        If velocity is not set, then this will return None.
 
         >>> n = note.Note()
         >>> n.volume.velocityScalar is None
@@ -384,16 +400,23 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             return v
 
     @velocityScalar.setter
-    def velocityScalar(self, value):
+    def velocityScalar(self, value: int|float|None):
+        if value is None:
+            self._velocityScalar = None
+
         if not common.isNum(value):
             raise VolumeException('value provided for velocityScalar must be a number, '
                                   + f'not {value}')
+
+        scalar: float
         if value < 0:
-            scalar = 0
+            scalar = 0.0
         elif value > 1:
-            scalar = 1
+            scalar = 1.0
         else:
-            scalar = value
+            if t.TYPE_CHECKING:
+                assert value is not None
+            scalar = float(value)
         self._velocityScalar = scalar
 
 
@@ -484,10 +507,9 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         import gc
-        from music21 import volume
 
         n1 = note.Note('G#4')
-        v = volume.Volume(client=n1)
+        v = Volume(client=n1)
         self.assertEqual(v.client, n1)
         del n1
         gc.collect()
@@ -497,7 +519,6 @@ class Test(unittest.TestCase):
 
     def testGetContextSearchA(self):
         from music21 import stream
-        from music21 import volume
 
         s = stream.Stream()
         d1 = dynamics.Dynamic('mf')
@@ -506,7 +527,7 @@ class Test(unittest.TestCase):
         s.insert(2, d2)
 
         n1 = note.Note('g')
-        v1 = volume.Volume(client=n1)
+        v1 = Volume(client=n1)
         s.insert(4, n1)
 
         # can get dynamics from volume object
@@ -532,10 +553,9 @@ class Test(unittest.TestCase):
 
     def testDeepCopyA(self):
         import copy
-        from music21 import volume
         n1 = note.Note()
 
-        v1 = volume.Volume()
+        v1 = Volume()
         v1.velocity = 111
         v1.client = n1
 
@@ -548,9 +568,7 @@ class Test(unittest.TestCase):
 
 
     def testGetRealizedA(self):
-        from music21 import volume
-
-        v1 = volume.Volume(velocity=64)
+        v1 = Volume(velocity=64)
         self.assertEqual(v1.getRealizedStr(), '0.5')
 
         d1 = dynamics.Dynamic('p')
@@ -565,7 +583,7 @@ class Test(unittest.TestCase):
 
 
         # if vel is at max, can scale down with a dynamic
-        v1 = volume.Volume(velocity=127)
+        v1 = Volume(velocity=127)
         d1 = dynamics.Dynamic('fff')
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '1.0')
 
@@ -596,7 +614,6 @@ class Test(unittest.TestCase):
 
     def testRealizeVolumeA(self):
         from music21 import stream
-        from music21 import volume
 
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)
@@ -613,7 +630,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['0.71'] * 16)
 
         # calling realize will set all to new cached values
-        volume.realizeVolume(s)
+        realizeVolume(s)
         match = [n.volume.cachedRealizedStr for n in s.notes]
         self.assertEqual(match, ['0.35', '0.35', '0.5', '0.5',
                                  '0.64', '0.64', '0.99', '0.99',
@@ -642,7 +659,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [None] * 16)
 
         # can set velocity with realized values
-        volume.realizeVolume(s, setAbsoluteVelocity=True)
+        realizeVolume(s, setAbsoluteVelocity=True)
         match = [n.volume.velocity for n in s.notes]
         self.assertEqual(match, [45, 45, 63, 63, 81, 81, 126, 126, 99, 99,
                                  127, 127, 27, 27, 99, 99])

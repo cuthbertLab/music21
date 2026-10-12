@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         omr/evaluators.py
 # Purpose:      music21 module for evaluating correcting of output from OMR software
@@ -18,12 +17,6 @@ from __future__ import annotations
 from music21.omr import correctors
 from music21 import converter
 
-# import matplotlib.pyplot as plt
-# import numpy as np
-# from matplotlib.ticker import MultipleLocator, FormatStrFormatter
-
-# import difflib
-
 globalDebug = False
 
 
@@ -35,7 +28,6 @@ class OmrGroundTruthPair:
     (or a pair of music21.stream.Score objects).
 
     See below for examples.
-
     '''
 
     def __init__(self, omr=None, ground=None):
@@ -90,7 +82,7 @@ class OmrGroundTruthPair:
 
     def getOmrScore(self):
         '''
-        Returns a ScoreCorrector object of the OMR score. does NOT store it anywhere...
+        Returns a ScoreCorrector object of the OMR score. does not store it anywhere
 
          >>> omrPath = omr.correctors.K525omrShortPath
          >>> ground = omr.correctors.K525groundTruthShortPath
@@ -185,7 +177,7 @@ class OmrGroundTruthPair:
                 distance[i][j] = min(distance[i - 1][j] + 1,
                                      distance[i][j - 1] + 1,
                                      distance[i - 1][j - 1]
-                                        + self.substCost(source[j - 1], target[i - 1]))
+                                     + self.substCost(source[j - 1], target[i - 1]))
         return distance[n][m]
 
     def getDifferences(self):
@@ -334,7 +326,6 @@ def autoCorrelationBestMeasure(inputScore):
     >>> print( float(totalUnflaggedWithMatches) / totalUnflagged )
     0.901...
 
-
     Schoenberg has low autoCorrelation.
 
     >>> c = corpus.parse('schoenberg/opus19/movement6')
@@ -343,7 +334,6 @@ def autoCorrelationBestMeasure(inputScore):
     (18, 6)
     >>> print( float(totalUnflaggedWithMatches) / totalUnflagged )
     0.333...
-
     '''
     ss = correctors.ScoreCorrector(inputScore)
     allHashes = ss.getAllHashes()
@@ -362,7 +352,7 @@ def autoCorrelationBestMeasure(inputScore):
             totalMeasures += 1
             match = False
 
-            # horizontal search...
+            # horizontal search
             for j, nHash in enumerate(pHashArray):
                 if i == j:
                     continue
@@ -370,7 +360,7 @@ def autoCorrelationBestMeasure(inputScore):
                     match = True
                     break
 
-            # vertical search...
+            # vertical search
             if match is False:
                 for otherPNum in range(len(singleParts)):
                     if otherPNum == pNum:

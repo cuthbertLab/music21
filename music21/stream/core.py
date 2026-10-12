@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         stream/core.py
 # Purpose:      mixin class for the core elements of Streams
@@ -6,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -66,7 +65,7 @@ class StreamCore(Music21Object):
         # should isFlat become readonly?
         self.isFlat = True  # does it have no embedded Streams
 
-        # someday...
+        # someday
         # self._elementTree = tree.trees.ElementTree(source=self)
 
     def coreInsert(
@@ -76,7 +75,7 @@ class StreamCore(Music21Object):
         *,
         ignoreSort=False,
         setActiveSite=True
-    ):
+    ) -> bool:
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
 
@@ -91,7 +90,11 @@ class StreamCore(Music21Object):
 
         Do not mix coreInsert with coreAppend operations.
 
-        Returns boolean if the Stream is now sorted.
+        Returns boolean if the Stream (assuming it was sorted before) is still guaranteed
+        to be sorted.  (False doesn't mean that it's not sorted, just that we can't guarantee it.)
+        If you don't care and plan to sort the stream later, then use `ignoreSort=True`.
+
+        No need to opFrac before getting here -- the inner routine will do it for us.
         '''
         # environLocal.printDebug(['coreInsert', 'self', self,
         #    'offset', offset, 'element', element])
@@ -101,9 +104,9 @@ class StreamCore(Music21Object):
         if not ignoreSort:
             # # if sorted and our insertion is > the highest time, then
             # # are still inserted
-            # if self.isSorted is True and self.highestTime <= offset:
+            # if self.isSorted and self.highestTime <= offset:
             #     storeSorted = True
-            if self.isSorted is True:
+            if self.isSorted:
                 ht = self.highestTime   # type: ignore
                 if ht < offset:
                     storeSorted = True
@@ -119,7 +122,7 @@ class StreamCore(Music21Object):
 
         self.coreSetElementOffset(
             element,
-            float(offset),  # why is this not opFrac?
+            offset,  # coreSetElementOffset will opFrac for us
             addElement=True,
             setActiveSite=setActiveSite
         )
@@ -135,7 +138,7 @@ class StreamCore(Music21Object):
         element: Music21Object,
         *,
         setActiveSite=True
-    ):
+    ) -> None:
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .append() instead.
 
@@ -158,7 +161,7 @@ class StreamCore(Music21Object):
         # Make this faster
         # self._elementTree.insert(self.highestTime, element)
         # does not change sorted state
-        self._setHighestTime(ht + element.duration.quarterLength)    # type: ignore
+        self._setHighestTime(opFrac(ht + element.duration.quarterLength))    # type: ignore
     # --------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False
@@ -166,11 +169,11 @@ class StreamCore(Music21Object):
     def coreSetElementOffset(
         self,
         element: Music21Object,
-        offset: int | float | Fraction | OffsetSpecial,
+        offset: int|float|Fraction|OffsetSpecial,
         *,
         addElement=False,
         setActiveSite=True
-    ):
+    ) -> None:
         '''
         Sets the Offset for an element, very quickly.
         Caller is responsible for calling :meth:`~music21.stream.core.coreElementsChanged`
@@ -193,9 +196,9 @@ class StreamCore(Music21Object):
         try:
             # try first, for the general case of not OffsetSpecial.
             offset = opFrac(offset)  # type: ignore
-        except TypeError:
+        except TypeError as te:
             if offset not in OffsetSpecial:  # pragma: no cover
-                raise StreamException(f'Cannot set offset to {offset!r} for {element}')
+                raise StreamException(f'Cannot set offset to {offset!r} for {element}') from te
 
         idEl = id(element)
         if not addElement and idEl not in self._offsetDict:
@@ -210,7 +213,7 @@ class StreamCore(Music21Object):
         *,
         updateIsFlat: bool = True,
         clearIsSorted: bool = True,
-        memo: list[int] | None = None,
+        memo: list[int]|None = None,
         keepIndex: bool = False,
     ) -> None:
         '''
@@ -254,7 +257,7 @@ class StreamCore(Music21Object):
 
         # WHY??? THIS SEEMS OVERKILL, esp. since the first call to .sort() in .flatten() will
         # invalidate it! TODO: Investigate if this is necessary and then remove if not necessary
-        # should not need to do this...
+        # should not need to do this
 
         # if this Stream is a flat representation of something, and its
         # elements have changed, than we must clear the cache of that
@@ -333,32 +336,6 @@ class StreamCore(Music21Object):
             post.setDerivationMethod(methodName, recurse=True)
         return post
 
-    def coreHasElementByMemoryLocation(self, objId: int) -> bool:
-        '''
-        NB -- a "core" stream method that is not necessary for most users. use hasElement(obj)
-
-        Return True if an element object id, provided as an argument, is contained in this Stream.
-
-        >>> s = stream.Stream()
-        >>> n1 = note.Note('g')
-        >>> n2 = note.Note('g#')
-        >>> s.append(n1)
-        >>> s.coreHasElementByMemoryLocation(id(n1))
-        True
-        >>> s.coreHasElementByMemoryLocation(id(n2))
-        False
-        '''
-        if objId in self._offsetDict:
-            return True
-
-        for e in self._elements:
-            if id(e) == objId:  # pragma: no cover
-                return True
-        for e in self._endElements:
-            if id(e) == objId:  # pragma: no cover
-                return True
-        return False
-
     def coreGetElementByMemoryLocation(self, objId):
         '''
         NB -- a "core" stream method that is not necessary for most users.
@@ -368,7 +345,7 @@ class StreamCore(Music21Object):
         This is not the same as getElementById, which refers to the id
         attribute which may be manually set and not unique.
 
-        However, some implementations of python will reuse object locations, sometimes
+        However, some implementations of Python will reuse object locations, sometimes
         quickly, so don't keep these around.
 
         Used by spanner and variant.
@@ -426,7 +403,6 @@ class StreamCore(Music21Object):
         music21.exceptions21.StreamException: The object you tried to add to
         the Stream, 3.14159, is not a Music21Object.  Use an ElementWrapper
         object if this is what you intend.
-
         '''
         if element is self:  # cannot add this Stream into itself
             raise StreamException('this Stream cannot be contained within itself')
@@ -451,9 +427,9 @@ class StreamCore(Music21Object):
                         if eInStream is element:
                             raise StreamException(
                                 f'the object ({element!r}, id()={id(element)} '
-                                + f'is already found in this Stream ({self!r}, id()={id(self)})'
+                                f'is already found in this Stream ({self!r}, id()={id(self)})'
                             )
-                # something was old... delete from _offsetDict
+                # something was old. delete from _offsetDict
                 # environLocal.warn('stale object')
                 del self._offsetDict[idElement]  # pragma: no cover
         # if we do not purge locations here, we may have ids() for
@@ -494,7 +470,7 @@ class StreamCore(Music21Object):
         highly optimized data structure for searching through elements and
         offsets.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTimespans()
         >>> print(scoreTree)
         <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
@@ -543,20 +519,18 @@ class StreamCore(Music21Object):
 
         See tree.fromStream.asTree() for more details.
 
-        >>> score = tree.makeExampleScore()
+        >>> score = tree.examples.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
         '''
-        if t.TYPE_CHECKING:
-            assert isinstance(self, Stream)
         hashedAttributes = hash((tuple(classList or ()),
-                                  flatten,
-                                  useTimespans,
-                                  groupOffsets))
+                                 flatten,
+                                 useTimespans,
+                                 groupOffsets))
         cacheKey = 'elementTree' + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            hashedElementTree = tree.fromStream.asTree(self,
+            hashedElementTree = tree.fromStream.asTree(t.cast('Stream', self),
                                                        flatten=flatten,
                                                        classList=classList,
                                                        useTimespans=useTimespans,
@@ -570,8 +544,8 @@ class StreamCore(Music21Object):
         recurse: bool = True,
         requireAllPresent: bool = True,
         insert: bool = True,
-        constrainingSpannerBundle: spanner.SpannerBundle | None = None
-    ) -> list[spanner.Spanner] | None:
+        constrainingSpannerBundle: spanner.SpannerBundle|None = None
+    ) -> list[spanner.Spanner]|None:
         '''
         find all spanners that are referenced by elements in the
         (recursed if recurse=True) stream and either inserts them in the Stream
@@ -621,7 +595,6 @@ class StreamCore(Music21Object):
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
 
-
         Now we'll remove the second note so not all elements of the Slur
         are present. This, by default, will not insert the Slur:
 
@@ -652,7 +625,6 @@ class StreamCore(Music21Object):
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
 
-
         But the default acts with recursion:
 
         >>> part.coreGatherMissingSpanners()
@@ -661,7 +633,6 @@ class StreamCore(Music21Object):
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
         {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
-
 
         Spanners already in the stream are not put there again:
 
@@ -716,8 +687,8 @@ class StreamCore(Music21Object):
         {1.0} <music21.note.Note D>
         '''
         sb = self.spannerBundle
-        sIter: StreamIterator | RecursiveIterator
-        if recurse is True:
+        sIter: StreamIterator|RecursiveIterator
+        if recurse:
             sIter = self.recurse()  # type: ignore
         else:
             sIter = self.iter()  # type: ignore
@@ -732,16 +703,16 @@ class StreamCore(Music21Object):
                 if constrainingSpannerBundle is not None and sp not in constrainingSpannerBundle:
                     continue
                 if requireAllPresent:
-                    allFound = True
+                    allFound: bool = True
                     for spannedElement in sp.getSpannedElements():
                         if spannedElement not in sIter:
                             allFound = False
                             break
-                    if allFound is False:
+                    if not allFound:
                         continue
                 collectList.append(sp)
 
-        if insert is False:
+        if not insert:
             return collectList
 
         if collectList:  # do not run elementsChanged if nothing here.

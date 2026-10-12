@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/formats.py
 # Purpose:      Utilities for formats
@@ -38,17 +37,15 @@ if t.TYPE_CHECKING:
 
 
 # used for checking preferences, and for setting environment variables
-# TODO: only check top-level.  Let subconverters check sub formats.
+# TODO: only check top-level.  Let subConverters check sub formats.
 VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
                       'png', 'pdf', 'svg',
                       'lily.pdf', 'lily.png', 'lily.svg', 'braille',
-                      'vexflow', 'vexflow.html', 'vexflow.js',
                       'ipython', 'ipython.png', 'ipython.midi',
                       'musicxml.png', 'musicxml.pdf']
 VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
                        'png', 'pdf', 'svg',
                        'lily.pdf', 'lily.png', 'lily.svg', 'braille',
-                       'vexflow', 'vexflow.html', 'vexflow.js',
                        'ipython', 'ipython.png', 'ipython.midi',
                        'musicxml.png', 'musicxml.pdf',
                        'rntxt']
@@ -57,7 +54,7 @@ VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 # ------------------------------------------------------------------------------
 
 
-def findSubConverterForFormat(fmt: str) -> type[SubConverter] | None:
+def findSubConverterForFormat(fmt: str) -> type[SubConverter]|None:
     '''
     return a converter.subConverter.SubConverter subclass
     for a given format -- this is a music21 format name,
@@ -72,15 +69,14 @@ def findSubConverterForFormat(fmt: str) -> type[SubConverter] | None:
     >>> common.findSubConverterForFormat('romantext')
     <class 'music21.converter.subConverters.ConverterRomanText'>
 
-    Some subconverters have format aliases
+    Some subConverters have format aliases
 
     >>> common.findSubConverterForFormat('t')
     <class 'music21.converter.subConverters.ConverterText'>
-
     '''
     fmt = fmt.lower().strip()
     from music21 import converter
-    scl = converter.Converter().subconvertersList()
+    scl = converter.Converter().subConvertersList()
     for sc in scl:
         formats = sc.registerFormats
         if fmt in formats:
@@ -89,7 +85,7 @@ def findSubConverterForFormat(fmt: str) -> type[SubConverter] | None:
 
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
-def findFormat(fmt):
+def findFormat(fmt: str) -> tuple[str|None, str|None]:
     '''
     Given a format defined either by a format name, abbreviation, or
     an extension, return the regularized format name as well as
@@ -97,9 +93,8 @@ def findFormat(fmt):
 
     DEPRECATED May 2014 -- moving to converter
 
-
     All but the first element of the tuple are deprecated for use, since
-    the extension can vary by subconverter (e.g., lily.png)
+    the extension can vary by subConverter (e.g., lily.png)
 
     >>> common.findFormat('.mxl')
     ('musicxml', '.musicxml')
@@ -123,40 +118,34 @@ def findFormat(fmt):
     ('scala', '.scl')
     >>> common.findFormat('braille')
     ('braille', '.txt')
-    >>> common.findFormat('vexflow')
-    ('vexflow', '.html')
     >>> common.findFormat('capx')
     ('capella', '.capx')
 
-
     Works the same whether you have a leading dot or not:
-
 
     >>> common.findFormat('md')
     ('musedata', '.md')
     >>> common.findFormat('.md')
     ('musedata', '.md')
 
-
     If you give something we can't deal with, returns a Tuple of None, None:
 
     >>> common.findFormat('wpd')
     (None, None)
-
-
-    These don't work but should eventually:
-
-    # >>> common.findFormat('png')
-    # ('musicxml.png', '.png')
-
-    # >>> common.findFormat('ipython')
-    # ('ipython', '.png')
-    # >>> common.findFormat('ipython.png')
-    # ('ipython', '.png')
-
-    # >>> common.findFormat('musicxml.png')
-    # ('musicxml.png', '.png')
     '''
+    # These don't work but should eventually:
+    #
+    # # >>> common.findFormat('png')
+    # # ('musicxml.png', '.png')
+    #
+    # # >>> common.findFormat('ipython')
+    # # ('ipython', '.png')
+    # # >>> common.findFormat('ipython.png')
+    # # ('ipython', '.png')
+    #
+    # # >>> common.findFormat('musicxml.png')
+    # # ('musicxml.png', '.png')
+
     from music21 import converter
     c = converter.Converter()
     fileFormat = c.regularizeFormat(fmt)
@@ -179,7 +168,7 @@ def findFormat(fmt):
 @cache
 def findInputExtension(fmt: str) -> tuple[str, ...]:
     '''
-    Will be fully deprecated when there's an exact equivalent in converter...
+    Will be fully deprecated when there's an exact equivalent in converter.
 
     Given an input format or music21 format, find and return all possible
     input extensions.
@@ -193,7 +182,7 @@ def findInputExtension(fmt: str) -> tuple[str, ...]:
     >>> common.findInputExtension('musedata')
     ('.md', '.musedata', '.zip')
 
-    Leading dots don't matter...
+    Leading dots don't matter:
 
     >>> common.findInputExtension('.mxl')
     ('.xml', '.mxl', '.musicxml')
@@ -212,7 +201,7 @@ def findInputExtension(fmt: str) -> tuple[str, ...]:
     if sc is None:
         # file extension
         post: list[str] = []
-        for sc in converter.Converter().subconvertersList():
+        for sc in converter.Converter().subConvertersList():
             if fmt not in sc.registerInputExtensions:
                 continue
             for ext in sc.registerInputExtensions:
@@ -234,12 +223,11 @@ def findInputExtension(fmt: str) -> tuple[str, ...]:
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 
 
-def findFormatFile(fp):
+def findFormatFile(fp: str|pathlib.Path) -> str|None:
     r'''
     Given a file path (relative or absolute) return the format
 
     DEPRECATED May 2014 -- moving to converter
-
 
     >>> common.findFormatFile('test.xml')
     'musicxml'
@@ -260,7 +248,7 @@ def findFormatFile(fp):
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 
 
-def findFormatExtFile(fp):
+def findFormatExtFile(fp: str|pathlib.Path) -> tuple[str|None, str|None]:
     r'''
     Given a file path (relative or absolute)
     find format and extension used (not the output extension)
@@ -297,13 +285,12 @@ def findFormatExtFile(fp):
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 
 
-def findFormatExtURL(url):
+def findFormatExtURL(url: str) -> tuple[str|None, str|None]:
     '''
     Given a URL, attempt to find the extension.
     This may scrub arguments in a URL, or simply look at the last characters.
 
     DEPRECATED May 2014 -- moving to converter
-
 
     >>> urlA = 'http://somesite.com/?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
     >>> urlB = 'http://somesite.com/cgi-bin/ksdata?l=cc/schubert/d0576&file=d0576-06.krn&f=kern'
@@ -333,7 +320,7 @@ def findFormatExtURL(url):
     elif 'format=stage2' in url or 'format=stage1' in url:
         ext = '.md'
     else:  # check for file that ends in all known input extensions
-        for sc in converter.Converter().subconvertersList():
+        for sc in converter.Converter().subConvertersList():
             inputTypes = sc.registerInputExtensions
             for extSample in inputTypes:
                 if url.endswith('.' + extSample):

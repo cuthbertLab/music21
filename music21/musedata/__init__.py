@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         musedata/__init__.py
 # Purpose:      parses Walter Hewlett's MuseData format
@@ -27,7 +26,24 @@ Low level MuseData conversion is facilitated by the objects in this module and
 '''
 from __future__ import annotations
 
+__all__ = [
+    'MuseDataDirectory',
+    'MuseDataException',
+    'MuseDataFile',
+    'MuseDataMeasure',
+    'MuseDataMeasureIterator',
+    'MuseDataPart',
+    'MuseDataRecord',
+    'MuseDataRecordIterator',
+    'MuseDataWork',
+    'base12_26',
+    'base40',
+    'translate',
+]
+
+from collections.abc import Iterable
 import os
+import typing as t
 import unittest
 
 from music21 import environment
@@ -38,12 +54,13 @@ from music21.musedata import translate
 
 from music21 import common
 from music21 import prebase
+from music21.common.types import OffsetQL
 
 environLocal = environment.Environment('musedata')
 
 # for implementation
-# see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
-# and http://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
+# see https://www.ccarh.org/publications/books/beyondmidi/online/musedata/
+# and https://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
 
 
 # ------------------------------------------------------------------------------
@@ -57,8 +74,11 @@ class MuseDataRecord(prebase.ProtoM21Object):
     Object for extracting data from a Note or other related record, or a
     single line of musedata data.
     '''
-
-    def __init__(self, src='', parent=None):
+    def __init__(
+        self,
+        src: str = '',
+        parent=None
+    ):
         # environLocal.printDebug(['creating MuseDataRecord'])
         self.src = src  # src here is one line of text
         self.parent = parent
@@ -69,9 +89,9 @@ class MuseDataRecord(prebase.ProtoM21Object):
         else:
             self.stage = None
         # store frequently used values
-        self._cache = {}
+        self._cache: dict[str, str|None] = {}
 
-    def isRest(self):
+    def isRest(self) -> bool:
         '''
         Return a boolean if this record is a rest.
 
@@ -81,7 +101,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('measure 1       A')
         >>> mdr.isRest()
         False
-
         '''
         if self.src and self.src[0] == 'r':
             return True
@@ -94,7 +113,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('D4     8-       h     d        -')
         >>> mdr.isTied()
         True
-
 
         >>> mdr = musedata.MuseDataRecord('C4     1        s     u  [[')
         >>> mdr.isTied()
@@ -141,7 +159,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
 
     def _getPitchParameters(self):
         '''
-
         >>> mdr = musedata.MuseDataRecord('Ef4    1        s     d  ==')
         >>> mdr.isNote()
         True
@@ -161,7 +178,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         else:
             raise MuseDataException('cannot get pitch parameters from this kind of record')
 
-        pStr = [data[0]]  # first element will be A...G
+        pStr = [data[0]]  # first element will be A–G
         if '#' in data:
             pStr.append('#')
         elif '##' in data:
@@ -243,7 +260,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> p.accidental.displayStatus
         True
 
-
         Double sharps were giving octave problems.
 
         >>> mdr = musedata.MuseDataRecord('F##5   2        e x   d')
@@ -277,7 +293,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
             # environLocal.printDebug(['p', p])
             return p
 
-    def getQuarterLength(self, divisionsPerQuarterNote=None):
+    def getQuarterLength(self, divisionsPerQuarterNote: int|None = None) -> OffsetQL:
         '''
         Gets the quarterLength of the note given the prevailing divisionsPerQuarterNote
 
@@ -322,7 +338,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         else:
             raise MuseDataException('cannot access parent container of this record '
                                     + 'to obtain divisions per quarter')
-        return divisions / dpq
+        return common.opFrac(divisions / dpq)
 
     def getDots(self):
         if self.stage == 1:
@@ -335,16 +351,16 @@ class MuseDataRecord(prebase.ProtoM21Object):
                     return 2
             return 0
 
-#    def getType(self):
-#        # TODO: column 17 self.src[16] defines the graphic note type
-#        # this may or may not align with derived quarter length
-#        if self.stage == 1:
-#            return None
-#        else:
-#            if len(self.src) == 0:
-#                return None
-#            data = self.src[16]
-#            return data
+   # def getType(self):
+   #     # TODO: column 17 self.src[16] defines the graphic note type
+   #     # this may or may not align with derived quarter length
+   #     if self.stage == 1:
+   #         return None
+   #     else:
+   #         if len(self.src) == 0:
+   #             return None
+   #         data = self.src[16]
+   #         return data
 
     def getLyrics(self):
         '''
@@ -380,7 +396,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('E2     4        q     u')
         >>> mdr.getBeams() is None
         True
-
         '''
         if self.stage == 1:
             return None
@@ -394,9 +409,9 @@ class MuseDataRecord(prebase.ProtoM21Object):
     # TODO: need to get slurs from this indication:
     # (), {}, []
 
-    def _getAdditionalNotations(self):
+    def _getAdditionalNotations(self) -> str|None:
         '''
-        Return an articulation object or None
+        Return an articulation string or None
 
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p')
         >>> mdr._getAdditionalNotations()
@@ -416,16 +431,17 @@ class MuseDataRecord(prebase.ProtoM21Object):
         except KeyError:
             pass
 
+        data: str|None
         if len(self.src) < 31:
             data = None
         else:
             # accumulate chars 32-43, index 31, 42
-            data = []
+            data_list = []
             i = 31
             while i <= 42 and i < len(self.src):
-                data.append(self.src[i])
+                data_list.append(self.src[i])
                 i += 1
-            data = ''.join(data).strip()
+            data = ''.join(data_list).strip()
         self._cache['_getAdditionalNotations'] = data
         return data
 
@@ -440,7 +456,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p>')
         >>> mdr.getArticulationObjects()
         [<music21.articulations.Staccato>, <music21.articulations.Accent>]
-
         '''
         from music21 import articulations
         post = []
@@ -480,7 +495,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p>F')
         >>> mdr.getExpressionObjects()
         [<music21.expressions.Fermata>]
-
         '''
         from music21 import expressions
         post = []
@@ -514,7 +528,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('E4    48        h     u        (pp')
         >>> mdr.getDynamicObjects()
         [<music21.dynamics.Dynamic pp>]
-
         '''
         from music21 import dynamics
         post = []
@@ -522,25 +535,25 @@ class MuseDataRecord(prebase.ProtoM21Object):
         if data is None:
             return post
         # find targets from largest to smallest
-        targets = ['ppp', 'fff',
-                    'pp', 'ff', 'fp', 'mp', 'mf',
-                    'p', 'f', 'm', 'Z', 'Zp', 'R']
-        for t in targets:
-            pos = data.find(t)
+        targets = ('ppp', 'fff',
+                   'pp', 'ff', 'fp', 'mp', 'mf',
+                   'p', 'f', 'm', 'Z', 'Zp', 'R')
+        for target in targets:
+            pos = data.find(target)
             if pos < 0:
                 continue
             # remove from data to avoid double hits
-            data = data[:pos] + data[pos + len(t):]
-            # those that can be directedly created
-            if t in ['ppp', 'fff', 'pp', 'ff', 'p', 'f', 'mp', 'mf', 'fp']:
-                post.append(dynamics.Dynamic(t))
-            elif t == 'm':
+            data = data[:pos] + data[pos + len(target):]
+            # those that can be directly created
+            if target in ('ppp', 'fff', 'pp', 'ff', 'p', 'f', 'mp', 'mf', 'fp'):
+                post.append(dynamics.Dynamic(target))
+            elif target == 'm':
                 post.append(dynamics.Dynamic('mp'))
-            elif t == 'Z':  # sfz
+            elif target == 'Z':  # sfz
                 post.append(dynamics.Dynamic('sf'))
-            elif t == 'Zp':  # sfp
+            elif target == 'Zp':  # sfp
                 post.append(dynamics.Dynamic('sf'))
-            elif t == 'R':  # rfz
+            elif target == 'R':  # rfz
                 post.append(dynamics.Dynamic('sf'))
         # environLocal.printDebug(['got dynamics', post])
         return post
@@ -557,7 +570,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [')
         >>> mdr.hasCautionaryAccidental()
         False
-
         '''
         data = self._getAdditionalNotations()
         if data is None:
@@ -575,7 +587,7 @@ class MuseDataRecordIterator:
     '''
 
     def __init__(self, src, parent):
-        self.src = src  # the lost of all record lines
+        self.src = src  # the list of all record lines
         self.index = 0
         self.parent = parent
 
@@ -584,7 +596,7 @@ class MuseDataRecordIterator:
 
     def __next__(self):
         if self.index >= len(self.src):
-            raise StopIteration
+            raise StopIteration()
         # add one b/c end is inclusive
         mdr = MuseDataRecord(self.src[self.index], self.parent)
         self.index += 1
@@ -735,7 +747,7 @@ class MuseDataMeasureIterator:
     '''
 
     def __init__(self, src, boundaries, parent):
-        self.src = src  # the lost of all record lines
+        self.src = src  # the list of all record lines
         self.boundaries = boundaries  # pairs of all boundaries
         self.index = 0
         self.parent = parent
@@ -745,7 +757,7 @@ class MuseDataMeasureIterator:
 
     def __next__(self):
         if self.index >= len(self.boundaries):
-            raise StopIteration
+            raise StopIteration()
         start, end = self.boundaries[self.index]
         # add one b/c end is inclusive
         mdm = MuseDataMeasure(self.src[start:end + 1], self.parent)
@@ -789,8 +801,8 @@ class MuseDataPart(prebase.ProtoM21Object):
         attributes record starting with a $; if not found, it is stage 1. if it is found
         it is stage 2.
         '''
-        for i in range(len(self.src)):
-            if self.src[i].startswith('$'):
+        for attribute in self.src:
+            if attribute.startswith('$'):
                 return 2
         return 1
 
@@ -816,7 +828,6 @@ class MuseDataPart(prebase.ProtoM21Object):
 
     def _getDigitsFollowingTag(self, line, tag):
         '''
-
         >>> mdp = musedata.MuseDataPart()
         >>> mdp._getDigitsFollowingTag('junk WK#:2345', 'WK#:')
         '2345'
@@ -847,7 +858,6 @@ class MuseDataPart(prebase.ProtoM21Object):
     def _getAlphasFollowingTag(self, line, tag, keepSpace=False,
                                keepCase=False):
         '''
-
         >>> mdp = musedata.MuseDataPart()
         >>> mdp._getAlphasFollowingTag('Group memberships: sound, score', 'Group memberships:')
         'sound,score'
@@ -936,13 +946,33 @@ class MuseDataPart(prebase.ProtoM21Object):
                 return alphas.strip()
 
     def getSource(self):
-        '''
+        r'''
+        Return the source (original print encoding) for the score.
+
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
-        ...                    / 'test01' / '01.md')
+        ...                    / 'test01' / '03.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getSource()
-        'Breitkopf & H...rtel, Vol. 13'
+        'Breitkopf & Härtel, Vol. 13'
+
+        Note that the publisher is Härtel. MuseData predates the standardization
+        of encoding as UTF-8, so many
+        MuseData files are in Windows (ISO-8859-1) encodings.
+        Music21 tries first
+        in utf-8 and if there are errors will try again in ISO-8859-1, and if it
+        fails it will try to read ignoring any errors (leaving "Hrtel").
+        In this case, both UTF-8 and ISO-8859-1 support this character (Latin-1 space
+        in Unicode).
+
+        If you know the encoding you can pass that to MuseDataWork or MuseDataFile.
+        It is not yet a property you can specify in converter.
+
+        >>> mdw = musedata.MuseDataWork()
+        >>> mdw.encoding = 'ISO-8859-1'
+        >>> mdw.addFile(fp1)
+        >>> mdw.getParts()[0].getSource()
+        'Breitkopf & Härtel, Vol. 13'
         '''
         if self.stage == 1:
             # get the header number: not sure what this is for now
@@ -1075,7 +1105,6 @@ class MuseDataPart(prebase.ProtoM21Object):
         '''
         The attributes record is not in a fixed position,
         but is the first line that starts with a $.
-
 
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
         ...                    / 'test01' / '01.md')
@@ -1273,7 +1302,6 @@ class MuseDataPart(prebase.ProtoM21Object):
         '''
         Get the transposition, if defined, from the Metadata header.
 
-
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
         ...                    / 'test01' / '01.md')
         >>> fp2 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
@@ -1351,7 +1379,6 @@ class MuseDataPart(prebase.ProtoM21Object):
 
     def _getMeasureBoundaryIndices(self, src=None):
         '''
-
         >>> mdp = musedata.MuseDataPart()
         >>> mdp.stage is None
         True
@@ -1445,12 +1472,12 @@ class MuseDataFile(prebase.ProtoM21Object):
 
     When read, one or more MuseDataPart objects are created and stored on self.parts.
     '''
+    def __init__(self) -> None:
+        self.parts: list[MuseDataPart] = []
 
-    def __init__(self):
-        self.parts = []  # a lost of MuseDataPart objects
-
-        self.filename = None
-        self.file = None
+        self.filename: str|None = None
+        self.file: t.BinaryIO|None = None
+        self.encoding: str = 'utf-8'
 
     def _reprInternal(self):
         return ''
@@ -1465,7 +1492,7 @@ class MuseDataFile(prebase.ProtoM21Object):
         # call readstr with source string from file
         fileContents = self.file.read()
         try:
-            fileContents = fileContents.decode('utf-8')
+            fileContents = fileContents.decode(self.encoding)
         except UnicodeDecodeError:
             fileContents = fileContents.decode('ISO-8859-1', 'ignore')
         return self.readstr(fileContents)
@@ -1527,22 +1554,26 @@ class MuseDataWork(prebase.ProtoM21Object):
     A work might consist of one or more files.
     '''
 
-    def __init__(self):
-        self.files = []  # a list of one or more MuseDataFile objects
+    def __init__(self) -> None:
+        self.files: list[MuseDataFile] = []
+        self.encoding: str = 'utf-8'
 
-    def addFile(self, fp):
+    def addFile(self, fp: str | Iterable[str]) -> None:
         '''
         Open and read this file path or list of paths as MuseDataFile objects
         and set self.files
         '''
+        fpList: Iterable[str]
         if not common.isIterable(fp):
-            fpList = [fp]
+            fp_single = t.cast(str, fp)
+            fpList = [fp_single]
         else:
             fpList = fp
 
         for fpInner in fpList:
             mdf = MuseDataFile()
-            # environLocal.printDebug('processing MuseData file: %s' % fp)
+            mdf.encoding = self.encoding
+            # environLocal.printDebug(f'processing MuseData file: {fp}')
             mdf.open(fpInner)
             mdf.read()  # process string and break into parts
             mdf.close()
@@ -1553,11 +1584,11 @@ class MuseDataWork(prebase.ProtoM21Object):
         Add a string representation acting like a part file
 
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString('WK#:581       MV#:3c\nBreitkopf & Hartel, Vol. 13\n' +
-        ...               'Clarinet Quintet\n' +
-        ...               'Trio II\n' +
-        ...               '$  K:0   Q:6   T:3/4   X:-11   C:4\n' +
-        ...               'C5     3        e     d  [     (&0p\n' +
+        >>> mdw.addString('WK#:581       MV#:3c\nBreitkopf & Hartel, Vol. 13\n'
+        ...               'Clarinet Quintet\n'
+        ...               'Trio II\n'
+        ...               '$  K:0   Q:6   T:3/4   X:-11   C:4\n'
+        ...               'C5     3        e     d  [     (&0p\n'
         ...               'E5     3        e     d  ]')
 
         # TODO: Okay, so what? did we test this or demo anything?

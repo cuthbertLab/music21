@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 '''
 Run tests of notebooks using nbval -- called from testDocumentation
 
@@ -13,14 +12,31 @@ import sys
 import subprocess
 
 # noinspection PyPackageRequirements
-import pytest  # pylint: disable=unused-import,import-error
+try:
+    import pytest
+except ImportError:  # pragma: no cover
+    # fail here to get a better message than file-not-found below.
+    raise ImportError(
+        'Please install pytest -- in the music21 directory run "pip install ".[dev]"'
+    )
+
 # noinspection PyPackageRequirements
-import nbval  # pylint: disable=unused-import,import-error
+try:
+    import nbval
+except ImportError:  # pragma: no cover
+    raise ImportError(
+        'Please install nbval -- in the music21 directory run "pip install ".[dev]"'
+    )
 
 from music21 import environment
 from music21 import common
 
-# pytest --nbval usersGuide_15_key.ipynb --sanitize-with ../../nbval-sanitize.cfg -q
+if pytest is None or nbval is None:  # pragma: no cover
+    # this will never run, but it's important to use pytest and nbval variables
+    # or some modern code linters will remove the import pytest, import nbval lines.
+    raise ImportError('Please install pytest and nbval')
+
+# pytest --nbval usersGuide_15_key.ipynb --nbval-sanitize-with ../../nbval-sanitize.cfg -q
 skip = ['installJupyter.ipynb']
 
 def getAllFiles() -> list[pathlib.Path]:
@@ -60,17 +76,19 @@ def runOne(nbFile):
     us['musescoreDirectPNGPath'] = '/skip' + str(museScore)
 
     # this config file changes 0x39f3a0 to 0xADDRESS.
-    sanitize_fn = str(common.getRootFilePath()
-                      / 'documentation'
-                      / 'docbuild'
-                      / 'nbval-sanitize.cfg'
-                      )
+    sanitize_fn = str(
+        common.getRootFilePath()
+        / 'documentation'
+        / 'docbuild'
+        / 'nbval-sanitize.cfg'
+    )
+
     try:
         retVal = subprocess.run(
             ['pytest',
              '--disable-pytest-warnings',
              '--nbval', str(nbFile),
-             '--sanitize-with', sanitize_fn,
+             '--nbval-sanitize-with', sanitize_fn,
              '-q'],
             check=False,
         )
