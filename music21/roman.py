@@ -917,6 +917,35 @@ def correctRNAlterationForMinor(
     return FigureTuple(figureTuple.degFromRefPitch, alter, rootAlterationString)
 
 
+def _isDiatonicToKey(chordObj: chord.Chord, keyObj: key.Key) -> bool:
+    '''
+    True if every pitch name in the chord is in the key's scale.
+    In minor, the raised sixth and seventh are in the scale too.
+
+    AI-assisted (Claude).
+
+    >>> roman._isDiatonicToKey(chord.Chord('F4 A4 C5'), key.Key('c'))
+    True
+    >>> roman._isDiatonicToKey(chord.Chord('F4 A4 C5'), key.Key('f'))
+    False
+    '''
+    # keyObj.pitches is slow; the key signature gives the same scale
+    signatureAlters = {p.step: p.alter for p in keyObj.alteredPitches}
+    outsideScale = [p for p in chordObj.pitches
+                    if p.alter != signatureAlters.get(p.step, 0)]
+    if not outsideScale:
+        return True
+    if keyObj.mode != 'minor':
+        return False
+    stepOrder = 'CDEFGAB'
+    tonicIndex = stepOrder.index(keyObj.tonic.step)
+    sixthAndSeventhSteps = (stepOrder[(tonicIndex + 5) % 7],
+                            stepOrder[(tonicIndex + 6) % 7])
+    return all(p.step in sixthAndSeventhSteps
+               and p.alter == signatureAlters.get(p.step, 0) + 1
+               for p in outsideScale)
+
+
 def romanNumeralFromChord(
     chordObj: chord.Chord,
     keyObj: key.Key|str|None = None,
@@ -1142,7 +1171,8 @@ def romanNumeralFromChord(
 
     * the chord is a major triad or dominant seventh
 
-    * the chord is not diatonic to the primary key (i.e., chromatically altered)
+    * the chord is not diatonic to the primary key (i.e., chromatically altered;
+      in minor, the raised sixth and seventh count as diatonic)
 
     * the root of secondary key is diatonic to the primary key.
 
@@ -1417,6 +1447,7 @@ def romanNumeralFromChord(
         preferSecondaryDominants
         and stepRoman != 'V'  # ignore if already "primary" dominant
         and (chordObj.isDominantSeventh() or chordObj.isMajorTriad())
+        and not _isDiatonicToKey(chordObj, keyObj)
     ):
         possibleSecondaryTonic = chordObj.root().transpose('P4').name
         degree = keyObj.getScaleDegreeFromPitch(possibleSecondaryTonic)
@@ -4900,6 +4931,25 @@ class Test(unittest.TestCase):
             with self.subTest(figure=fig):
                 with self.assertRaises(RomanNumeralException):
                     RomanNumeral(fig, 'C')
+
+    def testPreferSecondaryDominantsSkipsDiatonicChords(self):
+        # https://github.com/cuthbertLab/music21/issues/2053
+        # in minor, the raised sixth and seventh count as diatonic
+        for chordString, keyString, plainFigure, preferredFigure in (
+            ('C4 E4 G4', 'C', 'I', 'I'),
+            ('E-4 G4 B-4', 'c', 'III', 'III'),
+            ('F4 A4 C5', 'c', 'IV', 'IV'),
+            ('D4 F#4 A4', 'C', 'II', 'V/V'),
+            ('F4 A4 C5', 'f', 'I', 'V/iv'),
+        ):
+            with self.subTest(chord=chordString, key=keyString):
+                cObj = chord.Chord(chordString)
+                plain = romanNumeralFromChord(cObj, keyString)
+                self.assertEqual(plain.figure, plainFigure)
+                preferred = romanNumeralFromChord(cObj,
+                                                  keyString,
+                                                  preferSecondaryDominants=True)
+                self.assertEqual(preferred.figure, preferredFigure)
 
 
 class TestExternal(unittest.TestCase):
