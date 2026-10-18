@@ -510,6 +510,14 @@ class Test(unittest.TestCase):
         self.assertEqual(str(i1.transposition), '<music21.interval.Interval M-2>')
         self.assertEqual(str(i2.transposition), '<music21.interval.Interval M-6>')
 
+    def testTransposeOctaveChangeWithoutDiatonic(self):
+        # https://github.com/cuthbertLab/music21/issues/2082
+        MP = MeasureParser()
+        mxTranspose = self.EL('<transpose><chromatic>0</chromatic>'
+                              '<octave-change>-1</octave-change></transpose>')
+        self.assertEqual(str(MP.xmlTransposeToInterval(mxTranspose)),
+                         '<music21.interval.Interval P-8>')
+
     def testInstrumentTranspositionB(self):
         from music21.musicxml import testPrimitive
         from music21 import converter
