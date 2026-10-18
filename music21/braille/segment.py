@@ -1328,13 +1328,11 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                 break
             self.allKeyPairs.popleft()
             if useKey.affinity == Affinity.SIGNATURE:
-                try:
-                    keySignature, timeSignature = useElement[0], useElement[1]
-                except IndexError:
-                    if isinstance(useElement, key.KeySignature):
-                        keySignature = useElement[0]
-                    else:
-                        timeSignature = useElement[0]
+                for el in useElement:
+                    if keySignature is None and isinstance(el, key.KeySignature):
+                        keySignature = el
+                    elif timeSignature is None and isinstance(el, meter.TimeSignature):
+                        timeSignature = el
             elif useKey.affinity == Affinity.TTEXT:
                 tempoText = useElement[0]
             elif useKey.affinity == Affinity.MMARK:
