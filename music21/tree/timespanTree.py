@@ -737,11 +737,33 @@ class TimespanTree(trees.OffsetTree):
     # PUBLIC PROPERTIES #
 
     def allParts(self):
-        parts = set()
-        for timespan in self:
-            parts.add(timespan.part)
-        parts = sorted(parts, key=lambda x: x.getInstrument().partId)
-        return parts
+        '''
+        Returns a list of the parts that the timespans in this tree belong to.
+
+        If the tree's source has parts (such as a Score), the parts are returned
+        in the order they appear in the source.  Other parts come after them,
+        sorted by the partId of their instrument.
+
+        Parts do not need a partId:
+
+        >>> upper = stream.Part([instrument.Instrument(), note.Note('E4')])
+        >>> lower = stream.Part([instrument.Instrument(), note.Note('C3')])
+        >>> score = stream.Score([upper, lower])
+        >>> scoreTree = score.asTimespans()
+        >>> scoreTree.allParts() == [upper, lower]
+        True
+        '''
+        parts = {timespan.part for timespan in self}
+        source = self.source
+        sourceOrder = {}
+        if source is not None and hasattr(source, 'parts'):
+            sourceOrder = {id(part): i for i, part in enumerate(source.parts)}
+
+        def sortKey(part):
+            partId = part.getInstrument().partId
+            return (sourceOrder.get(id(part), len(sourceOrder)), partId is None, str(partId))
+
+        return sorted(parts, key=sortKey)
 
     def maximumOverlap(self):
         '''
