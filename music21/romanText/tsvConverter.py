@@ -4,7 +4,7 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2019 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2019-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -25,6 +25,7 @@ import unittest
 from music21 import chord
 from music21 import common
 from music21 import environment
+from music21 import exceptions21
 from music21 import harmony
 from music21 import key
 from music21 import metadata
@@ -34,6 +35,11 @@ from music21 import spanner
 from music21 import stream
 
 environLocal = environment.Environment()
+
+
+class TsvException(exceptions21.Music21Exception):
+    pass
+
 
 # A coercion callable maps a raw TSV string cell to a typed value (str, int,
 # float, or a fraction-aware float via _float_or_frac).
@@ -566,9 +572,10 @@ class TsvHandler:
 
         with open(fileName, 'r', encoding='utf-8') as f:
             tsvreader = csv.reader(f, delimiter='\t', quotechar='"')
+            rows = ([cell.strip() for cell in row] for row in tsvreader)
             # The first row is the header
-            self._get_heading_indices(next(tsvreader))
-            return list(tsvreader)
+            self._get_heading_indices(next(rows))
+            return [row for row in rows if any(row)]
 
     def _makeTabChord(self, row: list[str]) -> TabChordBase:
         '''
@@ -653,6 +660,8 @@ class TsvHandler:
         Works like the .template() method,
         except that we don't have a score to base the template on as such.
         '''
+        if not self.chordList:
+            raise TsvException(f'no chord rows found in {self.tsvFileName}')
         s = stream.Score()
         p = stream.Part()
         m: stream.Measure|None = None
@@ -1368,6 +1377,38 @@ class Test(unittest.TestCase):
         first_ending, second_ending = rb_iter
         _test_ending_contents(first_ending, ['2a'])
         _test_ending_contents(second_ending, ['2b'])
+
+    def testWhitespaceRows(self) -> None:
+        '''
+        AI-assisted (Claude) regression coverage for whitespace in DCML TSV files.
+        '''
+        # https://github.com/cuthbertLab/music21/issues/1541
+        import os
+        path = common.getSourceFilePath() / 'romanText' / 'tsvEg_v2_repeats.tsv'
+        text = path.read_text(encoding='utf-8')
+        clean = TsvHandler(path, dcml_version=2).toM21Stream()
+        expected = [rn.figure for rn in clean[roman.RomanNumeral]]
+        padded = '\n'.join(
+            '\t'.join(f' {cell} ' for cell in line.split('\t')) for line in text.splitlines()
+        )
+        variants = {
+            'blank line': text + '\n',
+            'tabs only': text + '\t\t\t\t\t\n',
+            'padded cells': padded + '\n\t\t\t\t\t\t\n',
+        }
+        tempFile = environment.Environment().getTempFile()
+        try:
+            for name, variant in variants.items():
+                with open(tempFile, 'w', encoding='utf-8') as f:
+                    f.write(variant)
+                parsed = TsvHandler(tempFile, dcml_version=2).toM21Stream()
+                self.assertEqual([rn.figure for rn in parsed[roman.RomanNumeral]], expected, name)
+            with open(tempFile, 'w', encoding='utf-8') as f:
+                f.write(text.split('\n', 1)[0] + '\n\n')
+            with self.assertRaises(TsvException):
+                TsvHandler(tempFile, dcml_version=2).toM21Stream()
+        finally:
+            os.remove(tempFile)
 
 # ------------------------------------------------------------------------------
 
