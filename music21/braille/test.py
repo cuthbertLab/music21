@@ -10098,6 +10098,36 @@ Barline final ⠣⠅
         ⠁⠀⠨⠜⠨⠫⠬⠱⠬⠀⠀⠨⠝⠨⠤
         ⠀⠀⠸⠜⠸⠫⠬⠳⠸⠤⠀⠸⠝⠤⠀
         '''
+
+    def test_keyboardInteriorKeyChangeWithoutMeterChange(self):
+        # https://github.com/cuthbertLab/music21/issues/1986
+        def buildPart(pitchNames):
+            part = stream.PartStaff()
+            for i, pitchName in enumerate(pitchNames, 1):
+                m = stream.Measure(number=i)
+                if i == 1:
+                    m.append(key.KeySignature(0))
+                    m.append(meter.TimeSignature('4/4'))
+                if i == 5:
+                    m.append(BrailleSegmentDivision())
+                    m.append(key.KeySignature(2))
+                m.append(note.Note(pitchName, quarterLength=4.0))
+                part.append(m)
+            return part
+
+        self.method = keyboardPartsToBraille
+        score = stream.Score()
+        score.insert(0, buildPart(['C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5', 'C6']))
+        score.insert(0, buildPart(['C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4']))
+        self.s = score
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀
+        ⠁⠀⠨⠜⠨⠽⠀⠨⠵⠀⠨⠯⠀⠨⠿
+        ⠀⠀⠸⠜⠸⠽⠀⠸⠵⠀⠸⠯⠀⠸⠿
+        ⠀⠀⠀⠀⠀⠀⠀⠩⠩⠀⠀⠀⠀⠀⠀
+        ⠑⠀⠨⠜⠨⠷⠀⠨⠮⠀⠨⠾⠀⠰⠽
+        ⠀⠀⠸⠜⠸⠷⠀⠸⠮⠀⠸⠾⠀⠐⠽
+        '''
 # ------------------------------------------------------------------------------
 
 
