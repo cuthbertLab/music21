@@ -31,10 +31,9 @@ jobs:
               enable-cache: true
               cache-dependency-glob: |
                   pyproject.toml
-                  uv.lock
         - name: Install dependencies
           run: |
-              uv sync --locked
+              uv sync
         - name: Install Ubuntu dependencies
           run: ./.github/scripts/install_ubuntu_deps.sh
         - name: Setup Lilypond
@@ -66,10 +65,9 @@ jobs:
                   enable-cache: true
                   cache-dependency-glob: |
                       pyproject.toml
-                      uv.lock
             - name: Install dependencies
               run: |
-                  uv sync --locked
+                  uv sync
             - name: Lint with pylint
               run: |
                   uv run pylint -j0 music21
@@ -89,10 +87,9 @@ jobs:
                   enable-cache: true
                   cache-dependency-glob: |
                       pyproject.toml
-                      uv.lock
             - name: Install dependencies
               run: |
-                  uv sync --locked
+                  uv sync
             - name: Code-style etc. with Ruff
               run: |
                   uv run ruff check music21
@@ -112,10 +109,9 @@ jobs:
                   enable-cache: true
                   cache-dependency-glob: |
                       pyproject.toml
-                      uv.lock
             - name: Install dependencies
               run: |
-                  uv sync --locked
+                  uv sync
             - name: Type-check all modules with mypy
               run: |
                   uv run mypy music21

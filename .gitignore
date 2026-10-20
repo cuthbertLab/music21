@@ -97,3 +97,4 @@ music21/monkeytype.sqlite3
 # agents
 .agents/worktrees
 .claude/worktrees
+uv.lock

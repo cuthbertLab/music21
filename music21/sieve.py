@@ -2006,9 +2006,6 @@ class PitchSieve:
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def testDummy(self):
-        self.assertEqual(True, True)
-
     def pitchOut(self, listIn):
         out = '['
         for p in listIn:
