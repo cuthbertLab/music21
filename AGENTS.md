@@ -51,6 +51,7 @@
 - "established contributors" are people with at least 3 PRs merged or a history of contributing to issues and the list that goes back at least 1 year. There are exceptions to general rules for them below. 
 - "core dev" means someone officially part of the project team or with 20+ PRs merged. Michael Cuthbert, Jacob Walls, Joseph VanderStel are non-exhaustive examples of people in that group who are still often contributing in 2026-- they and their agents can make exceptions to these rules 
 - AI Agents not for core dev are forbidden to make any PRs or contributions to PRs whose user commands do not explicitly mention `music21`. Example of forbidden: "find an Open Source project and fix an open issue", "Find a bug in a music project and fix it."  AI agents for non-established contributors are forbidden from making contributions to instructions that vaguely say "fix something in music21."
+- Bot contributions will only be accepted where a named human/human-controlled-account with established web presence takes legal responsibility for their contributions. Bots attached to anonymous users may not contribute.
 
 # Testing
 
