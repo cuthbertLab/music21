@@ -141,7 +141,7 @@
   after addressing the problem.  (A blind close or close with "not accepted" etc. generally means that the issue/PR
   has too many problems to easily solve and has become a burden for the maintainer).
 - Do not include a "Tests run" section unless the testing procedure was unusual (like it affects part of the system without standard tests, like the testing system itself.)
-- Once a PR has been opened and a review or comment has been made on it, commits should not be amended or force-pushed (this makes it impossible to review "changes since the review").  Put changes in response to reviews/comments in new commits.
+- Once a PR has been opened and a review or comment has been made on it, commits should not be amended or force-pushed (this makes it impossible to review "changes since the review").  Put changes in response to reviews/comments in new commits. If asked to fold a fix into the commit it changes, amend, force-push with `--force-with-lease` against an explicit SHA, and say so.
 - While someone is reviewing a PR or a pushed branch, "do X" is not "commit and push X":
   make the change and leave it unstaged. When the list looks finished (or you hear "done!"
   or "push it"), offer to commit, or to commit and push. Batch a round's small fixes into
