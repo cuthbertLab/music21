@@ -5194,6 +5194,16 @@ class MeasureParser(XMLParserBase):
 
             # set number; '' or None is interpreted as 1
 
+        # a barline may also carry a segno or coda (MusicXML allows both inside <barline>);
+        # put them in the measure where the barline is, as a direction would
+        for tag, markClass in (('segno', repeat.Segno), ('coda', repeat.Coda)):
+            mxMark = mxBarline.find(tag)
+            if mxMark is not None:
+                rm = markClass()
+                synchronizeIds(mxMark, rm)
+                self.setPosition(mxMark, rm)
+                self.insertCoreAndRef(self.offsetMeasureNote, None, rm)
+
         if barline.location == 'left':
             # environLocal.printDebug(['setting left barline', barline])
             m.leftBarline = barline

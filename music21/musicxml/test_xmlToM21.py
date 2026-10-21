@@ -1832,6 +1832,42 @@ class Test(unittest.TestCase):
             p_notes2 = [n.name for n in p_expanded[note.Note]]
             self.assertEqual(p_notes2, ['G', 'A', 'G', 'B'])
 
+    def testSegnoAndCodaInBarline(self):
+        '''
+        MusicXML allows <segno/> and <coda/> inside a <barline>, not only in a
+        <direction>.  They should be imported, so that a later D.S. can find the segno.
+        '''
+        from music21 import converter
+
+        def measure(number, step, before='', after=''):
+            return (f'<measure number="{number}">{before}<note><pitch><step>{step}</step>'
+                    f'<octave>4</octave></pitch><duration>4</duration>'
+                    f'<type>whole</type></note>{after}</measure>')
+
+        def score(*measures):
+            return ('<score-partwise version="4.0"><part-list><score-part id="P1">'
+                    '<part-name>Music</part-name></score-part></part-list><part id="P1">'
+                    + ''.join(measures) + '</part></score-partwise>')
+
+        attributes = '<attributes><divisions>1</divisions></attributes>'
+        ds = '<direction><direction-type><words>D.S.</words></direction-type></direction>'
+        s = converter.parse(score(measure(1, 'C', attributes),
+                                  measure(2, 'D', '<barline location="left"><segno/></barline>'),
+                                  measure(3, 'E', after=ds)),
+                            format='musicxml')
+        segnos = s.parts.first().measure(2)[repeat.Segno]
+        self.assertEqual(len(segnos), 1)
+        self.assertEqual(segnos.first().offset, 0.0)
+        expanded = s.expandRepeats()
+        self.assertEqual([n.name for n in expanded[note.Note]], ['C', 'D', 'E', 'D', 'E'])
+
+        s = converter.parse(score(measure(1, 'C', attributes),
+                                  measure(2, 'D', '<barline location="left"><coda/></barline>')),
+                            format='musicxml')
+        codas = s.parts.first().measure(2)[repeat.Coda]
+        self.assertEqual(len(codas), 1)
+        self.assertEqual(codas.first().offset, 0.0)
+
 
 if __name__ == '__main__':
     import music21
