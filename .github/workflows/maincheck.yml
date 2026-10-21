@@ -12,7 +12,8 @@ on:
 env:
     # We run coverage on a middle supported Python so that failures on newest and
     # oldest versions return first.
-    PY_VERSION_WITH_COVERAGE: '3.13'
+    # 3.14+ is much faster: coverage uses sys.monitoring there by default.
+    PY_VERSION_WITH_COVERAGE: '3.14'
 
 jobs:
     run_tests:
