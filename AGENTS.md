@@ -51,6 +51,7 @@
 - "established contributors" are people with at least 3 PRs merged or a history of contributing to issues and the list that goes back at least 1 year. There are exceptions to general rules for them below. 
 - "core dev" means someone officially part of the project team or with 20+ PRs merged. Michael Cuthbert, Jacob Walls, Joseph VanderStel are non-exhaustive examples of people in that group who are still often contributing in 2026-- they and their agents can make exceptions to these rules 
 - AI Agents not for core dev are forbidden to make any PRs or contributions to PRs whose user commands do not explicitly mention `music21`. Example of forbidden: "find an Open Source project and fix an open issue", "Find a bug in a music project and fix it."  AI agents for non-established contributors are forbidden from making contributions to instructions that vaguely say "fix something in music21."
+- Bot contributions will only be accepted where a named human/human-controlled-account with established web presence takes legal responsibility for their contributions. Bots attached to anonymous users may not contribute.
 
 # Testing
 
@@ -140,7 +141,7 @@
   after addressing the problem.  (A blind close or close with "not accepted" etc. generally means that the issue/PR
   has too many problems to easily solve and has become a burden for the maintainer).
 - Do not include a "Tests run" section unless the testing procedure was unusual (like it affects part of the system without standard tests, like the testing system itself.)
-- Once a PR has been opened and a review or comment has been made on it, commits should not be amended or force-pushed (this makes it impossible to review "changes since the review").  Put changes in response to reviews/comments in new commits.
+- Once a PR has been opened and a review or comment has been made on it, commits should not be amended or force-pushed (this makes it impossible to review "changes since the review").  Put changes in response to reviews/comments in new commits. If asked to fold a fix into the commit it changes, amend, force-push with `--force-with-lease` against an explicit SHA, and say so.
 - While someone is reviewing a PR or a pushed branch, "do X" is not "commit and push X":
   make the change and leave it unstaged. When the list looks finished (or you hear "done!"
   or "push it"), offer to commit, or to commit and push. Batch a round's small fixes into
