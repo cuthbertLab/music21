@@ -20,6 +20,9 @@ reproduced on Mac or Windows.
 To reiterate: **GNU/Linux/etc. is not a system for which support
 questions will be answered**.  See Consulting in the FAQ for details on paid support.
 
+If you are new to your operating system, ask an AI agent that knows about it
+(tell it which one you have, such as Ubuntu 24.04) to help you with the steps below.
+
 
 Check Your Version of Python
 ----------------------------------------------
@@ -43,20 +46,28 @@ which do not ship by default with recent versions of Python.
 Download `music21` 
 ----------------------------------------------
 
-Download the newest version with:
+Download the newest version with uv, in a folder for your `music21` work
+(see :ref:`installMac`; the uv install command there works here too)::
 
-    pip3 install --upgrade music21
+    uv init --bare
+    uv add music21
 
 
 Configure `music21`
 ----------------------------------------------
 Configure music21 with:
 
-    python3 -m music21.configure
+    uv run python -m music21.configure
 
-It is important to put the path to your MusicXML reader during these
-prompts.  Music21 cannot find where your XML reader (probably MuseScore)
-is installed on most Unix/Linux systems.  If you do not know about
+The configuration assistant does not ask for your MusicXML reader on these
+systems.  `music21` looks for MuseScore at `/usr/bin/mscore3`; if yours is
+somewhere else, set it in `uv run python`::
+
+    from music21 import environment
+    environment.set('musicxmlPath', '/usr/bin/mscore')
+    environment.set('musescoreDirectPNGPath', '/usr/bin/mscore')
+
+If you do not know about
 filepaths and how to find them, you should probably not be using
 GNU/Linux, FreeBSD, etc. with `music21`.
 
@@ -90,7 +101,8 @@ Still have problems?
 
 If you have followed all the instructions and still encounter problems, 
 start over from scratch and try it again very carefully.  
-If you still have problems **contact an expert in your operating system**.
+If you still have problems ask an AI agent that knows about your operating system
+or **contact an expert in your operating system**.
 
 The `music21` maintainers cannot help with Unix installation problems except
 as paid support.  See Consulting in the FAQ for details on paid support.
