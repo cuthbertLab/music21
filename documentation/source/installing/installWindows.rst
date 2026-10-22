@@ -117,8 +117,8 @@ If you already have your own Python setup (a virtual environment, conda, and so 
 After Installation
 -------------------------------
 
-After a successful installation, you may proceed to :ref:`Notes <usersGuide_02_notes>` to
-begin using `music21`.
+After a successful installation, go back to :ref:`Chapter 1 <usersGuide_01_installing>`
+of the User's Guide to try out `music21`.
 
 
 Installation Help
