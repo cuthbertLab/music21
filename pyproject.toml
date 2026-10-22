@@ -97,6 +97,12 @@ default-groups = ["dev"]
 [tool.hatch.version]
 path = "music21/_version.py"
 
+[tool.hatch.build]
+# hatchling reads only this repo's .gitignore, not a global one
+exclude = [
+    ".*",
+]
+
 [tool.hatch.build.targets.sdist]
 include = [
     "music21",
