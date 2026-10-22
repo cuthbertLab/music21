@@ -242,16 +242,27 @@ class JupyterNotebookReSTWriter(ReSTWriter):
         # Do not run self.setupOutputDirectory()
 
     def run(self):
-        for jupyterNotebookFilePath in self.jupyterNotebookFilePaths:
-            nbConvertReturnCode = self.convertOneNotebook(jupyterNotebookFilePath)
-            if nbConvertReturnCode is True:
-                self.cleanupNotebookAssets(jupyterNotebookFilePath)
+        wasConverted = common.runParallel(self.jupyterNotebookFilePaths,
+                                          self.convertAndCleanUp)
+        for jupyterNotebookFilePath, converted in zip(self.jupyterNotebookFilePaths,
+                                                      wasConverted):
+            if converted:
                 print(f'\tWROTE   {common.relativepath(jupyterNotebookFilePath)}')
             else:
                 print(f'\tSKIPPED {common.relativepath(jupyterNotebookFilePath)}')
 
                 # do not print anything for skipped -checkpoint files
         self.writeIndexRst()
+
+    def convertAndCleanUp(self, jupyterNotebookFilePath) -> bool:
+        '''
+        Convert one notebook and clean up its assets; return True if it was converted.
+        run() calls this in separate processes, one notebook each.
+        '''
+        if self.convertOneNotebook(jupyterNotebookFilePath) is True:
+            self.cleanupNotebookAssets(jupyterNotebookFilePath)
+            return True
+        return False
 
     def writeIndexRst(self):
         '''
