@@ -451,7 +451,7 @@ class JupyterNotebookReSTWriter(ReSTWriter):
             # noinspection PyPackageRequirements
             from nbconvert import nbconvertapp as nb
         except ImportError:
-            environLocal.warn('nbconvert is not installed, run pip3 install nbconvert')
+            environLocal.warn('nbconvert is not installed, run uv sync')
             raise
 
         outputPath = os.path.splitext(
