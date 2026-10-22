@@ -3,164 +3,118 @@
 Installing `music21` on Mac
 ============================================
 
-Because Apple changes their system details so much
-from one version of OS X to another, installing `music21`
-is probably the hardest part of the experience.
-Once you have that set, the rest should be much less painful.
-Trust us that it should work.
+These steps give you a folder for your `music21` work, with Python, `music21`,
+and Jupyter inside it. Jupyter lets you write and run `music21` code in your
+web browser and see the results (including notation) right under it.
+You don't need to install Python first; the steps below do that for you.
 
 
-Downloading Python 3 from python.org
+Open Terminal
 ---------------------------------------
 
-Though most Macs come with Python, it's usually a very old version.
-We recommend updating that by going to https://www.python.org/downloads
-and getting the latest version.
-
-(The `music21` team strongly recommends using the version of
-Python 3 from the python.org website and not the Conda version
-(or Enthought Canopy) because music21 is fully compatible with
-`matplotlib` on the python.org site.
-If you have no plans on plotting functions,
-feel free to use any flavor of Python 3.)
+Terminal is where you type commands to your Mac. It's in Applications, then
+Utilities, then "Terminal" (or press Command-Space and type "Terminal").
+You'll use it often, so you might want to drag it to the Dock.
 
 
-Simple install on macOS Sierra or OS X El Capitan
---------------------------------------------------
+Install uv
+---------------------------------------
 
-If you're on the newest versions of OS X, Sierra or El Capitan, then
-installation is very easy.  Open up "Terminal" in "Applications -> Utilities",
-then type at the prompt:
+uv is a free tool that installs Python and Python packages like `music21`.
+Copy this line into Terminal and press Return::
 
-     sudo pip3 install music21
+    curl -LsSf https://astral.sh/uv/install.sh | sh
 
-it will prompt you for your password.  TADA: you have `music21` for Python!
-
-To upgrade later, just do
-
-    sudo pip3 install --upgrade music21
-
-If you have a techy friend, he or she may recommend you use a virtual
-environment to keep your `music21` installation separate from other
-installations.  If you friend is willing to help you through
-the additional problems that come with that (and the additional features),
-listen to them.  Otherwise, do it our way above.
+When it finishes, close the Terminal window and open a new one, so that
+Terminal knows where uv is. (If you use Homebrew, `brew install uv` works too.)
 
 
+Make a folder for music21
+---------------------------------------
 
-Starting Python and Checking the Version
-----------------------------------------------
+Type these lines one at a time, pressing Return after each::
 
-Python is a simple but powerful programming language that `music21`
-is written in and in which you will write your own programs that
-use `music21`.
+    mkdir ~/m21play
+    cd ~/m21play
+    uv init --bare
+    uv add music21
+    uv add notebook
 
-To determine the Python version you have installed, open a
-terminal (by going to Applications, then Utilities, and then
-double clicking "Terminal") and enter the following command-line argument:
-
-    `python3 -V`
-
-it should display in Terminal something like the following:
-
-.. image:: images/macScreenPythonVersion.*
-    :width: 650
-
-If it says 3.12 or higher (or possibly a number like 3.12.7), you're okay.
-If it says 2.7 or 3.4 or something,
-go to https://www.python.org/downloads/
-and download a newer version.  Multiple versions of Python can exist
-on a single computer without any problems.
-
-After starting Python, try typing:
-
-    `2+2`
-
-You should see `4`.  This means Python is working.  Now see if
-`music21` is working by typing:
-
-    `import music21`
-
-Hopefully this should work fine.
-
-Exit python by typing `quit()`.
+This makes a folder called `m21play` (or whatever you want to call your music21
+playing around applications) in your home folder (the one with
+the house icon in Finder) and installs Python, `music21`, and Jupyter Notebook
+into it. Just don't call the folder `music21`
+itself.
 
 
-Starting the Configuration Assistant
------------------------------------------------------
+Set up music notation
+---------------------------------------
 
-If you only installed the `music21` package with `pip` (for
-instance, by running `sudo pip3 install music21`), you should run
-the assistant from a command prompt::
+To see notation in the browser, `music21` needs MuseScore -- so download it even if
+you normally use Dorico or Sibelius or Finale. It's free at https://musescore.org;
+install it before going on.
 
-    python3 -m music21.configure
+Then run the Configuration Assistant. In the same Terminal window, type::
 
-You can also run the Configuration Assistant from a Python shell
- like this::
-
-    import music21
-    music21.configure.run()
+    uv run python -m music21.configure
 
 After waiting a few moments to load modules, the Configuration Assistant begins.
+It lists the notation programs it finds on your Mac. Type the number of your
+favorite and press Return: outside of Jupyter, `music21` will open scores there.
 
-.. image:: images/macScreenConfigAssistantStart.*
-    :width: 650
-
-If you have never used `music21` before,
-following these prompts is recommended.
-
-Selecting a MusicXML reader is the first step.
-MusicXML is one of many display formats used by `music21`, and
-will provide an easy way for you to visualize, print, and
-transfer the music you edit or develop in `music21`.
-
-The Configuration Assistant will attempt to find a MusicXML
-reader on your system. If it can't find any, you will be asked
-to open a URL to download MuseScore, a simple and free
-MusicXML reader and easy writer. Installing MuseScore is
-recommended for users who do not have Finale, Sibelius, Dorico, MuseScore,
-or another MusicXML reader.
-
-If one or more MusicXML readers are found, skip ahead to the next instructions.
-
-.. image:: images/macScreenConfigAssistantReader.*
-    :width: 650
-
-If you choose to install MuseScore (formerly we suggested Finale Reader; hence the pictures below),
-you will download an installer. Launch the installer immediately, and follow the instructions.
-
-.. image:: images/macScreenConfigAssistantFinaleInstall.*
-    :width: 650
-
-After installing a MusicXML reader, or if you already have
-one or more installed, the Configuration Assistant will present you with a
-list of MusicXML readers from which to select one to use with music21 by
-default. This means that `music21` will attempt to open MusicXML files
-with this application. This setting can be easily changed later.
-Enter the number of the selection as presented in the list:
-
-.. image:: images/macScreenConfigAssistantSelect.*
-    :width: 650
-
-After selecting a MusicXML reader, you will be asked a number of
+Next you will be asked a number of
 questions about working with `music21`. They concern whether music21 can access
 the Internet, and whether you are willing to comply with the license for
 use of music21 and the included corpus of scores.  You have to accept the
 license to continue (we need to retain some rights you know!), but you
 don't have to give us access to the Internet.
 
-.. image:: images/macScreenConfigAssistantQuestions.*
-    :width: 650
 
-After the Configuration Assistant is complete, you can close the window when
-it says "[process terminated]".
+Start Jupyter
+---------------------------------------
+
+Still in the `m21play` folder, type::
+
+    uv run jupyter notebook
+
+Your web browser opens with a list of the files in your folder. Choose
+"New", then "Notebook", and pick the Python kernel if asked. In the first box
+(a "cell"), type::
+
+    from music21 import *
+    n = note.Note('A4')
+    n.pitch.frequency
+
+and press Shift-Return. You should see `440.0`: `music21` is working. Now try
+`n.show()` in the next cell to see the note as notation.
+
+When you're done, close the browser tab and press Control-C in Terminal.
+
+
+Coming back later
+---------------------------------------
+
+Open Terminal and type::
+
+    cd ~/m21play
+    uv run jupyter notebook
+
+To get the newest version of `music21`, type this in the folder (not the jupyter notebook)::
+
+    uv add --upgrade music21
+
+Other packages go in the same way; for instance, `uv add matplotlib` for
+`music21`'s graphs.
+
+If you'd rather use Python without Jupyter, `uv run python` in the folder
+starts it with `music21` ready to import.
+
+If you already have your own Python setup (a virtual environment, conda, and so on),
+`pip install music21` there works too.
 
 
 After Installation
 -------------------------------
-
-Open up the Mac Terminal (under Applications/Utilities/Terminal). You might want
-to drag it to the dock.  You'll use it often.
 
 After a successful installation, you may proceed to :ref:`Notes <usersGuide_02_notes>` to
 begin using music21.
@@ -170,8 +124,8 @@ Installation Help
 -------------------------------
 
 If you have followed all the instructions and still encounter problems, start over from scratch
-and try it again very carefully.  If you still have problems
-contact the `music21` group and someone should be able to help:
+and try it again very carefully.  If you still have problems ask an AI agent (most know
+music21 pretty well) or lean on humans and contact the `music21` group and it's a friendly
+group with users always happy to help:
 
 https://groups.google.com/g/music21list
-

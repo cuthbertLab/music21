@@ -11,3 +11,4 @@ Project-shared agent memory for music21. One file per fact; see frontmatter for 
 - [Issue #1349 romanNumeral direction](issue-1349-romanNumeral-direction.md) — raised-^6/^7 fix landed; CAUTIONARY default kept; items 2+4 open with pablopupo/Malcolm
 - [Meter immutability re-apply](meter-immutability-reapply.md) — meter-speed is too stale to merge; re-apply FrozenDuration + immutable MeterTerminal + tuple NumDenom fresh on master
 - [Helpers public by default](helpers-public-by-default.md) — reusable theory helpers go public + documented (search first); inline one-caller helpers that would cost runtime
+- [MuseScore PNG path](musescore-png-path.md) — MuseScore renders notebook/.png/.pdf notation for everyone; users still pick their own app for show()
