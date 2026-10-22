@@ -9,6 +9,7 @@
 # -----------------------------------------------------------------------------
 from __future__ import annotations
 
+import enum
 import importlib
 
 from sphinx import addnodes
@@ -43,9 +44,37 @@ def fixLines(lines):
             newLines.append(line)
     lines[:] = newLines
 
+def isEnumClass(what, obj) -> bool:
+    '''
+    True if autodoc is documenting an enum class:
+
+    >>> from music21 import interval
+    >>> isEnumClass('class', interval.Direction)
+    True
+    >>> isEnumClass('class', interval.Interval)
+    False
+    '''
+    return what == 'class' and isinstance(obj, type) and issubclass(obj, enum.Enum)
+
+
+def enumMemberLines(enumClass: type[enum.Enum]) -> list[str]:
+    '''
+    rst lines listing an enum's members and their values:
+
+    >>> from music21 import interval
+    >>> enumMemberLines(interval.Direction)
+    ['', '.. rubric:: Members', '', '- ``DESCENDING`` = ``-1``',
+     '- ``OBLIQUE`` = ``0``', '- ``ASCENDING`` = ``1``']
+    '''
+    return ['', '.. rubric:: Members', ''] + [
+        f'- ``{member.name}`` = ``{member.value!r}``' for member in enumClass
+    ]
+
+
 def processDocstring(app, what, name, obj, options, lines):
     '''
     Process the ``lines`` of each docstring, in place.
+    Enum classes also get a list of their members.
     '''
     #    print('WHAT ', what)
     #    print('NAME ', name)
@@ -53,6 +82,17 @@ def processDocstring(app, what, name, obj, options, lines):
     #    print('OPTS ', options)
     #    print('LINES', lines)
     fixLines(lines)
+    if isEnumClass(what, obj):
+        lines.extend(enumMemberLines(obj))
+
+
+def processSignature(app, what, name, obj, options, signature, return_annotation):
+    '''
+    Show no signature for enum classes, rather than Python's `(*values)`.
+    '''
+    if isEnumClass(what, obj):
+        return '', None
+    return None
 
 
 def processSource(app, name, lines):
@@ -89,6 +129,7 @@ class LinkImportedNames(SphinxPostTransform):
 
 def setup(app):
     app.connect('autodoc-process-docstring', processDocstring)
+    app.connect('autodoc-process-signature', processSignature)
     app.connect('source-read', processSource)
     app.add_post_transform(LinkImportedNames)
     extension_metadata = {'version': '1.0',
