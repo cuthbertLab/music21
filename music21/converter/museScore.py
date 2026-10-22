@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-23 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2013-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -14,6 +14,7 @@ from music21.  It was formerly mostly in subConverters.
 from __future__ import annotations
 import os
 import pathlib
+import re
 import typing as t
 import unittest
 
@@ -25,7 +26,70 @@ from music21.exceptions21 import SubConverterException
 environLocal = environment.Environment('converter.museScore')
 
 if t.TYPE_CHECKING:
-    pass
+    from collections.abc import Iterable
+
+reMuseScoreBefore3 = re.compile(r'MuseScore ?[12]\b', re.IGNORECASE)
+
+
+def findMuseScore(searchDirs: Iterable[str|pathlib.Path]|None = None) -> pathlib.Path|None:
+    '''
+    Return the MuseScore program (version 3 or newer) that music21 can run to make
+    images of notation, or None if there isn't one.  Looks in the usual places for
+    this computer (Applications folders on Mac, Program Files on Windows, the PATH
+    elsewhere) unless given `searchDirs`.  If several versions are installed,
+    returns the newest.
+
+    * New in v11.
+
+    AI-assisted (Claude).
+    '''
+    platform = common.getPlatform()
+    if platform == 'darwin':
+        patterns: tuple[str, ...] = ('MuseScore*.app/Contents/MacOS/mscore',)
+        defaultDirs: list[str|pathlib.Path] = ['/Applications',
+                                               pathlib.Path.home() / 'Applications']
+    elif platform == 'win':
+        patterns = ('MuseScore*/bin/MuseScore*.exe',)
+        defaultDirs = [os.environ[key]
+                       for key in ('ProgramFiles', 'ProgramFiles(x86)', 'ProgramW6432')
+                       if os.environ.get(key)]
+    else:
+        # names do not give versions here, so check in order: a bare "mscore"
+        # is MuseScore 2 on Debian but MuseScore 4 on Arch
+        patterns = ('mscore4portable', 'mscore3', 'musescore3', 'mscore', 'musescore')
+        defaultDirs = [d for d in os.environ.get('PATH', '').split(os.pathsep) if d]
+
+    if searchDirs is None:
+        searchDirs = defaultDirs
+    searchPaths = [pathlib.Path(d) for d in searchDirs]
+    for pattern in patterns:
+        # keyed by the path inside its folder, e.g. "MuseScore 4.app/Contents/MacOS/mscore"
+        found = {str(p.relative_to(d)): p for d in searchPaths for p in d.glob(pattern)}
+        current = {name: p for name, p in found.items()
+                   if not reMuseScoreBefore3.search(name)}
+        if current:
+            return current[max(current)]
+    return None
+
+
+def getMuseScorePath() -> pathlib.Path:
+    '''
+    Return the MuseScore program set as `musescoreDirectPNGPath`.  If that is
+    missing or points nowhere, find MuseScore and save its location; if it is
+    not installed, raise a SubConverterException that says where to get it.
+
+    * New in v11.
+    '''
+    museScorePath = environLocal['musescoreDirectPNGPath']
+    if museScorePath is not None and museScorePath.exists():
+        return museScorePath
+    found = findMuseScore()
+    if found is None:
+        raise SubConverterException(
+            'To show notation, music21 needs MuseScore (free from https://musescore.org), '
+            + 'even if you use other notation software.  Install it and then try again.')
+    environment.set('musescoreDirectPNGPath', found)
+    return found
 
 def runThroughMuseScore(
     fp,
@@ -45,15 +109,7 @@ def runThroughMuseScore(
     * leaveMargin: if trimEdges is True, then this number of pixels is left around the
       trimmed image.
     '''
-    museScorePath = environLocal['musescoreDirectPNGPath']
-    if not museScorePath:
-        raise SubConverterException(
-            'To create PNG files directly from MusicXML you need to download MuseScore and '
-            + 'put a link to it in your .music21rc via Environment.')
-    if not museScorePath.exists():
-        raise SubConverterException(
-            "Cannot find a path to the 'mscore' file at "
-            + f'{museScorePath} -- download MuseScore')
+    museScorePath = getMuseScorePath()
 
     if not subformats:
         subformatExtension = 'png'
@@ -175,6 +231,66 @@ def findPNGRange(
 
 
 class Test(unittest.TestCase):
+    def _fakeInstall(self, root: pathlib.Path, *programs: str) -> None:
+        for program in programs:
+            (root / program).parent.mkdir(parents=True, exist_ok=True)
+            (root / program).touch()
+
+    def testFindMuseScoreNewestOnMac(self):
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            apps = pathlib.Path(tmp)
+            self._fakeInstall(apps,
+                              'MuseScore 3.app/Contents/MacOS/mscore',
+                              'MuseScore 4.app/Contents/MacOS/mscore')
+            oldApps = apps / 'old'
+            self._fakeInstall(oldApps,
+                              'MuseScore 2.app/Contents/MacOS/mscore',
+                              'Dorico 5.app/Contents/MacOS/Dorico 5')
+            with mock.patch('music21.common.getPlatform', return_value='darwin'):
+                self.assertEqual(findMuseScore([apps]),
+                                 apps / 'MuseScore 4.app' / 'Contents' / 'MacOS' / 'mscore')
+                self.assertIsNone(findMuseScore([oldApps]))
+
+    def testFindMuseScoreOnWindows(self):
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            programFiles = pathlib.Path(tmp)
+            self._fakeInstall(programFiles, 'MuseScore 4/bin/MuseScore4.exe')
+            with mock.patch('music21.common.getPlatform', return_value='win'):
+                self.assertEqual(findMuseScore([programFiles]),
+                                 programFiles / 'MuseScore 4' / 'bin' / 'MuseScore4.exe')
+
+    def testFindMuseScoreOnLinux(self):
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as tmp:
+            binDir = pathlib.Path(tmp)
+            # Debian's "mscore" is MuseScore 2; "mscore3" says what it is
+            self._fakeInstall(binDir, 'mscore', 'mscore3')
+            with mock.patch('music21.common.getPlatform', return_value='nix'):
+                self.assertEqual(findMuseScore([binDir]), binDir / 'mscore3')
+
+    def testGetMuseScorePathSavesWhatItFinds(self):
+        from unittest import mock
+        found = pathlib.Path(__file__)  # any file that exists
+        with (mock.patch('music21.converter.museScore.environLocal',
+                         {'musescoreDirectPNGPath': pathlib.Path('/nowhere/mscore')}),
+              mock.patch('music21.converter.museScore.findMuseScore', return_value=found),
+              mock.patch('music21.environment.set') as setMock):
+            self.assertEqual(getMuseScorePath(), found)
+        setMock.assert_called_once_with('musescoreDirectPNGPath', found)
+
+    def testGetMuseScorePathSaysWhereToGetIt(self):
+        from unittest import mock
+        with (mock.patch('music21.converter.museScore.environLocal',
+                         {'musescoreDirectPNGPath': None}),
+              mock.patch('music21.converter.museScore.findMuseScore', return_value=None)):
+            with self.assertRaisesRegex(SubConverterException, 'https://musescore.org'):
+                getMuseScorePath()
+
     def pngNumbering(self):
         '''
         Testing findNumberedPNGPath() with files of lengths
