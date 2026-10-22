@@ -29,7 +29,7 @@ When it finishes, close the Terminal window and open a new one, so that
 Terminal knows where uv is. (If you use Homebrew, `brew install uv` works too.)
 
 
-Make a folder for music21
+Make a folder for `music21`
 ---------------------------------------
 
 Type these lines one at a time, pressing Return after each::
@@ -40,7 +40,7 @@ Type these lines one at a time, pressing Return after each::
     uv add music21
     uv add notebook
 
-This makes a folder called `m21play` (or whatever you want to call your music21
+This makes a folder called `m21play` (or whatever you want to call your `music21`
 playing around applications) in your home folder (the one with
 the house icon in Finder) and installs Python, `music21`, and Jupyter Notebook
 into it. Just don't call the folder `music21`
@@ -63,9 +63,9 @@ It lists the notation programs it finds on your Mac. Type the number of your
 favorite and press Return: outside of Jupyter, `music21` will open scores there.
 
 Next you will be asked a number of
-questions about working with `music21`. They concern whether music21 can access
+questions about working with `music21`. They concern whether `music21` can access
 the Internet, and whether you are willing to comply with the license for
-use of music21 and the included corpus of scores.  You have to accept the
+use of `music21` and the included corpus of scores.  You have to accept the
 license to continue (we need to retain some rights you know!), but you
 don't have to give us access to the Internet.
 
@@ -88,7 +88,7 @@ Your web browser opens with a list of the files in your folder. Choose
 and press Shift-Return. You should see `440.0`: `music21` is working. Now try
 `n.show()` in the next cell to see the note as notation.
 
-When you're done, close the browser tab and press Control-C in Terminal.
+When you're done, close the browser tab and press Control-C twice in Terminal.
 
 
 Coming back later
@@ -117,7 +117,7 @@ After Installation
 -------------------------------
 
 After a successful installation, you may proceed to :ref:`Notes <usersGuide_02_notes>` to
-begin using music21.
+begin using `music21`.
 
 
 Installation Help
@@ -125,7 +125,7 @@ Installation Help
 
 If you have followed all the instructions and still encounter problems, start over from scratch
 and try it again very carefully.  If you still have problems ask an AI agent (most know
-music21 pretty well) or lean on humans and contact the `music21` group and it's a friendly
+`music21` pretty well) or lean on humans and contact the `music21` group. It's a friendly
 group with users always happy to help:
 
 https://groups.google.com/g/music21list
