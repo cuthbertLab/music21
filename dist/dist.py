@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2025 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -20,8 +20,8 @@ To do a release,
     lot of tests in corpus, metadata, etc. so don't skip the next step!
 3. IMPORTANT: `uv run documentation/testDocumentation.py` and afterwards fix errors [*]
 
-[*] you will need pytest, docutils, nbval installed (along with ipython and jupyter),
-you cannot check to see if fixed tests work while it is running.
+[*] `uv sync` installs pytest, docutils, nbval, ipython, and jupyter.
+You cannot check to see if fixed tests work while it is running.
 This takes a while and runs single core, and then almost always needs code patches
 so allocate time (2 min on M4).  Start working on the announcement while it's running.
 Cannot run 2 and 3 in parallel, since often metadata changes cause documentation changes.
@@ -49,7 +49,7 @@ Cannot run 2 and 3 in parallel, since often metadata changes cause documentation
      note that since AI-Agent world, more and more links are being blocked from bot checking.
 9. `uv run documentation/make.py`   [*]
 
-[*] you will need sphinx, Jupyter (uv will install it), markdown, and pandoc (.dmg) installed
+[*] `uv sync` installs sphinx and Jupyter; you will also need markdown and pandoc (.dmg)
 
 10. move music21 documentation/build/html to music21.org/music21docs/
     via Amazon S3 (contact MSAC for authentication if need be)
@@ -60,17 +60,14 @@ Cannot run 2 and 3 in parallel, since often metadata changes cause documentation
 
 11. zip up documentation/build/html and get ready to upload/delete it (you can put on your
     desktop or wherever you like).
-    Rename to music21-9.5.0-docs.zip (skip for Alpha/Beta)
+    Rename to music21-11.1.0-docs.zip (skip for Alpha/Beta)
 
-12. From the music21 main folder (not subfolder) run "hatch build" --
-    requires hatch to be installed "pip install hatch" -- brew version of hatch
-    was giving Environment `default` is incompatible messages recently. (mysql? why relevant?)
+12. From the music21 main folder (not subfolder) run "uvx hatch build".
 
-    This builds the dist/music21-9.3.0.tar.gz and dist/music21-9.3.0-py3-none-any.whl
+    This builds the dist/music21-11.1.0.tar.gz and dist/music21-11.1.0-py3-none-any.whl
     files.  That used to be what *this* script did, but now hatch does it better!
 
-13. Run this (dist.py) file: it builds the no-corpus version of music21.
-    (need Python 3.12 or higher)
+13. Run this (dist.py) file with `uv run dist/dist.py`: it builds the no-corpus version of music21.
     DO NOT RUN THIS ON A PC or the Mac .tar.gz might have an incorrect permission if you do.
 
 14. PR and Commit to GitHub at this point w/ commit comment of the new version,
@@ -92,13 +89,11 @@ Cannot run 2 and 3 in parallel, since often metadata changes cause documentation
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-19a. Upload the tar.gz file to PyPI with "twine upload music21-9.3.0.tar.gz" [*]
+19a. Upload the tar.gz file to PyPI with "uvx twine upload music21-11.1.0.tar.gz" [*]
 
 19b. Do the same for the whl file (but not for the no-corpus file) [*]
 
-    [*] Requires twine to be installed and up-to-date (pip install --upgrade twine)
-
-    You will need a file called ~/.pypirc with
+    [*] You will need a file called ~/.pypirc with
 
         [distutils]
         index-servers =
