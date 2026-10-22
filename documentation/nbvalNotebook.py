@@ -17,7 +17,7 @@ try:
 except ImportError:  # pragma: no cover
     # fail here to get a better message than file-not-found below.
     raise ImportError(
-        'Please install pytest -- in the music21 directory run "pip install ".[dev]"'
+        'Please install pytest -- in the music21 directory run "uv sync"'
     )
 
 # noinspection PyPackageRequirements
@@ -25,7 +25,7 @@ try:
     import nbval
 except ImportError:  # pragma: no cover
     raise ImportError(
-        'Please install nbval -- in the music21 directory run "pip install ".[dev]"'
+        'Please install nbval -- in the music21 directory run "uv sync"'
     )
 
 from music21 import environment
