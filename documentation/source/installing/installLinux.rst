@@ -18,29 +18,8 @@ maintainers will only entertain `music21`-specific problems that can also be
 reproduced on Mac or Windows.
 
 To reiterate: **GNU/Linux/etc. is not a system for which support
-questions will be answered**.  See Consulting in the FAQ for details on paid support.
-
-If you are new to your operating system, ask an AI agent that knows about it
+questions will be answered**. Ask an AI agent that knows more about your OS
 (tell it which one you have, such as Ubuntu 24.04) to help you with the steps below.
-
-
-Check Your Version of Python
-----------------------------------------------
-
-`Music21` requires a recent version of Python.
-
-To determine the Python version you have installed, open a shell 
-or terminal and enter the following command-line argument (where "$" is the prompt):
-
-    $ python3 -V
-    
-it should display something like:
-
-    Python 3.13.2
-
-if so, you're okay.  If not, upgrade your version of Python.  This is
-often a problem on some AWS configuations, Google Colab, etc.
-which do not ship by default with recent versions of Python.
 
 
 Download `music21` 
@@ -102,7 +81,6 @@ Still have problems?
 If you have followed all the instructions and still encounter problems, 
 start over from scratch and try it again very carefully.  
 If you still have problems ask an AI agent that knows about your operating system
-or **contact an expert in your operating system**.
-
-The `music21` maintainers cannot help with Unix installation problems except
-as paid support.  See Consulting in the FAQ for details on paid support.
+or contact an expert in your operating system. Please do not bring Unix issues to
+the mailing list or GitHub unless you're also arriving with solutions (that go
+beyond problems created by boutique installations).

@@ -112,8 +112,8 @@ I'm using Linux/GNU/Unix and I'm having trouble configuring `music21`, can
 you help?
 
     Unfortunately, due to the number of different flavors of open-source
-    operating systems, the development team can only give free help to
-    Mac and Windows installation. (but see paid support, below).
+    operating systems, the development team can only give help to
+    Mac and Windows installation. Most AI agents can help you nowadays, however.
 
 Recurring misunderstandings
 ----------------------------
@@ -193,25 +193,16 @@ Feature requests and Consulting
 
 No, you don't understand, I **really** need this feature!
 
-    If you really need something done in `music21`, we offer paid support
-    by the hour at standard consulting rates. Contact `michael.asato.cuthbert@gmail.com`
-    for details and rates.
+    If you really need something done in `music21`, there are people who do work for it
+    on paid consulting contracts. Often even the main developer. But be kind, only
+    contact devs if you are willing to actually pay consulting rates. (Otherwise, it means you
+    don't *really* need the feature.)
     
 Is this also what I should do if I need help using `music21` for my own project?
 
     Yes, if you're having trouble getting `music21` to do what you want and you've
-    tried the mailing list/StackOverflow, etc. consulting is available to help.
-    
-Why not put the rate here?
-
-    The rate varies according to the difficulty of the feature--whether it
-    requires a principal investigator to run or whether it could be incorporated
-    into the education of a student; whether licensing agreements need to be signed, etc.
-    
-    Discounts are available for
-    academic researchers/composers who consider the consultation sufficiently 
-    essential as to add
-    authorship credit to the development team on a publication. 
+    tried the mailing list/Agents/StackOverflow, etc. there are often people on the
+    music21list who are open to doing work for hire.
 
 
 3rd-Party Utilities
