@@ -9,7 +9,8 @@ General
 How do I ask a question so that it becomes frequently asked?
 
     Don't you hate FAQs that are not based on anything anyone's ever asked?  
-    To ask, post to https://groups.google.com/g/music21list.  
+    To ask, post to https://groups.google.com/g/music21list or post an issue on
+    `GitHub <https://github.com/cuthbertLab/music21/issues>`__.
     But first read what we've already come up with below.
 
 Why is it called `music21`?
@@ -101,7 +102,7 @@ What is the native `music21` data format?
       in one of the solutions above, 
       you should have enough experience to create a data storage format of your own. 
       Please consider contributing 
-      your solution to improve the package.
+      your solution to improve the package. (We might try to use MNX soon as it's stable.)
 
 I'm ready to give it a try, but how do I install `music21`?
 
@@ -155,9 +156,12 @@ Can `music21` read in music directly from an image or a .pdf?
     Sorry, that's beyond `music21`'s capabilities. This technology
     is called OMR (Optical Music Recognition) and it's a whole separate
     field of research in itself.  Audiveris is an open-source OMR
-    software toolkit.  The development team here has had good experience
+    software toolkit.  (Download it only from its GitHub page,
+    https://github.com/Audiveris/audiveris/releases -- other sites offering
+    Audiveris downloads are often scams or carry malware.)
+    The development team here has had good experience
     with the commercial SmartScore application.  `Music21` does have a
-    good set of modules for improving the output of OMR after it's done.
+    set of modules for improving the output of OMR after it's done.
     See :ref:`moduleOmrCorrectors`.
 
 I'm having trouble reading in MIDI.  The docs for `music21.midi.translate`
@@ -177,32 +181,38 @@ to understand.  (Same for `musicxml`, `mei`, etc.)
     `s.write('midi', fp='filename.mid')`.  Or to hear it immediately,
     `s.show('midi')`.
 
+    By the way: MuseScore and other software generally do a better job of reading
+    performed MIDI files than `music21` does, so for complex tasks, we often
+    recommend converting to MusicXML with other software first, and then loading
+    those XML files into music21 instead.
 
-Feature requests and Consulting
+
+Feature requests
 -------------------------------
 `Music21` doesn't have some feature that I need, how do I get it added?
 
-    It won't hurt to email the list (or us directly) and we'll consider it.
-    However, we do have a priority list based on what we think the widest
-    audience will require or what we need for our own research.  If you'd
-    like your request to leap-frog to the front of the line, the best way
-    is to endow the programming of your feature through a donation that will
-    enable us to increase the number of student programming assistants we
-    employ.  (Or side-step us and offer a cash bounty on the music21list
-    itself).
+    You can put a request as an "Issue" on
+    `GitHub <https://github.com/cuthbertLab/music21/issues>`__
+    (just report it as a request, not a bug).
+    In general though, the core team has a priority list based on what we think the widest
+    audience is needing (or what we need for our own research), so please don't be surprised if
+    no `music21` core devs have time to implement it.
+    You can also rally support on the mailing list and hope for an angel programmer to help there.
 
 No, you don't understand, I **really** need this feature!
 
-    If you really need something done in `music21`, there are people who do work for it
-    on paid consulting contracts. Often even the main developer. But be kind, only
-    contact devs if you are willing to actually pay consulting rates. (Otherwise, it means you
+    The `music21` project does not offer paid consulting.
+    But if you really need something done in `music21`, there are people who do `music21` work
+    on paid consulting contracts. Often even the main developer wearing a separate hat.
+    But be kind, only contact devs if you are willing
+    to actually pay consulting rates. (Otherwise, it means you
     don't *really* need the feature.)
     
-Is this also what I should do if I need help using `music21` for my own project?
+Is this also what I should do if I need help integrating or using `music21` in my own project?
 
     Yes, if you're having trouble getting `music21` to do what you want and you've
     tried the mailing list/Agents/StackOverflow, etc. there are often people on the
-    music21list who are open to doing work for hire.
+    music21list who are open to doing work for hire in that realm.
 
 
 3rd-Party Utilities
