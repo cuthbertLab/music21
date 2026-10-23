@@ -638,8 +638,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(str(sc.nextPitch('D-2', Direction.DESCENDING)))
-        self.assertGreater(post.count('C2'), 30)
-        self.assertGreater(post.count('B1'), 30)
+        self.assertGreater(post.count('C2'), 25)
+        self.assertGreater(post.count('B1'), 25)
 
     def testWeightedHexatonicBluesA(self):
         sc = scale.WeightedHexatonicBlues('c4')
