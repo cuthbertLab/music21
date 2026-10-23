@@ -13,12 +13,10 @@ Simple storage for data defaults used throughout music21.
 '''
 from __future__ import annotations
 
-import unittest
-import typing as t
 from music21 import _version
 
+
 # note: this module should not import any higher level modules
-type StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
 
 
 # TODO: defaults should check the environment object to see
@@ -40,8 +38,8 @@ limitOffsetDenominator = 65535  # > CD track level precision.
 # not allowing more can be construed as a feature.
 
 
-pitchStep: StepName = 'C'
-pitchOctave = 4
+# we used to have a defaultStep ('C') and defaultOctave (4) but
+# no one ever changed them, and inlining makes so much faster.
 
 partGroup = 'Part Group'
 partGroupAbbreviation = 'PG'
@@ -114,15 +112,6 @@ abcVersionDefault = (1, 3, 0)
 # ----------------------------------------------------------------||||||||||||--
 
 
-class Test(unittest.TestCase):
-    '''
-    Unit tests
-    '''
-    def testTest(self):
-        self.assertEqual(1, 1)
-
-
-# ----------------------------------------------------------------||||||||||||--
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest()

@@ -188,6 +188,7 @@ from music21 import clef
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
+from music21 import expressions
 from music21 import instrument
 from music21 import interval
 from music21 import key
@@ -270,6 +271,21 @@ _UNIMPLEMENTED_IMPORT = 'Importing {} without {} is not yet supported.'
 _UNPROCESSED_SUBELEMENT = 'Found an unprocessed <{}> element in a <{}>.'
 _MISSED_DATE = 'Unable to decipher the composition date "{}"'
 _BAD_VERSE_NUMBER = 'Verse number must be an int (got "{}")'
+
+
+# Mapping from an MEI <bTrem> @unitdur (the note value of one tremolo repetition) to the number of
+# tremolo marks used by :class:`~music21.expressions.Tremolo`: an eighth-note unit is one mark, a
+# sixteenth two, and so on (log2(unitdur) - 2).  Durations outside this table produce no marks.
+_MEI_UNITDUR_TO_TREMOLO_MARKS = {
+    '8': 1,
+    '16': 2,
+    '32': 3,
+    '64': 4,
+    '128': 5,
+    '256': 6,
+    '512': 7,
+    '1024': 8,
+}
 
 
 # Module-level Functions
@@ -2632,7 +2648,7 @@ def beamFromElement(elem, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <clef>, <chord>, <note>, <rest>, <space>, <tuplet>, <beam>, <barLine>
+    - <clef>, <chord>, <note>, <rest>, <space>, <tuplet>, <beam>, <bTrem>, <barLine>
 
     **Attributes/Elements Ignored:**
 
@@ -2660,7 +2676,7 @@ def beamFromElement(elem, slurBundle=None):
 
     **Contained Elements not Implemented:**
 
-    - MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
+    - MEI.cmn: beatRpt fTrem halfmRpt meterSig meterSigGrp
     - MEI.critapp: app
     - MEI.edittrans: (all)
     - MEI.mensural: ligature mensur proport
@@ -2677,6 +2693,7 @@ def beamFromElement(elem, slurBundle=None):
         f'{MEI_NS}rest': restFromElement,
         f'{MEI_NS}tuplet': tupletFromElement,
         f'{MEI_NS}beam': beamFromElement,
+        f'{MEI_NS}bTrem': bTremFromElement,
         f'{MEI_NS}space': spaceFromElement,
         f'{MEI_NS}barLine': barLineFromElement,
     }
@@ -2753,7 +2770,7 @@ def tupletFromElement(elem, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <space>, <barLine>
+    - <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <bTrem>, <space>, <barLine>
     - @num and @numbase
 
     **Attributes/Elements in Testing:** none
@@ -2782,7 +2799,7 @@ def tupletFromElement(elem, slurBundle=None):
 
     **Contained Elements not Implemented:**
 
-    - MEI.cmn: bTrem beatRpt fTrem halfmRpt meterSig meterSigGrp
+    - MEI.cmn: beatRpt fTrem halfmRpt meterSig meterSigGrp
     - MEI.critapp: app
     - MEI.edittrans: (all)
     - MEI.mensural: ligature mensur proport
@@ -2796,6 +2813,7 @@ def tupletFromElement(elem, slurBundle=None):
         f'{MEI_NS}rest': restFromElement,
         f'{MEI_NS}chord': chordFromElement,
         f'{MEI_NS}clef': clefFromElement,
+        f'{MEI_NS}bTrem': bTremFromElement,
         f'{MEI_NS}space': spaceFromElement,
         f'{MEI_NS}barLine': barLineFromElement,
     }
@@ -2835,6 +2853,87 @@ def tupletFromElement(elem, slurBundle=None):
     return tuple(tupletMembers)
 
 
+def bTremFromElement(elem, slurBundle=None):
+    '''
+    <bTrem> A measured tremolo on a single note or chord (also called a bowed tremolo), in which
+    the enclosed note or chord is rapidly repeated in performance.
+
+    In MEI 2013 (MEI.cmn module).
+
+    :param elem: The ``<bTrem>`` element to process.
+    :type elem: :class:`~xml.etree.ElementTree.Element`
+    :returns: An iterable of the objects contained within the ``<bTrem>`` container. The wrapped
+        ``<note>`` or ``<chord>`` is imported with its notated duration, so that the onsets of
+        following events are not shifted.
+    :rtype: list of :class:`~music21.base.Music21Object`
+
+    **Example**
+
+    A quarter-note chord notated as a measured tremolo of eighth notes (``@unitdur="8"``, one
+    tremolo mark). The function returns the chord itself, carrying its notated duration and a
+    :class:`~music21.expressions.Tremolo` expression.
+
+    >>> from xml.etree import ElementTree as ET
+    >>> meiSnippet = """<bTrem xmlns="http://www.music-encoding.org/ns/mei" unitdur="8">
+    ...     <chord dur="4">
+    ...         <note pname="E" oct="4"/>
+    ...         <note pname="E" oct="5"/>
+    ...     </chord>
+    ... </bTrem>"""
+    >>> meiSnippet = ET.fromstring(meiSnippet)
+    >>> result = mei.base.bTremFromElement(meiSnippet)
+    >>> len(result)
+    1
+    >>> result[0]
+    <music21.chord.Chord E4 E5>
+    >>> result[0].quarterLength
+    1.0
+    >>> result[0].expressions
+    [<music21.expressions.Tremolo>]
+    >>> result[0].expressions[0].numberOfMarks
+    1
+
+    **Attributes/Elements Implemented:**
+
+    - <note>, <chord>
+    - @unitdur (mapped to :attr:`~music21.expressions.Tremolo.numberOfMarks`)
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:**
+
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight)
+    - att.bTrem.log (att.tremmeasured (@num, @numbase))
+    - att.bTrem.vis (all)
+    - att.bTrem.ges (att.duration.performed (@dur.ges))
+    - att.bTrem.anl (all)
+
+    **Contained Elements not Implemented:** none
+    '''
+    # mapping from tag name to our converter function
+    tagToFunction = {
+        f'{MEI_NS}chord': chordFromElement,
+        f'{MEI_NS}note': noteFromElement,
+    }
+
+    # Import the wrapped <note>/<chord> as an ordinary note/chord so its notated duration survives;
+    # otherwise the tremolo (and every onset after it in the layer) would be silently dropped.
+    tremoloStuff = _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle)
+
+    # Attach a measured Tremolo, deriving the number of marks from @unitdur when it is a usable
+    # duration; timing correctness is preserved even when @unitdur is absent or unrecognized.
+    numberOfMarks = _MEI_UNITDUR_TO_TREMOLO_MARKS.get(elem.get('unitdur', ''))
+    if numberOfMarks is not None:
+        for eachObj in tremoloStuff:
+            if isinstance(eachObj, note.NotRest):
+                tremolo = expressions.Tremolo()
+                tremolo.numberOfMarks = numberOfMarks
+                eachObj.expressions.append(tremolo)
+
+    return tremoloStuff
+
+
 def layerFromElement(elem, overrideN=None, slurBundle=None):
     '''
     <layer> An independent stream of events on a staff.
@@ -2860,7 +2959,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <clef>, <chord>, <note>, <rest>, <mRest>, <beam>, <tuplet>, <space>, <mSpace> , and
+    - <clef>, <chord>, <note>, <rest>, <mRest>, <beam>, <tuplet>, <bTrem>, <space>, <mSpace> , and
       <barLine> contained within
     - @n, from att.common
 
@@ -2881,7 +2980,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
 
     **Contained Elements not Implemented:**
 
-    - MEI.cmn: arpeg bTrem beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
+    - MEI.cmn: arpeg beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
                harpPedal mRpt mRpt2 meterSig meterSigGrp multiRest multiRpt octave pedal
                reh slur tie tuplet tupletSpan
     - MEI.cmnOrnaments: mordent trill turn
@@ -2906,6 +3005,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
         f'{MEI_NS}mRest': mRestFromElement,
         f'{MEI_NS}beam': beamFromElement,
         f'{MEI_NS}tuplet': tupletFromElement,
+        f'{MEI_NS}bTrem': bTremFromElement,
         f'{MEI_NS}space': spaceFromElement,
         f'{MEI_NS}mSpace': mSpaceFromElement,
         f'{MEI_NS}barLine': barLineFromElement,

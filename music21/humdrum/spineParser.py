@@ -165,7 +165,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         self.protoSpines: list[ProtoSpine] = []
         self.eventCollections: list[EventCollection] = []
         self.spineCollection: SpineCollection|None = None
-        # populated by insertGlobalEvents(), consumed by parseMetadata()
+        # populated by insertGlobalEvents(), used by parseMetadata()
         self.globalReferences: list[GlobalReference] = []
 
         if isinstance(dataStream, str):
@@ -364,12 +364,19 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             hdc = HumdrumDataCollection(dc)
             sc = hdc.parse()
             sc.id = 'section_' + str(i + 1)
-            sc.metadata.number = i + 1
+            scoreMetadata = sc.metadata
+            if scoreMetadata is None:
+                scoreMetadata = metadata.Metadata()
+                sc.insert(0, scoreMetadata)
+            scoreMetadata.number = str(i + 1)
             opus.append(sc)
 
         if dataCollections:
-            opus.metadata = copy.deepcopy(opus.scores[0].metadata)
-            opus.metadata.number = 0
+            opusMetadata = copy.deepcopy(opus.scores[0].metadata)
+            if opusMetadata is None:
+                opusMetadata = metadata.Metadata()
+            opusMetadata.number = '0'
+            opus.metadata = opusMetadata
 
         self.stream = opus
         return opus
@@ -962,8 +969,8 @@ class GlobalReferenceLine(HumdrumLine):
 
     TODO: add parsing of three-digit Kern comment codes into fuller metadata
     TODO: parse ``@``/``@@`` language tags here (e.g. ``!!!OPT@@RUS:``, ``!!!OPT@FRE:``)
-      and propagate language/isPrimary so that GlobalReference.updateMetadata
-      can attach ``metadata.Text(value, language=...)`` instead of bare strings.
+    and propagate language/isPrimary so that GlobalReference.updateMetadata
+    can attach ``metadata.Text(value, language=...)`` instead of bare strings.
     '''
     def __init__(self, lineNumber: int = 0, contents: str = '!!! NUL: None') -> None:
         self.lineNumber = lineNumber
@@ -1198,7 +1205,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
             return ''
         return parentSpine.spineType
 
-    def _getSpineType(self) -> str:
+    @property
+    def spineType(self) -> str:
         '''
         Searches the current and parent spineType.
         '''
@@ -1215,10 +1223,9 @@ class HumdrumSpine(prebase.ProtoM21Object):
         raise HumdrumException('Could not determine spineType '
                                + 'for spine with id ' + str(self.id))
 
-    def _setSpineType(self, newSpineType: str = '') -> None:
+    @spineType.setter
+    def spineType(self, newSpineType: str = '') -> None:
         self._spineType = newSpineType
-
-    spineType = property(_getSpineType, _setSpineType)
 
     def moveElementsIntoMeasures(self, streamIn: stream.Stream) -> stream.Stream:
         # noinspection PyShadowingNames
@@ -2412,7 +2419,7 @@ def hdStringToDuration(contents: str) -> duration.Duration:
     (_"92.." is the correct ``**kern`` encoding for a note whose duration is
     23 notes in the time of a doubly-dotted quarter._)
 
-    We will call the second interpretation the "JRP Flavor". The default JRP Flavor is False::
+    We will call the second interpretation the "JRP Flavor". The default JRP Flavor is False:
 
     >>> humdrum.spineParser.flavors['JRP']
     False
@@ -2558,7 +2565,7 @@ def hdStringToNote(
     >>> n.fullName
     'D-double-sharp in octave 5 Eighth Triplet (1/3 QL) Note'
 
-    If `overrideDuration` is passed in as a Duration object, that is used no matter what::
+    If `overrideDuration` is passed in as a Duration object, that is used no matter what:
 
     >>> n = humdrum.spineParser.hdStringToNote('12dd##',
     ...         overrideDuration=duration.Duration('whole'))
@@ -2576,7 +2583,7 @@ def hdStringToNote(
     'B-double-flat in octave 1 Eighth Note'
 
     Otherwise, it uses a quarter note and gives a warning.  This may become an error in
-    future versions::
+    future versions:
 
     >>> import warnings
     >>> with warnings.catch_warnings(record=True) as w:

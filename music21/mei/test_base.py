@@ -36,6 +36,7 @@ from music21 import articulations
 from music21 import bar
 from music21 import clef
 from music21 import duration
+from music21 import expressions
 from music21 import instrument
 from music21 import interval
 from music21 import key
@@ -2224,6 +2225,64 @@ class Test(unittest.TestCase):
             self.assertEqual(base._MISSING_VOICE_ID, maError.args[0])
 
     # -----------------------------------------------------------------------------
+    # Tests for bTremFromElement()
+
+    def testIntegration1BTremFromElement(self):
+        '''
+        bTremFromElement(): the wrapped <chord> is imported with its notated duration, and a
+        Tremolo expression is attached with the number of marks derived from @unitdur.
+        '''
+        inputXML = '''<bTrem xmlns="http://www.music-encoding.org/ns/mei" form="meas" unitdur="8">
+                          <chord dur="4">
+                              <note pname="E" oct="4" />
+                              <note pname="E" oct="5" />
+                          </chord>
+                      </bTrem>'''
+        elem = ETree.fromstring(inputXML)
+
+        actual = base.bTremFromElement(elem)
+
+        self.assertIsInstance(actual, list)
+        self.assertEqual(1, len(actual))
+        self.assertEqual(1.0, actual[0].quarterLength)
+        self.assertEqual(['E4', 'E5'], [p.nameWithOctave for p in actual[0].pitches])
+        self.assertEqual(1, len(actual[0].expressions))
+        self.assertIsInstance(actual[0].expressions[0], expressions.Tremolo)
+        self.assertEqual(1, actual[0].expressions[0].numberOfMarks)
+
+    def testIntegration2BTremFromElement(self):
+        '''
+        bTremFromElement() within a <layer>: a <bTrem> must not be silently dropped. The tremolo
+        note/chord contributes its notated duration so the onsets of following events do not shift
+        (regression test for https://github.com/cuthbertLab/music21/issues/1994).
+        '''
+        inputXML = '''<layer n="1" xmlns="http://www.music-encoding.org/ns/mei">
+                          <note xml:id="n1" dur="4" oct="4" pname="c" />
+                          <bTrem xml:id="bt1" form="meas" unitdur="8">
+                              <chord xml:id="ch1" dur="4">
+                                  <note xml:id="n2" oct="4" pname="e" />
+                                  <note xml:id="n3" oct="5" pname="e" />
+                              </chord>
+                          </bTrem>
+                          <note xml:id="n4" dur="2" oct="4" pname="g" />
+                      </layer>'''
+        elem = ETree.fromstring(inputXML)
+
+        actual = base.layerFromElement(elem)
+
+        self.assertEqual(3, len(actual))
+        # onsets are not shifted: the tremolo chord keeps its place on beat 2
+        self.assertEqual([0.0, 1.0, 2.0], [obj.offset for obj in actual])
+        self.assertEqual([1.0, 1.0, 2.0], [obj.quarterLength for obj in actual])
+        self.assertEqual('C4', actual[0].nameWithOctave)
+        # the beat-2 element is the E4/E5 chord, imported with a Tremolo expression
+        self.assertEqual(['E4', 'E5'], [p.nameWithOctave for p in actual[1].pitches])
+        self.assertEqual(1, len(actual[1].expressions))
+        self.assertIsInstance(actual[1].expressions[0], expressions.Tremolo)
+        self.assertEqual(1, actual[1].expressions[0].numberOfMarks)
+        self.assertEqual('G4', actual[2].nameWithOctave)
+
+    # -----------------------------------------------------------------------------
     # Tests for staffFromElement()
 
     @mock.patch('music21.mei.base.layerFromElement')
@@ -2593,7 +2652,7 @@ class Test(unittest.TestCase):
         '''
         # 1.) prepare
         elem = ETree.Element(f'{MEI_NS}staffDef', attrib={'meter.count': '1',
-                                                                  'meter.unit': '3'})
+                                                          'meter.unit': '3'})
         mockTime.return_value = 'mockTime return'
         mockFromString.side_effect = instrument.InstrumentException
         # otherwise staffDefFromElement() thinks it got a real Instrument
@@ -2611,7 +2670,7 @@ class Test(unittest.TestCase):
         '''
         # 1.) prepare
         elem = ETree.Element(f'{MEI_NS}staffDef', attrib={'meter.count': '1',
-                                                                  'meter.unit': '3'})
+                                                          'meter.unit': '3'})
 
         # 2.) run
         actual = base.staffDefFromElement(elem)
@@ -2627,7 +2686,7 @@ class Test(unittest.TestCase):
         '''
         elem = ETree.Element('staffGrp')
         innerElems = [ETree.Element(f'{MEI_NS}staffDef', attrib={'n': str(n)})
-                                                                    for n in range(4)]
+                      for n in range(4)]
         for eachElem in innerElems:
             elem.append(eachElem)
         mockStaffDefFE.side_effect = lambda x, unused_y: f"processed {x.get('n')}"

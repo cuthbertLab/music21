@@ -47,8 +47,8 @@ install additional Python libraries.
 The following topics cover additional software used by `music21`.
 For each library, visit the websites listed below, download the
 additional python libraries, and install them just as you did with
-`music21` above.  If you don't feel like installing them now, no worries:
-you can always install them later.
+`music21` (with `uv add`, in your `m21play` folder, or whatever you named it).
+If you don't feel like installing them now, no worries: you can always install them later.
 
 It's best not to install these until you have `music21` working without
 additional modules.
@@ -64,15 +64,11 @@ Matplotlib
 Graphing and visual displays in Music21 are provided by Matplotlib.
 Matplotlib itself has additional dependencies (such as NumPy).
 
-On Mac if you are using the version from python.org, run:
+In your `m21play` folder, run:
 
-`pip3 install matplotlib`
+`uv add matplotlib`
 
-and you should be set.  If you are using a version from anaconda
-(conda, miniconda, etc.), you should run these lines::
-
-    conda install matplotlib
-    conda install python.app
+and you should be set.
 
 
 numpy
@@ -81,9 +77,9 @@ numpy
 
 Numeric extensions to Python.  Included with Matplotlib.
 
-On Mac if you are using the version of python 3 from python.org, run::
+In your `m21play` folder, run::
 
-    pip3 install numpy
+    uv add numpy
 
 and you should be set.
 
@@ -97,9 +93,9 @@ audio searching and fast-Fourier transforms in `music21`.
 If you will only be using symbolic music, it is not used, and
 not essential in any case.
 
-On Mac if you are using the version from python.org, run::
+In your `m21play` folder, run::
 
-    pip3 install scipy
+    uv add scipy
 
 and you should be set.
 
@@ -114,7 +110,7 @@ On the Mac, run::
 
     xcode-select --install
     brew install portaudio
-    pip3 install pyaudio
+    uv add pyaudio
 
 
 pygame
@@ -122,8 +118,8 @@ pygame
 Allows for realtime MIDI performance.  We use it in the midi.realtime module, and nowhere else.
 It is therefore not essential.
 
-On the Mac, run::
+In your `m21play` folder, run::
 
-    pip3 install pygame
+    uv add pygame
 
 Pygame 1.9 or later is required for correct error handling

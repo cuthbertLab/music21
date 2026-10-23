@@ -211,7 +211,20 @@ class ScoreReduction:
         self._chordReduction = None  # store a chordal reduction of available
 
 
-    def _setScore(self, value):
+    @property
+    def score(self):
+        '''
+        Get or set the Score. Setting the score set a deepcopy of the score; the score
+        set here will not be altered.
+
+        >>> s = corpus.parse('bwv66.6')
+        >>> sr = analysis.reduction.ScoreReduction()
+        >>> sr.score = s
+        '''
+        return self._score
+
+    @score.setter
+    def score(self, value):
         if not isinstance(value, stream.Stream):
             raise ScoreReductionException('cannot set a non Stream')
         if value.hasPartLikeStreams:
@@ -223,20 +236,16 @@ class ScoreReduction:
             self._score = s
         self._score.setDerivationMethod('ScoreReduction', recurse=True)
 
-    def _getScore(self):
-        return self._score
+    @property
+    def chordReduction(self):
+        '''
+        Get or set a Chord reduction as a Stream or Score. Setting the this values
+        set a deepcopy of the reduction; the reduction set here will not be altered.
+        '''
+        return self._chordReduction
 
-    score = property(_getScore, _setScore, doc='''
-        Get or set the Score. Setting the score set a deepcopy of the score; the score
-        set here will not be altered.
-
-        >>> s = corpus.parse('bwv66.6')
-        >>> sr = analysis.reduction.ScoreReduction()
-        >>> sr.score = s
-        ''')
-
-
-    def _setChordReduction(self, value):
+    @chordReduction.setter
+    def chordReduction(self, value):
         if not isinstance(value, stream.Stream):
             raise ScoreReductionException('cannot set a non Stream')
         if value.hasPartLikeStreams():
@@ -246,14 +255,6 @@ class ScoreReduction:
             s = stream.Score()
             s.insert(0, copy.deepcopy(value))
             self._chordReduction = s
-
-    def _getChordReduction(self):
-        return self._chordReduction
-
-    chordReduction = property(_getChordReduction, _setChordReduction, doc='''
-        Get or set a Chord reduction as a Stream or Score. Setting the this values
-        set a deepcopy of the reduction; the reduction set here will not be altered.
-        ''')
 
 
 
@@ -462,7 +463,6 @@ class PartReduction:
     of all parts. The default is True.
 
     If the `normalize` parameter is False, no normalization will take place. The default is True.
-
     '''
     def __init__(self,
                  srcScore=None,
@@ -733,9 +733,14 @@ class PartReduction:
                     offsetEnd = offsetStart + ds['span']
                     # get all targets within the contiguous region
                     # e.g., Dynamics objects
-                    match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
-                        includeEndBoundary=True, mustFinishInSpan=False,
-                        mustBeginInSpan=True).getElementsByClass(target).stream()
+                    inRegion = flatRef.getElementsByOffset(
+                        offsetStart,
+                        offsetEnd,
+                        includeEndBoundary=True,
+                        mustFinishInSpan=False,
+                        mustBeginInSpan=True,
+                    )
+                    match = inRegion.getElementsByClass(target).stream()
                     # environLocal.printDebug(['matched elements', target, match])
                     # extend duration of all found dynamics
                     match.extendDuration(target, inPlace=True)
@@ -1121,7 +1126,7 @@ class Test(unittest.TestCase):
             s.insert(0, p)
             pCount += 1
 
-        if show is True:
+        if show:
             s.show()
 
         pr = analysis.reduction.PartReduction(s, normalize=False)
@@ -1140,7 +1145,7 @@ class Test(unittest.TestCase):
 
         self._matchWeightedData(match, target)
 
-        if show is True:
+        if show:
             p = graph.plot.Dolan(s, title='Dynamics')
             p.run()
 
@@ -1251,7 +1256,7 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
         # s.show()
         pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
-                    segmentByTarget=False, normalize=False)
+                                              segmentByTarget=False, normalize=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         match = [(0, [[0.0, 4.0, 0.178571428571, '#666666'],
@@ -1264,7 +1269,7 @@ class Test(unittest.TestCase):
         self._matchWeightedData(match, target)
 
         pr = analysis.reduction.PartReduction(s, fillByMeasure=False,
-                    segmentByTarget=True, normalize=False)
+                                              segmentByTarget=True, normalize=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         match = [(0, [[0.0, 2.0, 0.05, '#666666'],
@@ -1281,7 +1286,7 @@ class Test(unittest.TestCase):
 
 
         pr = analysis.reduction.PartReduction(s, fillByMeasure=False,
-                    segmentByTarget=False)
+                                              segmentByTarget=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         # print(target)
@@ -1295,7 +1300,7 @@ class Test(unittest.TestCase):
 
 
         pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
-                    segmentByTarget=True)
+                                              segmentByTarget=True)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         match = [(0, [[0.0, 2.0, 0.3888888888888, '#666666'],

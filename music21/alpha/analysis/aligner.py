@@ -176,7 +176,6 @@ class StreamAligner:
         >>> sa2.hashedSourceStream
         [NoteHashWithReference(Pitch=69, Duration=1.0, Offset=0.0),
          NoteHashWithReference(Pitch=67, Duration=1.0, Offset=1.0)]
-
         '''
         if not self.preHashed:
             self.hashedTargetStream = self.hasher.hashStream(self.targetStream)
@@ -230,7 +229,6 @@ class StreamAligner:
         Traceback (most recent call last):
         music21.alpha.analysis.aligner.AlignerException:
             Cannot perform alignment with empty source stream.
-
         '''
         if not self.hashedTargetStream:
             self.makeHashedStreams()
@@ -306,7 +304,6 @@ class StreamAligner:
            [2, 2, 2, 4],
            [4, 4, 3, 3],
            [6, 6, 5, 3]])
-
         '''
 
         # calculate insert and delete costs based on the first tuple in the Source S
@@ -381,7 +378,6 @@ class StreamAligner:
 
         >>> sa.getPossibleMovesFromLocation(3, 0)
         [0, None, None]
-
         '''
         verticalCost = int(self.distanceMatrix[i - 1][j]) if i >= 1 else None
         horizontalCost = int(self.distanceMatrix[i][j - 1]) if j >= 1 else None
@@ -736,7 +732,6 @@ class StreamAligner:
 
         >>> sa.tupleEqualityWithoutReference(nhwr1, nhwr3)
         False
-
         '''
         for val in tup1.hashItemsKeys:
             if getattr(tup1, val) != getattr(tup2, val):
@@ -828,7 +823,6 @@ class StreamAligner:
         1
         >>> saD.similarityScore
         0.5
-
         '''
         i = self.n
         j = self.m

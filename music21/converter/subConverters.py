@@ -61,7 +61,6 @@ class SubConverter:
         codecWrite = True or False (default False) if encodings need to be used to write
         stringEncoding = string (default 'utf-8'). If codecWrite is True, this specifies what
             encoding to use
-
     '''
     readBinary: bool = False
     canBePickled: bool = True
@@ -100,7 +99,7 @@ class SubConverter:
         loading the file and putting the data into parseData then there is no need
         to implement this method.  Just set self.readBinary to True | False.
         '''
-        if self.readBinary is False:
+        if not self.readBinary:
             import locale
             with open(filePath, encoding=locale.getpreferredencoding()) as f:
                 dataStream = f.read()
@@ -113,15 +112,16 @@ class SubConverter:
 
         return self.stream
 
-    def _getStream(self):
+    @property
+    def stream(self):
+        '''
+        Returns or sets the stream in the converter.  Must be defined for subConverter to work.
+        '''
         return self._stream
 
-    def _setStream(self, newStream):
+    @stream.setter
+    def stream(self, newStream):
         self._stream = newStream
-
-    stream = property(_getStream, _setStream, doc='''
-        Returns or sets the stream in the converter.  Must be defined for subConverter to work.
-        ''')
 
     def checkShowAbility(self, **keywords) -> bool:
         '''
@@ -289,7 +289,7 @@ class SubConverter:
         if fp is None:
             fp = self.getTemporaryFile()
 
-        if self.readBinary is False:
+        if not self.readBinary:
             writeFlags = 'w'
         else:
             writeFlags = 'wb'
@@ -330,7 +330,7 @@ class SubConverter:
         and return the object (str or bytes) returned.
         '''
         fp = self.write(obj, fmt=fmt, subformats=subformats, **keywords)
-        if self.readBinary is False:
+        if not self.readBinary:
             readFlags = 'r'
         else:
             readFlags = 'rb'

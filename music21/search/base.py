@@ -267,7 +267,7 @@ class StreamSearcher:
                         break
                 if result is False:
                     break
-                if result is True:
+                if result:
                     result = None
 
             if result is not False:
@@ -1226,7 +1226,6 @@ def translateDurationToBytes(n: note.GeneralNote) -> str:
     '_'
     >>> (2 ** (ord(trans[0]) / 10)) / 256  # approximately 3
     2.828...
-
     '''
     duration1to127 = 1
     if n.duration.quarterLength:

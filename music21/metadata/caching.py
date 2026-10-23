@@ -316,7 +316,6 @@ class JobProcessor:
         available cores.
 
         jobs is a list of :class:`~music21.metadata.MetadataCachingJob` objects.
-
         '''
         processCount = processCount or common.cpus()
         processCount = max(processCount, 1)

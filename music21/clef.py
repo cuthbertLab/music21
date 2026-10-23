@@ -6,7 +6,7 @@
 #               Christopher Ariza
 #               Michael Bodenbach
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -107,7 +107,6 @@ class Clef(base.Music21Object):
             True
             >>> clef.NoClef().sign
             'none'
-
             ''',
         'line': '''
             The line, counting from the bottom up, that the clef resides on.
@@ -602,7 +601,6 @@ class TenorClef(CClef):
     'C'
     >>> a.line
     4
-
     '''
 
     def __init__(self, **keywords):
@@ -824,16 +822,12 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
         else:
             lineNum = False
     elif len(xnStr) > 2:
-        from music21 import clef as myself
         xnLower = xnStr.lower()
-        for x in dir(myself):
-            if 'Clef' not in x:
+        for className, classObj in globals().items():
+            if not isinstance(classObj, type) or not issubclass(classObj, Clef):
                 continue
-            if xnLower != x.lower() and xnLower + 'clef' != x.lower():
-                continue
-            objType = getattr(myself, x)
-            if isinstance(objType, type):
-                return objType()
+            if className.lower() in (xnLower, xnLower + 'clef'):
+                return classObj()
 
         raise ClefException('Could not find clef ' + xnStr)
     else:

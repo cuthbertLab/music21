@@ -560,7 +560,6 @@ class PitchedTimespan(ElementTimespan):
         True
         >>> pts.pitches is c.pitches
         False
-
         '''
         return self.element.pitches
 
@@ -623,7 +622,6 @@ class PitchedTimespan(ElementTimespan):
         <PitchedTimespan (3.0 to 4.0) <music21.note.Note C#>>
         >>> print(timespan_twoWrong.part)
         <music21.stream.Part Soprano>
-
         '''
         can, message = super().canMerge(other)
         if can is True:

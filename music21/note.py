@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2006-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -542,13 +542,13 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             rawText = str(rawText)
 
         # check for hyphens
-        if applyRaw is False and rawText.startswith('-') and not rawText.endswith('-'):
+        if not applyRaw and rawText.startswith('-') and not rawText.endswith('-'):
             self.text = rawText[1:]
             self.syllabic = 'end'
-        elif applyRaw is False and not rawText.startswith('-') and rawText.endswith('-'):
+        elif not applyRaw and not rawText.startswith('-') and rawText.endswith('-'):
             self.text = rawText[:-1]
             self.syllabic = 'begin'
-        elif applyRaw is False and rawText.startswith('-') and rawText.endswith('-'):
+        elif not applyRaw and rawText.startswith('-') and rawText.endswith('-'):
             self.text = rawText[1:-1]
             self.syllabic = 'middle'
         else:  # assume single
@@ -823,7 +823,7 @@ class GeneralNote(base.Music21Object):
                     thisLyric.text = text
                     foundLyric = True
                     break
-            if foundLyric is False:
+            if not foundLyric:
                 self.lyrics.append(Lyric(text, lyricNumber,
                                          applyRaw=applyRaw, identifier=lyricIdentifier))
 
@@ -1446,10 +1446,10 @@ class Note(NotRest):
     >>> n = note.Note('B-')
     >>> n.name
     'B-'
-    >>> n.octave is None
-    True
-    >>> n.pitch.implicitOctave
+    >>> n.octave
     4
+    >>> n.pitch.octaveIsImplicit
+    True
 
     >>> n = note.Note(name='D#')
     >>> n.name
@@ -1657,15 +1657,17 @@ class Note(NotRest):
         self.pitch.step = value
 
     @property
-    def octave(self) -> int|None:
+    def octave(self) -> int:
         '''
         Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.octave`.
+
+        * Changed in v11: always an int; see :attr:`~music21.pitch.Pitch.octaveIsImplicit`.
         '''
         return self.pitch.octave
 
     @octave.setter
-    def octave(self, value: int|None):
+    def octave(self, value: int|float|None):
         self.pitch.octave = value
 
     @property
@@ -1761,7 +1763,6 @@ class Note(NotRest):
         {0.0} <music21.note.Note F#>
         {1.0} <music21.key.Key of b- minor>
         {1.0} <music21.note.Note G->
-
         '''
         from music21 import key
         if isinstance(value, interval.IntervalBase):
@@ -1849,7 +1850,7 @@ class Unpitched(NotRest):
     >>> unp.displayStep = 'G'
     >>> unp.pitch
     Traceback (most recent call last):
-    AttributeError: 'Unpitched' object has no attribute 'pitch'. Did you mean: 'pitches'?
+    AttributeError: 'Unpitched' object has no attribute 'pitch'. Did you mean...'...pitches'...
 
     Unpitched elements generally have an instrument object associated with them:
 
@@ -1872,6 +1873,7 @@ class Unpitched(NotRest):
     >>> unp == unp2
     False
     '''
+    # When 3.15 is the minimum change ... to "Did you mean '.pitches' instead of '.pitch'?"
     equalityAttributes = ('displayStep', 'displayOctave', 'storedInstrument')
 
     def __init__(
@@ -1887,7 +1889,7 @@ class Unpitched(NotRest):
         if displayName:
             display_pitch = Pitch(displayName)
             self.displayStep = display_pitch.step
-            self.displayOctave = display_pitch.implicitOctave
+            self.displayOctave = display_pitch.octave
 
     def _reprInternal(self):
         if not self.storedInstrument:
@@ -2077,14 +2079,12 @@ class TestExternal(unittest.TestCase):
         '''
         Need to test direct note creation w/o stream
         '''
-        from music21 import note
-        a = note.Note('D-3')
+        a = Note('D-3')
         a.quarterLength = 2.25
         if self.show:
             a.show()
 
     def testBasic(self):
-        from music21 import note
         from music21 import stream
         a = stream.Stream()
 
@@ -2093,7 +2093,7 @@ class TestExternal(unittest.TestCase):
                                 ('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
                                 ('f#2', 1.75), ('g-3', (4 / 3)), ('d#6', (2 / 3))
                                 ]:
-            b = note.Note()
+            b = Note()
             b.quarterLength = qLen
             b.name = pitchName
             # Pylint going crazy here

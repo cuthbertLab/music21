@@ -697,7 +697,6 @@ class BrailleSegment(text.BrailleText):
         True
         >>> bs1.showLeadingOctaveFromNoteGrouping(beg1)
         True
-
         '''
         currentKey = self.currentGroupingKey
         previousKey = self.previousGroupingKey
@@ -827,8 +826,8 @@ class BrailleSegment(text.BrailleText):
                 # hence -- let us split this noteGrouping into two noteGroupings.
                 try:
                     bngA, bngB = self.splitNoteGroupingAndTranscribe(noteGrouping,
-                                                                 showLeadingOctave,
-                                                                 addSpace)
+                                                                     showLeadingOctave,
+                                                                     addSpace)
                     self.currentLine.append(bngA, addSpace=addSpace)
                     self.addToNewLine(bngB)
                 except BrailleSegmentException:
@@ -1073,8 +1072,8 @@ class BrailleSegment(text.BrailleText):
 
         newSegment = self.consolidate()
         noteGroupings = [newSegment[gpKey]
-                             for gpKey in newSegment.keys()
-                                if gpKey.affinity == Affinity.NOTEGROUP]
+                         for gpKey in newSegment.keys()
+                         if gpKey.affinity == Affinity.NOTEGROUP]
         for noteGrouping in noteGroupings:
             allNotes_outer = [n for n in noteGrouping if isinstance(n, note.Note)]
             for noteIndexStart_outer in range(len(allNotes_outer)):
@@ -1329,13 +1328,11 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                 break
             self.allKeyPairs.popleft()
             if useKey.affinity == Affinity.SIGNATURE:
-                try:
-                    keySignature, timeSignature = useElement[0], useElement[1]
-                except IndexError:
-                    if isinstance(useElement, key.KeySignature):
-                        keySignature = useElement[0]
-                    else:
-                        timeSignature = useElement[0]
+                for el in useElement:
+                    if keySignature is None and isinstance(el, key.KeySignature):
+                        keySignature = el
+                    elif timeSignature is None and isinstance(el, meter.TimeSignature):
+                        timeSignature = el
             elif useKey.affinity == Affinity.TTEXT:
                 tempoText = useElement[0]
             elif useKey.affinity == Affinity.MMARK:

@@ -6,7 +6,7 @@
 #               Michael Scott Asato Cuthbert
 #               Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -98,7 +98,6 @@ from music21.scale import scala
 # -------------------------
 from music21 import base
 from music21 import common
-from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import note
@@ -119,13 +118,14 @@ type _PitchDegreeCacheKey = tuple[
     type,  # scale class
     str,  # scale type
     str,  # tonic name with octave
+    str,  # stringified mode
     int,  # degree
     Direction,  # direction
     bool  # equating termini
 ]
 
 # a dictionary mapping an abstract scale class, tonic.nameWithOctave,
-# and degree to a pitchNameWithOctave.
+# _abstract.mode, and degree to a pitchNameWithOctave.
 _pitchDegreeCache: dict[_PitchDegreeCacheKey, str] = {}
 
 # a pitch given in any of the forms that can be coerced to a pitch.Pitch
@@ -250,8 +250,7 @@ class Scale(base.Music21Object):
                 seen.add(hashValue)
                 post.append(p)
         for p in post:
-            if p.octave is None:
-                p.octave = defaults.pitchOctave
+            p.octaveIsImplicit = False
 
         return post
 
@@ -300,6 +299,8 @@ class AbstractScale(Scale):
         self._net: intervalNetwork.IntervalNetwork|None = None
         # in most cases tonic/final of scale is step one, but not always
         self.tonicDegree: int = 1  # step of tonic
+
+        self.mode: t.Any = None
 
         # declare if this scale is octave duplicating
         # can be used as to optimize pitch gathering
@@ -388,8 +389,7 @@ class AbstractScale(Scale):
                 self.octaveDuplicating = False
         else:
             p = copy.deepcopy(pitchListProcessed[0])
-            if p.octave is None:
-                p.octave = p.implicitOctave
+            p.octaveIsImplicit = False
             if pitchListProcessed[-1] > pitchListProcessed[0]:  # ascending
                 while p.ps < pitchListProcessed[-1].ps:
                     p.octave += 1
@@ -426,10 +426,10 @@ class AbstractScale(Scale):
         >>> pitchListStrs = 'a b c d e f g a'.split()
         >>> pitchList = [pitch.Pitch(p) for p in pitchListStrs]
 
-        Here's the problem, between `pitchList[1]` and `pitchList[2]` the `.implicitOctave`
-        stays the same, so the `.ps` drops:
+        Here's the problem, between `pitchList[1]` and `pitchList[2]` the `.octave`
+        stays the same (since both pitches have .octaveIsImplicit == True), so the `.ps` drops:
 
-        >>> (pitchList[1].implicitOctave, pitchList[2].implicitOctave)
+        >>> (pitchList[1].octave, pitchList[2].octave)
         (4, 4)
         >>> (pitchList[1].ps, pitchList[2].ps)
         (71.0, 60.0)
@@ -438,7 +438,7 @@ class AbstractScale(Scale):
         one has a .ps above the previous:
 
         >>> pl2 = scale.AbstractScale.fixDefaultOctaveForPitchList(pitchList)
-        >>> (pl2[1].implicitOctave, pl2[2].implicitOctave, pl2[3].implicitOctave)
+        >>> (pl2[1].octave, pl2[2].octave, pl2[3].octave)
         (4, 5, 5)
         >>> (pl2[1].ps, pl2[2].ps)
         (71.0, 72.0)
@@ -452,9 +452,9 @@ class AbstractScale(Scale):
         '''
         # fix defaultOctave for pitchList
         lastPs: float = 0
-        lastOctave = pitchList[0].implicitOctave
+        lastOctave = pitchList[0].octave
         for p in pitchList:
-            if p.octave is None:
+            if p.octaveIsImplicit:
                 if lastPs > p.ps:
                     p.octave = lastOctave
                 while lastPs > p.ps:
@@ -462,7 +462,7 @@ class AbstractScale(Scale):
                     p.octave = lastOctave
 
             lastPs = p.ps
-            lastOctave = p.implicitOctave
+            lastOctave = p.octave
 
         return pitchList
 
@@ -560,7 +560,7 @@ class AbstractScale(Scale):
             alteredDegrees=self._alteredDegrees,
             equateTermini=equateTermini
         )
-        return copy.deepcopy(post)
+        return post
 
     def realizePitchByDegree(self,
                              pitchReference: _PitchOrStr,
@@ -614,7 +614,7 @@ class AbstractScale(Scale):
             direction=direction,
             alteredDegrees=self._alteredDegrees
         )
-        return copy.deepcopy(post)
+        return post
 
     def nextPitch(self,
                   pitchReference: _PitchOrStr,
@@ -629,14 +629,14 @@ class AbstractScale(Scale):
         '''
         net = t.cast('intervalNetwork.IntervalNetwork', self._net)
         post = net.nextPitch(pitchReference=pitchReference,
-                                   nodeName=nodeName,
-                                   pitchOrigin=pitchOrigin,
-                                   direction=direction,
-                                   stepSize=stepSize,
-                                   alteredDegrees=self._alteredDegrees,
-                                   getNeighbor=getNeighbor
-                                   )
-        return copy.deepcopy(post)
+                             nodeName=nodeName,
+                             pitchOrigin=pitchOrigin,
+                             direction=direction,
+                             stepSize=stepSize,
+                             alteredDegrees=self._alteredDegrees,
+                             getNeighbor=getNeighbor
+                             )
+        return post
 
     def getNewTonicPitch(self,
                          pitchReference: _PitchOrStr,
@@ -657,7 +657,7 @@ class AbstractScale(Scale):
             maxPitch=maxPitch,
             alteredDegrees=self._alteredDegrees
         )
-        return copy.deepcopy(post)
+        return post
 
     # --------------------------------------------------------------------------
 
@@ -753,7 +753,6 @@ class AbstractDiatonicScale(AbstractScale):
     '''
     def __init__(self, mode: str|None = None, **keywords) -> None:
         super().__init__(**keywords)
-        self.mode = mode
         self.type = 'Abstract diatonic'
         # tonicDegree and dominantDegree are set below by buildNetwork
         self.dominantDegree: int = 5  # step of dominant
@@ -864,6 +863,7 @@ class AbstractDiatonicScale(AbstractScale):
             intervalList,
             octaveDuplicating=self.octaveDuplicating,
             pitchSimplification=None)
+        self.mode = mode
 
 
 class AbstractOctatonicScale(AbstractScale):
@@ -903,6 +903,7 @@ class AbstractOctatonicScale(AbstractScale):
         self._net = intervalNetwork.IntervalNetwork(intervalList,
                                                     octaveDuplicating=self.octaveDuplicating,
                                                     pitchSimplification='maxAccidental')
+        self.mode = mode
         # might also set weights for tonic and dominant here
 
 
@@ -1008,10 +1009,6 @@ class AbstractOctaveRepeatingScale(AbstractScale):
             mode = ['P8']
         self.buildNetwork(mode=mode)
 
-        # by definition, these are forced to be octave duplicating
-        # though, do to some intervals, duplication may not happen every oct
-        self.octaveDuplicating = True
-
     def buildNetwork(self, mode: t.Any = None) -> None:
         '''
         Here, mode is the list of intervals.
@@ -1023,7 +1020,12 @@ class AbstractOctaveRepeatingScale(AbstractScale):
         intervalSum = interval.add(mode)
         iComplement = intervalSum.complement
         if iComplement is not None:
-            mode.append(iComplement)
+            mode = [*mode, iComplement]  # a copy: mode is the caller's list
+
+        # steps wider than an octave complete a pattern spanning several
+        # octaves, which does not repeat every octave
+        span = intervalSum.semitones + (iComplement.semitones if iComplement else 0)
+        self.octaveDuplicating = span == 12
 
         self.tonicDegree = 1
         self._net = intervalNetwork.IntervalNetwork(mode,
@@ -1061,54 +1063,54 @@ class AbstractRagAsawari(AbstractScale):
         edges = (
             # ascending
             {'interval': 'M2',
-                 'connections': (
-                     [Terminus.LOW, 0, Direction.ASCENDING],  # c to d
-                 )},
+             'connections': (
+                 [Terminus.LOW, 0, Direction.ASCENDING],  # c to d
+             )},
             {'interval': 'm3',
-                 'connections': (
-                     [0, 1, Direction.ASCENDING],  # d to f
-                 )},
+             'connections': (
+                 [0, 1, Direction.ASCENDING],  # d to f
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [1, 2, Direction.ASCENDING],  # f to g
-                 )},
+             'connections': (
+                 [1, 2, Direction.ASCENDING],  # f to g
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [2, 3, Direction.ASCENDING],  # g to a-
-                 )},
+             'connections': (
+                 [2, 3, Direction.ASCENDING],  # g to a-
+             )},
             {'interval': 'M3',
-                 'connections': (
-                     [3, Terminus.HIGH, Direction.ASCENDING],  # a- to c
-                 )},
+             'connections': (
+                 [3, Terminus.HIGH, Direction.ASCENDING],  # a- to c
+             )},
             # descending
             {'interval': 'M2',
-                 'connections': (
-                     [Terminus.HIGH, 4, Direction.DESCENDING],  # c to b-
-                 )},
+             'connections': (
+                 [Terminus.HIGH, 4, Direction.DESCENDING],  # c to b-
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [4, 5, Direction.DESCENDING],  # b- to a-
-                 )},
+             'connections': (
+                 [4, 5, Direction.DESCENDING],  # b- to a-
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [5, 6, Direction.DESCENDING],  # a- to g
-                 )},
+             'connections': (
+                 [5, 6, Direction.DESCENDING],  # a- to g
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [6, 7, Direction.DESCENDING],  # g to f
-                 )},
+             'connections': (
+                 [6, 7, Direction.DESCENDING],  # g to f
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [7, 8, Direction.DESCENDING],  # f to e-
-                 )},
+             'connections': (
+                 [7, 8, Direction.DESCENDING],  # f to e-
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [8, 9, Direction.DESCENDING],  # e- to d
-                 )},
+             'connections': (
+                 [8, 9, Direction.DESCENDING],  # e- to d
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [9, Terminus.LOW, Direction.DESCENDING],  # d to c
-                 )},
+             'connections': (
+                 [9, Terminus.LOW, Direction.DESCENDING],  # d to c
+             )},
         )
 
         self._net = intervalNetwork.IntervalNetwork(
@@ -1231,33 +1233,33 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
         edges = (
             # all bidirectional
             {'interval': 'm3',
-                 'connections': (
-                     [Terminus.LOW, 0, Direction.BI],  # c to e-
-                 )},
+             'connections': (
+                 [Terminus.LOW, 0, Direction.BI],  # c to e-
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [0, 1, Direction.BI],  # e- to f
-                 )},
+             'connections': (
+                 [0, 1, Direction.BI],  # e- to f
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [1, 3, Direction.BI],  # f to g
-                 )},
+             'connections': (
+                 [1, 3, Direction.BI],  # f to g
+             )},
             {'interval': 'a1',
-                 'connections': (
-                     [1, 2, Direction.BI],  # f to f#
-                 )},
+             'connections': (
+                 [1, 2, Direction.BI],  # f to f#
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [2, 3, Direction.BI],  # f# to g
-                 )},
+             'connections': (
+                 [2, 3, Direction.BI],  # f# to g
+             )},
             {'interval': 'm3',
-                 'connections': (
-                     [3, 4, Direction.BI],  # g to b-
-                 )},
+             'connections': (
+                 [3, 4, Direction.BI],  # g to b-
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [4, Terminus.HIGH, Direction.BI],  # b- to c
-                 )},
+             'connections': (
+                 [4, Terminus.HIGH, Direction.BI],  # b- to c
+             )},
         )
 
         self._net = intervalNetwork.IntervalNetwork(
@@ -1787,10 +1789,12 @@ class ConcreteScale(Scale):
         if (self.usePitchDegreeCache and self.tonic
                 and not minPitch and not maxPitch and getattr(self, 'type', None)):
             tonicCacheKey = self.tonic.nameWithOctave
+            modeCacheKey = str(self._abstract.mode)
             cacheKey = (
                 self.__class__,
                 self.type,
                 tonicCacheKey,
+                modeCacheKey,
                 degree,
                 direction,
                 equateTermini
@@ -1992,45 +1996,45 @@ class ConcreteScale(Scale):
     # noinspection SpellCheckingInspection
     _solfegSyllables = {1: {-2: 'def',
                             -1: 'de',
-                             0: 'do',
-                             1: 'di',
-                             2: 'dis',
+                            0: 'do',
+                            1: 'di',
+                            2: 'dis',
                             },
                         2: {-2: 'raf',
                             -1: 'ra',
-                             0: 're',
-                             1: 'ri',
-                             2: 'ris',
+                            0: 're',
+                            1: 'ri',
+                            2: 'ris',
                             },
                         3: {-2: 'mef',
                             -1: 'me',
-                             0: 'mi',
-                             1: 'mis',
-                             2: 'mish',
+                            0: 'mi',
+                            1: 'mis',
+                            2: 'mish',
                             },
                         4: {-2: 'fef',
                             -1: 'fe',
-                             0: 'fa',
-                             1: 'fi',
-                             2: 'fis',
+                            0: 'fa',
+                            1: 'fi',
+                            2: 'fis',
                             },
                         5: {-2: 'sef',
                             -1: 'se',
-                             0: 'sol',
-                             1: 'si',
-                             2: 'sis',
+                            0: 'sol',
+                            1: 'si',
+                            2: 'sis',
                             },
                         6: {-2: 'lef',
                             -1: 'le',
-                             0: 'la',
-                             1: 'li',
-                             2: 'lis',
+                            0: 'la',
+                            1: 'li',
+                            2: 'lis',
                             },
                         7: {-2: 'tef',
                             -1: 'te',
-                             0: 'ti',
-                             1: 'tis',
-                             2: 'tish',
+                            0: 'ti',
+                            1: 'tis',
+                            2: 'tish',
                             },
                         }
     # TOO SLOW!
@@ -2042,45 +2046,45 @@ class ConcreteScale(Scale):
     _humdrumSolfegSyllables = {
         1: {-2: 'def',
             -1: 'de',
-             0: 'do',
-             1: 'di',
-             2: 'dis',
+            0: 'do',
+            1: 'di',
+            2: 'dis',
             },
         2: {-2: 'raf',
             -1: 'ra',
-             0: 're',
-             1: 'ri',
-             2: 'ris',
+            0: 're',
+            1: 'ri',
+            2: 'ris',
             },
         3: {-2: 'mef',
             -1: 'me',
-             0: 'mi',
-             1: 'my',
-             2: 'mish',
+            0: 'mi',
+            1: 'my',
+            2: 'mish',
             },
         4: {-2: 'fef',
             -1: 'fe',
-             0: 'fa',
-             1: 'fi',
-             2: 'fis',
+            0: 'fa',
+            1: 'fi',
+            2: 'fis',
             },
         5: {-2: 'sef',
             -1: 'se',
-             0: 'so',
-             1: 'si',
-             2: 'sis',
+            0: 'so',
+            1: 'si',
+            2: 'sis',
             },
         6: {-2: 'lef',
             -1: 'le',
-             0: 'la',
-             1: 'li',
-             2: 'lis',
+            0: 'la',
+            1: 'li',
+            2: 'lis',
             },
         7: {-2: 'tef',
             -1: 'te',
-             0: 'ti',
-             1: 'ty',
-             2: 'tish',
+            0: 'ti',
+            1: 'ty',
+            2: 'tish',
             },
     }
 
@@ -2488,7 +2492,8 @@ class ConcreteScale(Scale):
         abstract = t.cast(AbstractScale, self._abstract)
         net = t.cast('intervalNetwork.IntervalNetwork', abstract._net)
         pairs = net.find(pitchTarget=otherPitches,
-                         comparisonAttribute=comparisonAttribute)
+                         comparisonAttribute=comparisonAttribute,
+                         alteredDegrees=abstract._alteredDegrees)
 
         newScale = self.__class__(tonic=pairs[0][1])
         if newScale.abstract is None:

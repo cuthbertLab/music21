@@ -97,7 +97,7 @@ def L(c, raiseException=True):
         transposeInterval = 'm2'
         changingPitch = c.fifth
     else:
-        if raiseException is True:
+        if raiseException:
             raise LRPException('Cannot perform L on this chord: not a major or minor triad')
         return c
 
@@ -134,7 +134,7 @@ def P(c, raiseException=True):
         transposeInterval = 'A1'
         changingPitch = c.third
     else:
-        if raiseException is True:
+        if raiseException:
             raise LRPException('Cannot perform P on this chord: not a Major or Minor triad')
         return c
 
@@ -171,7 +171,7 @@ def R(c, raiseException=True):
         transposeInterval = '-M2'
         changingPitch = c.root()
     else:
-        if raiseException is True:
+        if raiseException:
             raise LRPException('Cannot perform R on this chord: not a Major or Minor triad')
         return c
 
@@ -358,7 +358,7 @@ def LRP_combinations(c,
     '''
 
     if not c.isMajorTriad() and not c.isMinorTriad():  # First to avoid doing anything else if fail
-        if raiseException is True:
+        if raiseException:
             raise LRPException(
                 f'Cannot perform transformations on chord {c}: not a major or minor triad')
         return c
@@ -435,7 +435,7 @@ def completeHexatonic(c, simplifyEnharmonics=False, raiseException=True):
             hexatonicList.append(lastChord)
         return hexatonicList
     else:
-        if raiseException is True:
+        if raiseException:
             raise LRPException(
                 'Cannot perform transformations on this chord: not a major or minor triad')
 

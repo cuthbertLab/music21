@@ -26,7 +26,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'11.0.0b6'
+'11.0.0b13'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -316,7 +316,6 @@ def _getEqualityAttributes(cls) -> frozenset[str]:
     True
     >>> 'pitch' in base._getEqualityAttributes(bar.Barline)
     False
-
     '''
     equalityAttributes = set()
     # equalityAttributesIgnore works, but not yet needed.
@@ -1307,10 +1306,9 @@ class Music21Object(prebase.ProtoM21Object):
                     orphans.append(id(s))
         for i in orphans:
             self.sites.removeById(i)
-            p = self._getActiveSite()  # this can be simplified.
+            p = self.activeSite
             if p is not None and id(p) == i:
-                # noinspection PyArgumentList
-                self._setActiveSite(None)
+                self.activeSite = None
 
     def purgeLocations(self, rescanIsDead=False) -> None:
         '''
@@ -1895,7 +1893,7 @@ class Music21Object(prebase.ProtoM21Object):
         (<music21.stream.Score bach>, '9.5 <0.20...>', <RecursionType.ELEMENTS_ONLY>)
 
         Streams have themselves as the first element in their context sites, at position
-        zero and classSortOrder negative infinity.
+        zero and priority negative infinity.
 
         This example shows the context sites for Measure 3 of the
         Alto part. We will get the measure object using direct access to
@@ -2162,7 +2160,7 @@ class Music21Object(prebase.ProtoM21Object):
                     offsetAdjustedCsTuple = ContextSortTuple(
                         derivedCsTuple.site,
                         derivedCsTuple.offset.modify(offset=derivedCsTuple[1].offset
-                                                            + offsetAppend),
+                                                     + offsetAppend),
                         derivedCsTuple.recurseType)
                     if returnSortTuples:
                         yield offsetAdjustedCsTuple
@@ -2193,7 +2191,6 @@ class Music21Object(prebase.ProtoM21Object):
 
         TODO: make it so that it does not skip over multiple matching classes
         at the same offset. with sortTuple
-
         '''
         el = self.getContextByClass(className)
         while el is not None:
@@ -2419,20 +2416,48 @@ class Music21Object(prebase.ProtoM21Object):
     # -------------------------------------------------------------------------
     # properties
 
-    def _getActiveSite(self):
+    @property
+    def activeSite(self):
+        '''
+        A reference to the most-recent object used to
+        contain this object. In most cases, this will be a
+        Stream or Stream sub-class. In most cases, an object's
+        activeSite attribute is automatically set when the
+        object is attached to a Stream.
+
+
+        >>> n = note.Note('C#4')
+        >>> p = stream.Part()
+        >>> p.insert(20.0, n)
+        >>> n.activeSite is p
+        True
+        >>> n.offset
+        20.0
+
+        >>> m = stream.Measure()
+        >>> m.insert(10.0, n)
+        >>> n.activeSite is m
+        True
+        >>> n.offset
+        10.0
+        >>> n.activeSite = p
+        >>> n.offset
+        20.0
+        '''
         # can be None
         if WEAKREF_ACTIVE:
             if self._activeSite is None:  # leave None
                 return None
             else:  # even if current activeSite is not a weakref, this will work
-                # environLocal.printDebug(['_getActiveSite() called:',
+                # environLocal.printDebug(['activeSite getter called:',
                 #                          'self._activeSite', self._activeSite])
                 return common.unwrapWeakref(self._activeSite)
         else:  # pragma: no cover
             return self._activeSite
 
-    def _setActiveSite(self, site: stream.Stream|None):
-        # environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
+    @activeSite.setter
+    def activeSite(self, site: stream.Stream|None):
+        # environLocal.printDebug(['activeSite setter called:', 'self', self, 'site', site])
 
         # NOTE: this is a performance intensive call
         if site is not None:
@@ -2460,35 +2485,6 @@ class Music21Object(prebase.ProtoM21Object):
                 self._activeSite = common.wrapWeakref(site)
         else:  # pragma: no cover
             self._activeSite = site
-
-    activeSite = property(_getActiveSite,
-                          _setActiveSite,
-                          doc='''
-        A reference to the most-recent object used to
-        contain this object. In most cases, this will be a
-        Stream or Stream sub-class. In most cases, an object's
-        activeSite attribute is automatically set when the
-        object is attached to a Stream.
-
-
-        >>> n = note.Note('C#4')
-        >>> p = stream.Part()
-        >>> p.insert(20.0, n)
-        >>> n.activeSite is p
-        True
-        >>> n.offset
-        20.0
-
-        >>> m = stream.Measure()
-        >>> m.insert(10.0, n)
-        >>> n.activeSite is m
-        True
-        >>> n.offset
-        10.0
-        >>> n.activeSite = p
-        >>> n.offset
-        20.0
-        ''')
 
     @property
     def offset(self) -> OffsetQL:
@@ -2773,7 +2769,7 @@ class Music21Object(prebase.ProtoM21Object):
             insertIndex = 0
 
         return SortTuple(atEnd, offset, self.priority,
-                          self.classSortOrder, isNotGrace, insertIndex)
+                         self.classSortOrder, isNotGrace, insertIndex)
 
     # -----------------------------------------------------------------
     @property
@@ -2826,24 +2822,9 @@ class Music21Object(prebase.ProtoM21Object):
                 # noinspection PyCallingNonCallable
                 s.coreElementsChanged(updateIsFlat=False, keepIndex=True)
 
-    def _getPriority(self):
-        return self._priority
-
-    def _setPriority(self, value):
+    @property
+    def priority(self):
         '''
-        value is an int.
-
-        Informs all sites of the change.
-        '''
-        if not isinstance(value, int):
-            raise ElementException('priority values must be integers.')
-        if self._priority != value:
-            self._priority = value
-            self.informSites({'changedElement': 'priority', 'priority': value})
-
-    priority = property(_getPriority,
-                        _setPriority,
-                        doc='''
         Get and set the priority integer value.
 
         Priority specifies the order of processing from left (lowest number)
@@ -2872,7 +2853,21 @@ class Music21Object(prebase.ProtoM21Object):
         >>> a.priority = 'high'
         Traceback (most recent call last):
         music21.base.ElementException: priority values must be integers.
-        ''')
+        '''
+        return self._priority
+
+    @priority.setter
+    def priority(self, value):
+        '''
+        value is an int.
+
+        Informs all sites of the change.
+        '''
+        if not isinstance(value, int):
+            raise ElementException('priority values must be integers.')
+        if self._priority != value:
+            self._priority = value
+            self.informSites({'changedElement': 'priority', 'priority': value})
 
     # -------------------------------------------------------------------------
     # display and writing
@@ -3508,7 +3503,6 @@ class Music21Object(prebase.ProtoM21Object):
         ('64th', 0, (<music21.duration.Tuplet 3/2/64th>,))
 
         TODO: unite this and other functions into a "split" function -- document obscure uses.
-
         '''
         atm = self.duration.aggregateTupletMultiplier()
         quarterLengthList = [opFrac(c.quarterLength * atm) for c in self.duration.components]
@@ -3620,7 +3614,7 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         from music21 import stream
 
-        # TODO: v8 -- expose as public.
+        # TODO: expose as public.
         activeS = self.activeSite
         if activeS is not None and isinstance(activeS, stream.Measure):
             # environLocal.printDebug(['found activeSite as Measure, using for offset'])
@@ -3948,31 +3942,9 @@ class Music21Object(prebase.ProtoM21Object):
         except Music21ObjectException:
             return float('nan')
 
-    def _getSeconds(self) -> float:
-        from music21 import tempo
-        # do not search if duration is zero
-        if self.duration.quarterLength == 0.0:
-            return 0.0
-
-        ti = self.getContextByClass(tempo.TempoIndication)
-        if ti is None:
-            return float('nan')
-        mm = ti.getSoundingMetronomeMark()
-        # once we have mm, simply pass in this duration
-        return mm.durationToSeconds(self.duration)
-
-    def _setSeconds(self, value: int|float) -> None:
-        from music21 import tempo
-        ti = self.getContextByClass(tempo.TempoIndication)
-        if ti is None:
-            raise Music21ObjectException('this object does not have a TempoIndication in Sites')
-        mm = ti.getSoundingMetronomeMark()
-        self.duration = mm.secondsToDuration(value)
-        for s in self.sites.get(excludeNone=True):
-            if self in s.elements:
-                s.coreElementsChanged()  # highest time is changed.
-
-    seconds = property(_getSeconds, _setSeconds, doc='''
+    @property
+    def seconds(self) -> float:
+        '''
         Get or set the duration of this object in seconds, assuming
         that this object has a :class:`~music21.tempo.MetronomeMark`
         or :class:`~music21.tempo.MetricModulation`
@@ -4051,7 +4023,30 @@ class Music21Object(prebase.ProtoM21Object):
         'half'
 
         * Changed in v6.3: return `nan` instead of raising an exception.
-        ''')
+        '''
+        from music21 import tempo
+        # do not search if duration is zero
+        if self.duration.quarterLength == 0.0:
+            return 0.0
+
+        ti = self.getContextByClass(tempo.TempoIndication)
+        if ti is None:
+            return float('nan')
+        mm = ti.getSoundingMetronomeMark()
+        # once we have mm, simply pass in this duration
+        return mm.durationToSeconds(self.duration)
+
+    @seconds.setter
+    def seconds(self, value: int|float) -> None:
+        from music21 import tempo
+        ti = self.getContextByClass(tempo.TempoIndication)
+        if ti is None:
+            raise Music21ObjectException('this object does not have a TempoIndication in Sites')
+        mm = ti.getSoundingMetronomeMark()
+        self.duration = mm.secondsToDuration(value)
+        for s in self.sites.get(excludeNone=True):
+            if self in s.elements:
+                s.coreElementsChanged()  # highest time is changed.
 
 
 # ------------------------------------------------------------------------------

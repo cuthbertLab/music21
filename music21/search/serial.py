@@ -852,9 +852,9 @@ class ContiguousSegmentSearcher:
                 rowSuperset = csn.readPitchClassesFromBottom()
                 lowerBound = max([0,
                                   len(rowSuperset)
-                                    - self.searchLength
-                                    - len(self.activeChordList[-1].pitches)
-                                    + 1])
+                                  - self.searchLength
+                                  - len(self.activeChordList[-1].pitches)
+                                  + 1])
                 upperBound = min([len(self.activeChordList[0].pitches),
                                   len(rowSuperset) - self.searchLength + 1])
                 for j in range(lowerBound, upperBound):

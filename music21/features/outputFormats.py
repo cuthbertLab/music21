@@ -88,7 +88,6 @@ class OutputTabOrange(OutputFormat):
         ['Identifier', 'Changes_of_Meter', 'Composer']
         ['string', 'discrete', 'discrete']
         ['meta', '', 'class']
-
         '''
         if self._dataSet is None:  # pragma: no cover
             raise OutputFormatException('cannot get header lines without a DataSet')
@@ -217,7 +216,6 @@ class OutputARFF(OutputFormat):
         @ATTRIBUTE Changes_of_Meter NUMERIC
         @ATTRIBUTE class {}
         @DATA
-
         '''
         if self._dataSet is None:  # pragma: no cover
             raise OutputFormatException('cannot get header lines without a DataSet')

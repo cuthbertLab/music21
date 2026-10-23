@@ -452,7 +452,7 @@ def insertRepeatEnding(s, start, end, endingNumber: int = 1, *, inPlace=False):
     rbOffset = measures[0].getOffsetBySite(s)
     s.insert(rbOffset, rb)
 
-    if inPlace is True:
+    if inPlace:
         return
     else:
         return s
@@ -491,7 +491,6 @@ def insertRepeat(s, start, end, *, inPlace=False):
     'start'
     >>> s.parts[0].measure(6).rightBarline.direction
     'end'
-
     '''
 
     if s is None:
@@ -774,7 +773,7 @@ class Expander[StreamType: 'music21.stream.Stream']:
 
         # need to copy source measures, as may later measures before copying
         # them, and this can result in orphaned spanners
-        if deepcopy is not False:
+        if deepcopy:
             srcStream = self._srcMeasureStream.coreCopyAsDerivation('expandRepeats')
         else:
             srcStream = self._srcMeasureStream
@@ -951,7 +950,6 @@ class Expander[StreamType: 'music21.stream.Stream']:
         Return a DaCapo object if this piece uses any form of DaCapo; return
         a Segno object if this piece uses any form of Segno. Returns None if
         incoherent or the piece uses neither.
-
         '''
         sumDc = self._dcCount + self._dcafCount + self._dcacCount
         # for now, only accepting one segno
@@ -1943,7 +1941,6 @@ class RepeatFinder:
 
     .. image:: images/repeat-SimplifyExample_ChoraleSimplified.*
        :width: 600
-
     '''
     _DOC_ORDER = ['simplify',
                   'getMeasureSimilarityList',
@@ -2010,7 +2007,6 @@ class RepeatFinder:
         Traceback (most recent call last):
         music21.repeat.NoInternalStreamException:
             RepeatFinder must be initialized with a stream
-
         '''
         if self.s is None:
             raise NoInternalStreamException(
@@ -2218,7 +2214,7 @@ class RepeatFinder:
             # we have a repeated section at least 2 measures in length;
             # check to see how far it goes
             nextOne = self._getSimilarMeasuresHelper(measures, source + 1, compare + 1,
-                                                      resDict, useDict)
+                                                     resDict, useDict)
             # make sure we don't have overlap
             res = ([source], [compare])
             res[0].extend(nextOne[0])
@@ -2563,7 +2559,6 @@ class RepeatFinder:
         Notice that although measures 2-3 are the same as measures 6-7, we
         don't have ([2, 3], [6, 7]) in our result, since ([1, 2, 3], [5, 6, 7])
         already contains that information.
-
         '''
         # see if we've already done this computation
         if self._mGroups is None:

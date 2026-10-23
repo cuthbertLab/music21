@@ -269,7 +269,6 @@ class RnWriter(prebase.ProtoM21Object):
 
         >>> testCase.combinedList[-2]
         'Time Signature: 3/4'
-
         '''
 
         for thisMeasure in self.container.getElementsByClass(stream.Measure):
@@ -388,7 +387,6 @@ def rnString(measureNumber: int|str,
 
     As these examples show, the chordString can be a Roman numeral alone (e.g. 'viio6')
     or one prefixed by a change of key ('G: I').
-
     '''
 
     if inString:

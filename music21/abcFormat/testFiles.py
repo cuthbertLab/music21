@@ -633,11 +633,11 @@ g^G_ag a=ffF|=F2^c2 FB =ca|]
 
 # ------------------------------------------------------------------------------
 ALL = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
-        williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
-        sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
-        draughtOfAle,
-        valentineJigg,
-        testPrimitive, testPrimitivePolyphonic, testPrimitiveTuplet
+       williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
+       sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
+       draughtOfAle,
+       valentineJigg,
+       testPrimitive, testPrimitivePolyphonic, testPrimitiveTuplet
        ]
 
 

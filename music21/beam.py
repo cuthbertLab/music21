@@ -642,7 +642,6 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         >>> a.setAll('sexy')
         Traceback (most recent call last):
         music21.beam.BeamException: beam type cannot be sexy
-
         '''
         if type not in ('start', 'stop', 'continue', 'partial'):
             raise BeamException(f'beam type cannot be {type}')
@@ -679,7 +678,6 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         >>> a.setByNumber(2, 'crazy')
         Traceback (most recent call last):
         music21.beam.BeamException: beam type cannot be crazy
-
         '''
         # permit providing one argument hyphenated
         if '-' in type:

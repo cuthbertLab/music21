@@ -151,7 +151,6 @@ class NoteworthyTranslator:
                 {0.0} <music21.clef.BassClef>
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.note.Note E>
-
         '''
         # Main
         for pi in dataList:
@@ -243,7 +242,6 @@ class NoteworthyTranslator:
         >>> nwt.setDurationForObject(n, 'Half')
         >>> n.duration
         <music21.duration.Duration 2.0>
-
         '''
         parts = durationInfo.split(',')
         lengthNote = parts[0]
@@ -467,7 +465,6 @@ class NoteworthyTranslator:
         >>> nwt.translateNote({'Dur': 'Half', 'Pos': '-3'})
         >>> measure[1]
         <music21.note.Note F#>
-
         '''
         durationInfo = attributes['Dur']
         pitchInfo = attributes['Pos']
@@ -522,7 +519,6 @@ class NoteworthyTranslator:
         >>> nwt.translateChord({'Dur': ['Half'], 'Pos': ['1,3,5']})
         >>> measure[1]
         <music21.chord.Chord C5 E5 G#5>
-
         '''
         durationInfos = attributes['Dur']
         pitchInfos = attributes['Pos']
@@ -610,7 +606,6 @@ class NoteworthyTranslator:
         {0.0} <music21.note.Note C#>
         {2.0} <music21.note.Rest dotted-eighth>
         {2.75} <music21.note.Rest quarter>
-
         '''
         durationInfo = attributes['Dur']
 
@@ -649,7 +644,6 @@ class NoteworthyTranslator:
         Traceback (most recent call last):
         music21.noteworthy.translate.NoteworthyTranslateException: Did
             not find a proper clef in type, OrangeClef
-
         '''
         currentClef = None
         if 'OctaveShift' in attributes:
@@ -778,7 +772,6 @@ class NoteworthyTranslator:
         <music21.stream.Measure 0 offset=0.0>
         >>> nwt.currentMeasure.leftBarline
         <music21.bar.Repeat direction=start>
-
         '''
         self.activeAccidentals = {}
 

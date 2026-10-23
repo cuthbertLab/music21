@@ -101,7 +101,6 @@ class ScoreCorrector:
     def getSinglePart(self, pn):
         '''
         returns a NEW SinglePart object for part number pn from the score
-
         '''
 
         return SinglePart(self.score.parts[pn], pn)
@@ -167,7 +166,6 @@ class ScoreCorrector:
         '''
         Uses a score and returns an array of probabilities.
         For n in the array, n is the probability that the nth part
-
         '''
         if self.distributionArray is not None:
             return self.distributionArray
@@ -464,7 +462,6 @@ class SinglePart:
         >>> p[1].insert(0, meter.TimeSignature('3/8'))
         >>> sp.getIncorrectMeasureIndices(runFast=False)
         []
-
         '''
         from music21 import meter
         self.incorrectMeasures = []
@@ -555,7 +552,6 @@ class SinglePart:
         '''
         Returns an array of the indices of the minimum distance measures
         given a measure (with index i) to compare to.
-
         '''
         unused_probabilityDistribution = self.horizontalProbabilityDist()
         incorrectMeasures = self.incorrectMeasures
@@ -804,7 +800,6 @@ class MeasureHash:
     def hashGrace(self, n):
         '''
         Gives a Grace Note a duration of a 128th note
-
         '''
         graceNoteDuration = self.hashQuarterLength(0.015625)
         byteEncoding = chr(graceNoteDuration)
@@ -886,7 +881,6 @@ class MeasureHash:
         >>> hasher.setSequenceMatcher()
         >>> hasher.getMeasureDifference('VFUF')
         1.0
-
         '''
 
         self.sequenceMatcher.set_seq2(hashString)
@@ -1114,7 +1108,6 @@ class MeasureHash:
         Take minimum length. Compare index to index. Any additional letters
         in the flagged measure get graded as additions. Any additional letters
         in the comparison measure get graded as omissions.
-
         '''
         ls = len(source)
         ld = len(destination)

@@ -323,7 +323,6 @@ class CTSong(prebase.ProtoM21Object):
         Fadeout: I . . V | I . . V | I . . V |
         Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
         S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
-
     """
     _DOC_ORDER = ['text', 'toPart', 'title', 'homeTimeSig', 'homeKey', 'comments', 'rules']
     _DOC_ATTR: dict[str, str] = {
@@ -609,8 +608,7 @@ class CTSong(prebase.ProtoM21Object):
             m.number = i + 1
         partObj.append(measures)
 
-        partObj.insert(0, metadata.Metadata())
-        partObj.metadata.title = self.title
+        partObj.insert(0, metadata.Metadata(title=self.title))
 
         self._partObj = partObj
         return partObj
@@ -672,15 +670,17 @@ class CTRule(prebase.ProtoM21Object):
         return f'text={self.text!r}'
 
     # --------------------------------------------------------------------------
-    def _getParent(self) -> CTSong|None:
+    @property
+    def parent(self) -> CTSong|None:
+        r'''
+        A reference to the CTSong object housing the CTRule if any.
+        '''
         return common.unwrapWeakref(self._parent)
 
-    def _setParent(self, parent: CTSong) -> None:
+    @parent.setter
+    def parent(self, parent: CTSong) -> None:
         self._parent = common.wrapWeakref(parent)
 
-    parent = property(_getParent, _setParent, doc=r'''
-    A reference to the CTSong object housing the CTRule if any.
-    ''')
     # --------------------------------------------------------------------------
 
     def expand(
@@ -996,7 +996,6 @@ class CTRule(prebase.ProtoM21Object):
         'vii/o7'
         >>> s.fixupChordAtom('iia')
         'ii+'
-
         '''
         if 'x' in atom:
             atom = atom.replace('x', 'o')
@@ -1007,10 +1006,18 @@ class CTRule(prebase.ProtoM21Object):
         return atom
     # --------------------------------------------------------------------------
 
-    def _setMusicText(self, value: str) -> None:
-        self._musicText = str(value)
+    @property
+    def musicText(self) -> str:
+        '''
+        Gets just the music text of the CTRule, excluding the left hand side and comments
 
-    def _getMusicText(self) -> str:
+        >>> rs = 'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
+        >>> s = romanText.clercqTemperley.CTRule(rs)
+        >>> s.text
+        'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
+        >>> s.musicText
+        '$BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4'
+        '''
         if self._musicText:
             return self._musicText
 
@@ -1025,16 +1032,9 @@ class CTRule(prebase.ProtoM21Object):
         self._musicText = text.strip()
         return self._musicText
 
-    musicText = property(_getMusicText, _setMusicText, doc='''
-        Gets just the music text of the CTRule, excluding the left hand side and comments
-
-        >>> rs = 'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
-        >>> s = romanText.clercqTemperley.CTRule(rs)
-        >>> s.text
-        'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
-        >>> s.musicText
-        '$BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4'
-        ''')
+    @musicText.setter
+    def musicText(self, value: str) -> None:
+        self._musicText = str(value)
 
     @property
     def comment(self) -> str|None:
@@ -1050,7 +1050,18 @@ class CTRule(prebase.ProtoM21Object):
             return self.text[self.text.index('%') + 1:].strip()
         return None
 
-    def _getLHS(self) -> str:
+    @property
+    def LHS(self) -> str:
+        '''
+        Get the LHS (Left Hand Side) of the CTRule.
+        If not specified explicitly but CTtext present, searches
+        first characters up until ':' for rule and returns string)
+
+        >>> rs = 'In: $BP*3 I IV | R |*4 I |*4 % This is a comment'
+        >>> s = romanText.clercqTemperley.CTRule(rs)
+        >>> s.LHS
+        'In'
+        '''
         if self._LHS:
             return self._LHS
 
@@ -1066,19 +1077,9 @@ class CTRule(prebase.ProtoM21Object):
         else:
             return ''
 
-    def _setLHS(self, value: str) -> None:
+    @LHS.setter
+    def LHS(self, value: str) -> None:
         self._LHS = str(value)
-
-    LHS = property(_getLHS, _setLHS, doc='''
-        Get the LHS (Left Hand Side) of the CTRule.
-        If not specified explicitly but CTtext present, searches
-        first characters up until ':' for rule and returns string)
-
-        >>> rs = 'In: $BP*3 I IV | R |*4 I |*4 % This is a comment'
-        >>> s = romanText.clercqTemperley.CTRule(rs)
-        >>> s.LHS
-        'In'
-        ''')
 
     @property
     def sectionName(self) -> str:
@@ -1138,8 +1139,7 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testB(self) -> None:
-        from music21.romanText import clercqTemperley
-        s = clercqTemperley.CTSong(BlitzkriegBopCT)
+        s = CTSong(BlitzkriegBopCT)
         partObj = s.toPart()
         if self.show:
             partObj.show()

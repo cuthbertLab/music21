@@ -233,7 +233,7 @@ def base40ToPitch(base40Num: int) -> pitch.Pitch:
     '''
     p = pitch.Pitch()
     p.octave = ((base40Num - 1) / 40) + 1
-    tableNum = base40Num - 40 * (p.implicitOctave - 1)
+    tableNum = base40Num - 40 * (p.octave - 1)
     pitchName = base40Equivalent.get(tableNum, '')
     if pitchName:
         p.name = pitchName
@@ -266,7 +266,7 @@ def pitchToBase40(pitchToConvert: str|pitch.Pitch) -> int:
         pitchObj = pitchToConvert
     if pitchObj.name in base40Representation:
         tableNum = base40Representation[pitchObj.name]
-        base40Num = (40 * (pitchObj.implicitOctave - 1)) + tableNum
+        base40Num = (40 * (pitchObj.octave - 1)) + tableNum
         return base40Num
 
     raise Base40Exception('Base40 cannot handle this pitch ' + pitchObj.nameWithOctave)

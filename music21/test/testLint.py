@@ -54,7 +54,7 @@ def main(fnAccept=None, strict=False):
     poolSize = common.cpus()
 
     if pylintRun is None:
-        print("make sure that 'sudo pip3 install pylint' is there. exiting.")
+        print("make sure that pylint is installed ('uv sync'). exiting.")
         return
 
     mg = commonTest.ModuleGather()

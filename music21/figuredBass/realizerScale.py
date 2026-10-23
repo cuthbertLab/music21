@@ -203,7 +203,7 @@ class FiguredBassScale:
         bassPitch = convertToPitch(bassPitch)
         maxPitch = convertToPitch(maxPitch)
         pitchNames = self.getPitchNames(bassPitch, notationString)
-        maxOctave = maxPitch.implicitOctave
+        maxOctave = maxPitch.octave
         iter1 = itertools.product(pitchNames, range(maxOctave + 1))
         iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
         iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)

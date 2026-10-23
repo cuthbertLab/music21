@@ -178,7 +178,6 @@ def functionToRoman(thisHarmonicFunction: HarmonicFunction,
     >>> rn = roman.RomanNumeral('vi')
     >>> str(analysis.harmonicFunction.romanToFunction(rn))
     'Tp'
-
     '''
     if isinstance(keyOrScale, str):
         keyOrScale = key.Key(keyOrScale)

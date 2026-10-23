@@ -158,7 +158,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
         # unordered says that results can RETURN in any order; not that
         # they'd be pooled out in any order.
         res = pool.imap_unordered(runOneModuleWithoutImp,
-                                    ((modGather, fp) for fp in pathsToRun))
+                                  ((modGather, fp) for fp in pathsToRun))
 
         continueIt = True
         timeouts = 0

@@ -512,7 +512,6 @@ class RTMeasure(RTToken):
     ['a']
     >>> rtm.isMeasure()
     True
-
     '''
 
     def __init__(self, src: str = ''):
@@ -911,7 +910,6 @@ class RTAnalyticKey(RTKeyTypeAtom):
     <music21.romanText.rtObjects.RTAnalyticKey 'bb:'>
     >>> bMinor.getKey()
     <music21.key.Key of b- minor>
-
     '''
     footerStrip = ':'
 

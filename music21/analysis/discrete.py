@@ -565,14 +565,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
     def _bestKeyEnharmonic(self, pitchObj, mode, sStream=None):
         '''
-
         >>> ks = analysis.discrete.KrumhanslSchmuckler()
         >>> s = converter.parse('tinynotation: 4/4 b-4 e- f g-')
         >>> ks._bestKeyEnharmonic(pitch.Pitch('e#'), 'minor', s)
         <music21.pitch.Pitch F>
         >>> ks._bestKeyEnharmonic(pitch.Pitch('f-'), 'major', s)
         <music21.pitch.Pitch E>
-
         '''
         if pitchObj is None:
             return None
@@ -881,7 +879,6 @@ class BellmanBudge(KeyWeightKeyAnalysis):
         12
         >>> a.getWeights('major')
         [16.8..., 0.8..., 12.9..., 1.4..., ...]
-
         '''
         weightType = weightType.lower()
         # note: only one value is different from KrumhanslSchmuckler
@@ -1045,7 +1042,6 @@ class Ambitus(DiscreteAnalysis):
         >>> s.insert(4, harmony.ChordSymbol('C6'))
         >>> p.getPitchSpan(s) is None
         True
-
         '''
         if subStream is self._referenceStream and self.minPitchObj and self.maxPitchObj:
             return self.minPitchObj, self.maxPitchObj
@@ -1118,7 +1114,6 @@ class Ambitus(DiscreteAnalysis):
         >>> x = p.process(s.parts[1])
         >>> [len(y) for y in [x for x in p.solutionLegend(compress=True)]]
         [2, 2]
-
         '''
         colorsUsed = []
         if compress:
@@ -1160,7 +1155,6 @@ class Ambitus(DiscreteAnalysis):
 
     def solutionToColor(self, solution: int|None) -> str:
         '''
-
         >>> p = analysis.discrete.Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])

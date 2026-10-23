@@ -8,4 +8,5 @@ About `music21`
    about
    applications
    faq
+   migratingToV11
    referenceCorpus

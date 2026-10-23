@@ -18,7 +18,7 @@ Speed notes:
 
    If you really want to do lots of comparisons, the `scoreSimilarity` method will
    use python-Levenshtein if it is installed, unless forceDifflib is set to True.
-   python-Levenshtein can be installed via **pip install python-Levenshtein**.
+   python-Levenshtein can be installed via **uv add python-Levenshtein**.
    The ratios are very slightly different, but the speedup is between 10 and 100x!
    (But then PyPy probably won't work.)
 '''
@@ -97,7 +97,6 @@ def translateMonophonicPartToSegments(
 
     >>> measureLists[0:2]
     [(1, 12), (7, 18)]
-
     '''
     from music21 import search
     if algorithm is None:
@@ -328,7 +327,7 @@ def getDifflibOrPyLev(
         try:
             # noinspection PyPackageRequirements
             from Levenshtein import StringMatcher as pyLevenshtein  # type: ignore
-            smObject = pyLevenshtein.StringMatcher(junk, '', seq2Seq)
+            smObject = pyLevenshtein.StringMatcher(None, '', seq2Seq)
         except ImportError:
             smObject = difflib.SequenceMatcher(junk, '', seq2Seq)
     return smObject

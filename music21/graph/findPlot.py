@@ -109,7 +109,6 @@ def getAxisQuantities(synonyms=False, axesToCheck=None):
     >>> graph.findPlot.getAxisQuantities(True, axesToCheck=theseAxes)
     ['count', 'quantity', 'frequency', 'counting',
      'offset', 'measure', 'offsets', 'measures', 'time']
-
     '''
     if axesToCheck is None:
         axesToCheck = getAxisClasses()
@@ -167,7 +166,6 @@ def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
     >>> pcs = [graph.plot.ScatterWeighted, graph.plot.Dolan]
     >>> graph.findPlot.getPlotClassesFromFormat('scatterweighted', pcs)
     [<class 'music21.graph.plot.ScatterWeighted'>]
-
     '''
     graphFormat = userFormatsToFormat(graphFormat).lower()
 
@@ -306,7 +304,6 @@ def getPlotsToMake(graphFormat: str|None = None,
       OrderedDict({'x': <class 'music21.graph.axis.OffsetAxis'>,
                    'y': <class 'music21.graph.axis.DynamicsAxis'>,
                    'z': <class 'music21.graph.axis.CountingAxis'>}))]
-
     '''
     def _bestPlotType(graphClassesToChooseFrom):
         # now get the best graph type from this possibly motley list

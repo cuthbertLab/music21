@@ -351,7 +351,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         self._atSoundingPitch: bool|t.Literal['unknown'] = 'unknown'
 
         # experimental
-        self._mutable = True
+        self._mutable: bool = True
 
         if givenElements is None:
             return
@@ -662,7 +662,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
           still works until v9.  This is an attempt to unify __getitem__ behavior in
           StreamIterators and Streams.
           - allowed iterables of qualified class names, e.g. `[note.Note, note.Rest]`
-
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -1557,7 +1556,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         >>> tuple(s).index(n3)
         0
-
         '''
         if not self.isSorted and self.autoSort:
             self.sort()  # will set isSorted to True
@@ -2698,6 +2696,35 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         self.coreStoreAtEnd(element)
         # Streams cannot reside in end elements, thus do not update is flat
         self.coreElementsChanged(updateIsFlat=False)
+
+    def isAtEnd(self, element: base.Music21Object) -> bool:
+        '''
+        Return True if `element` is stored at the end of this Stream
+        (via :meth:`~music21.stream.base.Stream.storeAtEnd`).
+
+        >>> s = stream.Stream()
+        >>> n = note.Note('C')
+        >>> s.append(n)
+        >>> b = bar.Barline()
+        >>> s.storeAtEnd(b)
+        >>> s.isAtEnd(b)
+        True
+        >>> s.isAtEnd(n)
+        False
+
+        If the element is not in this Stream, :exc:`~music21.sites.SitesException`
+        is raised:
+
+        >>> s.isAtEnd(note.Note('E'))
+        Traceback (most recent call last):
+        music21.sites.SitesException: an entry for this object 0x... is not stored in stream
+            <music21.stream.Stream 0x...>
+
+        * New in v11.
+
+        AI-assisted.
+        '''
+        return self.elementOffset(element, returnSpecial=True) is OffsetSpecial.AT_END
 
     # --------------------------------------------------------------------------
     # all the following call either insert() or append()
@@ -4288,7 +4315,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         Traceback (most recent call last):
         music21.exceptions21.StreamException:
             cannot find object (<music21.note.Note C#>) in Stream
-
         '''
         if classList is not None:
             classSet = set(classList)
@@ -4383,13 +4409,13 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                 matches = [m for m in mStreamIter if m.number in matchingMeasureNumbers]
             else:
                 matches = [m for i, m in enumerate(mStreamIter)
-                                if i + 1 in matchingMeasureNumbers]
+                           if i + 1 in matchingMeasureNumbers]
         else:
             if hasUniqueMeasureNumbers:
                 matches = [m for m in mStreamIter if m.number >= numberStart]
             else:
                 matches = [m for i, m in enumerate(mStreamIter)
-                                    if i + 1 >= numberStart]
+                           if i + 1 >= numberStart]
 
         if startSuffix is not None:
             oldMatches = matches
@@ -5099,42 +5125,9 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         orderedOffsetMap = OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))
         return orderedOffsetMap
 
-    def _getFinalBarline(self):
-        # if we have part-like streams, process each part
-        if self.hasPartLikeStreams():
-            post = []
-            for p in self.getElementsByClass('Stream'):
-                post.append(p._getFinalBarline())
-            return post  # a list of barlines
-        # core routines for a single Stream
-        else:
-            if self.hasMeasures():
-                return self.getElementsByClass(Measure).last().rightBarline
-            elif hasattr(self, 'rightBarline'):
-                return self.rightBarline
-            else:
-                return None
-
-    def _setFinalBarline(self, value):
-        # if we have part-like streams, process each part
-        if self.hasPartLikeStreams():
-            if not common.isListLike(value):
-                value = [value]
-            for i, p in enumerate(self.getElementsByClass('Stream')):
-                # set final barline w/ mod iteration of value list
-                bl = value[i % len(value)]
-                # environLocal.printDebug(['enumerating measures', i, p, 'setting barline', bl])
-                p._setFinalBarline(bl)
-            return
-
-        # core routines for a single Stream
-        if self.hasMeasures():
-            self.getElementsByClass(Measure).last().rightBarline = value
-        elif hasattr(self, 'rightBarline'):
-            self.rightBarline = value  # pylint: disable=attribute-defined-outside-init
-        # do nothing for other streams
-
-    finalBarline = property(_getFinalBarline, _setFinalBarline, doc='''
+    @property
+    def finalBarline(self):
+        '''
         Get or set the final barline of this Stream's Measures,
         if and only if there are Measures defined as elements in this Stream.
         This method will not create Measures if none exist.
@@ -5193,7 +5186,41 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         * Changed in v6.3: does not raise an exception if queried or set on a measure-less stream.
           Previously raised a StreamException
-        ''')
+        '''
+        # if we have part-like streams, process each part
+        if self.hasPartLikeStreams():
+            post = []
+            for p in self.getElementsByClass('Stream'):
+                post.append(p.finalBarline)
+            return post  # a list of barlines
+        # core routines for a single Stream
+        else:
+            if self.hasMeasures():
+                return self.getElementsByClass(Measure).last().rightBarline
+            elif hasattr(self, 'rightBarline'):
+                return self.rightBarline
+            else:
+                return None
+
+    @finalBarline.setter
+    def finalBarline(self, value):
+        # if we have part-like streams, process each part
+        if self.hasPartLikeStreams():
+            if not common.isListLike(value):
+                value = [value]
+            for i, p in enumerate(self.getElementsByClass('Stream')):
+                # set final barline w/ mod iteration of value list
+                bl = value[i % len(value)]
+                # environLocal.printDebug(['enumerating measures', i, p, 'setting barline', bl])
+                p.finalBarline = bl
+            return
+
+        # core routines for a single Stream
+        if self.hasMeasures():
+            self.getElementsByClass(Measure).last().rightBarline = value
+        elif hasattr(self, 'rightBarline'):
+            self.rightBarline = value  # pylint: disable=attribute-defined-outside-init
+        # do nothing for other streams
 
     @property
     def voices(self):
@@ -5783,7 +5810,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             if searchActiveSite:
                 # if isinstance(self.activeSite, Stream) and self.activeSite != self:
                 if (self.activeSite is not None
-                    and self.activeSite.isStream
+                        and self.activeSite.isStream
                         and self.activeSite is not self):
                     # environLocal.printDebug(['searching activeSite Stream',
                     #    self, self.activeSite])
@@ -6151,7 +6178,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         NOTE: RENAME: this probably should be renamed, as we use Context in a special way.
         Perhaps better is extractNeighbors?
-
         '''
         display = self.cloneEmpty('extractContext')
 
@@ -6216,7 +6242,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         >>> s.flatten()._uniqueOffsetsAndEndTimes(offsetsOnly=True, endTimesOnly=True)
         []
-
         '''
         offsetDictValues = self._offsetDict.values()
         if endTimesOnly:
@@ -6228,7 +6253,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             endTimes = set()
         else:
             endTimes = {opFrac(v[0] + v[1].duration.quarterLength)
-                            for v in offsetDictValues}
+                        for v in offsetDictValues}
         return sorted(offsets.union(endTimes))
 
     def chordify(
@@ -8295,7 +8320,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         Clean this Stream: for self and all elements, purge all dead locations
         and remove all non-contained sites. Further, restore all active sites.
         '''
-        if self._mutable is not False:
+        if self._mutable:
             self.sort()  # must sort before making immutable
         for e in self.recurse(streamsOnly=True, includeSelf=False):
             # e.purgeLocations(rescanIsDead=True)
@@ -8308,6 +8333,10 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         self._mutable = False
 
     def makeMutable(self, recurse=True):
+        '''
+        Soft-Deprecated -- this will return a New Stream at some point --
+        once immutable, never mutable.
+        '''
         self._mutable = True
         if recurse:
             for e in self.recurse(streamsOnly=True):
@@ -8589,10 +8618,47 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
     def duration(self, value: 'music21.duration.Duration'):
         self._setDuration(value)
 
-    def _setSeconds(self, value):
-        pass
+    @property
+    def seconds(self):
+        '''
+        Get or set the duration of this Stream in seconds, assuming that
+        this object contains a :class:`~music21.tempo.MetronomeMark` or
+        :class:`~music21.tempo.MetricModulation`.
 
-    def _getSeconds(self):
+        >>> s = corpus.parse('bwv66.6')  # piece without a tempo
+        >>> sFlat = s.flatten()
+        >>> t = tempo.MetronomeMark('adagio')
+        >>> sFlat.insert(0, t)
+        >>> sFlat.seconds
+        38.57142857...
+        >>> tFast = tempo.MetronomeMark('allegro')
+        >>> sFlat.replace(t, tFast)
+        >>> sFlat.seconds
+        16.363...
+
+        Setting seconds on streams is not supported.  Ideally it would instead
+        scale all elements to fit, but this is a long way off.
+
+        If a stream does not have a tempo-indication in it then the property
+        returns 0.0 if an empty Stream (or self.highestTime is 0.0) or 'nan'
+        if there are non-zero duration objects in the stream:
+
+        >>> s = stream.Stream()
+        >>> s.seconds
+        0.0
+        >>> s.insert(0, clef.TrebleClef())
+        >>> s.seconds
+        0.0
+        >>> s.append(note.Note(type='half'))
+        >>> s.seconds
+        nan
+        >>> import math
+        >>> math.isnan(s.seconds)
+        True
+
+        * Changed in v6.3: return nan rather than raising an exception.  Do not
+          attempt to change seconds on a stream, as it did not do what you would expect.
+        '''
         getTempoFromContext = False
         # need to find all tempo indications and the number of quarter lengths
         # under each
@@ -8639,45 +8705,9 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         return sec
 
-    seconds = property(_getSeconds, _setSeconds, doc='''
-        Get or set the duration of this Stream in seconds, assuming that
-        this object contains a :class:`~music21.tempo.MetronomeMark` or
-        :class:`~music21.tempo.MetricModulation`.
-
-        >>> s = corpus.parse('bwv66.6')  # piece without a tempo
-        >>> sFlat = s.flatten()
-        >>> t = tempo.MetronomeMark('adagio')
-        >>> sFlat.insert(0, t)
-        >>> sFlat.seconds
-        38.57142857...
-        >>> tFast = tempo.MetronomeMark('allegro')
-        >>> sFlat.replace(t, tFast)
-        >>> sFlat.seconds
-        16.363...
-
-        Setting seconds on streams is not supported.  Ideally it would instead
-        scale all elements to fit, but this is a long way off.
-
-        If a stream does not have a tempo-indication in it then the property
-        returns 0.0 if an empty Stream (or self.highestTime is 0.0) or 'nan'
-        if there are non-zero duration objects in the stream:
-
-        >>> s = stream.Stream()
-        >>> s.seconds
-        0.0
-        >>> s.insert(0, clef.TrebleClef())
-        >>> s.seconds
-        0.0
-        >>> s.append(note.Note(type='half'))
-        >>> s.seconds
-        nan
-        >>> import math
-        >>> math.isnan(s.seconds)
-        True
-
-        * Changed in v6.3: return nan rather than raising an exception.  Do not
-          attempt to change seconds on a stream, as it did not do what you would expect.
-        ''')
+    @seconds.setter
+    def seconds(self, value):
+        pass
 
     def metronomeMarkBoundaries(self, srcObj=None):
         '''
@@ -8859,31 +8889,9 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
     # --------------------------------------------------------------------------
     # Metadata access
 
-    def _getMetadata(self) -> metadata.Metadata|None:
+    @property
+    def metadata(self) -> metadata.Metadata|None:
         '''
-        >>> a = stream.Stream()
-        >>> a.metadata = metadata.Metadata()
-        '''
-        mdList = self.getElementsByClass(metadata.Metadata)
-        # only return metadata that has an offset = 0.0
-        mdList = mdList.getElementsByOffset(0)
-        return mdList.first()
-
-    def _setMetadata(self, metadataObj: metadata.Metadata|None) -> None:
-        '''
-        >>> a = stream.Stream()
-        >>> a.metadata = metadata.Metadata()
-        '''
-        oldMetadata = self._getMetadata()
-        if oldMetadata is not None:
-            # environLocal.printDebug(['removing old metadata', oldMetadata])
-            junk = self.pop(self.index(oldMetadata))
-
-        if metadataObj is not None and isinstance(metadataObj, metadata.Metadata):
-            self.insert(0, metadataObj)
-
-    metadata = property(_getMetadata, _setMetadata,
-                        doc='''
         Get or set the :class:`~music21.metadata.Metadata` object
         found at the beginning (offset 0) of this Stream.
 
@@ -8894,7 +8902,21 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         'frank'
 
         May also return None if nothing is there.
-        ''')
+        '''
+        mdList = self.getElementsByClass(metadata.Metadata)
+        # only return metadata that has an offset = 0.0
+        mdList = mdList.getElementsByOffset(0)
+        return mdList.first()
+
+    @metadata.setter
+    def metadata(self, metadataObj: metadata.Metadata|None) -> None:
+        oldMetadata = self.metadata
+        if oldMetadata is not None:
+            # environLocal.printDebug(['removing old metadata', oldMetadata])
+            junk = self.pop(self.index(oldMetadata))
+
+        if metadataObj is not None and isinstance(metadataObj, metadata.Metadata):
+            self.insert(0, metadataObj)
 
     # --------------------------------------------------------------------------
     # these methods override the behavior inherited from base.py
@@ -9496,7 +9518,10 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             # is unsorted originally, this "looking ahead" could become O(n^2).
             originallySorted = useStream.isSorted
             rests_lacking_durations: list[note.Rest] = []
-            for i, e in enumerate(useStream._elements):
+            for i, e in enumerate(useStream.elements):
+                if useStream.isAtEnd(e):
+                    # Elements stored at the end carry no quantizable offset.
+                    continue
                 if processOffsets:
                     o = useStream.elementOffset(e)
                     sign = 1
@@ -9601,7 +9626,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         If `target` is None, the entire Stream is processed. Otherwise, only the element
         specified is manipulated.
-
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('sliceByQuarterLengths')
@@ -10807,7 +10831,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         >>> d = a.getOverlaps()
         >>> len(d[0])
         7
-
         '''
         overlapMap = self._findLayering()
         # environLocal.printDebug(['overlapMap', overlapMap])
@@ -11121,7 +11144,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         is list, it is used like
         classList in elsewhere in stream to provide a list of classes that the
         el must be a part of.
-
         '''
         if elStream is not None:  # a bit of safety
             elOffset = el.getOffsetBySite(elStream)
@@ -11537,7 +11559,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                         mEmpty.mergeAttributes(m)
                         # Propagate bar, meter, key elements to lower parts
                         mEmpty.mergeElements(m, classFilterList=('Barline',
-                                            'TimeSignature', 'KeySignature'))
+                                                                 'TimeSignature', 'KeySignature'))
                         s.parts[i].insert(self.elementOffset(m), mEmpty)
         # if part has no measures but has voices, contents of each voice go into the part
         elif self.hasVoices():
@@ -11704,7 +11726,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         >>> list(scr.lyrics(ignoreBarlines=True, recurse=False).keys())
         []
-
         '''
         returnLists: dict[int, list[RecursiveLyricList]] = {}
         numNotes = 0
@@ -12286,7 +12307,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
             {3.0} <music21.note.Note E>
-
         '''
         from music21 import variant
 
@@ -12422,7 +12442,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             {1.0} <music21.note.Note B>
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note A>
-
         '''
         from music21 import variant
 
@@ -12704,7 +12723,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         ...    fixedNumbers.append( m.number )
         >>> fixedNumbers
         [1, 2, 3, 4, 5]
-
         '''
         deletedMeasures.extend(insertedMeasures)
         allMeasures = deletedMeasures
@@ -12827,7 +12845,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         >>> streamWithOssia = s.showVariantAsOssialikePart(sPart,
         ...          ['variant1', 'variant2', 'variant3'], inPlace=False)
         >>> #_DOCS_SHOW streamWithOssia.show()
-
         '''
         from music21 import variant
 
@@ -13430,11 +13447,18 @@ class Measure(Stream):
 
         For further details about complex time signatures, etc.
         see `meter.bestTimeSignature()`
-
         '''
         return meter.bestTimeSignature(self)
 
-    def _getLeftBarline(self):
+    @property
+    def leftBarline(self):
+        '''
+        Get or set the left barline, or the Barline object
+        found at offset zero of the Measure.  Can be set either with a string
+        representing barline style or a bar.Barline() object or None.
+        Note that not all bars have
+        barline objects here -- regular barlines don't need them.
+        '''
         barList = []
         # directly access _elements, as do not want to get any bars
         # in _endElements
@@ -13448,7 +13472,8 @@ class Measure(Stream):
         else:
             return barList[0]
 
-    def _setLeftBarline(self, barlineObj):
+    @leftBarline.setter
+    def leftBarline(self, barlineObj):
         insert = True
         if isinstance(barlineObj, str):
             barlineObj = bar.Barline(barlineObj)
@@ -13458,69 +13483,18 @@ class Measure(Stream):
         else:  # assume a Barline object
             barlineObj.location = 'left'
 
-        oldLeftBarline = self._getLeftBarline()
+        oldLeftBarline = self.leftBarline
         if oldLeftBarline is not None:
-            # environLocal.printDebug(['_setLeftBarline()', 'removing left barline'])
+            # environLocal.printDebug(['leftBarline setter', 'removing left barline'])
             junk = self.pop(self.index(oldLeftBarline))
         if insert:
-            # environLocal.printDebug(['_setLeftBarline()',
+            # environLocal.printDebug(['leftBarline setter',
             # 'inserting new left barline', barlineObj])
             self.insert(0, barlineObj)
 
-    leftBarline = property(_getLeftBarline,
-                           _setLeftBarline,
-                           doc='''
-        Get or set the left barline, or the Barline object
-        found at offset zero of the Measure.  Can be set either with a string
-        representing barline style or a bar.Barline() object or None.
-        Note that not all bars have
-        barline objects here -- regular barlines don't need them.
-        ''')
-
-    def _getRightBarline(self):
-        # TODO: Move to Stream or make setting .rightBarline, etc. on Stream raise an exception
-        # look on _endElements
-        barList = []
-        for e in self._endElements:
-            if isinstance(e, bar.Barline):  # take the first
-                barList.append(e)
-                break
-        # barList = self.getElementsByClass(bar.Barline)
-        if not barList:  # do this before searching for barQL
-            return None
-        else:
-            return barList[0]
-
-    def _setRightBarline(self, barlineObj):
-        insert = True
-        if isinstance(barlineObj, str):
-            barlineObj = bar.Barline(barlineObj)
-            barlineObj.location = 'right'
-        elif barlineObj is None:  # assume removal
-            insert = False
-        else:  # assume a Barline object
-            barlineObj.location = 'right'
-
-        # if a repeat, setup direction if not assigned
-        if barlineObj is not None and isinstance(barlineObj, bar.Repeat):
-            # environLocal.printDebug(['got barline obj w/ direction', barlineObj.direction])
-            if barlineObj.direction in ['start', None]:
-                barlineObj.direction = 'end'
-        oldRightBarline = self._getRightBarline()
-
-        if oldRightBarline is not None:
-            # environLocal.printDebug(['_setRightBarline()', 'removing right barline'])
-            junk = self.pop(self.index(oldRightBarline))
-        # insert into _endElements
-        if insert:
-            self.storeAtEnd(barlineObj)
-
-        # environLocal.printDebug(['post _setRightBarline', barlineObj,
-        #    'len of elements highest', len(self._endElements)])
-
-    rightBarline = property(_getRightBarline,
-                            _setRightBarline,
-                            doc='''
+    @property
+    def rightBarline(self):
+        '''
         Get or set the right barline, or the Barline object
         found at the offset equal to the bar duration.
 
@@ -13547,8 +13521,47 @@ class Measure(Stream):
 
         .measure currently isn't the same as the
         original measure.
+        '''
+        # TODO: Move to Stream or make setting .rightBarline, etc. on Stream raise an exception
+        # look on _endElements
+        barList = []
+        for e in self._endElements:
+            if isinstance(e, bar.Barline):  # take the first
+                barList.append(e)
+                break
+        # barList = self.getElementsByClass(bar.Barline)
+        if not barList:  # do this before searching for barQL
+            return None
+        else:
+            return barList[0]
 
-        ''')
+    @rightBarline.setter
+    def rightBarline(self, barlineObj):
+        insert = True
+        if isinstance(barlineObj, str):
+            barlineObj = bar.Barline(barlineObj)
+            barlineObj.location = 'right'
+        elif barlineObj is None:  # assume removal
+            insert = False
+        else:  # assume a Barline object
+            barlineObj.location = 'right'
+
+        # if a repeat, setup direction if not assigned
+        if barlineObj is not None and isinstance(barlineObj, bar.Repeat):
+            # environLocal.printDebug(['got barline obj w/ direction', barlineObj.direction])
+            if barlineObj.direction in ['start', None]:
+                barlineObj.direction = 'end'
+        oldRightBarline = self.rightBarline
+
+        if oldRightBarline is not None:
+            # environLocal.printDebug(['rightBarline setter', 'removing right barline'])
+            junk = self.pop(self.index(oldRightBarline))
+        # insert into _endElements
+        if insert:
+            self.storeAtEnd(barlineObj)
+
+        # environLocal.printDebug(['post rightBarline setter', barlineObj,
+        #    'len of elements highest', len(self._endElements)])
 
 
 class Part(Stream):
@@ -13583,26 +13596,9 @@ class Part(Stream):
         self._partName = None
         self._partAbbreviation = None
 
-    def _getPartName(self):
-        if self._partName is not None:
-            return self._partName
-        elif '_partName' in self._cache:
-            return self._cache['_partName']
-        else:
-            pn = None
-            for e in self[instrument.Instrument]:
-                pn = e.partName
-                if pn is None:
-                    pn = e.instrumentName
-                if pn is not None:
-                    break
-            self._cache['_partName'] = pn
-            return pn
-
-    def _setPartName(self, newName):
-        self._partName = newName
-
-    partName = property(_getPartName, _setPartName, doc='''
+    @property
+    def partName(self):
+        '''
         Gets or sets a string representing the name of this part
         as a whole (not counting instrument changes, etc.).
 
@@ -13635,28 +13631,29 @@ class Part(Stream):
         .coreElementsChanged() is called or this Stream's elements are otherwise altered.
         This is because the value is cached so that O(n) searches through the Stream
         do not need to be done every time.
-    ''')
-
-    def _getPartAbbreviation(self):
-        if self._partAbbreviation is not None:
-            return self._partAbbreviation
-        elif '_partAbbreviation' in self._cache:
-            return self._cache['_partAbbreviation']
+        '''
+        if self._partName is not None:
+            return self._partName
+        elif '_partName' in self._cache:
+            return self._cache['_partName']
         else:
             pn = None
             for e in self[instrument.Instrument]:
-                pn = e.partAbbreviation
+                pn = e.partName
                 if pn is None:
-                    pn = e.instrumentAbbreviation
+                    pn = e.instrumentName
                 if pn is not None:
                     break
-            self._cache['_partAbbreviation'] = pn
+            self._cache['_partName'] = pn
             return pn
 
-    def _setPartAbbreviation(self, newName):
-        self._partAbbreviation = newName
+    @partName.setter
+    def partName(self, newName):
+        self._partName = newName
 
-    partAbbreviation = property(_getPartAbbreviation, _setPartAbbreviation, doc='''
+    @property
+    def partAbbreviation(self):
+        '''
         Gets or sets a string representing the abbreviated name of this part
         as a whole (not counting instrument changes, etc.).
 
@@ -13689,7 +13686,25 @@ class Part(Stream):
         .coreElementsChanged() is called or this Stream's elements are otherwise altered.
         This is because the value is cached so that O(n) searches through the Stream
         do not need to be done every time.
-    ''')
+        '''
+        if self._partAbbreviation is not None:
+            return self._partAbbreviation
+        elif '_partAbbreviation' in self._cache:
+            return self._cache['_partAbbreviation']
+        else:
+            pn = None
+            for e in self[instrument.Instrument]:
+                pn = e.partAbbreviation
+                if pn is None:
+                    pn = e.instrumentAbbreviation
+                if pn is not None:
+                    break
+            self._cache['_partAbbreviation'] = pn
+            return pn
+
+    @partAbbreviation.setter
+    def partAbbreviation(self, newName):
+        self._partAbbreviation = newName
 
     def makeAccidentals(
         self,
@@ -14164,7 +14179,6 @@ class Score(Stream):
         4
         >>> len(post.flatten().notes)
         165
-
         '''
         from music21 import spanner
 

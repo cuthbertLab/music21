@@ -510,6 +510,14 @@ class Test(unittest.TestCase):
         self.assertEqual(str(i1.transposition), '<music21.interval.Interval M-2>')
         self.assertEqual(str(i2.transposition), '<music21.interval.Interval M-6>')
 
+    def testTransposeOctaveChangeWithoutDiatonic(self):
+        # https://github.com/cuthbertLab/music21/issues/2082
+        MP = MeasureParser()
+        mxTranspose = self.EL('<transpose><chromatic>0</chromatic>'
+                              '<octave-change>-1</octave-change></transpose>')
+        self.assertEqual(str(MP.xmlTransposeToInterval(mxTranspose)),
+                         '<music21.interval.Interval P-8>')
+
     def testInstrumentTranspositionB(self):
         from music21.musicxml import testPrimitive
         from music21 import converter
@@ -813,7 +821,8 @@ class Test(unittest.TestCase):
     def testChordSymbolException(self):
         MP = MeasureParser()
         mxHarmony = self.EL('<harmony><root><root-step>A</root-step></root>'
-        '<degree><degree-value></degree-value><degree-type>add</degree-type></degree></harmony>')
+                            '<degree><degree-value></degree-value>'
+                            '<degree-type>add</degree-type></degree></harmony>')
         with self.assertRaisesRegex(MusicXMLImportException, 'degree-value missing'):
             MP.xmlToChordSymbol(mxHarmony)
 
@@ -1391,6 +1400,72 @@ class Test(unittest.TestCase):
         for spanned, ch in zip(sp, chords):
             self.assertIs(spanned, ch)
 
+    @staticmethod
+    def arpeggiatedChordsXml(partIds: list[str]) -> str:
+        '''
+        One part per id, each with two measures holding one arpeggiated chord,
+        every <arpeggiate> with number="1", as MuseScore writes them.
+
+        AI-assisted (Claude).
+        '''
+        def mxChord(steps: tuple[str, str]) -> str:
+            return ''.join(
+                f'<note>{"<chord/>" if i else ""}'
+                f'<pitch><step>{step}</step><octave>4</octave></pitch><duration>4</duration>'
+                '<notations><arpeggiate number="1"/></notations></note>'
+                for i, step in enumerate(steps)
+            )
+
+        mxParts = ''.join(
+            f'<part id="{partId}">'
+            f'<measure number="1"><attributes><divisions>1</divisions></attributes>'
+            f'{mxChord(("C", "E"))}</measure>'
+            f'<measure number="2">{mxChord(("D", "F"))}</measure>'
+            '</part>'
+            for partId in partIds
+        )
+        mxScoreParts = ''.join(
+            f'<score-part id="{partId}"><part-name/></score-part>' for partId in partIds
+        )
+        return (f'<score-partwise><part-list>{mxScoreParts}</part-list>'
+                f'{mxParts}</score-partwise>')
+
+    def testArpeggioMarkSpannersSameNumberDifferentOffsets(self) -> None:
+        '''
+        The same number at two offsets makes two arpeggios, not one.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import converter
+
+        s = t.cast(stream.Score,
+                   converter.parse(self.arpeggiatedChordsXml(['P1']), format='musicxml'))
+        spanners = s.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner)
+        chords = s.parts[0][chord.Chord]
+        self.assertEqual(
+            [[id(spanned) for spanned in sp] for sp in spanners],
+            [[id(ch)] for ch in chords],
+        )
+
+    def testArpeggioMarkSpannersSameNumberDifferentParts(self) -> None:
+        '''
+        The same number at the same offset in two parts makes two arpeggios:
+        number only tells apart arpeggios within a part, where they may
+        cross staves (see testArpeggioMarkSpanners).
+
+        AI-assisted (Claude).
+        '''
+        from music21 import converter
+
+        s = t.cast(stream.Score,
+                   converter.parse(self.arpeggiatedChordsXml(['P1', 'P2']), format='musicxml'))
+        spanners = s.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner)
+        chords = [ch for p in s.parts for ch in p[chord.Chord]]
+        self.assertEqual(
+            [[id(spanned) for spanned in sp] for sp in spanners],
+            [[id(ch)] for ch in chords],
+        )
+
     def testHiddenRests(self):
         from music21 import converter
         from music21 import corpus
@@ -1530,6 +1605,25 @@ class Test(unittest.TestCase):
         self.assertEqual(ly3.components[2].syllabic, 'end')
         self.assertEqual(len(s.lyrics(recurse=True)[1][0]), 4)
 
+    def testLyricPrintObject(self):
+        # print-object="no" was read as hideObjectOnPrint = False, and "yes" as True
+        from music21 import converter
+        from music21.musicxml import m21ToXml
+
+        MP = MeasureParser()
+        hiddenLyric = MP.xmlToLyric(self.EL('<lyric print-object="no"><text>la</text></lyric>'))
+        self.assertIs(hiddenLyric.style.hideObjectOnPrint, True)
+        shownLyric = MP.xmlToLyric(self.EL('<lyric print-object="yes"><text>la</text></lyric>'))
+        self.assertIs(shownLyric.style.hideObjectOnPrint, False)
+
+        n = note.Note('D4')
+        n.lyric = 'la'
+        n.lyrics[0].style.hideObjectOnPrint = True
+        GEX = m21ToXml.GeneralObjectExporter()
+        xmlOut = GEX.parse(n).decode('utf-8')
+        roundTrip = converter.parse(xmlOut, format='musicxml')
+        self.assertIs(roundTrip.flatten().notes[0].lyrics[0].style.hideObjectOnPrint, True)
+
     def testDirectionPosition(self):
         from music21 import converter
         from music21 import corpus
@@ -1548,7 +1642,7 @@ class Test(unittest.TestCase):
         # TextExpression
         s = converter.parse(testPrimitive.textExpressions)
         positionedEls = [el for el in s.recurse() if el.hasStyleInformation
-            and el.style.relativeX is not None]
+                         and el.style.relativeX is not None]
         self.assertEqual(len(positionedEls), 3)
         self.assertEqual(
             list(set(type(el) for el in positionedEls)),
@@ -1558,7 +1652,7 @@ class Test(unittest.TestCase):
         # Wedge
         s = corpus.parse('beach')
         positionedEls = [el for el in s.recurse() if el.hasStyleInformation
-            and el.style.relativeX is not None]
+                         and el.style.relativeX is not None]
         self.assertEqual(len(positionedEls), 40)
         self.assertEqual(
             sorted(set(type(el) for el in positionedEls), key=repr),
@@ -1617,7 +1711,7 @@ class Test(unittest.TestCase):
         d = duration.Duration(2 / 3)
         self.assertEqual(len(d.tuplets), 1)
         mxNoteNoType = EL('<note><pitch><step>D</step><octave>6</octave></pitch>'
-                            '<duration>3</duration></note>')
+                          '<duration>3</duration></note>')
         MP.xmlToDuration(mxNoteNoType, inputM21=d)
         self.assertEqual(len(d.tuplets), 0)
         self.assertEqual(d.linked, True)
@@ -1737,6 +1831,42 @@ class Test(unittest.TestCase):
             p_expanded = repeat.Expander[stream.Part](p).process()
             p_notes2 = [n.name for n in p_expanded[note.Note]]
             self.assertEqual(p_notes2, ['G', 'A', 'G', 'B'])
+
+    def testSegnoAndCodaInBarline(self):
+        '''
+        MusicXML allows <segno/> and <coda/> inside a <barline>, not only in a
+        <direction>.  They should be imported, so that a later D.S. can find the segno.
+        '''
+        from music21 import converter
+
+        def measure(number, step, before='', after=''):
+            return (f'<measure number="{number}">{before}<note><pitch><step>{step}</step>'
+                    f'<octave>4</octave></pitch><duration>4</duration>'
+                    f'<type>whole</type></note>{after}</measure>')
+
+        def score(*measures):
+            return ('<score-partwise version="4.0"><part-list><score-part id="P1">'
+                    '<part-name>Music</part-name></score-part></part-list><part id="P1">'
+                    + ''.join(measures) + '</part></score-partwise>')
+
+        attributes = '<attributes><divisions>1</divisions></attributes>'
+        ds = '<direction><direction-type><words>D.S.</words></direction-type></direction>'
+        s = converter.parse(score(measure(1, 'C', attributes),
+                                  measure(2, 'D', '<barline location="left"><segno/></barline>'),
+                                  measure(3, 'E', after=ds)),
+                            format='musicxml')
+        segnos = s.parts.first().measure(2)[repeat.Segno]
+        self.assertEqual(len(segnos), 1)
+        self.assertEqual(segnos.first().offset, 0.0)
+        expanded = s.expandRepeats()
+        self.assertEqual([n.name for n in expanded[note.Note]], ['C', 'D', 'E', 'D', 'E'])
+
+        s = converter.parse(score(measure(1, 'C', attributes),
+                                  measure(2, 'D', '<barline location="left"><coda/></barline>')),
+                            format='musicxml')
+        codas = s.parts.first().measure(2)[repeat.Coda]
+        self.assertEqual(len(codas), 1)
+        self.assertEqual(codas.first().offset, 0.0)
 
 
 if __name__ == '__main__':

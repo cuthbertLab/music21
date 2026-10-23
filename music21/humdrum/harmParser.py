@@ -186,14 +186,14 @@ class HarmDefs:
     '''
     # The definition for a harm expr
     harmExpression = (r'^('
-        + accidental
-        + roots
-        + attribute
-        + intervals
-        + inversion
-        + alternative
-        + secondary
-        + r')$')
+                      + accidental
+                      + roots
+                      + attribute
+                      + intervals
+                      + inversion
+                      + alternative
+                      + secondary
+                      + r')$')
 
 
 class HarmParser:

@@ -378,7 +378,6 @@ class AVLNode[PayloadType](common.SlottedObjectMixin):
         child notes of `n` then this would not fix that node's balance/height.
         This method assumes that children have the correct information and only
         updates the information for this node.
-
         '''
         leftHeight = self.leftChild.height if self.leftChild else -1
         rightHeight = self.rightChild.height if self.rightChild else -1

@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -626,6 +626,42 @@ class Test(unittest.TestCase):
             'C4', minPitch='C4', maxPitch='C5', reverse=True)
         self.assertEqual(descending_melodic_minor_reversed[0].nameWithOctave, 'C4')  # was B-4
         self.assertEqual(descending_melodic_minor_reversed[-1].nameWithOctave, 'B-4')  # was C4
+
+    def test_get_pitch_from_node_degree_returns_a_new_pitch(self):
+        '''
+        A realization may be held in _ascendingCache or _descendingCache, so
+        the pitch taken out of one has to be the caller's own -- otherwise
+        writing to it edits the cached scale.
+        '''
+        net = IntervalNetwork()
+        net.fillBiDirectedEdges(['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2'])
+
+        first = net.getPitchFromNodeDegree('c4', 1, 1)
+        self.assertEqual(first.nameWithOctave, 'C4')
+        first.octave = 1
+
+        again = net.getPitchFromNodeDegree('c4', 1, 1)
+        self.assertEqual(again.nameWithOctave, 'C4')
+
+    def test_next_pitch_does_not_move_a_cached_degree(self):
+        sc = scale.RagAsawari('c4')
+        self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
+        self.assertEqual(str(sc.nextPitch('c1', Direction.ASCENDING)), 'D1')
+        self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
+
+    def testNextPitchNotReusePitchInstances(self):
+        sc = scale.MajorScale('c4')
+        p = sc.nextPitch('e4')
+        p.octave = 1
+        self.assertEqual(str(sc.nextPitch('e4')), 'F4')
+
+    def testFindMissingNotReusePitchInstances(self):
+        net = IntervalNetwork(['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2'])
+        missing = net.findMissing('c4', 1, ['d'])
+        self.assertEqual(self.pitchOut(missing), '[C4, E4, F4, G4, A4, B4, C5]')
+        missing[0].octave = 7
+        self.assertEqual(self.pitchOut(net.realizePitch('c4')),
+                         '[C4, D4, E4, F4, G4, A4, B4, C5]')
 
 
 # ------------------------------------------------------------------------------

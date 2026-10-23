@@ -737,6 +737,31 @@ class Test(unittest.TestCase):
         for c in [c1, c2, c3]:
             s.append(c)
 
+    def testPartsWithoutPartId(self):
+        # parts from MIDI files often have no partId; this used to raise
+        # a TypeError when sorting the parts
+        from music21 import instrument
+        upper = stream.Part([instrument.Instrument(),
+                             stream.Measure([chord.Chord('C4 E4', type='whole')])])
+        lower = stream.Part([instrument.Instrument(),
+                             stream.Measure([note.Note('G3', type='whole')])])
+        score = stream.Score([upper, lower])
+        scoreTree = score.asTimespans()
+        self.assertEqual(scoreTree.allParts(), [upper, lower])
+        ChordReducer().run(score)
+
+    def testPartsOrderedAsInScore(self):
+        # the last part is used as the bass, so the order must follow the
+        # score even when partIds do not sort that way
+        from music21 import instrument
+        parts = []
+        for partId in ('P2', 'P10', 'P1'):
+            inst = instrument.Instrument()
+            inst.partId = partId
+            parts.append(stream.Part([inst, note.Note('C4', type='whole')]))
+        score = stream.Score(parts)
+        self.assertEqual(score.asTimespans().allParts(), parts)
+
 
 class TestExternal(unittest.TestCase):
     show = True

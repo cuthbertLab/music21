@@ -400,7 +400,6 @@ class ElementTree[PayloadType](core.AVLTree[PayloadType]):
         <music21.note.Note C>
         <music21.note.Note C#>
         ...
-
         '''
         for node in self.iterNodes():
             yield node.payload
@@ -736,7 +735,6 @@ class ElementTree[PayloadType](core.AVLTree[PayloadType]):
         In an ElementTree, this will be a list of .sortTuple() calls.
 
         In an OffsetTree, this will be a list of .offset calls
-
         '''
         return [self.getPositionFromElementUnsafe(el) for el in elements]
 
@@ -1077,7 +1075,6 @@ class OffsetTree(ElementTree[list[object]]):
         <music21.note.Note C>
         <music21.note.Note C#>
         ...
-
         '''
         for node in self.iterNodes():
             for el in node.payload:
@@ -1381,7 +1378,6 @@ class OffsetTree(ElementTree[list[object]]):
         >>> otp = scoreOffsetTree.overlapTimePoints(returnVerticality=True)
         >>> otp[0]
         {0.5: <music21.tree.verticality.Verticality 0.5 {G#3 B3 E4 B4}>}
-
         '''
         checkPoints = self.allOffsets() if includeStopPoints is False else self.allTimePoints()
         overlaps = []

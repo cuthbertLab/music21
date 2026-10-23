@@ -179,7 +179,6 @@ class RehearsalMark(Expression):
     >>> rm = expressions.RehearsalMark('B')
     >>> rm
     <music21.expressions.RehearsalMark 'B'>
-
     '''
     classSortOrder = -30
     _styleClass = style.TextStylePlacement
@@ -220,7 +219,6 @@ class RehearsalMark(Expression):
 
         >>> print(ex._getNumberingFromContent('*'))
         None
-
         '''
         if c is None:
             return None
@@ -584,8 +582,8 @@ class Ornament(Expression):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Subclassable method call that takes a sourceObject and optional keySig
         and returns a three-element tuple of a list of notes before the
@@ -704,7 +702,6 @@ class GeneralMordent(Ornament):
         >>> invertedMordent = expressions.InvertedMordent(accidental=sharp)
         >>> invertedMordent.name
         'inverted mordent (sharp)'
-
         '''
         theName: str = super().name
         if self.accidental is not None:
@@ -763,8 +760,7 @@ class GeneralMordent(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
 
         if self._direction == 'up':
             ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
@@ -831,8 +827,7 @@ class GeneralMordent(Ornament):
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
         ornamentalPitch.transpose(transposeInterval, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if ornamentalPitch.microtone.cents != 0:
@@ -914,8 +909,8 @@ class GeneralMordent(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize a mordent.
 
@@ -1270,7 +1265,6 @@ class Trill(Ornament):
       The size property has been removed and replaced with `.getSize()` (which requires
       a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
       `.realize()` as well.
-
     '''
     _direction: str = 'up'
 
@@ -1299,7 +1293,6 @@ class Trill(Ornament):
         >>> doubleSharpedTrill = expressions.Trill(accidental=pitch.Accidental('double-sharp'))
         >>> doubleSharpedTrill.name
         'trill (double-sharp)'
-
         '''
         theName: str = super().name
         if self.accidental:
@@ -1380,8 +1373,7 @@ class Trill(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
 
         if self._direction == 'up':
             ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
@@ -1429,8 +1421,7 @@ class Trill(Ornament):
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
         ornamentalPitch.transpose(transposeInterval, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if ornamentalPitch.microtone.cents != 0:
@@ -1581,8 +1572,8 @@ class Trill(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize a trill.
 
@@ -1992,7 +1983,6 @@ class Turn(Ornament):
         ...     delay=1.0, lowerAccidental=pitch.Accidental('double-flat'))
         >>> delayedBy1Turn.name
         'delayed(delayQL=1.0) turn (lower=double-flat)'
-
         '''
         theName: str = super().name
         if self.delay == OrnamentDelay.DEFAULT_DELAY:
@@ -2049,8 +2039,7 @@ class Turn(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
 
         accidental: pitch.Accidental|None = None
         if which == 'upper':
@@ -2125,16 +2114,14 @@ class Turn(Ornament):
             srcObj, 'lower', keySig=keySig)
 
         upperPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if upperPitch.octave is None:
-            upperPitch.octave = upperPitch.implicitOctave
+        upperPitch.octaveIsImplicit = False
         upperPitch.transpose(transposeIntervalUp, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if upperPitch.microtone.cents != 0:
             upperPitch.convertMicrotonesToQuarterTones(inPlace=True)
 
         lowerPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if lowerPitch.octave is None:
-            lowerPitch.octave = lowerPitch.implicitOctave
+        lowerPitch.octaveIsImplicit = False
         lowerPitch.transpose(transposeIntervalDown, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if lowerPitch.microtone.cents != 0:
@@ -2455,8 +2442,8 @@ class GeneralAppoggiatura(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize an appoggiatura.
 
@@ -2603,8 +2590,8 @@ class Tremolo(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize the ornament.
 
@@ -2724,16 +2711,9 @@ class TrillExtension(spanner.Spanner):
 
         self._placement = None  # can above or below or None, after musicxml
 
-    def _getPlacement(self):
-        return self._placement
-
-    def _setPlacement(self, value):
-        if value is not None and value.lower() not in ['above', 'below']:
-            raise TrillExtensionException(f'incorrect placement value: {value}')
-        if value is not None:
-            self._placement = value.lower()
-
-    placement = property(_getPlacement, _setPlacement, doc='''
+    @property
+    def placement(self):
+        '''
         Get or set the placement as either above, below, or None.
 
         >>> s = stream.Stream()
@@ -2745,7 +2725,15 @@ class TrillExtension(spanner.Spanner):
 
         A setting of None implies that the placement will be determined
         by notation software and no particular placement is demanded.
-        ''')
+        '''
+        return self._placement
+
+    @placement.setter
+    def placement(self, value):
+        if value is not None and value.lower() not in ['above', 'below']:
+            raise TrillExtensionException(f'incorrect placement value: {value}')
+        if value is not None:
+            self._placement = value.lower()
 
 
 class TremoloSpanner(spanner.Spanner):

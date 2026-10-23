@@ -19,8 +19,12 @@ from music21 import scale
 environLocal = environment.Environment('audioSearch.transcriber')
 
 
-def runTranscribe(show=True, plot=True, useMic=True,
-                  seconds=20.0, useScale=None, saveFile=True):  # pragma: no cover
+def runTranscribe(show: bool = True,
+                  plot: bool = True,
+                  useMic: bool = True,
+                  seconds: float = 20.0,
+                  useScale=None,
+                  saveFile: bool|str = True):  # pragma: no cover
     '''
     runs all the methods to record from audio for `seconds` length (default 10.0)
     and transcribe the resulting melody returning a music21.Score object
@@ -54,7 +58,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
         waveFilename = saveFile
 
     # the rest of the score
-    if useMic is True:
+    if useMic:
         freqFromAQList = audioSearchBase.getFrequenciesFromMicrophone(
             length=seconds,
             storeWaveFilename=str(waveFilename))

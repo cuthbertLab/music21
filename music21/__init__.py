@@ -53,7 +53,7 @@ if sys.version_info < minPythonVersion:
     If you have the wrong version there are several options for getting
     the right one.
 
-    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.14).
+    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.15).
 
          The great features there will more
          than make up for the headache of downloading
@@ -82,6 +82,8 @@ del minPythonVersionStr
 
 
 __all__ = [
+    '__version__',
+
     # testing routines
     'mainTest',
 
@@ -177,6 +179,7 @@ __all__ = [
     'Music21Object',
     'ElementWrapper',
     'VERSION',
+    'VERSION_STR',
 ]
 
 # ------------------------------------------------------------------------------

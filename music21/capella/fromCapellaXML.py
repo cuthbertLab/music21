@@ -539,7 +539,7 @@ class CapellaImporter:
         noteNameWithOctave = headElement.attrib['pitch']
         n = note.Note()
         n.nameWithOctave = noteNameWithOctave
-        n.octave = n.pitch.implicitOctave - 1  # capella octaves are 1 off
+        n.octave = n.pitch.octave - 1  # capella octaves are 1 off
 
         alters = headElement.findall('alter')
         if len(alters) > 1:
@@ -877,7 +877,6 @@ class CapellaImporter:
         >>> repeatTag = ci.domElementFromText('<barline type="repEndBegin"/>')
         >>> ci.barlineListFromBarline(repeatTag)
         [<music21.bar.Repeat direction=end>, <music21.bar.Repeat direction=start>]
-
         '''
         barlineList: list[bar.Barline] = []
         hasRepeatEnd = False
