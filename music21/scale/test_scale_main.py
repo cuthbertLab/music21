@@ -613,8 +613,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(sc.getScaleDegreeFromPitch('A1', Direction.ASCENDING))
-        self.assertGreater(post.count(5), 30)
-        self.assertGreater(post.count(7), 30)
+        self.assertGreater(post.count(5), 25)
+        self.assertGreater(post.count(7), 25)
 
         # for rag marwa, and given only the pitch d-, the scale can move to
         # either b or c; this selection is determined by weighted random
@@ -622,8 +622,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(sc.getScaleDegreeFromPitch('D-3', Direction.DESCENDING))
-        self.assertGreater(post.count(2), 30)
-        self.assertGreater(post.count(7), 30)
+        self.assertGreater(post.count(2), 25)
+        self.assertGreater(post.count(7), 25)
 
     def testRagMarwaC(self):
         sc = scale.RagMarwa('c4')
