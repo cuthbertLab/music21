@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import enum
 import importlib
+import re
 
 from sphinx import addnodes
 from sphinx.transforms.post_transforms import SphinxPostTransform
@@ -127,9 +128,43 @@ class LinkImportedNames(SphinxPostTransform):
                 node['reftarget'] = fullName
 
 
+# "User's Guide, Chapter 14: " -- Sphinx may render the apostrophe as ’ or an entity
+reUsersGuideChapter = re.compile(r'User(?:&#8217;|&#x27;|’|\')s Guide, Chapter (\d+): ')
+
+
+def shortChapterTitles(html: str) -> str:
+    '''
+    Shorten User's Guide chapter titles in rendered html to "number. title":
+
+    >>> shortChapterTitles('<a>User’s Guide, Chapter 2: Notes</a>')
+    '<a>2. Notes</a>'
+    >>> shortChapterTitles("<a>User's Guide, Chapter 14: Time Signatures</a>")
+    '<a>14. Time Signatures</a>'
+    >>> shortChapterTitles('<a>User’s Guide: Table of Contents</a>')
+    '<a>User’s Guide: Table of Contents</a>'
+    '''
+    return reUsersGuideChapter.sub(r'\1. ', html)
+
+
+def shortenSidebarChapterTitles(app, pagename, templatename, context, doctree):
+    '''
+    In the sidebar's table of contents only, show User's Guide chapters as
+    "2. Notes" instead of "User's Guide, Chapter 2: Notes".
+    '''
+    toctree = context.get('toctree')
+    if toctree is None:
+        return
+
+    def toctreeWithShortTitles(**kwargs):
+        return shortChapterTitles(toctree(**kwargs))
+
+    context['toctree'] = toctreeWithShortTitles
+
+
 def setup(app):
     app.connect('autodoc-process-docstring', processDocstring)
     app.connect('autodoc-process-signature', processSignature)
+    app.connect('html-page-context', shortenSidebarChapterTitles)
     app.connect('source-read', processSource)
     app.add_post_transform(LinkImportedNames)
     extension_metadata = {'version': '1.0',
