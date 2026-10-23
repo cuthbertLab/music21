@@ -969,8 +969,8 @@ class GlobalReferenceLine(HumdrumLine):
 
     TODO: add parsing of three-digit Kern comment codes into fuller metadata
     TODO: parse ``@``/``@@`` language tags here (e.g. ``!!!OPT@@RUS:``, ``!!!OPT@FRE:``)
-      and propagate language/isPrimary so that GlobalReference.updateMetadata
-      can attach ``metadata.Text(value, language=...)`` instead of bare strings.
+    and propagate language/isPrimary so that GlobalReference.updateMetadata
+    can attach ``metadata.Text(value, language=...)`` instead of bare strings.
     '''
     def __init__(self, lineNumber: int = 0, contents: str = '!!! NUL: None') -> None:
         self.lineNumber = lineNumber
@@ -2419,7 +2419,7 @@ def hdStringToDuration(contents: str) -> duration.Duration:
     (_"92.." is the correct ``**kern`` encoding for a note whose duration is
     23 notes in the time of a doubly-dotted quarter._)
 
-    We will call the second interpretation the "JRP Flavor". The default JRP Flavor is False::
+    We will call the second interpretation the "JRP Flavor". The default JRP Flavor is False:
 
     >>> humdrum.spineParser.flavors['JRP']
     False
@@ -2565,7 +2565,7 @@ def hdStringToNote(
     >>> n.fullName
     'D-double-sharp in octave 5 Eighth Triplet (1/3 QL) Note'
 
-    If `overrideDuration` is passed in as a Duration object, that is used no matter what::
+    If `overrideDuration` is passed in as a Duration object, that is used no matter what:
 
     >>> n = humdrum.spineParser.hdStringToNote('12dd##',
     ...         overrideDuration=duration.Duration('whole'))
@@ -2583,7 +2583,7 @@ def hdStringToNote(
     'B-double-flat in octave 1 Eighth Note'
 
     Otherwise, it uses a quarter note and gives a warning.  This may become an error in
-    future versions::
+    future versions:
 
     >>> import warnings
     >>> with warnings.catch_warnings(record=True) as w:
