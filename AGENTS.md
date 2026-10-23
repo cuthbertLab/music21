@@ -69,9 +69,3 @@
 # Worktrees
 
 - When creating a new worktree, create a new virtual environment with `uv sync`.
-
-# Documentation notebooks (image-free)
-
-- A notebook named `*-noimage.ipynb` has its rendered image output stripped before commit (so
-  PR diffs stay small). To enable it in a fresh clone/worktree, register the filter once:
-  `git config filter.stripnbimage.clean "uv run python documentation/scripts/stripNotebookImages.py"`

@@ -86,7 +86,7 @@ sentence. And **almost all those predicates already live on `VoiceLeadingQuartet
 | scale degrees, tonic/dominant, "common-practice errors" | out of scope — key/roman-numeral territory, and the most Bach-assuming pieces |
 
 So for voice-leading errors the capability *already exists*; the score-wide sweep is the
-~5-line loop in the `findingParallels-noimage` notebook. The job is to make that sweep
+~5-line loop in the `findingParallels` notebook. The job is to make that sweep
 ergonomic and teachable — **not** to resurrect the wrapper.
 
 **Baggage we will NOT carry over:**
@@ -319,7 +319,7 @@ pairing with `voiceLeading`, plus sidestepping the `voiceLeading.py` name clash.
 
 ### I. Verticality / finding-parallels User's Guide chapter (late)
 
-Promote the in-progress `findingParallels-noimage` notebook into a real User's Guide chapter in
+Promote the in-progress `findingParallels` notebook into a real User's Guide chapter in
 the house tone, and **integrate the `theoryExercises/Rouen` example** (dense with parallels —
 fun to hunt) alongside the subtle single Bach case. Deliberately late — on top of the finished
 API and the relocated `music21.verticality`, not racing ahead.
@@ -353,7 +353,7 @@ runs in Phases 2–4 below, **prerequisites first**.
   `getVerticalityAt()` / `verticalitiesNwise(n=3)`; `tree.Verticality.__iter__` (+ `__len__` /
   `__contains__`) + `isConsonant()`; zero-pitch `Chord` tests + the brief doc notes; decide
   `root()`-on-empty. Fully typed, with doctests. *(New in v11.)* Then rewrite the
-  `findingParallels-noimage` loop to `for v in score.verticalities():`.
+  `findingParallels` loop to `for v in score.verticalities():`.
 - **3B — `includeRests` flip** (Design C): change the default; update the 2 doctests + 2 notebooks.
 - **3C — Deprecate `voiceLeading.Verticality`** (Design D, F): `@common.deprecated`, redirect
   docstring, cut/replace members per the fate table.
@@ -367,7 +367,7 @@ runs in Phases 2–4 below, **prerequisites first**.
   so `theoryExercises/Rouen` is indexed (and `corpus.search('Rouen')` works); fix any
   corpus-count assertion (the floors in `corpus/testCorpus.py`, the range doctest at
   `corpora.py:615` — verify, likely already in range); commit the regenerated `core.p.gz`.
-- **4B — User's Guide chapter** (Design I): promote `findingParallels-noimage` + integrate Rouen.
+- **4B — User's Guide chapter** (Design I): promote `findingParallels` + integrate Rouen.
 - **4C — Tuples → `VerticalitySequence`** (Design E): port `hasPassingTone` / `hasNeighborTone`
   (shedding `partNum`/coloring), then deprecate the tuple classes pointing there; remove after
   the window.
