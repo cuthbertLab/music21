@@ -105,6 +105,7 @@
 - Music21 uses even minor version numbers for alpha/beta and odd minor numbers for releases.
   Thus the first release major version is MAJOR.1 (not .0). 
 - If the current version is MAJOR.0....  then mark `Changed in vMAJOR:` if it is `MAJOR.[even]` use the next odd number, like if it's 10.2 now use "Changed in 10.3".  If current version is odd that's likely a mistake or you caught it just before a new release. Use the following odd number instead.
+- The steps for releasing a new version are in RELEASING.md.
 
 # PRs and Issues
 
