@@ -19,13 +19,17 @@ Two separate settings:
 command line to render images, so anyone who wants notation in a notebook needs it
 installed, even if they never open it.
 
-**State as of 2026-10-22:** the Configuration Assistant sets `musescoreDirectPNGPath`
-only when the user picks MuseScore as the MusicXML reader (new in v11, #1980; never in
-10.x). Picking Dorico leaves the per-platform default in `environment.py`: MuseScore 4's
-standard install location on Mac and Windows, but still `/usr/bin/mscore3` on Linux,
-where MuseScore 4 has no standard location. Branch `musescore-png-detect` fixes this:
-the assistant always sets the path when it finds MuseScore, and rendering looks for
-MuseScore when the setting is missing. Update this note when it merges.
+**How the path gets set (v11, #1980 and #2099; none of this is in 10.x):**
+
+- `converter.museScore.findMuseScore()` finds MuseScore 3 or newer in the usual places:
+  Applications on Mac, Program Files on Windows, the PATH on Linux.
+- The Configuration Assistant sets `musescoreDirectPNGPath` to the chosen reader if it is
+  MuseScore (the program inside a Mac `.app`), otherwise to any MuseScore it finds,
+  unless the current setting already exists.
+- When rendering, `getOrFindMuseScoreDirectPNGPath()` looks for MuseScore if the setting
+  is missing or points nowhere, saves what it finds, or raises with the musescore.org link.
+- Defaults in `environment.py`: MuseScore 4's install location on Mac and Windows;
+  `/usr/bin/mscore3` on Linux, where MuseScore 4 has no standard location.
 
 Myke renders with MuseScore 3 because it is much faster than 4 -- an advanced tip not
 yet in the docs.

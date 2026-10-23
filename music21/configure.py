@@ -1295,21 +1295,37 @@ class SelectMusicXMLReader(SelectFilePath):
 
     def _performAction(self, simulate=False):
         '''
-        Set musicxmlPath to the selected reader.  If the reader is a version
-        of MuseScore, also set musescoreDirectPNGPath to it.
+        Set musicxmlPath to the selected reader, and point musescoreDirectPNGPath
+        (used for notation in notebooks) at a MuseScore: the selected reader if it
+        is one, otherwise any MuseScore found, unless the current setting works.
+
+        AI-assisted (Claude).
         '''
+        from music21.converter.museScore import findMuseScore
+
         result = self.getResult()
-        if result is not None and not isinstance(result, DialogError):
-            # noinspection PyTypeChecker
-            reload(environment)
-            environment.set('musicxmlPath', result)
-            musicXmlNew = environment.get('musicxmlPath')
-            if reMuseScoreName.search(pathlib.Path(str(result)).name):
-                environment.set('musescoreDirectPNGPath', musicXmlNew)
-                self._writeToUser(
-                    [f'MusicXML Reader and PNG/PDF generator set to: {musicXmlNew}', ' '])
-            else:
-                self._writeToUser([f'MusicXML Reader set to: {musicXmlNew}', ' '])
+        if result is None or isinstance(result, DialogError):
+            return
+        # noinspection PyTypeChecker
+        reload(environment)
+        environment.set('musicxmlPath', result)
+        musicXmlNew = environment.get('musicxmlPath')
+        self._writeToUser([f'MusicXML Reader set to: {musicXmlNew}', ' '])
+
+        resultPath = pathlib.Path(str(result))
+        if reMuseScoreName.search(resultPath.name):
+            pngPath = resultPath
+            if resultPath.suffix == '.app':
+                pngPath = resultPath / 'Contents' / 'MacOS' / 'mscore'
+        else:
+            currentPNGPath = environment.get('musescoreDirectPNGPath')
+            if currentPNGPath is not None and pathlib.Path(currentPNGPath).exists():
+                return
+            pngPath = findMuseScore()
+            if pngPath is None:
+                return
+        environment.set('musescoreDirectPNGPath', pngPath)
+        self._writeToUser([f'Notation images (PNG/PDF) made with: {pngPath}', ' '])
 
 
 # ------------------------------------------------------------------------------
@@ -1581,6 +1597,48 @@ class Test(unittest.TestCase):
         post = d.getResult()
         # returns a bad condition b/c there are no options and user entered 'n'
         self.assertIsInstance(post, BadConditions)
+
+    def _performActionSettings(self, reader, currentPNGPath, foundMuseScore):
+        '''
+        Run SelectMusicXMLReader._performAction choosing `reader` without touching
+        the real user settings; return the {key: value} it would have set.
+        '''
+        from unittest import mock
+        d = SelectMusicXMLReader()
+        d._result = reader
+        current = {'musicxmlPath': reader, 'musescoreDirectPNGPath': currentPNGPath}
+        newSettings = {}
+        with (mock.patch('music21.configure.reload'),
+              mock.patch('music21.environment.set',
+                         side_effect=newSettings.__setitem__),
+              mock.patch('music21.environment.get', side_effect=current.__getitem__),
+              mock.patch('music21.converter.museScore.findMuseScore',
+                         return_value=foundMuseScore, create=True)):
+            d._performAction()
+        return newSettings
+
+    def testPerformActionFindsMuseScoreForOtherReader(self):
+        # picking Dorico still gives notebooks a MuseScore to render with
+        found = pathlib.Path('/Applications/MuseScore 4.app/Contents/MacOS/mscore')
+        newSettings = self._performActionSettings('/Applications/Dorico 5.app',
+                                                  '/nowhere/mscore', found)
+        self.assertEqual(newSettings['musicxmlPath'], '/Applications/Dorico 5.app')
+        self.assertEqual(newSettings['musescoreDirectPNGPath'], found)
+
+    def testPerformActionKeepsWorkingPNGPath(self):
+        # someone rendering with an older MuseScore that still exists keeps it
+        newSettings = self._performActionSettings('/Applications/Dorico 5.app',
+                                                  sys.executable,
+                                                  pathlib.Path('/somewhere/else'))
+        self.assertNotIn('musescoreDirectPNGPath', newSettings)
+
+    def testPerformActionMuseScoreAppRunsProgramInside(self):
+        # a Mac .app is a folder; the program to run is inside it
+        newSettings = self._performActionSettings('/Applications/MuseScore 4.app',
+                                                  None, None)
+        self.assertEqual(
+            pathlib.Path(newSettings['musescoreDirectPNGPath']),
+            pathlib.Path('/Applications/MuseScore 4.app/Contents/MacOS/mscore'))
 
     def testMuseScoreNameRe(self):
         '''
