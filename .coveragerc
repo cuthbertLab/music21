@@ -7,7 +7,7 @@ omit =
     music21/configure.py
     music21/figuredBass/examples.py
     music21/alpha/*
-    dist/dist.py
+    scripts/buildNoCorpus.py
 
 [report]
 exclude_lines =
