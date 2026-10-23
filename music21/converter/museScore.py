@@ -72,7 +72,7 @@ def findMuseScore(searchDirs: Iterable[str|pathlib.Path]|None = None) -> pathlib
     return None
 
 
-def getMuseScorePath() -> pathlib.Path:
+def getOrFindMuseScoreDirectPNGPath() -> pathlib.Path:
     '''
     Return the MuseScore program set as `musescoreDirectPNGPath`.  If that is
     missing or points nowhere, find MuseScore and save its location; if it is
@@ -109,7 +109,7 @@ def runThroughMuseScore(
     * leaveMargin: if trimEdges is True, then this number of pixels is left around the
       trimmed image.
     '''
-    museScorePath = getMuseScorePath()
+    museScorePath = getOrFindMuseScoreDirectPNGPath()
 
     if not subformats:
         subformatExtension = 'png'
@@ -273,23 +273,23 @@ class Test(unittest.TestCase):
             with mock.patch('music21.common.getPlatform', return_value='nix'):
                 self.assertEqual(findMuseScore([binDir]), binDir / 'mscore3')
 
-    def testGetMuseScorePathSavesWhatItFinds(self):
+    def testMuseScoreFindSavesResults(self):
         from unittest import mock
         found = pathlib.Path(__file__)  # any file that exists
         with (mock.patch('music21.converter.museScore.environLocal',
                          {'musescoreDirectPNGPath': pathlib.Path('/nowhere/mscore')}),
               mock.patch('music21.converter.museScore.findMuseScore', return_value=found),
               mock.patch('music21.environment.set') as setMock):
-            self.assertEqual(getMuseScorePath(), found)
+            self.assertEqual(getOrFindMuseScoreDirectPNGPath(), found)
         setMock.assert_called_once_with('musescoreDirectPNGPath', found)
 
-    def testGetMuseScorePathSaysWhereToGetIt(self):
+    def testMuseScoreNotFoundGivesDownloadSite(self):
         from unittest import mock
         with (mock.patch('music21.converter.museScore.environLocal',
                          {'musescoreDirectPNGPath': None}),
               mock.patch('music21.converter.museScore.findMuseScore', return_value=None)):
             with self.assertRaisesRegex(SubConverterException, 'https://musescore.org'):
-                getMuseScorePath()
+                getOrFindMuseScoreDirectPNGPath()
 
     def pngNumbering(self):
         '''
