@@ -725,6 +725,31 @@ class Chord(ChordBase):
     False
     >>> c1 != c2
     True
+
+    **Empty chords**
+
+    A chord with no pitches is False, so `if not c:` finds one:
+
+    >>> emptyChord = chord.Chord()
+    >>> len(emptyChord)
+    0
+    >>> bool(emptyChord)
+    False
+    >>> bool(c1)
+    True
+
+    Most methods still answer:
+
+    >>> emptyChord.commonName
+    'empty chord'
+    >>> emptyChord.quality
+    'other'
+
+    But calling `root()` on an empty chord raises an exception:
+
+    >>> emptyChord.root()
+    Traceback (most recent call last):
+    music21.chord.ChordException: no pitches in chord <music21.chord.Chord ...>
     '''
     # CLASS VARIABLES #
     isChord = True
