@@ -1,148 +1,129 @@
-# Verticality consolidation plan (v11)
+# Verticality consolidation plan
 
-**Goal.** Make a single Verticality *the* concept in music21 — `tree.verticality.Verticality`
-today, relocated to a top-level `music21.verticality.Verticality` — easy enough to teach
-early, and deprecate the older `voiceLeading.Verticality` (and, later, the
-`voiceLeading.VerticalityNTuplet` / `VerticalityTriplet` "tuple" classes).
+music21 has two classes called Verticality. This plan makes `tree.verticality.Verticality`
+the one people use, moves it to a top-level module, `music21.verticality`, and deprecates the
+older `voiceLeading.Verticality`. Later, the `voiceLeading.VerticalityNTuplet` and
+`VerticalityTriplet` classes get the same treatment.
 
-**Status.** Planning only — no implementation code changed yet. Target release line: **v11**
-(current version `11.0.0b6`).
+Nothing has been implemented yet. The target is v11.
 
-**How it runs.** One PR at a time, via supervised subagents (no heavy workflow orchestration).
-Each PR is its own branch+worktree off `master`. **Prerequisites land first**, then the core
-implementation, then the late polish — see the Execution plan at the end. The lettered
-*Design notes* are reference (the *what*); the Execution plan is the *when*.
+The work would go in as a series of small PRs, each on its own branch off `master`. The
+"Order of work" section at the end gives the sequence. The lettered sections before it
+describe each change.
 
----
 
-## Decisions
+## Questions for Michael
 
-Settled:
+1. Deprecate `voiceLeading.Verticality` in v11 and remove it in v13? Yes, or v12 to v14
+   if this slips to v12.
+2. On an empty chord, `root()` keeps raising. Whether `bass()` should raise too, instead
+   of returning `None`, is open and minor (see G).
 
-- **Keep** the empty final-barline verticality. Follow-up: harden zero-pitch `Chord` (Design G).
-- **No generic predicate-sweep helper.** The docs teach the loop.
-- **`VerticalityView`** is the view-class name: snapshot at construction, takes a Stream
-  (always `flatten=True`, with `classList`), plus an advanced keyword-only `tree=` override.
-- **Everything ships fully typed** (principle 5).
-- **Prerequisites first**, each its own small PR: notebook image-stripping infra, the `tree`
-  typing/grammar pass, and the GitHub usage survey.
-- **No deprecation window or shim for the `tree.verticality.*` path** (advanced/undocumented) —
-  just move it — *unless* the usage survey finds external importers.
-  `voiceLeading.Verticality` still gets the normal **v11 → v13** window.
-- **`VerticalitySequence` replaces the tuples** (Design E) — designed now, built late.
-- **Rouen corpus integration is its own task** (regenerate + commit `core.p.gz`).
-- **Subagents, one PR at a time** (no Workflow orchestration).
 
-Open (need Michael):
+## Already decided
 
-1. Confirm `voiceLeading.Verticality` deprecate/remove versions (**v11 → v13** proposed).
-2. Design G: should `root()` on an empty chord return `None` (like `bass()`) or keep raising?
+- Keep the empty Verticality at the final barline (see G).
+- No general-purpose helper for "run this test over every Verticality." The docs show
+  the loop instead.
+- The object returned by `Stream.verticalities()` is called `VerticalityView` (see A).
+- Everything new is fully typed and passes mypy.
+- `tree.verticality` moves to `music21.verticality` with no deprecation period, unless a
+  search of GitHub finds outside code importing it. `voiceLeading.Verticality` gets the
+  usual v11 to v13 period.
+- `VerticalitySequence` replaces the tuplet classes. It gets designed now and built last.
+- Adding the Rouen example to the corpus index is its own task.
 
----
 
-## Guiding principles
+## Principles
 
-1. **A Verticality is an easy concept: "everything happening at one vertical moment."**
-   That deliberately *includes* non-note objects (keys, clefs, time signatures, barlines)
-   that occur at that offset — they genuinely happen there. Pitched-analysis methods
-   (`toChord`, `pitchSet`, `getAllVoiceLeadingQuartets`, …) already filter to pitched
-   timespans, so carrying the extra objects along is harmless to analysis.
-2. **Hide timespans.** `startTimespans` / `overlapTimespans` / `startAndOverlapTimespans`
-   and the whole timespan layer are an implementation detail. A learner should be able to
-   use Verticalities — iterate them, get a chord, find voice-leading quartets — without
-   ever hearing the words "timespan" or "tree." Timespans become an *advanced* topic.
-3. **Identify parts from elements, not by index.** No `partNum`-by-position APIs. To get
-   an element's part, use `element.getContextByClass(stream.Part)`. To get the
-   verticalities of a single part, call `.verticalities()` on that Part.
-4. **Don't mutate the score through a Verticality.** Changing the durations of underlying
-   elements is an advanced timespans-era operation, documented later — not a Verticality
-   method.
-5. **Everything ships fully typed.** Every new method, the `VerticalityView`, and every
-   `tree.Verticality` addition carries complete type annotations (PEP 695 syntax per repo
-   style) and must pass `uv run mypy music21`.
+1. **A Verticality is everything happening at one offset.** That includes keys, clefs,
+   time signatures and barlines at that offset, not just notes. Methods that analyze
+   pitches (`toChord`, `pitchSet`, `getAllVoiceLeadingQuartets`, ...) already skip the
+   unpitched objects, so including them does no harm.
+2. **Users shouldn't need to know about timespans.** `startTimespans`, `overlapTimespans`,
+   and the rest of the timespan layer are internals. Someone should be able to loop over
+   Verticalities, get chords, and find voice-leading quartets without ever reading the word
+   "timespan" or "tree." Timespans become an advanced topic.
+3. **Find parts from elements, not by number.** No `partNum` arguments. To get an
+   element's part, use `element.getContextByClass(stream.Part)`. For one part's
+   Verticalities, call `.verticalities()` on that Part.
+4. **A Verticality doesn't change the score.** Changing the durations of the notes at an
+   offset is an advanced timespans operation to document later, not a Verticality method.
+5. **Everything is fully typed**, in PEP 695 style.
 
----
 
-## Measure of success: theoryAnalyzer's ease is recreated, minus its baggage
+## What success looks like: theoryAnalyzer, without its limits
 
-A second goal is to make the kinds of results the old `theoryAnalysis.theoryAnalyzer` (now in
-`cuthbertLab/music21-tools`) used to make easy — "find every parallel fifth / hidden octave /
-passing tone in this score" — easy again, but **without the baggage** that tied that tool to
-Bach-chorale homework.
+The old `theoryAnalysis.theoryAnalyzer` (now in `cuthbertLab/music21-tools`) made it easy to
+ask "where are all the parallel fifths, hidden octaves, and passing tones in this score?"
+This plan should make that easy again, without the parts that tied it to Bach-chorale
+homework.
 
-The key realization: `theoryAnalyzer` was, underneath, a single pattern — *run a
-`VoiceLeadingQuartet` (or Verticality / triplet) predicate across the whole score and collect
-the hits.* Every `identifyX` was just `testFunction = lambda vlq: vlq.X()` plus a text
-sentence. And **almost all those predicates already live on `VoiceLeadingQuartet` today**:
+Underneath, theoryAnalyzer did one thing over and over: test every `VoiceLeadingQuartet` (or
+Verticality, or triplet) in the score and collect the ones that passed. Each `identifyX` was
+`lambda vlq: vlq.X()` plus a sentence of text. Almost all of those tests already exist on
+`VoiceLeadingQuartet`:
 
-| `theoryAnalyzer` capability | Modern home |
+| theoryAnalyzer could find... | Today, use... |
 |---|---|
-| parallel 5ths / 8ves / unisons | `VoiceLeadingQuartet.parallelFifth()` / `parallelOctave()` / `parallelUnison()` ✅ |
-| hidden (direct) 5ths / 8ves | `hiddenFifth()` / `hiddenOctave()` ✅ |
-| oblique/similar/parallel/contrary/anti-parallel motion, motion type | `obliqueMotion()` … `antiParallelMotion()`, `motionType()` ✅ |
-| improper resolution, leap-not-set-with-step, modal open/close, clausula vera | `isProperResolution()`, `leapNotSetWithStep()`, `modalOpening()`, `opensIncorrectly()`, `clausulaVera()`, `closesIncorrectly()` ✅ |
-| harmonic / melodic intervals between parts | trivial over verticalities / part pairs ✅ |
-| **passing tones / neighbor tones** | `VerticalityTriplet.hasPassingTone()` / `hasNeighborTone()` — **the one real gap** (Design E) |
-| scale degrees, tonic/dominant, "common-practice errors" | out of scope — key/roman-numeral territory, and the most Bach-assuming pieces |
+| parallel 5ths, 8ves, unisons | `VoiceLeadingQuartet.parallelFifth()`, `parallelOctave()`, `parallelUnison()` |
+| hidden 5ths, 8ves | `hiddenFifth()`, `hiddenOctave()` |
+| kinds of motion | `obliqueMotion()` ... `antiParallelMotion()`, `motionType()` |
+| improper resolution, unfilled leaps, modal openings and closings | `isProperResolution()`, `leapNotSetWithStep()`, `modalOpening()`, `opensIncorrectly()`, `clausulaVera()`, `closesIncorrectly()` |
+| harmonic and melodic intervals between parts | a few lines over Verticalities or pairs of parts |
+| passing and neighbor tones | only `VerticalityTriplet.hasPassingTone()` / `hasNeighborTone()`; this is the one real gap (see E) |
+| scale degrees, tonic/dominant, "common-practice errors" | out of scope; these belong with keys and Roman numerals and assume Bach the most |
 
-So for voice-leading errors the capability *already exists*; the score-wide sweep is the
-~5-line loop in the `findingParallels` notebook. The job is to make that sweep
-ergonomic and teachable — **not** to resurrect the wrapper.
+So the voice-leading tests are already there. Running one over a whole score is about five
+lines, as in the `findingParallels` notebook. The work is making that loop easy to write and
+easy to teach, not bringing back theoryAnalyzer.
 
-**Baggage we will NOT carry over:**
+What we leave behind:
 
-- **`resultsDict` / `analysisData`** — results were stashed in
-  `analyzer.store[score.id]['ResultDict'][dictKey]` keyed by string. Modern: functions
-  *return* plain lists of findings.
-- **`partNum1` / `partNum2` / `partNumToIdentify`** — index-based part addressing (and
-  `'Part ' + str(pn+1)` text). Modern: Part identity via `getContextByClass`, all-pairs by
-  default.
-- **`color=` side effects** — `identifyX` mutated noteheads. Modern: return findings; the
-  caller decides whether to color / `.show()` (and colouring is a *VLQ-element* operation, not
-  a verticality one).
-- **`VLQTheoryResult.text` English sentences** — a result whose payload is a prebuilt
-  sentence. Modern: a finding carries the *objects* (the VLQ, offset, measure, parts); text
-  is the caller's concern.
-- **Bach-chorale / common-practice assumptions** — `identifyCommonPracticeErrors`,
-  `identifyTonicAndDominant`, `opens/closesIncorrectly`, the SATB framing. Keep the neutral
-  primitives; leave the stylistic bundles out.
+- **Results stored in a dictionary** (`analyzer.store[score.id]['ResultDict'][dictKey]`).
+  Functions should just return a list.
+- **Parts by number** (`partNum1`, `partNum2`, `partNumToIdentify`, and text like
+  `'Part ' + str(pn+1)`). Use the Part object, and check all pairs of parts by default.
+- **Coloring as a side effect.** `identifyX` changed notehead colors. Return the results
+  and let the caller color or show them. Coloring belongs to the notes in a quartet, not to
+  a Verticality.
+- **Results that are English sentences** (`VLQTheoryResult.text`). A result should hold
+  the objects (the quartet, offset, measure, parts) and leave wording to the caller.
+- **Bach-chorale assumptions** (`identifyCommonPracticeErrors`, `identifyTonicAndDominant`,
+  the SATB setup). Keep the neutral tests and leave out the style-specific bundles.
 
----
 
-## Why this is low-risk
+## Why this is safe
 
-`voiceLeading.Verticality`, `VerticalityNTuplet`, and `VerticalityTriplet` are referenced
-**only inside `voiceLeading.py` itself** — no internal consumers anywhere else in music21.
-`getChord()` appears in **no** documentation notebook. So the deprecation has essentially no
-migration surface to clean up first.
+`voiceLeading.Verticality`, `VerticalityNTuplet`, and `VerticalityTriplet` are used only
+inside `voiceLeading.py`. Nothing else in music21 calls them, and `getChord()` is in no
+documentation notebook. So almost nothing needs updating before the deprecation.
 
----
 
-## Design notes
+## The changes
 
-The *what*. Lettered for cross-reference, **not** for ordering — see the Execution plan for
-sequence.
+### A. New Stream methods
 
-### A. New Stream API
-
-Add to `stream.Stream`, in `stream/base.py` (the documented, taught-early API), each
-delegating into the already-cached `StreamCore.asTimespans()`:
+Add to `stream.Stream` in `stream/base.py`, since this is everyday, taught-early API. Both
+use the already-cached `asTimespans()`:
 
 ```python
 def verticalities(self, *, classList=None) -> VerticalityView:
-    '''A re-iterable, reversible view of this stream's Verticalities,
-    one per vertical moment.'''
+    '''
+    The Verticalities of this stream, one per offset. Can be looped over more
+    than once, and reversed.
+    '''
     return VerticalityView(self, classList=classList)
 
 def getVerticalityAt(self, offset: OffsetQLIn, *, classList=None) -> Verticality:
-    '''Return the Verticality sounding at the given offset.'''
+    '''
+    The Verticality sounding at offset.
+    '''
     return self.asTimespans(flatten=True, classList=classList).getVerticalityAt(offset)
 ```
 
-`VerticalityView` takes the **Stream itself**, builds the timespan tree **once in `__init__`**,
-and stores it as a plain public attribute, so the view is a stable snapshot. Advanced callers
-may pass a prebuilt `tree=` (keyword-only) to view a `TimespanTree` they already hold; if
-omitted it builds from the stream exactly as below:
+`VerticalityView` takes the Stream and builds the timespan tree once, in `__init__`, as a
+public attribute. Advanced users can pass in a tree they already have with `tree=`:
 
 ```python
 class VerticalityView:
@@ -159,241 +140,211 @@ class VerticalityView:
         return self.tree.iterateVerticalities(reverse=True)
 ```
 
-Snapshot semantics (decided): a held `v = score.verticalities()` iterates the structure as it
-was when asked for; re-building the (expensive) tree on a second pass just because the stream
-changed would be surprising. Caveat to document, not fix: this freezes *structure* (which notes
-sound where) but the timespans still hold the **live Note objects**, so editing a note's pitch
-is still visible.
+Because the tree is built once, `v = score.verticalities()` keeps showing the score as it
+was when `v` was made, even if notes are later added or moved. Rebuilding the tree on every
+loop would be slow and surprising. The docs should mention one exception: the timespans
+still point at the real Note objects, so changing a note's pitch does show up.
 
-Name — DECIDED: **`VerticalityView`** (not `Verticalities`, not `VerticalityIterator`). In
-music21 a `…Iterator` (`StreamIterator`, `OffsetIterator`, `RecursiveIterator`,
-`corpus.chorales.Iterator`) does its *own* `__next__` over an internal cursor and is usually an
-indexable `Sequence`. `VerticalityView` has none of that — no `__next__`, no cursor, no
-indexing; it just hands back fresh generators off `self.tree`. So `Iterator` would over-promise.
-(Python's own views — `dict.keys()`, `memoryview` — are *live*, so the docstring should say
-"snapshot at construction.")
+Why `VerticalityView` and not `VerticalityIterator`: in music21, an `...Iterator`
+(`StreamIterator`, `OffsetIterator`, `corpus.chorales.Iterator`) has its own `__next__`, keeps
+a position, and can usually be indexed. `VerticalityView` does none of that; it just hands out
+a new generator each time. (Python's own views, like `dict.keys()`, update live, so the
+docstring should say this one doesn't.)
 
-Other decisions baked in:
+Other details:
 
-- **Name `Stream.verticalities()`** (not `iterateVerticalities()`); the tree keeps its
-  `iterateVerticalities()`. A hidden `Stream.iterateVerticalities` alias only if demand appears.
-- **Takes a Stream, always `flatten=True`, with `classList`.** `Part` is a Stream, so
-  `part.verticalities()` gives a single part's slices for free.
-- **No `reverse=` kwarg — use `reversed()`** (dispatches to `__reversed__`; a bare generator
-  isn't reversible, the view is).
-- **`classList=None` default** — include keys/clefs/barlines (principle 1). Pitched-only:
-  `classList=(note.NotRest,)`.
-- **Placement** — `base.py`, not StreamCore (everyday/taught-early API).
+- The method is `Stream.verticalities()`, not `iterateVerticalities()`. The tree keeps its
+  own `iterateVerticalities()`.
+- It always flattens. Since a `Part` is a Stream, `part.verticalities()` gives one part's
+  Verticalities with no extra work.
+- No `reverse=` argument; `reversed()` works.
+- `classList=None` by default, so keys, clefs, and barlines are included (principle 1). For
+  notes and chords only, pass `classList=(note.NotRest,)`.
 
-The empty final-barline moment — DECIDED: **keep it.** With `classList=None` the last moment is
-the final barline: an **empty** Verticality (`pitchSet == set()`, `toChord()` an empty `Chord`,
-`isConsonant()` → `False` — Design G). Faithful to "every vertical moment," and suppressing
-would also hide a real mid-piece key/clef change that lands between notes.
+With `classList=None`, the last Verticality is the final barline, and it is empty: `pitchSet`
+is `set()`, `toChord()` gives an empty `Chord`, and `isConsonant()` is `False` (see G). That
+is true to "every offset," and leaving it out would also hide a key or clef change that falls
+between notes in mid-piece.
 
-### B. `tree.verticality.Verticality` changes
+### B. Changes to `tree.verticality.Verticality`
 
-- **B1 — make it iterable** (replaces `objects`): `__iter__` (and probably `__len__` /
-  `__contains__`) yielding the sounding elements, so users write `for el in verticality:`
-  instead of touching `startAndOverlapTimespans`. The single biggest reason to reach into the
-  timespan layer, gone.
-- **B2 — add `isConsonant()`**: one-line `return self.toChord().isConsonant()` for now (a
-  later optimization could skip materializing a chord). On an empty verticality this returns
-  `False` (see Design G).
-- **B3 — keep as-is**: `toChord()`, `.offset`, `pitchSet`, `pitchClassSet`, `beatStrength`,
-  `measureNumber`, `nextVerticality`/`previousVerticality`, `nextStartOffset`,
-  `timeToNextEvent`, `bassTimespan`, `makeElement()`, `getAllVoiceLeadingQuartets()`,
-  `getPairedMotion()`.
+- **B1. Make it iterable**, replacing `objects`: add `__iter__` (and probably `__len__` and
+  `__contains__`) over the elements sounding at that offset, so users write
+  `for el in verticality:` instead of reading `startAndOverlapTimespans`. That is the most
+  common reason people reach into timespans today.
+- **B2. Add `isConsonant()`**, for now just `return self.toChord().isConsonant()`. It
+  returns `False` on an empty Verticality (see G).
+- **B3. Keep everything else**: `toChord()`, `.offset`, `pitchSet`, `pitchClassSet`,
+  `beatStrength`, `measureNumber`, `nextVerticality` / `previousVerticality`,
+  `nextStartOffset`, `timeToNextEvent`, `bassTimespan`, `makeElement()`,
+  `getAllVoiceLeadingQuartets()`, `getPairedMotion()`.
 
-### C. `getAllVoiceLeadingQuartets` / `getPairedMotion`: flip `includeRests` default
+### C. `includeRests` defaults to False
 
-**`includeRests=True` → `includeRests=False`** in both. A rest is not a voice in motion; `True`
-was only ever harmless because the common idiom builds a note-only tree. The `tree` package has
-always been perpetual-beta, so the default change is allowed. Doctests/notebooks whose output
-changes: `tree/verticality.py:982` and `:1108`; `usersGuide_61_trees.ipynb`;
-`devTest_timespans.ipynb`.
+In `getAllVoiceLeadingQuartets` and `getPairedMotion`, change the default from
+`includeRests=True` to `False`. A rest is not a voice moving. `True` has only been harmless
+because people usually build the tree from notes only. The `tree` package has always been
+beta, so changing the default is allowed. Output changes in `tree/verticality.py` (two
+doctests), `usersGuide_61_trees.ipynb`, and `devTest_timespans.ipynb`.
 
-### D. Fate of every `voiceLeading.Verticality` member
+### D. What happens to each `voiceLeading.Verticality` member
 
-| member | Plan | Replacement / notes |
+| member | plan | instead |
 |---|---|---|
-| `getChord()` | **Cut** | `toChord()`; unused in any doc |
-| `isConsonant()` | **Port** (B2) | `toChord().isConsonant()` for now |
-| `objects` (property) | **Replace** | iterate the Verticality (B1) |
-| `getObjectsByClass(classes, partNums)` | **Drop** | iterate + filter by class |
-| `getObjectsByPart(partNum, …)` | **Drop** | `element.getContextByClass(Part)`; or `part.verticalities()` |
-| `getVerticalityOffset(leftAlign=)` | **Drop** | `.offset`; `leftAlign=False` was unused |
-| `getStream()` | **Drop** | buggy (`# probably wrong!`); use `chordify()` / `makeElement()` |
-| `makeAllSmallestDuration()` / `makeAllLargestDuration()` | **Drop** | advanced timespans topic; `makeElement(ql)` |
-| `getShortestDuration()` / `getLongestDuration()` | **Drop** | one-liners; `timeToNextEvent` |
-| `changeDurationOfAllObjects(ql)` | **Drop** | advanced timespans topic |
-| `color` / `lyric` (properties) | **Drop** | color/lyric the elements of a VLQ, not a verticality |
+| `getChord()` | remove | `toChord()` |
+| `isConsonant()` | move over (B2) | |
+| `objects` | replace | loop over the Verticality (B1) |
+| `getObjectsByClass(classes, partNums)` | remove | loop and check class |
+| `getObjectsByPart(partNum, ...)` | remove | `element.getContextByClass(Part)`, or `part.verticalities()` |
+| `getVerticalityOffset(leftAlign=)` | remove | `.offset` (`leftAlign=False` was never used) |
+| `getStream()` | remove | already marked `# probably wrong!`; use `chordify()` or `makeElement()` |
+| `makeAllSmallestDuration()`, `makeAllLargestDuration()` | remove | `makeElement(ql)` |
+| `getShortestDuration()`, `getLongestDuration()` | remove | `timeToNextEvent` |
+| `changeDurationOfAllObjects(ql)` | remove | an advanced timespans topic, later |
+| `color`, `lyric` | remove | color or label the notes of a quartet instead |
 
-The five duration methods predate `chordify()` doing duration correctly; none belongs on
-Verticality. Document "changing the durations of the elements at a vertical moment" as an
-*advanced* TimeSpans topic later; the non-destructive equivalent is
-`verticality.makeElement(quarterLength)`.
+The five duration methods date from before `chordify()` handled durations correctly, and
+none of them belongs on a Verticality.
 
-### E. `VerticalitySequence` replaces the `Tuplet` classes
+### E. `VerticalitySequence` replaces the tuplet classes
 
-`VerticalityNTuplet` / `VerticalityTriplet` are a sliding window of N verticalities plus
-`hasPassingTone` / `hasNeighborTone`. Plan their replacement **now** (build late):
+`VerticalityNTuplet` and `VerticalityTriplet` are a run of N Verticalities plus
+`hasPassingTone()` and `hasNeighborTone()`. Design the replacement now and build it last.
 
-- **Structural half — already done.** `TimespanTree.iterateVerticalitiesNwise(n)` yields
-  `VerticalitySequence` objects (thin wrapper over N verticalities, with `__len__` /
-  `__getitem__` / `unwrap`) — that *is* the modern `VerticalityNTuplet`. Add
-  `Stream.verticalitiesNwise(n=3)` sugar so users never touch the tree.
-- **Analytical half — the real port.** Move passing/neighbor-tone detection onto
-  `VerticalitySequence` (a 3-element sequence) as `hasPassingTone()` / `hasNeighborTone()`,
-  shedding the same baggage as Design D: no `partNumToIdentify` (work per part identity / return
-  findings), no coloring, keep `unaccentedOnly`. Then `@common.deprecated` the tuple classes
-  pointing here.
+- **The run of N Verticalities already exists.** `TimespanTree.iterateVerticalitiesNwise(n)`
+  gives `VerticalitySequence` objects (with `__len__`, `__getitem__`, `unwrap`). Add
+  `Stream.verticalitiesNwise(n=3)` so users never need the tree.
+- **The analysis needs moving.** Put `hasPassingTone()` and `hasNeighborTone()` on a
+  three-Verticality `VerticalitySequence`, dropping the same things as in D: no
+  `partNumToIdentify` and no coloring; keep `unaccentedOnly`. Then deprecate the tuplet
+  classes with a pointer here.
 
-The survey (Phase 2B) found a real external user of exactly this layer via the removed
-`theoryAnalyzer`, so this must be a genuine migration path, not a delete. Planning it now keeps
-the `VerticalitySequence` API consistent with the `Verticality` / `VerticalityView` decisions.
+The GitHub search turned up one outside user of the tuplet classes (through the old
+theoryAnalyzer), so they need a real replacement, not just removal.
 
-### F. Deprecation mechanics
+### F. How the deprecation works
 
-Two situations, two policies:
+- **`voiceLeading.Verticality` and the tuplet classes** have been public and documented for
+  years. Put `@common.deprecated('v11', 'v13', '...use music21.verticality.Verticality...')`
+  on `__init__`, and on removed methods someone might still call on an old object. Remove
+  no earlier than v13. Point the docstring at the replacements.
+- **The `tree.verticality` module** is advanced, barely documented, and beta. Move it to
+  `music21.verticality` without a deprecation period and update the four or so references
+  inside music21. Leave a stand-in at the old path only if the GitHub search finds outside
+  code importing it.
 
-- **`voiceLeading.Verticality`** (and its tuples) — long-documented public class. Use
-  `@common.deprecated('v11', 'v13', '…use music21.verticality.Verticality…')` on `__init__`
-  (and the dropped methods someone might still call on an old instance). Removal no earlier than
-  **v13**. Tighten its docstring to point at the concrete replacements.
-- **The `tree.verticality.*` path** — advanced, barely documented, perpetual-beta. Relocating
-  to `music21.verticality` gets **no deprecation window** by default: move it, update the ~4
-  internal references. *Only if* the usage survey (2B) finds external `tree.verticality.*`
-  importers do we add a short-lived shim.
+This way there are never more than two classes named Verticality at a time. It is also why
+the new home can't be `voiceLeading.py`: the deprecated `voiceLeading.Verticality` keeps
+that name until v13.
 
-**At most two `Verticality` names at once (not three):** because the `tree` path carries no
-window, while `voiceLeading.Verticality` is deprecated (v11→v13) the canonical class moves
-straight to `music21.verticality.Verticality`. That is also why the canonical class **cannot**
-live in `voiceLeading.py` — the deprecated `voiceLeading.Verticality` keeps that name during its
-window, and two classes named `Verticality` can't share one file.
+### G. Empty chords
 
-### G. Harden zero-pitch (empty) `Chord` behavior
+Keeping the empty final Verticality means empty chords will show up much more often. What
+they do now:
 
-Keeping the empty final-barline moment means verticalities will surface empty chords far more
-often than today. Current state (probed):
+- **Fine already:** `isConsonant()` is `False`, `bass()` is `None`, `third` and `fifth` are
+  `None`, `quality` is `'other'`, `isTriad()` is `False`, `commonName` is `'empty chord'`,
+  `orderedPitchClasses` is `[]`, `intervalVector` is all zeros, and `closedPosition()` is an
+  empty chord.
+- **Raises:** `root()` raises `ChordException('no pitches in chord')`, unlike `bass()`.
 
-- **Cope fine** → `isConsonant()` → `False`, `bass()` → `None`, `third`/`fifth` → `None`,
-  `quality` → `'other'`, `isTriad()` → `False`, `commonName`/`pitchedCommonName` →
-  `'empty chord'`, `orderedPitchClasses` → `[]`, `intervalVector` → all-zero,
-  `closedPosition()` → empty chord.
-- **Raises** → `root()` raises `ChordException('no pitches in chord')` — inconsistent with
-  `bass()` returning `None`.
+To do:
 
-Actions:
+- `root()` keeps raising. Maybe make `bass()` raise too (question 2 above), which would
+  match its type hint: it already says it returns a `Pitch`, never `None`. About five places in music21 check
+  `bass() is None` and would need changing (`chord/__init__.py`, `harmony.py`,
+  `features/native.py`).
+- Add tests for empty chords across the common methods.
+- Add one line to the docs of methods where the empty-chord answer isn't obvious:
+  `isConsonant()` and `root()`. Not `isTriad()` and the like.
 
-- Decide `root()`-on-empty: return `None` (consistent with `bass()`) or keep raising.
-- Add explicit zero-pitch-`Chord` tests across the common accessors.
-- **Document, very briefly, at the end of the *ambiguous* methods** what a zero-pitch chord
-  returns — where the answer isn't self-evident: `isConsonant()` (→ `False`) and whatever we
-  decide for `root()`. **Not** the obvious ones (`isTriad()` is obviously `False` for an empty
-  chord — no note needed). One line each, only where a reader would wonder.
+### H. Move Verticality to `music21.verticality`
 
-### H. Relocate Verticality to a top-level `music21.verticality` module
+Move `Verticality`, `VerticalityView`, and `VerticalitySequence` out of `tree/` into
+`music21/verticality.py`, so people meet "everything at one offset" without having to learn
+about trees. This is easier than it sounds:
 
-Move `Verticality` (and `VerticalityView`, `VerticalitySequence`) out of `tree/` into
-`music21/verticality.py`, so most users meet "a vertical slice of music" without entering
-tree-land. The coupling is mild (verified):
+- `tree/spans.py` mentions `Verticality` only in docstrings and imports nothing from `tree`,
+  so `verticality` can import from it with no circular import.
+- The only circular import is between `tree/trees.py` and verticality (`getVerticalityAt`
+  returns a `Verticality`), and that one exists already. The move adds none.
 
-- `tree/spans.py` mentions `Verticality` **only in docstrings**; it imports nothing from `tree`
-  (just `copy`, `typing`, `common.types`, `environment`, `exceptions21`), so it's a leaf and
-  `verticality → tree.spans` is a safe one-way edge.
-- The only genuine cycle is `tree/trees.py` ↔ verticality (`getVerticalityAt` returns a
-  `Verticality`), and **that already exists today, in one place** — relocating adds none.
+So it is a file move plus about four reference updates:
 
-So it's a file relocation plus ~4 internal-reference updates, not an import untangle:
+- No stand-in at the old path unless the GitHub search finds outside importers. If it does,
+  a short `tree/verticality.py` with `from music21.verticality import *` for one release line.
+- Import lazily where load order requires it; the file already does so for `timespanTree`,
+  `stream`, `voiceLeading`, and `tree.analysis`.
+- Add `music21/verticality.py` to the module list and the reference docs.
 
-- **Default: no shim — we don't expect to need one.** Only if 2B turns up external
-  `tree.verticality.*` importers do we leave a thin `tree/verticality.py`
-  (`from music21.verticality import *`) for a release line.
-- Lazy-import where load order bites (the file already lazy-imports `timespanTree`, `stream`,
-  `voiceLeading`, `tree.analysis`).
-- Add `music21/verticality.py` to the module list / docs reference pages.
+A `Verticality` will still hold timespans from `tree.spans` internally. The move changes what
+users see and where they look for it, and keeps it next to `voiceLeading`.
 
-Honest caveat: this hides the tree from the user's *vocabulary*, not from the code — a
-`Verticality` still structurally holds `tree.spans` timespans. The win is discoverability and
-pairing with `voiceLeading`, plus sidestepping the `voiceLeading.py` name clash.
+### I. A User's Guide chapter on finding parallels
 
-### I. Verticality / finding-parallels User's Guide chapter (late)
+Turn the `findingParallels` notebook into a User's Guide chapter in the usual tone, and add
+the `theoryExercises/Rouen` example, which is full of parallels, alongside the one subtle Bach
+example. This comes last, once the new methods and `music21.verticality` exist.
 
-Promote the in-progress `findingParallels` notebook into a real User's Guide chapter in
-the house tone, and **integrate the `theoryExercises/Rouen` example** (dense with parallels —
-fun to hunt) alongside the subtle single Bach case. Deliberately late — on top of the finished
-API and the relocated `music21.verticality`, not racing ahead.
 
----
+## Order of work
 
-## Execution plan (one PR at a time, via supervised subagents)
+Each step is its own PR off `master`.
 
-Everything above (Decisions through Design notes) is **Phase 1 — Planning**. The implementation
-runs in Phases 2–4 below, **prerequisites first**.
+### First: groundwork
 
-### Phase 2 — Prerequisites (land first; each its own small PR off `master`)
+- **Type and tidy the `tree` package.** Several small PRs: first a grammar and punctuation
+  pass over `music21/tree/` with no code changes, then type it module by module, starting
+  with `spans`. Must pass ruff, mypy, and pylint with doctests unchanged.
+- **Finish the GitHub search.** This decides whether the move in H needs a stand-in, and
+  checks that removing `voiceLeading.Verticality` is safe. So far: nobody outside music21
+  calls the duration methods, and one project uses the tuplet classes, through the old
+  theoryAnalyzer. Still to search for: `tree.verticality`, `from music21.tree.verticality
+  import`, `.iterateVerticalities`, and `.getVerticalityAt`. If none turn up, no stand-in.
+  (`gh search code` has no regex and misses private repos and notebooks, so "none found"
+  is good evidence but not proof.)
 
-- **2A — Type & clean up the `tree` package.** Several small PRs: start with a
-  grammar/punctuation-only pass over `music21/tree/` (zero logic), then type module by module
-  (`spans` leaf first). Green under `ruff` / `mypy` / `pylint`; doctests unchanged.
-- **2B — GitHub usage survey.** Decide whether the relocation needs a shim and confirm the
-  `voiceLeading.Verticality` removal is safe. Findings so far: zero external callers of the
-  duration methods; one external user of the tuples but only via the removed `theoryAnalyzer`.
-  Still to run (the decisive one): external importers of `tree.verticality` /
-  `from music21.tree.verticality import` / `.iterateVerticalities` / `.getVerticalityAt`. Empty
-  → relocate with no shim. (Caveats: `gh search code` has no regex and under-counts private
-  repos / notebooks; "zero" is strong evidence, not proof.)
-- **2C — Notebook image-stripping infra.** Extract the `stripNotebookImages.py` clean filter,
-  the `testsAndInProgress/.gitattributes`, the `documenting.rst` sentence, and the AGENTS.md note
-  into their own PR off `master`. Standalone, generally useful, needed before the notebook work.
+### Then: the main changes
 
-### Phase 3 — Core implementation (one PR at a time)
+1. New methods (A, B, G): `VerticalityView`, `Stream.verticalities()`,
+   `getVerticalityAt()`, `verticalitiesNwise(n=3)`; `__iter__`, `__len__`, `__contains__`,
+   and `isConsonant()` on Verticality; empty-chord tests and doc lines; the `bass()`
+   decision. Fully typed, with doctests, marked New in v11. Then change the
+   `findingParallels` loop to `for v in score.verticalities():`.
+2. `includeRests` default (C), with the two doctests and two notebooks.
+3. Deprecate `voiceLeading.Verticality` (D, F).
+4. Move to `music21.verticality` (H), after the `tree` typing and the GitHub search.
 
-- **3A — Additive API** (Design A, B, G): `VerticalityView` + `Stream.verticalities()` /
-  `getVerticalityAt()` / `verticalitiesNwise(n=3)`; `tree.Verticality.__iter__` (+ `__len__` /
-  `__contains__`) + `isConsonant()`; zero-pitch `Chord` tests + the brief doc notes; decide
-  `root()`-on-empty. Fully typed, with doctests. *(New in v11.)* Then rewrite the
-  `findingParallels` loop to `for v in score.verticalities():`.
-- **3B — `includeRests` flip** (Design C): change the default; update the 2 doctests + 2 notebooks.
-- **3C — Deprecate `voiceLeading.Verticality`** (Design D, F): `@common.deprecated`, redirect
-  docstring, cut/replace members per the fate table.
-- **3D — Relocate Verticality to `music21.verticality`** (Design H; needs 2A & 2B): move the
-  class + `VerticalityView` + `VerticalitySequence`, update references and docs; shim only if
-  2B found importers.
+### Last
 
-### Phase 4 — Late
+1. Add Rouen to the corpus index: regenerate `music21/corpus/_metadataCache/core.p.gz` so
+   `corpus.search('Rouen')` finds it, check the corpus-count tests (`corpus/testCorpus.py`
+   and the range doctest in `corpora.py`, probably still fine), and commit the new
+   `core.p.gz`.
+2. The User's Guide chapter (I).
+3. Tuplet classes to `VerticalitySequence` (E): move `hasPassingTone()` and
+   `hasNeighborTone()`, then deprecate the tuplet classes.
 
-- **4A — Finish Rouen corpus integration:** regenerate `music21/corpus/_metadataCache/core.p.gz`
-  so `theoryExercises/Rouen` is indexed (and `corpus.search('Rouen')` works); fix any
-  corpus-count assertion (the floors in `corpus/testCorpus.py`, the range doctest at
-  `corpora.py:615` — verify, likely already in range); commit the regenerated `core.p.gz`.
-- **4B — User's Guide chapter** (Design I): promote `findingParallels` + integrate Rouen.
-- **4C — Tuples → `VerticalitySequence`** (Design E): port `hasPassingTone` / `hasNeighborTone`
-  (shedding `partNum`/coloring), then deprecate the tuple classes pointing there; remove after
-  the window.
 
----
+## Later, once `tree` is typed
 
-## Deferred tree-internals follow-ups (after the `tree` package is typed — not now)
+These came up while typing `tree/`. Each would simplify the code and speed it up, but none
+is easy, so they wait until the typing is done.
 
-Found while typing `tree/` (Phase 2A); they simplify + speed things up but are **not easy**, so
-per "do it now only if easy + simplifies + faster" they wait until the existing code is typed.
-
-- **Make AVL `payload` required `PayloadType` (no `None` default), threaded through
-  construction.** `createNodeAtPosition(position, payload)` would let nodes be born with their
-  payload and let `ElementTree._insertCore` drop its redundant `getNodeByPosition` re-traversal
-  (a real speedup). The hard part is `OffsetTree`: several elements can share one offset (chords),
-  so it appends into a *list* on a possibly-existing node — so `createNodeAtPosition` would need
-  to **return the created-or-found node** and the base position-only tree / `OffsetNode(40, None)`
-  still want a `None`/empty state. Worth doing; needs its own focused PR.
-- **A mutual base class for `ElementNode` / `OffsetNode`.** When typing `node.py`, the two will
-  likely want a shared typed base so the `OffsetNode` list-payload vs `ElementNode` single-payload
-  split is expressed cleanly — and probably a `createNodeAtPositionIfNotExists` (or similar) to
-  capture the find-or-create that the payload refactor above needs.
-- **Give `AVLTree` a second type parameter for its node type** so `rootNode` and `nodeClass` are
-  tied: `class AVLTree[PayloadType, NodeType: AVLNode]` with `nodeClass: type[NodeType]` and
-  `rootNode: NodeType | None`. Verified to work (cast-free node-specific access on `rootNode`;
-  wrong `nodeClass` flagged). Caveats: the bound must be the un-subscripted `AVLNode` (mypy won't
-  let a bound reference the earlier `PayloadType`), and `OffsetTree` *rebinds* the node class
-  (`ElementNode` → `OffsetNode`), so threading `NodeType` through that hierarchy is the fiddly
-  part — do it during the `trees.py` typing pass, where it removes casts.
+- **Make an AVL node's `payload` required.** Nodes would get their payload when created,
+  via `createNodeAtPosition(position, payload)`, and `ElementTree._insertCore` could skip a
+  second lookup with `getNodeByPosition`, which is a real speedup. The hard part is
+  `OffsetTree`: several elements (a chord's notes, say) can share an offset, so it appends to
+  a list on a node that may already exist. `createNodeAtPosition` would have to return the
+  node it created or found, and the plain position-only tree (`OffsetNode(40, None)`) still
+  needs an empty state. Worth its own PR.
+- **A shared base class for `ElementNode` and `OffsetNode`**, so their single payload versus
+  list payload is clear in the types, probably along with a find-or-create method like
+  `createNodeAtPositionIfNotExists` for the change above.
+- **A second type parameter on `AVLTree` for its node type**, so `rootNode` and `nodeClass`
+  agree: `class AVLTree[PayloadType, NodeType: AVLNode]`, with `nodeClass: type[NodeType]`
+  and `rootNode: NodeType | None`. Tested and works: no casts needed on `rootNode`, and mypy
+  catches a wrong `nodeClass`. Two catches: the bound has to be plain `AVLNode` (mypy won't
+  let a bound use `PayloadType`), and `OffsetTree` switches the node class from
+  `ElementNode` to `OffsetNode`, so carrying `NodeType` through that hierarchy takes care.
+  Best done while typing `trees.py`, where it removes casts.
