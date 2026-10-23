@@ -3714,7 +3714,7 @@ class Chord(ChordBase):
         >>> c2c
         <music21.chord.Chord C2 E3 G4 C5>
 
-        Pitches with extreme octaves (whose `.nameWithOctave`s
+        Pitches with extreme octaves (whose `.nameWithOctave` strings
         look identical) are still distinguished.
 
         >>> p1 = pitch.Pitch('B')

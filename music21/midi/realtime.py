@@ -17,7 +17,7 @@ https://joecodeswell.wordpress.com/2012/06/13/how-to-produce-python-controlled-a
 
 https://stackoverflow.com/questions/10983462/how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
-Requires pygame 2 (or 1.9) install with: pip3 install pygame
+Requires pygame 2 (or 1.9) install with: uv add pygame
 '''
 from __future__ import annotations
 
