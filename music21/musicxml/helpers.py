@@ -115,10 +115,10 @@ def insertBeforeElements(root, insert, tagList=None):
     of any instance of a child tag given in `tagList`. Append the element
     if `tagList` is `None`.
 
-    >>> from xml.etree.ElementTree import fromstring as El
+    >>> from xml.etree.ElementTree import fromstring as EL
     >>> from music21.musicxml.helpers import insertBeforeElements, dump
-    >>> root = El('<clef><sign>G</sign><line>4</line></clef>')
-    >>> insert = El('<foo/>')
+    >>> root = EL('<clef><sign>G</sign><line>4</line></clef>')
+    >>> insert = EL('<foo/>')
 
     >>> insertBeforeElements(root, insert, tagList=['line'])
     >>> dump(root)
@@ -130,7 +130,7 @@ def insertBeforeElements(root, insert, tagList=None):
 
     Now insert another element at the end by not specifying a tag list:
 
-    >>> insert2 = El('<bar/>')
+    >>> insert2 = EL('<bar/>')
     >>> insertBeforeElements(root, insert2)
     >>> dump(root)
     <clef>
@@ -149,6 +149,47 @@ def insertBeforeElements(root, insert, tagList=None):
         if child.tag in tagList:
             insertIndices.add(i)
     root.insert(min(insertIndices), insert)
+
+
+def insertAfterElements(root, insert, tagList=None):
+    # noinspection PyShadowingNames
+    '''
+    Insert element `insert` into element `root` directly after the last
+    instance of any child tag given in `tagList`. Insert at the beginning
+    if `tagList` is `None` or no instance is found.
+
+    >>> from xml.etree.ElementTree import fromstring as EL
+    >>> from music21.musicxml.helpers import insertAfterElements, dump
+    >>> root = EL('<note><grace /><voice>1</voice></note>')
+    >>> insert = EL('<unpitched/>')
+
+    >>> insertAfterElements(root, insert, tagList=['grace'])
+    >>> dump(root)
+    <note>
+        <grace />
+        <unpitched />
+        <voice>1</voice>
+    </note>
+
+    Insert at the beginning when nothing in `tagList` matches:
+
+    >>> insert2 = EL('<foo/>')
+    >>> insertAfterElements(root, insert2, tagList=['bar'])
+    >>> dump(root)
+    <note>
+        <foo />
+        <grace />
+        <unpitched />
+        <voice>1</voice>
+    </note>
+    '''
+    insertIndex = 0
+    if tagList:
+        # Iterate children only, not grandchildren
+        for i, child in enumerate(root.findall('*')):
+            if child.tag in tagList:
+                insertIndex = i + 1
+    root.insert(insertIndex, insert)
 
 
 def measureNumberComesBefore(mNum1: str, mNum2: str) -> bool:
@@ -214,8 +255,8 @@ def synchronizeIdsToM21(element: ET.Element, m21Object: Music21Object):
 
     <fermata id="hello"><id>bye</id></fermata>
 
-    >>> from xml.etree.ElementTree import fromstring as El
-    >>> e = El('<fermata id="fermata1"/>')
+    >>> from xml.etree.ElementTree import fromstring as EL
+    >>> e = EL('<fermata id="fermata1"/>')
     >>> f = expressions.Fermata()
     >>> musicxml.helpers.synchronizeIdsToM21(e, f)
     >>> f.id
@@ -223,7 +264,7 @@ def synchronizeIdsToM21(element: ET.Element, m21Object: Music21Object):
 
     Does not change the id if the id is not specified:
 
-    >>> e = El('<fermata />')
+    >>> e = EL('<fermata />')
     >>> f = expressions.Fermata()
     >>> f.id = 'doNotOverwrite'
     >>> musicxml.helpers.synchronizeIdsToM21(e, f)
@@ -245,8 +286,8 @@ def synchronizeIdsToXML(
     on many elements which is perfect for getting from .id on
     a music21 element.
 
-    >>> from xml.etree.ElementTree import fromstring as El
-    >>> e = El('<fermata />')
+    >>> from xml.etree.ElementTree import fromstring as EL
+    >>> e = EL('<fermata />')
     >>> f = expressions.Fermata()
     >>> f.id = 'fermata1'
     >>> musicxml.helpers.synchronizeIdsToXML(e, f)
@@ -255,7 +296,7 @@ def synchronizeIdsToXML(
 
     Does not set attr: id if el.id is not valid or default:
 
-    >>> e = El('<fermata />')
+    >>> e = EL('<fermata />')
     >>> f = expressions.Fermata()
     >>> musicxml.helpers.synchronizeIdsToXML(e, f)
     >>> e.get('id', None) is None
@@ -267,7 +308,7 @@ def synchronizeIdsToXML(
 
     None can be passed in instead of a m21object.
 
-    >>> e = El('<fermata />')
+    >>> e = EL('<fermata />')
     >>> musicxml.helpers.synchronizeIdsToXML(e, None)
     >>> e.get('id', 'no idea')
     'no idea'
@@ -304,8 +345,8 @@ def setM21AttributeFromAttribute(
 
     Pass a function or lambda function as transform to transform the value before setting it
 
-    >>> from xml.etree.ElementTree import fromstring as El
-    >>> e = El('<page-layout new-page="yes" page-number="4" />')
+    >>> from xml.etree.ElementTree import fromstring as EL
+    >>> e = EL('<page-layout new-page="yes" page-number="4" />')
 
     >>> setb = musicxml.helpers.setM21AttributeFromAttribute
     >>> pl = layout.PageLayout()
@@ -356,8 +397,8 @@ def setXMLAttributeFromAttribute(
 
     Pass a function or lambda function as transform to transform the value before setting it
 
-    >>> from xml.etree.ElementTree import fromstring as El
-    >>> e = El('<page-layout/>')
+    >>> from xml.etree.ElementTree import fromstring as EL
+    >>> e = EL('<page-layout/>')
 
     >>> setb = musicxml.helpers.setXMLAttributeFromAttribute
     >>> pl = layout.PageLayout()

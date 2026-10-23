@@ -296,7 +296,6 @@ def search(
     If ``corpusNames`` is None, all corpora known to music21 will be searched.
 
     See usersGuide (chapter 11) for more information on searching
-
     '''
     # >>> corpus.search('coltrane', corpusNames=('virtual',))
     # <music21.metadata.bundles.MetadataBundle {1 entry}>

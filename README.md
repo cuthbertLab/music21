@@ -16,8 +16,12 @@ https://tinyurl.com/m21colab (run all to set up an environment for the latest re
 And to install, see:
 https://www.music21.org/music21docs/usersGuide/usersGuide_01_installing.html
 
-`Music21` runs on Python 3.11+.  (Use music21 version 4 on Python 2 or Py3.4, v5
-on Py3.5, v6 on Py3.6, v7 on Py3.7, v8 on Py3.8/Py3.9, and v9 on Py3.10)
+`Music21` runs on Python 3.12+.  (Use music21 version 4 on Python 2 or Py3.4, v5
+on Py3.5, v6 on Py3.6, v7 on Py3.7, v8 on Py3.8/Py3.9, v9 on Py3.10, and v10 on Py3.11)
+
+Since v9, `music21` has supported at least the last two released versions of Python,
+but rarely more.  We do, however, try to keep supporting whatever (often older)
+version of Python that Google Colab runs on (as of 2026, that is Python 3.12).
 
 [![Build Status](https://github.com/cuthbertLab/music21/workflows/maincheck/badge.svg)](https://github.com/cuthbertLab/music21)
 [![Coverage Status](https://coveralls.io/repos/github/cuthbertLab/music21/badge.svg?branch=master)](https://coveralls.io/github/cuthbertLab/music21?branch=master)
@@ -35,6 +39,8 @@ See: https://groups.google.com/forum/#!forum/music21list
 ## Contributing Guide ##
 
 [Contributing Guide](CONTRIBUTING.md)
+
+Please note the required AI declarations there.  The world is changing fast, so please review it from time to time for recent changes.
 
 ## Community Code of Conduct<a name="community-code-of-conduct"></a> ##
 
@@ -63,19 +69,18 @@ Maintainers will respect confidentiality with regard to reports.
 
 The early development of `music21` was supported by
 the generosity of the Seaver Institute and the
-National Endowment for the Humanities, along with MIT's Music and Theater Arts Section
-and the School of Humanities, Arts, and Social Sciences.
+National Endowment for the Humanities, along with support from across MIT.
 
 ## License Coverage and Other/Prior Licenses ##
 
 Music21 is Open-Source Software released under the BSD (3-clause) license.
-Essentially, it's free and you can do with it what you'd like as long as you
-keep the LICENSE file and copyright statement.
+Essentially, it's free and you can do almost anything what it that you'd like as long as you
+keep the LICENSE file and copyright statements.
 
 The license applies to all code files that are new to music21 along with
 documentation. Externally provided software (including the MIT-licensed 
 Lilypond/MusicXML test Suite) may have other licenses.  The encoded
-musical scores in the corpus have their own copyrights and licenses. They
+musical scores in the corpus have their own copyrights and licenses. The
 underlying music is believed to be in the public domain in the US, EU, and
 Canada (and most of the world) and the encodings are also either public domain
 or used by permission. For those needing a strict BSD-license of all parts of

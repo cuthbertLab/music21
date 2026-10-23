@@ -13,12 +13,10 @@ Simple storage for data defaults used throughout music21.
 '''
 from __future__ import annotations
 
-import unittest
-import typing as t
 from music21 import _version
 
+
 # note: this module should not import any higher level modules
-StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
 
 
 # TODO: defaults should check the environment object to see
@@ -40,8 +38,8 @@ limitOffsetDenominator = 65535  # > CD track level precision.
 # not allowing more can be construed as a feature.
 
 
-pitchStep: StepName = 'C'
-pitchOctave = 4
+# we used to have a defaultStep ('C') and defaultOctave (4) but
+# no one ever changed them, and inlining makes so much faster.
 
 partGroup = 'Part Group'
 partGroupAbbreviation = 'PG'
@@ -61,12 +59,12 @@ clefLine = 2
 # define a default notehead for notes that know they are unpitched
 noteheadUnpitched = 'square'
 '''
-Divisions are a MusicXML concept that music21 does not share
+Divisions are a MusicXML concept that music21 does not share.
 It basically represents the lowest time unit that all other notes
 are integer multiples of.  Useful for compatibility with MIDI, but
 ultimately restricting since it must be less than 16384, so thus
 cannot accurately reflect a piece which uses 64th notes, triplets,
-quintuplets, septuplets, 11-tuplets, and 13-tuplets in the same piece
+quintuplets, septuplets, 11-tuplets, and 13-tuplets in the same piece.
 I have chosen a useful base that allows for perfect representation of
 128th notes, triplets within triplets, quintuplets, and septuplets
 within the piece.  Other tuplets (11, etc.) will be close enough for
@@ -114,15 +112,6 @@ abcVersionDefault = (1, 3, 0)
 # ----------------------------------------------------------------||||||||||||--
 
 
-class Test(unittest.TestCase):
-    '''
-    Unit tests
-    '''
-    def testTest(self):
-        self.assertEqual(1, 1)
-
-
-# ----------------------------------------------------------------||||||||||||--
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest()

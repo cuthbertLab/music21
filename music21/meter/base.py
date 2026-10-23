@@ -195,14 +195,15 @@ def bestTimeSignature(meas: stream.Stream) -> 'music21.meter.TimeSignature':
                 break
         # numerator is the count of min parts in the sum
         multiplier = 1
+        numeratorFloat = 0.0
         while i > 0:
-            numerator = multiplier * sumDurQL / minDurQL
-            if numerator == int(numerator):
+            numeratorFloat = multiplier * sumDurQL / minDurQL
+            if numeratorFloat == int(numeratorFloat):
                 break
             multiplier *= 2
             i -= 1
 
-        numerator = int(numerator)
+        numerator = int(numeratorFloat)
         floatDenominator *= multiplier
         denominator = int(floatDenominator)
         # simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
@@ -272,7 +273,7 @@ class TimeSignature(TimeSignatureBase):
     that they apply to.  Alternatively you can put the time signature at the
     front of a `Part` or at the beginning of a `Score`, and they will work
     within music21, but they won't necessarily display properly in MusicXML,
-    Lilypond, etc.  So best is to create structures where the TimeSignature
+    LilyPond, etc.  So best is to create structures where the TimeSignature
     goes in the first Measure of the score, as below:
 
     >>> s = stream.Score()
@@ -496,7 +497,6 @@ class TimeSignature(TimeSignatureBase):
     >>> another44 = meter.TimeSignature()  # '4/4' by default
     >>> one44 == another44
     True
-
     '''
     _styleClass = style.TextStyle
     classSortOrder = 4
@@ -1260,7 +1260,6 @@ class TimeSignature(TimeSignatureBase):
         >>> ts2._setDefaultAccentWeights(3)  # lower depth
         >>> [mt.weight for mt in ts2.accentSequence]
         [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]
-
         '''
         # NOTE: this is a performance critical method
         firstPartitionForm: MeterSequence|int|None
@@ -1434,9 +1433,7 @@ class TimeSignature(TimeSignatureBase):
             beams = beamsList[i]
             if beams is None:
                 return
-
-            if t.TYPE_CHECKING:
-                assert isinstance(beams, beam.Beams)
+            beams = t.cast(beam.Beams, beams)
 
             beamNumber = depth + 1
             # see if there is a component defined for this beam number

@@ -7,7 +7,7 @@
 #               Amy Hailes
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -268,7 +268,7 @@ perfSpecifiers = [
     Specifier.QUADAUG,
 ]
 
-perfOffset = 4  # that is, Perfect is third on the list.s
+perfOffset = 4  # that is, Perfect is third on the list.
 
 # why is this not called imperfSpecifiers?
 specifiers = [
@@ -1409,10 +1409,7 @@ class GenericInterval(IntervalBase):
         >>> gSharp
         <music21.pitch.Pitch D#5>
         '''
-        if p.octave is None:
-            useImplicitOctave = True
-        else:
-            useImplicitOctave = False
+        useImplicitOctave = p.octaveIsImplicit
         pitchDNN = p.diatonicNoteNum
 
         if inPlace:
@@ -1422,7 +1419,7 @@ class GenericInterval(IntervalBase):
 
         newPitch.diatonicNoteNum = pitchDNN + self.staffDistance
         if useImplicitOctave:
-            newPitch.octave = None
+            newPitch.octaveIsImplicit = True
 
         if not inPlace:
             return newPitch
@@ -1736,7 +1733,7 @@ class DiatonicInterval(IntervalBase):
         # if self.direction != other.direction:
         #    return False
         if (self.generic == other.generic
-            and self.specifier == other.specifier
+                and self.specifier == other.specifier
                 and self.direction == other.direction):
             return True
         else:
@@ -1853,7 +1850,6 @@ class DiatonicInterval(IntervalBase):
 
         >>> interval.DiatonicInterval('A', 1).generic.direction
         <Direction.OBLIQUE: 0>
-
         '''
         if self.generic.undirected != 1:
             return self.generic.direction
@@ -2331,7 +2327,7 @@ class ChromaticInterval(IntervalBase):
     @property
     def mod12(self) -> int|float:
         '''
-        The number of semitones within an octave using modulo arithmatic.
+        The number of semitones within an octave using modulo arithmetic.
 
         (see :meth:`~music21.interval.ChromaticInterval.simpleUndirected`
         for a similar method that puts musical
@@ -2454,7 +2450,7 @@ class ChromaticInterval(IntervalBase):
         transposed Pitch, that is transformed
         according to this ChromaticInterval.
 
-        Because :class:`~music21.interval.ChromaticInterval` object
+        Because :class:`~music21.interval.ChromaticInterval` objects
         do not take into account diatonic spelling,
         the new Pitch is simplified to the most common intervals.  See
         :meth:`~music21.pitch.Pitch.simplifyEnharmonic` with ``mostCommon = True``
@@ -2501,10 +2497,7 @@ class ChromaticInterval(IntervalBase):
 
         * Changed in v6: added inPlace.
         '''
-        if p.octave is None:
-            useImplicitOctave = True
-        else:
-            useImplicitOctave = False
+        useImplicitOctave = p.octaveIsImplicit
         pps = p.ps
 
         if not inPlace:
@@ -2513,8 +2506,8 @@ class ChromaticInterval(IntervalBase):
             newPitch = p
 
         newPitch.ps = pps + self.semitones
-        if useImplicitOctave is True:
-            newPitch.octave = None
+        if useImplicitOctave:
+            newPitch.octaveIsImplicit = True
 
         if not inPlace:
             return newPitch
@@ -2777,7 +2770,6 @@ def intervalFromGenericAndChromatic(
 
     >>> interval.intervalFromGenericAndChromatic(1, 0.5)
     <music21.interval.Interval A1 (-50c)>
-
     '''
     gIntV: GenericInterval
     if not isinstance(gInt, GenericInterval):
@@ -2798,7 +2790,7 @@ def intervalFromGenericAndChromatic(
 # ------------------------------------------------------------------------------
 
 # store implicit diatonic if set from chromatic specification
-# if implicit, turing transpose, set to simplifyEnharmonic
+# if implicit, during transpose, set to simplifyEnharmonic
 
 
 class Interval(IntervalBase):
@@ -3410,10 +3402,11 @@ class Interval(IntervalBase):
 
         if self.implicitDiatonic:
             # this will not preserve diatonic relationships
-            pOut = self.chromatic.transposePitch(
-                p,
-                inPlace=inPlace,
-            )
+            if inPlace:
+                self.chromatic.transposePitch(p, inPlace=True)
+                pOut = p
+            else:
+                pOut = self.chromatic.transposePitch(p)
         else:
             pOut = self._diatonicTransposePitch(
                 p,
@@ -3428,8 +3421,8 @@ class Interval(IntervalBase):
                 maxAccidental=maxAccidental,
             )
 
-            if p.fundamental.octave is None:
-                pOut.fundamental.octave = None
+            if p.fundamental.octaveIsImplicit:
+                pOut.fundamental.octaveIsImplicit = True
 
         if not inPlace:
             return pOut
@@ -3452,15 +3445,19 @@ class Interval(IntervalBase):
             # true unison and any multiple of true octave
             inheritAccidentalDisplayStatus = True
 
-        if p.octave is None:
-            useImplicitOctave = True
-        else:
-            useImplicitOctave = False
+        useImplicitOctave = p.octaveIsImplicit
 
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
         oldDiatonicNum = pitch1.diatonicNoteNum
-        # centsOrigin = pitch1.microtone.cents  # unused!!
+        # Only carry pitch1's microtone through when the interval is not itself
+        # microtonal: a microtonal interval already supplies the result's cents
+        # (e.g. scale realization), so preserving here would double-count.
+        intervalIsMicrotonal = self.chromatic.semitones != int(self.chromatic.semitones)
+        if not pitch1.isTwelveTone() and not intervalIsMicrotonal:
+            centsOrigin = pitch1.microtone.cents
+        else:
+            centsOrigin = 0.0
         distanceToMove = self.diatonic.generic.staffDistance
 
         newDiatonicNumber = oldDiatonicNum + distanceToMove
@@ -3473,9 +3470,15 @@ class Interval(IntervalBase):
         # if this is not set to None then terrible things happen
         pitch2.microtone = None  # type: ignore
 
-        # We have the right note name but not the right accidental
-        interval2 = Interval(pitch1, pitch2)
-        # halfStepsToFix already has any microtones
+        # We have the right note name but not the right accidental. Measure it
+        # from pitch1 without its microtone (reapplied to the result below); a
+        # microtonal endpoint here yields a fractional chromatic with no
+        # interval specifier.
+        pitch1ForAccidental = pitch1
+        if centsOrigin:
+            pitch1ForAccidental = copy.deepcopy(pitch1)
+            pitch1ForAccidental.microtone = None
+        interval2 = Interval(pitch1ForAccidental, pitch2)
         halfStepsToFix = self.chromatic.semitones - interval2.chromatic.semitones
 
         # environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix,
@@ -3492,7 +3495,7 @@ class Interval(IntervalBase):
                 # pitchAlt = copy.deepcopy(pitch2)
                 # pitchAlt.ps = pitch2.ps + halfStepsToFix
                 # environLocal.printDebug(
-                #    'coercing pitch due to a transposition that requires an extreme ' +
+                #    'coercing pitch due to a transposition that requires an extreme '
                 #    f'accidental: {pitch2} -> {pitchAlt}')
                 # pitch2 = pitchAlt
                 pitch2.ps = pitch2.ps + halfStepsToFix
@@ -3527,8 +3530,12 @@ class Interval(IntervalBase):
                         and oldPitch2Accidental.name == 'natural'):
                     pitch2.accidental = oldPitch2Accidental
 
+        if centsOrigin:
+            # restore the cents peeled off halfStepsToFix above
+            pitch2.microtone = pitch2.microtone.cents + centsOrigin
+
         if useImplicitOctave:
-            pitch2.octave = None
+            pitch2.octaveIsImplicit = True
 
         if not inPlace:
             return pitch2
@@ -4079,7 +4086,6 @@ def subtract(intervalList):
     'Descending Diminished Unison'
     >>> a.chromatic.semitones
     -1
-
     '''
     from music21 import pitch
     if not intervalList:

@@ -61,7 +61,6 @@ class SubConverter:
         codecWrite = True or False (default False) if encodings need to be used to write
         stringEncoding = string (default 'utf-8'). If codecWrite is True, this specifies what
             encoding to use
-
     '''
     readBinary: bool = False
     canBePickled: bool = True
@@ -100,7 +99,7 @@ class SubConverter:
         loading the file and putting the data into parseData then there is no need
         to implement this method.  Just set self.readBinary to True | False.
         '''
-        if self.readBinary is False:
+        if not self.readBinary:
             import locale
             with open(filePath, encoding=locale.getpreferredencoding()) as f:
                 dataStream = f.read()
@@ -113,15 +112,16 @@ class SubConverter:
 
         return self.stream
 
-    def _getStream(self):
+    @property
+    def stream(self):
+        '''
+        Returns or sets the stream in the converter.  Must be defined for subConverter to work.
+        '''
         return self._stream
 
-    def _setStream(self, newStream):
+    @stream.setter
+    def stream(self, newStream):
         self._stream = newStream
-
-    stream = property(_getStream, _setStream, doc='''
-        Returns or sets the stream in the converter.  Must be defined for subConverter to work.
-        ''')
 
     def checkShowAbility(self, **keywords) -> bool:
         '''
@@ -129,7 +129,7 @@ class SubConverter:
         equipped to show in this format.
 
         Default True. Might be False if, say
-        a Lilypond converter is used and Lilypond
+        a LilyPond converter is used and LilyPond
         is not installed.
         '''
         return True
@@ -289,7 +289,7 @@ class SubConverter:
         if fp is None:
             fp = self.getTemporaryFile()
 
-        if self.readBinary is False:
+        if not self.readBinary:
             writeFlags = 'w'
         else:
             writeFlags = 'wb'
@@ -330,7 +330,7 @@ class SubConverter:
         and return the object (str or bytes) returned.
         '''
         fp = self.write(obj, fmt=fmt, subformats=subformats, **keywords)
-        if self.readBinary is False:
+        if not self.readBinary:
             readFlags = 'r'
         else:
             readFlags = 'rb'
@@ -346,8 +346,7 @@ class SubConverter:
 class ConverterIPython(SubConverter):
     '''
     Meta-subConverter for displaying image data in a Notebook
-    using either png (via MuseScore or LilyPond) or directly via
-    Vexflow/music21j, or MIDI using music21j.
+    using either png (via MuseScore or LilyPond) or MIDI using music21j.
     '''
     registerFormats = ('ipython', 'jupyter')
     registerOutputExtensions = ()
@@ -388,11 +387,10 @@ class ConverterIPython(SubConverter):
             )
             return None
         elif helperFormat == 'midi':
-            if t.TYPE_CHECKING:
-                assert isinstance(helperSubConverter, ConverterMidi)
+            midiSubConverter = t.cast(ConverterMidi, helperSubConverter)
             return ip21_converters.displayMusic21jMIDI(
                 obj,
-                subConverter=helperSubConverter,
+                subConverter=midiSubConverter,
                 fmt=helperFormat,
                 subformats=helperSubformats,
                 **keywords,
@@ -401,9 +399,9 @@ class ConverterIPython(SubConverter):
 
 class ConverterLilypond(SubConverter):
     '''
-    Convert to Lilypond and from there usually to png, pdf, or svg.
+    Convert to LilyPond and from there usually to png, pdf, or svg.
 
-    Note: that the proper format for displaying Lilypond in Jupyter
+    Note: that the proper format for displaying LilyPond in Jupyter
     notebook in v9 is ipython.lily.png and not lily.ipython.png
     '''
     registerFormats = ('lilypond', 'lily')
@@ -487,25 +485,6 @@ class ConverterBraille(SubConverter):
         dataStr = braille.translate.objectToBraille(obj, **keywords)
         if 'ascii' in subformats:
             dataStr = braille.basic.brailleUnicodeToBrailleAscii(dataStr)
-        fp = self.writeDataStream(fp, dataStr)
-        return fp
-
-
-class ConverterVexflow(SubConverter):
-    registerFormats = ('vexflow',)
-    registerOutputExtensions = ('html',)
-
-    def write(self,
-              obj,
-              fmt,
-              fp=None,
-              subformats=(),
-              *,
-              local: bool = False,
-              **keywords):  # pragma: no cover
-        # from music21 import vexflow
-        from music21.vexflow import toMusic21j as vexflow
-        dataStr = vexflow.fromObject(obj, mode='html', local=local)
         fp = self.writeDataStream(fp, dataStr)
         return fp
 
@@ -631,8 +610,8 @@ class ConverterHumdrum(SubConverter):
         Open Humdrum data from a string -- calls
         :meth:`~music21.humdrum.spineParser.HumdrumDataCollection.parse()`.
 
-        >>> humData = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n' +
-        ...     '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
+        >>> humData = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n'
+        ...            '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
         >>> c = converter.subConverters.ConverterHumdrum()
         >>> s = c.parseData(humData)
         >>> c.stream.show('text')
@@ -762,8 +741,8 @@ class ConverterNoteworthy(SubConverter):
         r'''
         Open Noteworthy data from a string or list
 
-        >>> nwcData = ('!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|' +
-        ...     'Type:Treble\n|Note|Dur:Whole|Pos:1^')
+        >>> nwcData = ('!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|'
+        ...            'Type:Treble\n|Note|Dur:Whole|Pos:1^')
         >>> c = converter.subConverters.ConverterNoteworthy()
         >>> c.parseData(nwcData)
         >>> c.stream.show('text')

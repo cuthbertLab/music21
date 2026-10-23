@@ -155,8 +155,8 @@ class Test(unittest.TestCase):
     #     self.assertGreater(len(searchResults), 0)
     #     # returns items in pairs: url and work number
     #     self.assertEqual(searchResults[0].sourcePath,
-    #         'http://impromastering.com/uploads/transcription_file/' +
-    #         'file/196/Giant_Steps__John_Coltrane_C.xml')
+    #         'http://impromastering.com/uploads/transcription_file/'
+    #         + 'file/196/Giant_Steps__John_Coltrane_C.xml')
 
     # def testGetWorkList(self):
     #     self.assertGreaterEqual(len(corpus.corpora.CoreCorpus().getPaths('.md')), 38)

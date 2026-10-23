@@ -63,7 +63,7 @@ def abcToStreamPart(
     '''
     Handler conversion of a single Part of a Score with multiple Parts.
     Results are added into the provided inputM21 object
-    or a newly created Part object
+    or a newly created Part object.
 
     The part object is then returned.
     '''
@@ -109,6 +109,7 @@ def abcToStreamPart(
 
     barCount = 0
     measureNumber = 1
+    lyricTargets: list[note.GeneralNote] = []
     # merged handler are ABCHandlerBar objects, defining attributes for barlines
 
     for mh in mergedHandlers:
@@ -122,7 +123,7 @@ def abcToStreamPart(
             # environLocal.printDebug(['abcToStreamPart', 'useMeasures',
             #    useMeasures, 'mh.hasNotes()', mh.hasNotes()])
             dst = stream.Measure()
-            # bar tokens are already extracted form token list and are available
+            # bar tokens are already extracted from token list and are available
             # as attributes on the handler object
             # may return None for a regular barline
 
@@ -181,7 +182,9 @@ def abcToStreamPart(
         # environLocal.printDebug([mh, 'dst', dst])
         # ql = 0  # might not be zero if there is a pickup
 
-        postTransposition, clefSet = parseTokens(mh, dst, p, useMeasures)
+        postTransposition, clefSet = parseTokens(
+            mh, dst, p, useMeasures, lyricTargets
+        )
 
         # append measure to part; in the case of trailing metadata
         # dst may be part, even though useMeasures is True
@@ -253,10 +256,11 @@ def parseTokens(
     mh: abcFormat.ABCHandler,
     dst: stream.Measure|stream.Part,
     p: stream.Part,
-    useMeasures: bool
+    useMeasures: bool,
+    lyricTargets: list[note.GeneralNote],
 ) -> tuple[int, bool]:
     '''
-    parses all the tokens in a measure or part.
+    Parses all the tokens in a measure or part.
     '''
     # in case need to transpose due to clef indication
     from music21 import abcFormat
@@ -265,11 +269,16 @@ def parseTokens(
     clefSet = False
     for t in mh.tokens:
         if isinstance(t, abcFormat.ABCMetadata):
+            if t.tag == 'w':
+                addABCLyrics(t.data, lyricTargets)
+                lyricTargets.clear()
             postTransposition, clefSet = metadataToM21Object(
                 t, dst, postTransposition, clefSet, useMeasures
             )
         elif isinstance(t, abcFormat.ABCNote):
-            parseABCNote(t, dst)
+            m21Note = parseABCNote(t, dst)
+            if m21Note is not None and not isinstance(m21Note, note.Rest) and not t.inGrace:
+                lyricTargets.append(m21Note)
         elif isinstance(t, abcFormat.ABCSlurStart):
             if typing.TYPE_CHECKING:
                 assert t.slurObj is not None
@@ -285,10 +294,36 @@ def parseTokens(
     dst.coreElementsChanged()
     return postTransposition, clefSet
 
+
+def addABCLyrics(lyricData: str, lyricTargets: list[note.GeneralNote]) -> None:
+    '''
+    Attach simple ``w:`` ABC lyric syllables to their corresponding notes.
+
+    AI-assisted implementation.
+    '''
+    lyricTargetIndex = 0
+    for lyricWord in lyricData.split():
+        if lyricWord in ('*', '-'):
+            lyricTargetIndex += 1
+            continue
+
+        syllables = lyricWord.split('-')
+        for syllableIndex, syllable in enumerate(syllables):
+            if not syllable:
+                lyricTargetIndex += 1
+                continue
+            if lyricTargetIndex >= len(lyricTargets):
+                return
+            prefix = '-' if syllableIndex else ''
+            suffix = '-' if syllableIndex < len(syllables) - 1 else ''
+            lyricTargets[lyricTargetIndex].addLyric(prefix + syllable + suffix)
+            lyricTargetIndex += 1
+
+
 def parseABCNote(
     t: abcFormat.ABCNote,
     dst: stream.Measure|stream.Part,
-) -> None:
+) -> note.GeneralNote|None:
     '''
     Parse an ABCNote object and add it to the destination stream.
     '''
@@ -307,7 +342,7 @@ def parseABCNote(
             if cs_name in ('NC', 'N.C.', 'No Chord', 'None'):
                 cs = harmony.NoChord(cs_name)
             elif cs_name.startswith('>'):
-                return  # fingering diagram?  Appears in some pieces, ryans-Neumedia
+                return None  # fingering diagram?  Appears in some pieces, ryans-Neumedia
             else:
                 cs = harmony.ChordSymbol(cs_name)
             dst.coreAppend(cs, setActiveSite=False)
@@ -319,7 +354,7 @@ def parseABCNote(
     if isinstance(t, abcFormat.ABCChord):
         # Skip an empty chord
         if not t.subTokens:
-            return
+            return None
 
         # may have more than notes?
         pitchNameList: list[str] = []
@@ -345,6 +380,7 @@ def parseABCNote(
             if acc is not None:
                 acc.displayStatus = accStatusList[pIndex]
         dst.coreAppend(c)
+        return c
 
         # ql += t.quarterLength
     else:
@@ -388,6 +424,7 @@ def parseABCNote(
             n.articulations.append(m21ArticulationObj)
 
         dst.coreAppend(n, setActiveSite=False)
+        return n
 
 
 def metadataToM21Object(
@@ -443,7 +480,10 @@ def metadataToM21Object(
     return postTransposition, clefSet
 
 
-def abcToStreamScore(abcHandler, inputM21=None):
+def abcToStreamScore(
+    abcHandler: abcFormat.ABCHandler,
+    inputM21: stream.Score|None = None
+) -> stream.Score:
     '''
     Given an abcHandler object, build into a
     multi-part :class:`~music21.stream.Score` with metadata.
@@ -472,12 +512,11 @@ def abcToStreamScore(abcHandler, inputM21=None):
         if isinstance(t, abcFormat.ABCMetadata):
             if t.isVersion():
                 v = t.data.replace('abc-version', '').strip()
-                try:
+                versionMatch = re.match(r'(\d+).(\d+).?(\d+)?', v)
+                if versionMatch is not None:
                     abcHandler.abcVersion = abcHandler.returnAbcVersionFromMatch(
-                        re.match(r'(\d+).(\d+).?(\d+)?', v)
+                        versionMatch
                     )
-                except AttributeError:
-                    pass
 
             elif t.isTitle():
                 if titleCount == 0:  # first
@@ -530,12 +569,18 @@ def abcToStreamScore(abcHandler, inputM21=None):
     s.coreElementsChanged()
     return s
 
-def abcToStreamOpus(abcHandler, inputM21=None, number=None):
+def abcToStreamOpus(
+    abcHandler: abcFormat.ABCHandler,
+    inputM21: stream.Opus|None = None,
+    number: int|None = None
+) -> stream.Opus:
     '''
     Convert a multi-work stream into one or more complete works packed into an Opus Stream.
 
     If a `number` argument is given, and a work is defined by
-    that number, that work is returned.
+    that number, an Opus containing just that single work is returned.
+
+    * Changed in v11: always returns an Opus even if only a single number is given.
     '''
     if inputM21 is None:
         opus = stream.Opus()
@@ -548,8 +593,8 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     if abcHandler.definesReferenceNumbers():
         abcDict = abcHandler.splitByReferenceNumber()
         if number is not None and number in abcDict:
-            # get number from dictionary; set to new score
-            opus = abcToStreamScore(abcDict[number])  # return a score, not an opus
+            # get the single requested work, but still wrap it in an Opus
+            opus.append(abcToStreamScore(abcDict[number]))
         else:  # build entire opus into an opus stream
             scoreList = []
             for key, value in sorted(abcDict.items()):
@@ -569,7 +614,17 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     return opus
 
 
-def reBar(music21Part, *, inPlace=False):
+@typing.overload
+def reBar(music21Part: stream.Part, *, inPlace: typing.Literal[True]) -> None:
+    ...
+
+
+@typing.overload
+def reBar(music21Part: stream.Part, *, inPlace: typing.Literal[False] = False) -> stream.Part:
+    ...
+
+
+def reBar(music21Part: stream.Part, *, inPlace: bool = False) -> stream.Part|None:
     # noinspection PyShadowingNames,SpellCheckingInspection
     '''
     Re-bar overflow measures using the last known time signature.
@@ -867,23 +922,47 @@ class Test(unittest.TestCase):
         self.assertEqual(len(op), 8)
 
     def testLyrics(self):
-        # TODO(msc) -- test better
-
         from music21 import abcFormat
-        from music21.abcFormat import testFiles
-
-        tf = testFiles.sicutRosa
         af = abcFormat.ABCFile()
-        s = abcToStreamScore(af.readstr(tf))
+        s = abcToStreamScore(af.readstr('''
+X:1
+T:Lyrics
+M:4/4
+L:1/4
+K:C
+C D E F|G A B c|
+w:hel-lo world * one two three four
+'''))
         assert s is not None
 
-        # s.show()
-        # self.assertEqual(len(s.parts), 3)
-        # self.assertEqual(len(s.parts[0].notesAndRests), 6)
-        # self.assertEqual(len(s.parts[1].notesAndRests), 20)
-        # self.assertEqual(len(s.parts[2].notesAndRests), 6)
-        # s.show()
-        # s.show('midi')
+        notes = s.parts[0].recurse().notes
+        self.assertEqual(notes[0].lyric, 'hel')
+        self.assertEqual(notes[0].lyrics[0].syllabic, 'begin')
+        self.assertEqual(notes[1].lyric, 'lo')
+        self.assertEqual(notes[1].lyrics[0].syllabic, 'end')
+        self.assertEqual(notes[2].lyric, 'world')
+        self.assertEqual(notes[3].lyrics, [])
+        self.assertEqual([m21Note.lyric for m21Note in notes[4:]],
+                         ['one', 'two', 'three', 'four'])
+
+    def testLyricsIgnoreSyllablesAfterLastNote(self):
+        '''AI-assisted regression coverage for surplus lyric syllables.'''
+        from music21 import abcFormat
+        af = abcFormat.ABCFile()
+        s = abcToStreamScore(af.readstr('''
+X:1
+T:Lyrics with extra words
+M:4/4
+L:1/4
+K:C
+C D|
+w:first second third
+'''))
+        assert s is not None
+
+        notes = s.parts[0].recurse().notes
+        self.assertEqual([m21Note.lyric for m21Note in notes],
+                         ['first', 'second'])
 
     def testMultiWorkImported(self):
 
@@ -965,9 +1044,9 @@ class Test(unittest.TestCase):
         score = harmony.realizeChordSymbolDurations(score)
 
         self.assertEqual(8, score.getElementsByClass(harmony.ChordSymbol)
-                            .last().quarterLength)
+                         .last().quarterLength)
         self.assertEqual(4, score.getElementsByClass(harmony.ChordSymbol)
-                            .first().quarterLength)
+                         .first().quarterLength)
 
     def testAbcKeyImport(self):
         from music21 import abcFormat

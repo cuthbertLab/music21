@@ -347,7 +347,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True
         >>> bachBundle == 'foo'
         False
-
         '''
         if hasattr(other, '_metadataEntries'):
             if self._metadataEntries == other._metadataEntries:
@@ -1096,7 +1095,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         Traceback (most recent call last):
         music21.exceptions21.MetadataException: Unnamed MetadataBundles have
             no default file path to read from.
-
         '''
         timer = common.Timer()
         timer.start()
@@ -1337,7 +1335,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             storedCorpusClient = self._corpus  # no weakrefs allowed
             self._corpus = None
 
-            # Protocol 5 is Python 3.8 and above.
+            # Protocol 5 available since Python 3.8.
             uncompressed = pickle.dumps(self, protocol=5)
 
             # # uncomment this and SafePickler when we next need to

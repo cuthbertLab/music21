@@ -94,7 +94,6 @@ class WindowedAnalysis:
 
         >>> wa1 = analysis.windowed.WindowedAnalysis(s, p)
         >>> wa2 = analysis.windowed.WindowedAnalysis(s.flatten(), p)
-
         '''
         # create a stream that contains just a 1/4 time signature; this is
         # the minimum window size (and partitioning will be done by measure)
@@ -151,7 +150,6 @@ class WindowedAnalysis:
         >>> a, b = wa.analyze(1, windowType='adjacentAverage')
         >>> len(a), len(b)
         (36, 36)
-
         '''
         maxWindowCount = len(self._windowedStream)
         # assuming that this is sorted
@@ -349,7 +347,7 @@ class MockObjectProcessor:
         '''
         Simply count the number of notes found
         '''
-        return len(subStream.flatten().notesAndRests), None
+        return len(subStream.recurse().notesAndRests), None
 
 
 class Test(unittest.TestCase):

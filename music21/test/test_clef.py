@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from xml.etree.ElementTree import fromstring as El
+from xml.etree.ElementTree import fromstring as EL
 import unittest
 
 from music21 import clef
@@ -38,7 +38,7 @@ class Test(unittest.TestCase):
 
         for params, className in src:
             sign, line, octaveChange = params
-            mxClef = El(r'<clef><sign>'
+            mxClef = EL(r'<clef><sign>'
                         + sign + '</sign><line>'
                         + str(line) + '</line>'
                         + '<clef-octave-change>'

@@ -9,7 +9,7 @@
 #               Ben Houge
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -48,8 +48,8 @@ def unbundleInstruments(streamIn: stream.Stream,
                         inPlace=False) -> stream.Stream|None:
     # noinspection PyShadowingNames
     '''
-    takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
-    and moves their `.storedInstrument` attributes to a new Stream (unless inPlace=True)
+    Takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
+    and moves their `.storedInstrument` attributes to a new Stream (unless inPlace=True).
 
     >>> up1 = note.Unpitched()
     >>> up1.storedInstrument = instrument.BassDrum()
@@ -65,7 +65,7 @@ def unbundleInstruments(streamIn: stream.Stream,
     {1.0} <music21.instrument.Cowbell 'Cowbell'>
     {1.0} <music21.note.Unpitched 'Cowbell'>
     '''
-    if inPlace is True:
+    if inPlace:
         s = streamIn
     else:
         s = streamIn.coreCopyAsDerivation('unbundleInstruments')
@@ -78,7 +78,7 @@ def unbundleInstruments(streamIn: stream.Stream,
                 off = thisObj.offset
                 s.insert(off, i)
 
-    if inPlace is False:
+    if not inPlace:
         return s
 
 
@@ -104,9 +104,8 @@ def bundleInstruments(streamIn: stream.Stream,
     Bass Drum
     Bass Drum
     Cowbell
-
     '''
-    if inPlace is True:
+    if inPlace:
         s = streamIn
     else:
         s = streamIn.coreCopyAsDerivation('bundleInstruments')
@@ -120,7 +119,7 @@ def bundleInstruments(streamIn: stream.Stream,
         elif isinstance(thisObj, note.NotRest):
             thisObj.storedInstrument = lastInstrument
 
-    if inPlace is False:
+    if not inPlace:
         return s
 
 
@@ -200,7 +199,7 @@ class Instrument(base.Music21Object):
             new.instrumentIdRandomize()
         return new
 
-    def bestName(self):
+    def bestName(self) -> str|None:
         '''
         Find a viable name, looking first at instrument, then part, then
         abbreviations.
@@ -218,7 +217,7 @@ class Instrument(base.Music21Object):
 
     def partIdRandomize(self):
         '''
-        Force a unique id by using an MD5
+        Force a unique id by using an MD5.
         '''
         idNew = f'P{common.getMd5()}'
         # environLocal.printDebug(['incrementing instrument from',
@@ -228,7 +227,7 @@ class Instrument(base.Music21Object):
 
     def instrumentIdRandomize(self):
         '''
-        Force a unique id by using an MD5
+        Force a unique id by using an MD5.
         '''
         idNew = f'I{common.getMd5()}'
         # environLocal.printDebug(['incrementing instrument from',
@@ -241,7 +240,7 @@ class Instrument(base.Music21Object):
         Assign an unused midi channel given a list of
         used channels.  Music21 uses 0-indexed MIDI channels.
 
-        assigns the number to self.midiChannel and returns
+        Assigns the number to self.midiChannel and returns
         it as an int.
 
         Note that the Percussion MIDI channel (9 in music21, 10 in 1-16 numbering) is special,
@@ -254,7 +253,7 @@ class Instrument(base.Music21Object):
         >>> i.midiChannel
         12
 
-        Note that used is unchanged after calling this and would need to be updated manually
+        Note that used is unchanged after calling this and would need to be updated manually.
 
         >>> used
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
@@ -283,7 +282,7 @@ class Instrument(base.Music21Object):
         Traceback (most recent call last):
         music21.exceptions21.InstrumentException: we are out of midi channels! help!
 
-        Get around this by assinging higher channels:
+        Get around this by assigning higher channels:
 
         >>> i.autoAssignMidiChannel(used2, maxMidi=32)
         16
@@ -315,7 +314,7 @@ class Instrument(base.Music21Object):
                     self.midiChannel = ch
                     return self.midiChannel
             return 0
-            # raise InstrumentException('we are out of midi channels and this ' +
+            # raise InstrumentException('we are out of midi channels and this '
             #            'was not already detected PROGRAM BUG!')
 
 
@@ -332,7 +331,6 @@ class KeyboardInstrument(Instrument):
 
 class Piano(KeyboardInstrument):
     '''
-
     >>> p = instrument.Piano()
     >>> p.instrumentName
     'Piano'
@@ -398,7 +396,6 @@ class Sampler(KeyboardInstrument):
 
 class ElectricPiano(Piano):
     '''
-
     >>> p = instrument.ElectricPiano()
     >>> p.instrumentName
     'Electric Piano'
@@ -500,7 +497,32 @@ class StringInstrument(Instrument):
 
         self.midiProgram = 48
 
-    def _getStringPitches(self):
+    @property
+    def stringPitches(self):
+        '''
+        stringPitches is a property that stores a list of Pitches (or pitch names,
+        such as "C4") that represent the pitch of the open strings from lowest to
+        highest.[*]
+
+        >>> vln1 = instrument.Violin()
+        >>> [str(p) for p in vln1.stringPitches]
+        ['G3', 'D4', 'A4', 'E5']
+
+        instrument.stringPitches are full pitch objects, not just names:
+
+        >>> [x.octave for x in vln1.stringPitches]
+        [3, 4, 4, 5]
+
+        Scordatura for Scelsi's violin concerto *Anahit*.
+        (N.B. that string to pitch conversion is happening automatically)
+
+        >>> vln1.stringPitches = ['G3', 'G4', 'B4', 'D4']
+
+        (`[*]In some tuning methods such as reentrant tuning on the ukulele,
+        lute, or five-string banjo the order might not strictly be from lowest to
+        highest.  The same would hold true for certain violin scordatura pieces, such
+        as some of Biber's *Mystery Sonatas*`)
+        '''
         if hasattr(self, '_cachedPitches') and self._cachedPitches is not None:
             return self._cachedPitches
         elif not hasattr(self, '_stringPitches'):
@@ -509,7 +531,8 @@ class StringInstrument(Instrument):
             self._cachedPitches = [pitch.Pitch(x) for x in self._stringPitches]
             return self._cachedPitches
 
-    def _setStringPitches(self, newPitches):
+    @stringPitches.setter
+    def stringPitches(self, newPitches):
         if newPitches and (hasattr(newPitches[0], 'step') or newPitches[0] is None):
             # newPitches is pitchObjects or something
             self._stringPitches = newPitches
@@ -517,31 +540,6 @@ class StringInstrument(Instrument):
         else:
             self._cachedPitches = None
             self._stringPitches = newPitches
-
-    stringPitches = property(_getStringPitches, _setStringPitches, doc='''
-            stringPitches is a property that stores a list of Pitches (or pitch names,
-            such as "C4") that represent the pitch of the open strings from lowest to
-            highest.[*]
-
-            >>> vln1 = instrument.Violin()
-            >>> [str(p) for p in vln1.stringPitches]
-            ['G3', 'D4', 'A4', 'E5']
-
-            instrument.stringPitches are full pitch objects, not just names:
-
-            >>> [x.octave for x in vln1.stringPitches]
-            [3, 4, 4, 5]
-
-            Scordatura for Scelsi's violin concerto *Anahit*.
-            (N.B. that string to pitch conversion is happening automatically)
-
-            >>> vln1.stringPitches = ['G3', 'G4', 'B4', 'D4']
-
-            (`[*]In some tuning methods such as reentrant tuning on the ukulele,
-            lute, or five-string banjo the order might not strictly be from lowest to
-            highest.  The same would hold true for certain violin scordatura pieces, such
-            as some of Biber's *Mystery Sonatas*`)
-            ''')
 
 
 class Violin(StringInstrument):
@@ -1125,10 +1123,40 @@ class UnpitchedPercussion(Percussion):
         self._percMapPitchToModifier = {}
         self.midiChannel = 9  # 0-indexed, i.e. MIDI channel 10
 
-    def _getModifier(self):
+    @property
+    def modifier(self):
+        '''
+        Returns or sets the modifier for this instrument.  A modifier could
+        be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
+
+        If the modifier is in the object's ._modifierToPercMapPitch dictionary
+        then changing the modifier also changes the .percMapPitch for the object
+
+        >>> bd = instrument.BongoDrums()
+        >>> bd.modifier
+        'high'
+
+        >>> bd.percMapPitch
+        60
+        >>> bd.modifier = 'low'
+        >>> bd.percMapPitch
+        61
+
+        Variations on modifiers can also be used and they get normalized:
+
+        >>> wb1 = instrument.Woodblock()
+        >>> wb1.percMapPitch
+        76
+        >>> wb1.modifier = 'LO'
+        >>> wb1.percMapPitch
+        77
+        >>> wb1.modifier  # n.b. -- not LO
+        'low'
+        '''
         return self._modifier
 
-    def _setModifier(self, modifier):
+    @modifier.setter
+    def modifier(self, modifier):
         modifier = modifier.lower().strip()
         # BEN: to-do, pull out hyphens, spaces, etc.
 
@@ -1140,36 +1168,6 @@ class UnpitchedPercussion(Percussion):
                 modifier = self._percMapPitchToModifier[self.percMapPitch]
 
         self._modifier = modifier
-
-    modifier = property(_getModifier, _setModifier, doc='''
-    Returns or sets the modifier for this instrument.  A modifier could
-    be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
-
-    If the modifier is in the object's ._modifierToPercMapPitch dictionary
-    then changing the modifier also changes the .percMapPitch for the object
-
-
-    >>> bd = instrument.BongoDrums()
-    >>> bd.modifier
-    'high'
-
-    >>> bd.percMapPitch
-    60
-    >>> bd.modifier = 'low'
-    >>> bd.percMapPitch
-    61
-
-    Variations on modifiers can also be used and they get normalized:
-
-    >>> wb1 = instrument.Woodblock()
-    >>> wb1.percMapPitch
-    76
-    >>> wb1.modifier = 'LO'
-    >>> wb1.percMapPitch
-    77
-    >>> wb1.modifier  # n.b. -- not LO
-    'low'
-    ''')
 
 
 class Vibraphone(PitchedPercussion):
@@ -1802,7 +1800,7 @@ ensembleNamesBySize = ['no performers', 'solo', 'duet', 'trio', 'quartet',
 
 def ensembleNameBySize(number):
     '''
-    return the name of a generic ensemble with "number" players:
+    Return the name of a generic ensemble with "number" players:
 
     >>> instrument.ensembleNameBySize(4)
     'quartet'
@@ -2302,7 +2300,7 @@ def partitionByInstrument(streamObj: stream.Stream) -> stream.Stream:
 
 def _combinations(instrumentString):
     '''
-    find all combinations of instrumentString.  Remove all punctuation.
+    Find all combinations of instrumentString.  Remove all punctuation.
     '''
     sampleList = instrumentString.split()
     allComb = []
@@ -2544,13 +2542,17 @@ def getAllNamesForInstrument(instrumentClass: Instrument,
     'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
 
     Note that the language string is not case-sensitive, so 'German' is also fine.
-
     '''
+
+    from music21.languageExcerpts import instrumentLookup
 
     language = language.lower()
     instrumentNameDict = {}
 
-    instrumentClassName = instrumentClass.instrumentName or ''
+    namedClasses = set(instrumentLookup.allToClassName.values())
+    instrumentClassName = next((cls.__name__ for cls in type(instrumentClass).__mro__
+                                if cls.__name__ in namedClasses),
+                               instrumentClass.instrumentName or '')
 
     if language == SearchLanguage.ALL:
         for lang in SearchLanguage:
@@ -2571,6 +2573,18 @@ class TestExternal(unittest.TestCase):
 
 
 class Test(unittest.TestCase):
+
+    def testGetAllNamesForInstrumentByClass(self):
+        acousticBass = getAllNamesForInstrument(AcousticBass(), SearchLanguage.ENGLISH)
+        self.assertEqual(acousticBass, {'english': ['acoustic bass']})
+
+        firstViolins = Violin()
+        firstViolins.instrumentName = 'Violin I'
+        self.assertEqual(getAllNamesForInstrument(firstViolins, SearchLanguage.ENGLISH),
+                         {'english': ['violin', 'violins']})
+
+        self.assertEqual(getAllNamesForInstrument(Instrument('Violin'), SearchLanguage.ENGLISH),
+                         {'english': ['violin', 'violins']})
 
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
@@ -2599,82 +2613,79 @@ class Test(unittest.TestCase):
         # s3.show()
 
     def testPartitionByInstrumentA(self):
-        from music21 import instrument
         from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
         p1 = stream.Part()
-        p1.append(instrument.Piano())
+        p1.append(Piano())
 
         p2 = stream.Part()
-        p2.append(instrument.Piccolo())
+        p2.append(Piccolo())
         s.insert(0, p1)
         s.insert(0, p2)
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass(instrument.Instrument)), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(Instrument)), 2)
 
         # post.show('t')
 
         # one Stream with multiple instruments
         s = stream.Stream()
-        s.insert(0, instrument.PanFlute())
-        s.insert(20, instrument.ReedOrgan())
+        s.insert(0, PanFlute())
+        s.insert(20, ReedOrgan())
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post[instrument.Instrument]), 2)
+        self.assertEqual(len(post[Instrument]), 2)
         # post.show('t')
 
     def testPartitionByInstrumentB(self):
-        from music21 import instrument
         from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
         p1 = stream.Part()
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note(), 6)
 
         p2 = stream.Part()
-        p2.append(instrument.Piccolo())
+        p2.append(Piccolo())
         p2.repeatAppend(note.Note(), 12)
         s.insert(0, p1)
         s.insert(0, p2)
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post[instrument.Instrument]), 2)
+        self.assertEqual(len(post[Instrument]), 2)
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(len(post.parts[1].notes), 12)
 
     def testPartitionByInstrumentC(self):
-        from music21 import instrument
         from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
         p1 = stream.Part()
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('a'), 6)
         # will go in next available offset
-        p1.append(instrument.AcousticGuitar())
+        p1.append(AcousticGuitar())
         p1.repeatAppend(note.Note('b'), 3)
 
         p2 = stream.Part()
-        p2.append(instrument.Piccolo())
+        p2.append(Piccolo())
         p2.repeatAppend(note.Note('c'), 2)
-        p2.append(instrument.Flute())
+        p2.append(Flute())
         p2.repeatAppend(note.Note('d'), 4)
 
         s.insert(0, p1)
         s.insert(0, p2)
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post[instrument.Instrument]), 4)
+        self.assertEqual(len(post[Instrument]), 4)
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(post.parts[1].getInstrument().instrumentName, 'Acoustic Guitar')
@@ -2688,34 +2699,33 @@ class Test(unittest.TestCase):
         # post.show('t')
 
     def testPartitionByInstrumentD(self):
-        from music21 import instrument
         from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
         p1 = stream.Part()
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('a'), 6)
         # will go in next available offset
-        p1.append(instrument.AcousticGuitar())
+        p1.append(AcousticGuitar())
         p1.repeatAppend(note.Note('b'), 3)
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('e'), 5)
 
         p2 = stream.Part()
-        p2.append(instrument.Piccolo())
+        p2.append(Piccolo())
         p2.repeatAppend(note.Note('c'), 2)
-        p2.append(instrument.Flute())
+        p2.append(Flute())
         p2.repeatAppend(note.Note('d'), 4)
-        p2.append(instrument.Piano())
+        p2.append(Piano())
         p2.repeatAppend(note.Note('f'), 1)
 
         s.insert(0, p1)
         s.insert(0, p2)
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post[instrument.Instrument]), 4)
+        self.assertEqual(len(post[Instrument]), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 12)
@@ -2727,32 +2737,31 @@ class Test(unittest.TestCase):
         # post.show('t')
 
     def testPartitionByInstrumentE(self):
-        from music21 import instrument
         from music21 import stream
 
         # basic case of instruments in Parts
         # s = stream.Score()
         p1 = stream.Part()
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('a'), 6)
         # will go in next available offset
-        p1.append(instrument.AcousticGuitar())
+        p1.append(AcousticGuitar())
         p1.repeatAppend(note.Note('b'), 3)
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('e'), 5)
 
-        p1.append(instrument.Piccolo())
+        p1.append(Piccolo())
         p1.repeatAppend(note.Note('c'), 2)
-        p1.append(instrument.Flute())
+        p1.append(Flute())
         p1.repeatAppend(note.Note('d'), 4)
-        p1.append(instrument.Piano())
+        p1.append(Piano())
         p1.repeatAppend(note.Note('f'), 1)
 
         s = p1
 
-        post = instrument.partitionByInstrument(s)
+        post = partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post[instrument.Instrument]), 4)
+        self.assertEqual(len(post[Instrument]), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
 
@@ -2766,16 +2775,15 @@ class Test(unittest.TestCase):
                          [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
 
     def testPartitionByInstrumentF(self):
-        from music21 import instrument
         from music21 import stream
 
         s1 = stream.Stream()
-        s1.append(instrument.AcousticGuitar())
+        s1.append(AcousticGuitar())
         s1.append(note.Note())
-        s1.append(instrument.Tuba())
+        s1.append(Tuba())
         s1.append(note.Note())
 
-        post = instrument.partitionByInstrument(s1)
+        post = partitionByInstrument(s1)
         self.assertEqual(len(post), 2)  # 4 instruments
 
     # def testPartitionByInstrumentDocTest(self):
@@ -2802,14 +2810,12 @@ class Test(unittest.TestCase):
     #         p.makeRests(fillGaps=True, inPlace=True)
 
     def testLanguageChoice(self):
-        from music21 import instrument
-
         # fromString
 
         testString = 'Klarinette'  # German name
 
         # Works when language not specified
-        self.assertEqual(instrument.fromString(testString).instrumentName,
+        self.assertEqual(fromString(testString).instrumentName,
                          testString)
 
         workingExamples = ['german',  # Works with correct language for the term
@@ -2817,7 +2823,7 @@ class Test(unittest.TestCase):
                            ]
 
         for langStr in workingExamples:
-            instrName = instrument.fromString(testString, language=langStr).instrumentName
+            instrName = fromString(testString, language=langStr).instrumentName
             self.assertEqual(instrName, testString)
 
         failingExamples = ['french',  # Error when the language doesn't match the term
@@ -2826,20 +2832,20 @@ class Test(unittest.TestCase):
 
         for langStr in failingExamples:
             self.assertRaises(InstrumentException,
-                              instrument.fromString,
+                              fromString,
                               testString,
                               language=langStr)
 
         # getAllNamesForInstrument
 
-        inst = instrument.Flute()
+        inst = Flute()
         # Working example
-        self.assertEqual(instrument.getAllNamesForInstrument(inst,
-                                                             language=SearchLanguage.ABBREVIATION),
+        self.assertEqual(getAllNamesForInstrument(inst,
+                                                  language=SearchLanguage.ABBREVIATION),
                          {'abbreviation': ['fl']})
         # Error for unsupported language
         self.assertRaises(InstrumentException,
-                          instrument.getAllNamesForInstrument,
+                          getAllNamesForInstrument,
                           inst,
                           language='finnish')
 

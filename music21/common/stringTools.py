@@ -28,6 +28,8 @@ __all__ = [
     'ParenthesesMatch',
 ]
 
+from collections.abc import Iterable
+import typing as t
 import dataclasses
 import hashlib
 import random
@@ -162,7 +164,11 @@ def camelCaseToHyphen(usrStr: str, replacement: str = '-') -> str:
     return re.sub('([a-z0-9])([A-Z])', r'\1' + replacement + r'\2', s1).lower()
 
 
-def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
+def spaceCamelCase(
+    usrStr: str,
+    replaceUnderscore: bool = True,
+    fixMeList: Iterable[str]|None = None
+) -> str:
     '''
     Given a camel-cased string, or a mixture of numbers and characters,
     create a space separated string.
@@ -200,6 +206,7 @@ def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
     post: list[str] = []
 
     # do not split these
+    fixupList: Iterable[str]
     if fixMeList is None:
         fixupList = ('PMFC',)
     else:
@@ -243,7 +250,7 @@ def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
     return postStr
 
 
-def getMd5(value=None) -> str:
+def getMd5(value: str|bytes|None = None) -> str:
     # noinspection SpellCheckingInspection
     '''
     Return an md5 hash from a string.  If no value is given then
@@ -254,18 +261,16 @@ def getMd5(value=None) -> str:
     '''
     if value is None:
         value = str(time.time()) + str(random.random())
+    if isinstance(value, str):
+        value = value.encode('UTF-8')
     m = hashlib.md5()
-    try:
-        m.update(value)
-    except TypeError:  # unicode
-        m.update(value.encode('UTF-8'))
-
+    m.update(value)
     return m.hexdigest()
 
 
-def formatStr(msg,
-              *rest_of_message,
-              **keywords) -> str:
+def formatStr(msg: object,
+              *rest_of_message: object,
+              **keywords: object) -> str:
     '''
     DEPRECATED: do not use.  May be removed at any time.
 
@@ -277,20 +282,20 @@ def formatStr(msg,
     test 1 2 3
     <BLANKLINE>
     '''
-    msg = [msg, *rest_of_message]
-    for i in range(len(msg)):
-        x = msg[i]
+    msgList: list[t.Any] = [msg, *rest_of_message]
+    for i in range(len(msgList)):
+        x = msgList[i]
         if isinstance(x, bytes):
-            msg[i] = x.decode('utf-8')
+            msgList[i] = x.decode('utf-8')
         if not isinstance(x, str):
             try:
-                msg[i] = repr(x)
+                msgList[i] = repr(x)
             except TypeError:
                 try:
-                    msg[i] = x.decode('utf-8')
+                    msgList[i] = x.decode('utf-8')
                 except AttributeError:
-                    msg[i] = ''
-    return ' '.join(msg) + '\n'
+                    msgList[i] = ''
+    return ' '.join(msgList) + '\n'
 
 
 def stripAccents(inputString: str) -> str:

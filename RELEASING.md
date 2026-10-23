@@ -9,7 +9,6 @@ Run `uv sync`. This installs all the devtools the steps below need.
 Install separately:
 
 - `pandoc` — brew install pandoc
-- `markdown` — `uv pip install markdown` (or `pip install markdown`).
 
 ## Steps
 
@@ -29,6 +28,8 @@ Install separately:
       announcement while it runs.
     - You cannot run steps 2 and 3 in parallel, since metadata changes often
       cause documentation changes.
+    - developerReference/musicxmlTest - 41b and 41c are currently failing and acceptable.
+    - usersGuide_22_graphing 3dbars sometimes returns 1, sometimes 2 Axes.  It should just do one...
 
 4. `uv run music21/test/warningMultiprocessTest.py` for the lowest and highest
    supported Python versions — fix all warnings.
@@ -38,8 +39,8 @@ Install separately:
       set is empty. (It prints a bunch of module names, but only the final
       `set()` being empty matters.)
     - Then the same for `treeYield.find_all_non_default_instantiation_m21objects()`.
-      If that one isn't empty it is not a bug, but it's nice to keep it so that
-      `Music21Object`s don't need args.
+      If that one isn't empty it is not a bug, and v11 will make some M21 objects require
+      arguments (such as VoiceLeadingQuartet)
 
 6. Commit and wait for results on GitHub Actions.
    (Normally not necessary — it's slower and mostly duplicates
@@ -51,25 +52,25 @@ Install separately:
 8. `uv run documentation/make.py linkcheck`.
    Some persistent errors that actually work are listed in `conf.py` under
    `linkcheck_ignore`.
+   Note that since AI-Agent world, more and more links are being blocked from bot checking.
 
 9. `uv run documentation/make.py` -- build the documentation HTML files and supports.
 
 10. `uv run documentation/upload.py` — zips `documentation/build/html` and
     uploads it to `music21.org/music21docs/`. Requires MSAC's private key.
+    Or MSAC has a program combine_sync/deploy.py that will do this automatically
+    when he updates the site.
 
 11. Zip up `documentation/build/html` and get ready to upload/delete it (your
     desktop or wherever is fine). Rename to `music21-X.Y.Z-docs.zip`
     (skip for Alpha/Beta).
 
-12. From the music21 main folder (not a subfolder) run `uv run hatch build`.
+12. From the music21 main folder (not a subfolder) run `uvx hatch build`.
     This builds `dist/music21-X.Y.Z.tar.gz` and
     `dist/music21-X.Y.Z-py3-none-any.whl`.
 
 13. Run `uv run scripts/buildNoCorpus.py`: it builds the no-corpus version of
-    music21 (needs Python 3.12 or higher).
-    **Do not run this on a PC**, or the Mac `.tar.gz` might end up with incorrect
-    permissions. (TODO: To lift this restriction, rewrite removeCorpus() to run tar-to-tar with
-    `tarfile`, copying each TarInfo so Unix modes survive)
+    music21.
 
 14. PR and commit to GitHub at this point w/ a commit comment of the new
     version, then don't change anything until the next step is done. Merge to
@@ -86,11 +87,11 @@ Install separately:
 
 18. Create a new release on GitHub (using the tag just created) and upload the
     non-wheel files created here and the docs.
-    Drag in this order: `.tar.gz` (wait to finish), `-docs.zip` (wait), `.whl` (wait), and
+    Drag in this order: `.tar.gz` (wait to finish), `-docs.zip` (wait), and
     `no-corpus.tar.gz`. Finish this before doing the next step, even though it
     looks like it could be done in parallel.
 
-19. Upload the tar.gz file to PyPI: `uv run twine upload music21-X.Y.Z.tar.gz`.
+19. Upload the tar.gz file to PyPI: `uvx twine upload music21-X.Y.Z.tar.gz`.
 
 20. Do the same for the `.whl` file (but not for the no-corpus file).
 

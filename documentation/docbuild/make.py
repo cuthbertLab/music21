@@ -94,7 +94,7 @@ class DocBuilder:
             import sphinx
         except ImportError:
             message = 'Sphinx is required to build documentation; '
-            message += 'run pip install Sphinx'
+            message += 'run uv sync'
             raise ImportError(message)
 
         target = self.command

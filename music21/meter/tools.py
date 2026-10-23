@@ -29,9 +29,9 @@ class MeterTerminalTuple(t.NamedTuple):
     division: MeterDivision
 
 
-NumDenom = tuple[int, int]
-NumDenomTuple = tuple[NumDenom, ...]
-MeterOptions = tuple[tuple[str, ...], ...]
+type NumDenom = tuple[int, int]
+type NumDenomTuple = tuple[NumDenom, ...]
+type MeterOptions = tuple[tuple[str, ...], ...]
 
 validDenominators = (1, 2, 4, 8, 16, 32, 64, 128)  # in order
 validDenominatorsSet = frozenset(validDenominators)

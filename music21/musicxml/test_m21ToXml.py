@@ -229,6 +229,21 @@ class Test(unittest.TestCase):
         xmlOut = self.getXml(m)
         self.assertIn('<voice>hello</voice>', xmlOut)
 
+    def testUnpitchedGraceInVoice(self):
+        '''
+        <unpitched> must precede <voice> even on a grace note, which has
+        no <duration> element to insert before.
+        '''
+        # https://github.com/cuthbertLab/music21/issues/1732
+        grace = note.Unpitched(duration=duration.GraceDuration())
+        v1 = stream.Voice([grace])
+        v2 = stream.Voice([note.Note()])
+        m = stream.Measure([v1, v2])
+
+        tree = self.getET(m)
+        mxNote = tree.find('part/measure/note')
+        self.assertEqual([el.tag for el in mxNote], ['grace', 'unpitched', 'voice', 'type'])
+
     def testVoiceNumberOffsetsThreeStaffsInGroup(self):
         n1_1 = note.Note()
         v1_1 = stream.Voice([n1_1])

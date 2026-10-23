@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import platform
-import sys
 from typing import Any
 from unittest import TestCase
 
@@ -13,7 +12,7 @@ except ImportError:
         pass
 
 import music21
-from music21.test.testRunner import fix312OrderedDict, stripAddresses
+from music21.test.testRunner import stripAddresses
 
 @pytest.fixture(scope='session')
 def doctest_namespace() -> dict[str, Any]:
@@ -35,7 +34,6 @@ def pytest_collection_modifyitems(config, items) -> None:
     for doctest.DocTestSuite.
     '''
     windows: bool = platform.system() == 'Windows'
-    is_python312: bool = sys.version_info >= (3, 12)
 
     kept = []
     for item in items:
@@ -64,9 +62,6 @@ def pytest_collection_modifyitems(config, items) -> None:
 
         for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
-
-            if is_python312:
-                example.want = fix312OrderedDict(example.want, '...')
 
             if windows:
                 example.want = example.want.replace('PosixPath', 'WindowsPath')

@@ -398,8 +398,9 @@ class Date(prebase.ProtoM21Object):
 
         >>> a.datetime
         Traceback (most recent call last):
-        TypeError: function missing required argument 'day' (pos 3)
+        TypeError: ... missing required argument 'day' (pos 3)
         '''
+        # When 3.15 is the minimum change ... to datetime()
         post = []
         # order here is order for datetime
         # TODO: need defaults for incomplete times.
@@ -453,7 +454,6 @@ class Date(prebase.ProtoM21Object):
         ...     )
         >>> b.hasError
         False
-
         '''
         for attr in self.attrNames:
             if getattr(self, attr + 'Error') is not None:
@@ -498,9 +498,9 @@ class DatePrimitive(prebase.ProtoM21Object):
         False
         '''
         return (type(self) is type(other)
-                    and self._data == other._data
-                    and self._dataUncertainty == other._dataUncertainty
-                    and self.relevance == other.relevance)
+                and self._data == other._data
+                and self._dataUncertainty == other._dataUncertainty
+                and self.relevance == other.relevance)
 
     def _reprInternal(self) -> str:
         return str(self)
@@ -1607,8 +1607,8 @@ _DOC_ORDER = (
     Copyright,
 )
 
-DateParseType = Date|datetime.datetime|str
-ValueType = DatePrimitive|Text|Contributor|Copyright|int
+type DateParseType = Date|datetime.datetime|str
+type ValueType = DatePrimitive|Text|Contributor|Copyright|int
 
 
 if __name__ == '__main__':

@@ -5,24 +5,28 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
 import copy
+from fractions import Fraction
 import unittest
+from unittest import mock
 
 from music21 import common
 from music21 import converter
 from music21 import corpus
+from music21 import editorial
+from music21 import interval
 from music21 import key
 from music21 import note
 from music21 import pitch
 from music21 import scale
 from music21 import stream
 from music21.musicxml import m21ToXml
-from music21.pitch import Pitch, Accidental
+from music21.pitch import Pitch, Accidental, AccidentalException, PitchException
 
 
 class Test(unittest.TestCase):
@@ -41,6 +45,69 @@ class Test(unittest.TestCase):
         b = Pitch('B#3')
         self.assertEqual(b.octave, 3)
 
+    def testOctaveIsImplicit(self):
+        anyFSharp = Pitch('F#')
+        self.assertTrue(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.octave, 4)
+        self.assertEqual(anyFSharp.implicitOctave, 4)
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#')
+        self.assertEqual(anyFSharp.ps, 66.0)
+
+        anyFSharp.octave = 5
+        self.assertFalse(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.octave, 5)
+        self.assertEqual(anyFSharp.implicitOctave, 5)
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#5')
+
+        anyFSharp.octaveIsImplicit = True
+        self.assertEqual(anyFSharp.octave, 4)
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#')
+        self.assertEqual(anyFSharp.ps, 66.0)
+
+        # False gives the default octave explicitly
+        anyFSharp.octaveIsImplicit = False
+        self.assertEqual(anyFSharp.nameWithOctave, 'F#4')
+
+        # octave = None still forgets the octave
+        anyFSharp.octave = None
+        self.assertTrue(anyFSharp.octaveIsImplicit)
+        self.assertEqual(anyFSharp.octave, 4)
+
+        # Notes proxy the int
+        self.assertEqual(note.Note('B-').octave, 4)
+        self.assertEqual(note.Note('B-3').octave, 3)
+
+        # creation paths
+        self.assertTrue(Pitch().octaveIsImplicit)
+        self.assertTrue(Pitch(3).octaveIsImplicit)  # pitch class
+        self.assertFalse(Pitch(65).octaveIsImplicit)  # midi
+        self.assertFalse(Pitch('C4').octaveIsImplicit)
+        self.assertFalse(Pitch('C', octave=4).octaveIsImplicit)
+        self.assertTrue(Pitch(step='D', accidental='#').octaveIsImplicit)
+        self.assertTrue(note.Note('B-').pitch.octaveIsImplicit)
+        self.assertFalse(note.Note().pitch.octaveIsImplicit)
+
+        # implicitness survives copying and transposition
+        anyD = Pitch('D')
+        self.assertTrue(copy.deepcopy(anyD).octaveIsImplicit)
+        self.assertTrue(anyD.transpose('M2').octaveIsImplicit)
+        self.assertTrue(anyD.transpose(3).octaveIsImplicit)
+        self.assertTrue(anyD.getEnharmonic().octaveIsImplicit)
+        self.assertFalse(Pitch('D4').transpose('M2').octaveIsImplicit)
+
+        # an implicit octave is not the same as an explicit default octave
+        self.assertNotEqual(Pitch('C'), Pitch('C4'))
+        self.assertEqual(Pitch('C'), Pitch('C'))
+        self.assertNotEqual(hash(Pitch('C')), hash(Pitch('C4')))
+
+        # the setter informs a Note client only when something changed
+        n = note.Note('C4')
+        with mock.patch.object(n, 'pitchChanged') as pitchChanged:
+            n.pitch.octaveIsImplicit = False
+            pitchChanged.assert_not_called()
+            n.pitch.octaveIsImplicit = True
+        pitchChanged.assert_called_once()
+
     def testNameSetting(self):
         with self.assertRaisesRegex(ValueError,
                                     r"Cannot have octave given before pitch name in '8D-4'\."):
@@ -54,6 +121,99 @@ class Test(unittest.TestCase):
             "Argument to name, 32, must be a string, not <class 'int'>."
         ):
             p.name = 32
+
+    def testNameCache(self):
+        '''
+        A name is parsed once and remembered; names that cannot be parsed are not.
+        '''
+        with mock.patch.dict(pitch._pitchNameCache, clear=True):
+            first = Pitch('E-6')
+            self.assertEqual(pitch._pitchNameCache, {'E-6': ('E', '-', 6)})
+            second = Pitch('E-6')
+            self.assertEqual(second.nameWithOctave, 'E-6')
+            # Accidentals can be changed, so each Pitch gets its own
+            self.assertIsNot(second.accidental, first.accidental)
+
+            # a name that cannot be parsed changes nothing
+            with self.assertRaises(AccidentalException):
+                second.name = 'D$'
+            self.assertEqual(second.nameWithOctave, 'E-6')
+            with self.assertRaisesRegex(ValueError, 'must be a string'):
+                second.name = ['C4']  # not hashable
+            with self.assertRaisesRegex(ValueError, 'at most 100 characters'):
+                second.name = 'C4'.center(101)  # padding counts
+            self.assertEqual(list(pitch._pitchNameCache), ['E-6'])
+            self.assertEqual(Pitch('C4'.center(100)).nameWithOctave, 'C4')
+
+            # cleared when full
+            with mock.patch.object(pitch, '_pitchNameCacheSize', 1):
+                Pitch('F4')
+            self.assertEqual(list(pitch._pitchNameCache), ['F4'])
+
+    def testNameSetterInformsNoteOnce(self):
+        '''
+        Setting a name without an octave, even one not seen before, keeps the
+        octave and the microtone, makes the spelling explicit, and tells the Note once.
+        '''
+        n = note.Note(73)  # C#5, spelling inferred
+        n.pitch.microtone = 20
+        with (mock.patch.dict(pitch._pitchNameCache, clear=True),
+              mock.patch.object(n, 'pitchChanged') as pitchChanged):
+            n.pitch.name = 'B-'
+        pitchChanged.assert_called_once()
+        self.assertEqual(str(n.pitch), 'B-5(+20c)')
+        self.assertFalse(n.pitch.spellingIsInferred)
+
+    def testInitShortcutsMatchParsing(self):
+        # 'C', 'C4', and step= skip the name and step setters
+        self.assertEqual(Pitch('C'), Pitch('c'))
+        self.assertTrue(Pitch('C').octaveIsImplicit)
+        self.assertEqual(Pitch('C4'), Pitch('c4'))
+        self.assertFalse(Pitch('C4').octaveIsImplicit)
+        self.assertEqual(Pitch('C', step='D').step, 'C')
+        self.assertEqual(Pitch(step='D'), Pitch('d'))
+        self.assertEqual(Pitch(step='d').step, 'D')
+        with self.assertRaises(PitchException):
+            Pitch(step='CD')
+
+    def testPsAndMidiSettersInformNoteOnce(self):
+        for attribute in ('ps', 'midi'):
+            with self.subTest(attribute=attribute):
+                n = note.Note('D4')
+                with mock.patch.object(n, 'pitchChanged') as pitchChanged:
+                    setattr(n.pitch, attribute, 61)
+                pitchChanged.assert_called_once()
+
+    def testWholeNumberPsAndMidi(self):
+        '''
+        Setting a whole-number .ps or .midi replaces a quarter-tone accidental
+        and clears a microtone.
+        '''
+        p = Pitch('D~5')
+        p.microtone = 20
+        p.ps = 61
+        self.assertEqual(p.nameWithOctave, 'C#4')
+        self.assertEqual(p.microtone.cents, 0)
+
+        # a natural is None, and a negative ps floors to the octave below
+        p.ps = 60.0
+        self.assertEqual(p.nameWithOctave, 'C4')
+        self.assertIsNone(p.accidental)
+        p.ps = -1
+        self.assertEqual((p.step, p.octave), ('B', -2))
+
+        # above 127, the midi setter wraps into the top octave; ps does not
+        p = Pitch()
+        p.midi = 130
+        self.assertEqual(p.nameWithOctave, 'B-8')
+        p.ps = 130
+        self.assertEqual(p.nameWithOctave, 'B-9')
+
+        # Pitch(number) keeps the natural
+        for value in (60, 60.0):
+            p = Pitch(value)
+            self.assertEqual(p.nameWithOctave, 'C4')
+            self.assertEqual(p.accidental.name, 'natural')
 
 
 
@@ -73,6 +233,140 @@ class Test(unittest.TestCase):
         pAltered = altoM6.pitches[2]
         self.assertEqual(pAltered.accidental.name, 'sharp')
         self.assertTrue(pAltered.accidental.displayStatus)
+
+    def testAccidentalDeepcopyDoesNotShareStyleOrEditorial(self):
+        '''
+        A deepcopy of an Accidental gets its own Style and Editorial.
+        '''
+        a = Accidental('sharp')
+        a.style.color = 'red'
+        a.editorial.comments.append(editorial.Comment('cautionary'))
+        b = copy.deepcopy(a)
+        self.assertEqual(b.style.color, 'red')
+        self.assertEqual(len(b.editorial.comments), 1)
+        b.style.color = 'blue'
+        b.editorial.comments.append(editorial.Comment('ficta'))
+        self.assertEqual(a.style.color, 'red')
+        self.assertEqual(len(a.editorial.comments), 1)
+
+    def testAccidentalLookupTable(self):
+        '''
+        Every way of writing each standard accidental gives the same accidental
+        from Accidental(), set(), and set(allowNonStandardValue=True),
+        and set() tells the client once.  AI-assisted (Claude).
+        '''
+        import numpy
+        valuesByResult = {
+            ('natural', 0.0, ''): ['natural', 'n', 0, 0.0, False, 'Natural', 'N'],
+            ('sharp', 1.0, '#'): ['sharp', '#', 'is', 1, 1.0, True, 'Sharp', 'IS'],
+            ('double-sharp', 2.0, '##'): [
+                'double-sharp', '##', 'isis', 2, 2.0, 'Double-Sharp', numpy.int64(2)],
+            ('triple-sharp', 3.0, '###'): ['triple-sharp', '###', 'isisis', 3, 3.0],
+            ('quadruple-sharp', 4.0, '####'): ['quadruple-sharp', '####', 'isisisis', 4, 4.0],
+            ('flat', -1.0, '-'): [
+                'flat', '-', 'es', 'b', -1, -1.0, 'FLAT', 'B', numpy.float64(-1.0)],
+            ('double-flat', -2.0, '--'): ['double-flat', '--', 'eses', -2, -2.0, 'ESES'],
+            ('triple-flat', -3.0, '---'): ['triple-flat', '---', 'eseses', -3, -3.0],
+            ('quadruple-flat', -4.0, '----'): ['quadruple-flat', '----', 'eseseses', -4, -4.0],
+            ('half-sharp', 0.5, '~'): [
+                'half-sharp', '~', 'quarter-sharp', 'ih', 'semisharp', 0.5, Fraction(1, 2)],
+            ('one-and-a-half-sharp', 1.5, '#~'): [
+                'one-and-a-half-sharp', '#~', 'three-quarter-sharp', 'three-quarters-sharp',
+                'isih', 'sesquisharp', 1.5],
+            ('half-flat', -0.5, '`'): [
+                'half-flat', '`', 'quarter-flat', 'eh', 'semiflat', -0.5],
+            ('one-and-a-half-flat', -1.5, '-`'): [
+                'one-and-a-half-flat', '-`', 'three-quarter-flat', 'three-quarters-flat',
+                'eseh', 'sesquiflat', -1.5, Fraction(-3, 2)],
+        }
+        listed = set()
+        for values in valuesByResult.values():
+            listed.update(values)
+        # every name, every alternate name, and every modifier except natural's ''
+        self.assertLessEqual(set(pitch.accidentalNameToModifier), listed)
+        self.assertLessEqual(set(pitch.alternateNameToAccidentalName), listed)
+        self.assertLessEqual(set(pitch.accidentalNameToModifier.values()) - {''}, listed)
+
+        for (name, alter, modifier), values in valuesByResult.items():
+            for value in values:
+                for allowNonStandardValue in (None, False, True):
+                    with self.subTest(value=value, allowNonStandardValue=allowNonStandardValue):
+                        if allowNonStandardValue is None:
+                            acc = Accidental(value)
+                        else:
+                            acc = Accidental('sharp')
+                            acc.setAttributeIndependently('name', 'unset')
+                            acc.setAttributeIndependently('alter', 99)
+                            acc.setAttributeIndependently('modifier', '?')
+                            acc._client = mock.Mock()
+                            acc.set(value, allowNonStandardValue=allowNonStandardValue)
+                            self.assertEqual(acc._client.informClient.call_count, 1)
+                        self.assertEqual(acc.name, name)
+                        self.assertIs(type(acc.alter), float)
+                        self.assertEqual(acc.alter, alter)
+                        self.assertEqual(acc.modifier, modifier)
+
+    def testUnsupportedAccidentalValues(self):
+        '''
+        Anything else raises, naming the value (lowercased).
+        '''
+        # '' is natural's modifier, but set() does not take it
+        for value, shown in [
+            ('flat-flat-up', 'flat-flat-up'),
+            ('FLAT-FLAT-UP', 'flat-flat-up'),
+            ('Dièse', 'dièse'),
+            ('', ''),
+            (5, '5'),
+            (0.25, '0.25'),
+            (None, 'None'),
+            (['flat'], "['flat']"),
+        ]:
+            with self.subTest(value=value):
+                message = f'{shown} is not a supported accidental type'
+                with self.assertRaises(AccidentalException) as cm:
+                    Accidental(value)
+                self.assertEqual(str(cm.exception), message)
+
+                acc = Accidental('sharp')
+                acc._client = mock.Mock()
+                with self.assertRaises(AccidentalException) as cm:
+                    acc.set(value)
+                self.assertEqual(str(cm.exception), message)
+                self.assertEqual((acc.name, acc.alter, acc.modifier), ('sharp', 1.0, '#'))
+                self.assertEqual(acc._client.informClient.call_count, 0)
+
+    def testAccidentalSetNonStandardValue(self):
+        '''
+        A nonstandard string changes only the name (lowercased); a nonstandard
+        number changes only the alter.  Neither tells the client.
+        '''
+        for value, name, alter in [
+            ('quintuple-sharp', 'quintuple-sharp', 1.0),
+            ('FLAT-FLAT-UP', 'flat-flat-up', 1.0),
+            ('', '', 1.0),
+            (5, 'sharp', 5),
+            (0.25, 'sharp', 0.25),
+        ]:
+            with self.subTest(value=value):
+                acc = Accidental('sharp')
+                acc._client = mock.Mock()
+                acc.set(value, allowNonStandardValue=True)
+                self.assertEqual(acc.name, name)
+                self.assertEqual(acc.alter, alter)
+                self.assertEqual(acc.modifier, '#')
+                self.assertEqual(acc._client.informClient.call_count, 0)
+
+    def testAccidentalInitDefaults(self):
+        for acc in (Accidental(), Accidental('Flat')):
+            self.assertEqual(acc.displayType, 'normal')
+            self.assertIsNone(acc.displayStatus)
+            self.assertEqual(acc.displayStyle, 'normal')
+            self.assertEqual(acc.displaySize, 'full')
+            self.assertEqual(acc.displayLocation, 'normal')
+            self.assertIsNone(acc._client)
+            self.assertFalse(acc.hasStyleInformation)
+            self.assertIsNone(acc._editorial)
+        self.assertEqual(repr(Accidental()), '<music21.pitch.Accidental natural>')
 
     def testUpdateAccidentalDisplaySimple(self):
         '''
@@ -266,7 +560,7 @@ class Test(unittest.TestCase):
         pList = [Pitch('f#3'), Pitch('f3'), Pitch('f#3'),
                  Pitch('g3'), Pitch('f#4'), Pitch('f#4')]
         result = [('sharp', False), ('natural', True), ('sharp', True),
-                   (None, None), ('sharp', True), ('sharp', False)]
+                  (None, None), ('sharp', True), ('sharp', False)]
         # no 4 is a dicey affair; could go either way
         ks = key.KeySignature(1)
         proc(pList, [], ks.alteredPitches)
@@ -396,6 +690,55 @@ class Test(unittest.TestCase):
         n.pitch.updateAccidentalDisplay(overrideStatus=True, alteredPitches=k.alteredPitches)
         self.assertIs(n.pitch.accidental.displayStatus, False)
 
+    def testDisplayTypeAlwaysWithNothingInPast(self):
+        '''
+        `displayType='always'` and `cautionaryAll` win over the key signature
+        even for the first pitch of a part, where nothing precedes it.
+
+        AI-assisted (Claude).
+        '''
+        p = Pitch('An2')
+        p.accidental.displayType = 'always'
+        p.updateAccidentalDisplay()
+        self.assertIs(p.accidental.displayStatus, True)
+
+        # a sharp already implied by the key signature still shows
+        p = Pitch('F#4')
+        p.accidental.displayType = 'always'
+        p.updateAccidentalDisplay(alteredPitches=key.Key('G').alteredPitches)
+        self.assertIs(p.accidental.displayStatus, True)
+
+        # cautionaryAll creates the natural that was not there
+        p = Pitch('B4')
+        p.updateAccidentalDisplay(cautionaryAll=True)
+        self.assertEqual(p.accidental.name, 'natural')
+        self.assertIs(p.accidental.displayStatus, True)
+
+        # 'even-tied' behaves the same as 'always' here
+        p = Pitch('E-3')
+        p.accidental.displayType = 'even-tied'
+        p.updateAccidentalDisplay(alteredPitches=key.Key('E-').alteredPitches)
+        self.assertIs(p.accidental.displayStatus, True)
+
+        # in a stream, every note of the part shows, not just the ones after the first
+        s = converter.parse('tinyNotation: AAn2 Fn')
+        for n in s.recurse().notes:
+            n.pitch.accidental.displayType = 'always'
+        s.makeAccidentals(inPlace=True)
+        self.assertEqual([n.pitch.accidental.displayStatus for n in s.recurse().notes],
+                         [True, True])
+
+        # regression guard: a normal displayType is untouched by the above
+        p = Pitch('F#4')
+        p.updateAccidentalDisplay(alteredPitches=key.Key('G').alteredPitches)
+        self.assertIs(p.accidental.displayStatus, False)
+
+        # regression guard: with a non-empty past, repeated pitches are unchanged
+        past = [Pitch('c#4')]
+        p = Pitch('c#4')
+        p.updateAccidentalDisplay(pitchPast=past)
+        self.assertIs(p.accidental.displayStatus, False)
+
     def testImplicitToExplicitNatural(self):
         p = converter.parse('tinyNotation: 2/4 f4 fn4')
         last_note = p.recurse().notes.last()
@@ -405,6 +748,18 @@ class Test(unittest.TestCase):
         last_note.pitch.accidental.displayStatus = None
         p['Measure'].first().insert(0, key.Key('C-'))
         p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+    def testExplicitNaturalDisplayStatusNone(self):
+        p = converter.parse('tinyNotation: d1 d1')
+        first_note = p.recurse().notes.first()
+        last_note = p.recurse().notes.last()
+        first_note.pitch.accidental = pitch.Accidental('natural')
+        last_note.pitch.accidental = pitch.Accidental('natural')
+        self.assertIsNone(first_note.pitch.accidental.displayStatus)
+        self.assertIsNone(last_note.pitch.accidental.displayStatus)
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(first_note.pitch.accidental.displayStatus, False)
         self.assertIs(last_note.pitch.accidental.displayStatus, False)
 
     def testIfAbsolutelyNecessary(self):
@@ -488,6 +843,12 @@ class Test(unittest.TestCase):
         lowC = dPitch.transpose('M-23')
         self.assertEqual(lowC.name, 'C')
         self.assertEqual(lowC.octave, -1)
+
+    def testTransposeInPlaceReplacesMicrotone(self):
+        p = Pitch('C4')
+        p.microtone = 50
+        p.transpose(interval.ChromaticInterval(0.5), inPlace=True)
+        self.assertEqual(str(p), 'C#4')
 
     def testQuarterToneA(self):
         p1 = Pitch('D#~')

@@ -244,7 +244,7 @@ class ArchiveManager:
                 # this was f.open(subFp, 'rU') for universal newline support
                 # but that was removed in Python 3.6 and while it is supposed
                 # to be fixed with io.TextIOWrapper, there are no docs that
-                # show how to do so.  -- hopefully fixed
+                # show how to do so.  -- hopefully fixed -- no problems for years, maybe okay.
                 try:
                     with f.open(subFp, 'r') as zipOpen:
                         lines = list(io.TextIOWrapper(zipOpen, newline=None))
@@ -565,12 +565,11 @@ class Converter:
         if useFormat is None:
             useFormat = self.getFormatFromFileExtension(fpPathlib)
         self.setSubConverterFromFormat(useFormat)
-        if t.TYPE_CHECKING:
-            assert isinstance(self.subConverter, subConverters.SubConverter)
+        subConverter = t.cast(subConverters.SubConverter, self.subConverter)
 
-        self.subConverter.keywords = keywords
+        subConverter.keywords = keywords
         try:
-            self.subConverter.parseFile(
+            subConverter.parseFile(
                 fp,
                 number=number,
                 **keywords
@@ -578,14 +577,13 @@ class Converter:
         except NotImplementedError:
             raise ConverterFileException(f'File is not in a correct format: {fp}')
 
-        if t.TYPE_CHECKING:
-            assert isinstance(self.stream, stream.Stream)
+        parsedStream = t.cast(stream.Stream, self.stream)
 
-        if not self.stream.metadata:
-            self.stream.metadata = metadata.Metadata()
-        self.stream.metadata.filePath = str(fpPathlib)
-        self.stream.metadata.fileNumber = number
-        self.stream.metadata.fileFormat = useFormat
+        if not parsedStream.metadata:
+            parsedStream.metadata = metadata.Metadata()
+        parsedStream.metadata.filePath = str(fpPathlib)
+        parsedStream.metadata.fileNumber = number
+        parsedStream.metadata.fileFormat = useFormat
 
     def getFormatFromFileExtension(self, fp):
         # noinspection PyShadowingNames
@@ -723,10 +721,9 @@ class Converter:
                 )
 
         self.setSubConverterFromFormat(useFormat)
-        if t.TYPE_CHECKING:
-            assert isinstance(self.subConverter, subConverters.SubConverter)
-        self.subConverter.keywords = keywords
-        self.subConverter.parseData(dataStr, number=number)
+        subConverter = t.cast(subConverters.SubConverter, self.subConverter)
+        subConverter.keywords = keywords
+        subConverter.parseData(dataStr, number=number)
 
     def parseURL(
         self,
@@ -749,7 +746,7 @@ class Converter:
         re-reading from a cached file.
 
         >>> joplinURL = ('https://github.com/cuthbertLab/music21/raw/master'
-        ...              + '/music21/corpus/joplin/maple_leaf_rag.mxl')
+        ...              '/music21/corpus/joplin/maple_leaf_rag.mxl')
         >>> c = converter.Converter()
         >>> #_DOCS_SHOW c.parseURL(joplinURL)
         >>> #_DOCS_SHOW joplinStream = c.stream
@@ -773,8 +770,9 @@ class Converter:
                 raise ConverterException(f'cannot determine file format of url: {url}')
         else:
             unused_formatType, ext = common.findFormat(format)
-            if ext is None:
-                ext = '.txt'
+
+        if ext is None:
+            ext = '.txt'
 
         directory = environLocal.getRootTempDir()
         fp = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
@@ -798,17 +796,21 @@ class Converter:
             raise ConverterException(f'Cannot automatically find a format for {fp!r}')
 
         self.setSubConverterFromFormat(useFormat)
-        if t.TYPE_CHECKING:
-            assert isinstance(self.subConverter, subConverters.SubConverter)
 
-        self.subConverter.keywords = keywords
-        self.subConverter.parseFile(fp, number=number)
+        subConverter = t.cast(subConverters.SubConverter, self.subConverter)
+        subConverter.keywords = keywords
+        subConverter.parseFile(fp, number=number)
 
-        if self.stream is None:
+        s = self.stream
+        if s is None:
             raise ConverterException('Could not create a Stream via a subConverter.')
-        self.stream.metadata.filePath = fp
-        self.stream.metadata.fileNumber = number
-        self.stream.metadata.fileFormat = useFormat
+
+        if not s.metadata:
+            s.metadata = metadata.Metadata()
+
+        s.metadata.filePath = fp
+        s.metadata.fileNumber = number
+        s.metadata.fileFormat = useFormat
 
 
     # -----------------------------------------------------------------------#
@@ -863,7 +865,6 @@ class Converter:
          <class 'music21.converter.subConverters.ConverterScala'>,
          <class 'music21.converter.subConverters.ConverterText'>,
          <class 'music21.converter.subConverters.ConverterTextLine'>,
-         <class 'music21.converter.subConverters.ConverterVexflow'>,
          <class 'music21.converter.subConverters.ConverterVolpiano'>]
 
         >>> class ConverterSonix(converter.subConverters.SubConverter):
@@ -975,7 +976,6 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterText'>
         <class 'music21.converter.subConverters.ConverterTextLine'>
         <class 'music21.converter.subConverters.ConverterTinyNotation'>
-        <class 'music21.converter.subConverters.ConverterVexflow'>
         <class 'music21.converter.subConverters.ConverterVolpiano'>
         <class 'music21.converter.subConverters.SubConverter'>
         '''
@@ -1027,7 +1027,6 @@ class Converter:
         ('textline', <class 'music21.converter.subConverters.ConverterTextLine'>)
         ('tinynotation', <class 'music21.converter.subConverters.ConverterTinyNotation'>)
         ('txt', <class 'music21.converter.subConverters.ConverterText'>)
-        ('vexflow', <class 'music21.converter.subConverters.ConverterVexflow'>)
         ('volpiano', <class 'music21.converter.subConverters.ConverterVolpiano'>)
         ('xml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
         '''
@@ -1247,9 +1246,8 @@ def parseFile(fp,
     v = Converter()
     fp = common.cleanpath(fp, returnPathlib=True)
     v.parseFile(fp, number=number, format=format, forceSource=forceSource, **keywords)
-    if t.TYPE_CHECKING:
-        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
-    return v.stream
+    vStream = t.cast(stream.Score | stream.Part | stream.Opus, v.stream)
+    return vStream
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
@@ -1263,9 +1261,8 @@ def parseData(dataStr,
     '''
     v = Converter()
     v.parseData(dataStr, number=number, format=format, **keywords)
-    if t.TYPE_CHECKING:
-        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
-    return v.stream
+    vStream = t.cast(stream.Score | stream.Part | stream.Opus, v.stream)
+    return vStream
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
@@ -1284,9 +1281,8 @@ def parseURL(url,
     '''
     v = Converter()
     v.parseURL(url, format=format, forceSource=forceSource, **keywords)
-    if t.TYPE_CHECKING:
-        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
-    return v.stream
+    vStream = t.cast(stream.Score | stream.Part | stream.Opus, v.stream)
+    return vStream
 
 
 def parse(value: bundles.MetadataEntry|bytes|str|pathlib.Path|list|tuple,
@@ -2130,8 +2126,8 @@ class Test(unittest.TestCase):
         # These strings aren't valid documents, but they are enough to pass the detection we're
         # testing in parseData(). But it does mean we'll be testing in a strange way.
         meiString = '<?xml version="1.0" encoding="UTF-8"?><mei><note/></mei>'
-        # mxlString = ('<?xml version="1.0" encoding="UTF-8"?>' +
-        #                '<score-partwise><note/></score-partwise>')
+        # mxlString = ('<?xml version="1.0" encoding="UTF-8"?>'
+        #              '<score-partwise><note/></score-partwise>')
 
         # The "mei" module raises an MeiElementError with "meiString," so as long as that's raised,
         # we know that parseData() chose correctly.

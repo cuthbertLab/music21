@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2006-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -75,6 +75,10 @@ noteheadTypeNames = (
     'triangle',
     'x',
 )
+'''
+A tuple of the valid notehead type names accepted by a Note's
+:attr:`~music21.note.NotRest.notehead` property.
+'''
 
 stemDirectionNames = (
     'double',
@@ -84,6 +88,10 @@ stemDirectionNames = (
     'unspecified',
     'up',
 )
+'''
+A tuple of the valid stem direction names accepted by a Note's
+:attr:`~music21.note.NotRest.stemDirection` property.
+'''
 
 def __dir__():
     out = [n for n in globals() if not n.startswith('__') and not n.startswith('Test')]
@@ -127,7 +135,7 @@ class NotRestException(exceptions21.Music21Exception):
 
 
 # ------------------------------------------------------------------------------
-SyllabicChoices = t.Literal[None, 'begin', 'single', 'end', 'middle', 'composite']
+type SyllabicChoices = t.Literal[None, 'begin', 'single', 'end', 'middle', 'composite']
 
 SYLLABIC_CHOICES: list[SyllabicChoices] = [
     None, 'begin', 'single', 'end', 'middle', 'composite',
@@ -390,7 +398,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     @property
     def rawText(self) -> str:
         '''
-        returns the text of the syllable with '-' etc.
+        Returns the text of the syllable with '-' etc.
 
         >>> l = note.Lyric('hel-')
         >>> l.text
@@ -529,18 +537,18 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         This method wipes out components.
         '''
         # do not want to do this unless we are sure this is not a string
-        # possible might alter unicode or other string-like representations
+        # possibly might alter unicode or other string-like representations
         if not isinstance(rawText, str):
             rawText = str(rawText)
 
         # check for hyphens
-        if applyRaw is False and rawText.startswith('-') and not rawText.endswith('-'):
+        if not applyRaw and rawText.startswith('-') and not rawText.endswith('-'):
             self.text = rawText[1:]
             self.syllabic = 'end'
-        elif applyRaw is False and not rawText.startswith('-') and rawText.endswith('-'):
+        elif not applyRaw and not rawText.startswith('-') and rawText.endswith('-'):
             self.text = rawText[:-1]
             self.syllabic = 'begin'
-        elif applyRaw is False and rawText.startswith('-') and rawText.endswith('-'):
+        elif not applyRaw and rawText.startswith('-') and rawText.endswith('-'):
             self.text = rawText[1:-1]
             self.syllabic = 'middle'
         else:  # assume single
@@ -607,7 +615,7 @@ class GeneralNote(base.Music21Object):
                  **keywords
                  ):
         if duration is None:
-            # ensure music21base not automatically create a zero duration before we can.
+            # ensure music21base does not automatically create a zero duration before we can.
             if not keywords or ('type' not in keywords and 'quarterLength' not in keywords):
                 tempDuration = Duration(1.0)
             else:
@@ -815,7 +823,7 @@ class GeneralNote(base.Music21Object):
                     thisLyric.text = text
                     foundLyric = True
                     break
-            if foundLyric is False:
+            if not foundLyric:
                 self.lyrics.append(Lyric(text, lyricNumber,
                                          applyRaw=applyRaw, identifier=lyricIdentifier))
 
@@ -823,7 +831,7 @@ class GeneralNote(base.Music21Object):
         '''
         Inserts a lyric into the Note, Chord, or Rest's lyric list in front of
         the index specified (0 by default), using index + 1 as the inserted lyric's
-        line number. shifts line numbers of all following lyrics in list
+        line number. Shifts line numbers of all following lyrics in the list.
 
         >>> n1 = note.Note()
         >>> n1.addLyric('second')
@@ -961,8 +969,6 @@ class GeneralNote(base.Music21Object):
 
         Appoggiaturas are still a work in progress.
 
-        * Changed in v6: corrected spelling of `appoggiatura` keyword.
-
         >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
         <music21.duration.AppoggiaturaDuration unlinked type:half quarterLength:0.0>
@@ -976,15 +982,17 @@ class GeneralNote(base.Music21Object):
         >>> r.getGrace(inPlace=True)
         >>> r.duration
         <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
+
+        * Changed in v6: corrected spelling of `appoggiatura` keyword.
         '''
-        if inPlace is False:
+        if not inPlace:
             e = copy.deepcopy(self)
         else:
             e = self
 
         e.duration = e.duration.getGraceDuration(appoggiatura=appoggiatura)
 
-        if inPlace is False:
+        if not inPlace:
             return e
 
 
@@ -1438,10 +1446,10 @@ class Note(NotRest):
     >>> n = note.Note('B-')
     >>> n.name
     'B-'
-    >>> n.octave is None
-    True
-    >>> n.pitch.implicitOctave
+    >>> n.octave
     4
+    >>> n.pitch.octaveIsImplicit
+    True
 
     >>> n = note.Note(name='D#')
     >>> n.name
@@ -1649,15 +1657,17 @@ class Note(NotRest):
         self.pitch.step = value
 
     @property
-    def octave(self) -> int|None:
+    def octave(self) -> int:
         '''
         Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.octave`.
+
+        * Changed in v11: always an int; see :attr:`~music21.pitch.Pitch.octaveIsImplicit`.
         '''
         return self.pitch.octave
 
     @octave.setter
-    def octave(self, value: int|None):
+    def octave(self, value: int|float|None):
         self.pitch.octave = value
 
     @property
@@ -1753,7 +1763,6 @@ class Note(NotRest):
         {0.0} <music21.note.Note F#>
         {1.0} <music21.key.Key of b- minor>
         {1.0} <music21.note.Note G->
-
         '''
         from music21 import key
         if isinstance(value, interval.IntervalBase):
@@ -1841,7 +1850,7 @@ class Unpitched(NotRest):
     >>> unp.displayStep = 'G'
     >>> unp.pitch
     Traceback (most recent call last):
-    AttributeError: 'Unpitched' object has no attribute 'pitch...
+    AttributeError: 'Unpitched' object has no attribute 'pitch'. Did you mean...'...pitches'...
 
     Unpitched elements generally have an instrument object associated with them:
 
@@ -1864,9 +1873,7 @@ class Unpitched(NotRest):
     >>> unp == unp2
     False
     '''
-    # TODO: when Python 3.12 is minimum version.  Change AttributeError to read:
-    #        AttributeError: 'Unpitched' object has no attribute 'pitch'. Did you mean: 'pitches'?
-
+    # When 3.15 is the minimum change ... to "Did you mean '.pitches' instead of '.pitch'?"
     equalityAttributes = ('displayStep', 'displayOctave', 'storedInstrument')
 
     def __init__(
@@ -1882,7 +1889,7 @@ class Unpitched(NotRest):
         if displayName:
             display_pitch = Pitch(displayName)
             self.displayStep = display_pitch.step
-            self.displayOctave = display_pitch.implicitOctave
+            self.displayOctave = display_pitch.octave
 
     def _reprInternal(self):
         if not self.storedInstrument:
@@ -1892,8 +1899,8 @@ class Unpitched(NotRest):
 
     def displayPitch(self) -> Pitch:
         '''
-        returns a pitch object that is the same as the displayStep and displayOctave.
-        it will never have an accidental.
+        Returns a pitch object that is the same as the displayStep and displayOctave.
+        It will never have an accidental.
 
         >>> unp = note.Unpitched()
         >>> unp.displayStep = 'E'
@@ -2072,14 +2079,12 @@ class TestExternal(unittest.TestCase):
         '''
         Need to test direct note creation w/o stream
         '''
-        from music21 import note
-        a = note.Note('D-3')
+        a = Note('D-3')
         a.quarterLength = 2.25
         if self.show:
             a.show()
 
     def testBasic(self):
-        from music21 import note
         from music21 import stream
         a = stream.Stream()
 
@@ -2088,7 +2093,7 @@ class TestExternal(unittest.TestCase):
                                 ('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
                                 ('f#2', 1.75), ('g-3', (4 / 3)), ('d#6', (2 / 3))
                                 ]:
-            b = note.Note()
+            b = Note()
             b.quarterLength = qLen
             b.name = pitchName
             # Pylint going crazy here

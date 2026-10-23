@@ -109,7 +109,6 @@ def getAxisQuantities(synonyms=False, axesToCheck=None):
     >>> graph.findPlot.getAxisQuantities(True, axesToCheck=theseAxes)
     ['count', 'quantity', 'frequency', 'counting',
      'offset', 'measure', 'offsets', 'measures', 'time']
-
     '''
     if axesToCheck is None:
         axesToCheck = getAxisClasses()
@@ -167,7 +166,6 @@ def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
     >>> pcs = [graph.plot.ScatterWeighted, graph.plot.Dolan]
     >>> graph.findPlot.getPlotClassesFromFormat('scatterweighted', pcs)
     [<class 'music21.graph.plot.ScatterWeighted'>]
-
     '''
     graphFormat = userFormatsToFormat(graphFormat).lower()
 
@@ -283,30 +281,29 @@ def getPlotsToMake(graphFormat: str|None = None,
 
     >>> graph.findPlot.getPlotsToMake('scatter', 'offset', 'dynamics')
     [(<class 'music21.graph.plot.Scatter'>,
-      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>),
-                   ('y', <class 'music21.graph.axis.DynamicsAxis'>)]))]
+      OrderedDict({'x': <class 'music21.graph.axis.OffsetAxis'>,
+                   'y': <class 'music21.graph.axis.DynamicsAxis'>}))]
 
     Just a couple of values:
 
     >>> graph.findPlot.getPlotsToMake('offset', 'dynamics')
     [(<class 'music21.graph.plot.Scatter'>,
-      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>),
-                   ('y', <class 'music21.graph.axis.DynamicsAxis'>)]))]
+      OrderedDict({'x': <class 'music21.graph.axis.OffsetAxis'>,
+                   'y': <class 'music21.graph.axis.DynamicsAxis'>}))]
 
     Just one value:
 
     >>> graph.findPlot.getPlotsToMake('octave')
     [(<class 'music21.graph.plot.Histogram'>,
-      OrderedDict([('x', <class 'music21.graph.axis.PitchSpaceOctaveAxis'>)]))]
+      OrderedDict({'x': <class 'music21.graph.axis.PitchSpaceOctaveAxis'>}))]
 
     Three values:
 
     >>> graph.findPlot.getPlotsToMake('offset', 'dynamics', 'count')
     [(<class 'music21.graph.plot.ScatterWeighted'>,
-      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>),
-                   ('y', <class 'music21.graph.axis.DynamicsAxis'>),
-                   ('z', <class 'music21.graph.axis.CountingAxis'>)]))]
-
+      OrderedDict({'x': <class 'music21.graph.axis.OffsetAxis'>,
+                   'y': <class 'music21.graph.axis.DynamicsAxis'>,
+                   'z': <class 'music21.graph.axis.CountingAxis'>}))]
     '''
     def _bestPlotType(graphClassesToChooseFrom):
         # now get the best graph type from this possibly motley list

@@ -1309,7 +1309,7 @@ del _key
 
 class Test(unittest.TestCase):
 
-    def testAllToClassNamePopulated(self):
+    def testAllToClassNamePopulated(self) -> None:
         '''
         Test that the allToClassName dict includes all the keys from the constituent dicts.
 
@@ -1327,7 +1327,7 @@ class Test(unittest.TestCase):
             for key in eachDict:
                 self.assertIn(key, allToClassName)
 
-    def testAllToClassNameExamples(self):
+    def testAllToClassNameExamples(self) -> None:
         '''
         Test an example from each constituent dict that makes up allToClassName.
         '''
@@ -1342,7 +1342,7 @@ class Test(unittest.TestCase):
                                      ]:
             self.assertEqual(allToClassName[testString], langDict[testString])
 
-    def testAllClassNames(self):
+    def testAllClassNames(self) -> None:
         '''
         Test that all class names are real.
         '''

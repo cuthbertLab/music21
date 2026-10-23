@@ -1,93 +1,132 @@
 .. _installWindows:
 
-
-Installing `music21` in Windows
+Installing `music21` on Windows
 ============================================
 
-
-Get Python
--------------------------------
-
-Python is a simple but powerful programming language that `music21`
-is written in and in which you will write your own programs that
-use `music21`.
-
-Windows users should download and install Python version
-3.11 or higher.
-
-To get Python for Windows, go to https://www.python.org/downloads/
-and click on the "Windows installer" link.  It is probably the
-first link.  Save the file to your desktop
-and then click on it there.
-
-To test to see if Python has been installed properly, go
-to the start menu and run (either by clicking "Run" in older
-Windows or by typing in the search box) a program called `IDLE`.
-Once it's started, type `2+2`.  If your system then
-displays `4` python is working properly and we can start thinking
-about installing `music21`.
+These steps give you a folder for your `music21` work, with Python, `music21`,
+and Jupyter inside it. Jupyter lets you write and run `music21` code in your
+web browser and see the results (including notation) right under it.
+You don't need to install Python first; the steps below do that for you.
 
 
-Updating Python
--------------------------------
-If you have already installed Python on your computer,
-launch IDLE (a Python interpreter and code editor) by clicking
-the start menu and clicking Run (on Windows XP or older) and
-typing in "IDLE" or (on Windows Vista and newer) typing
-in "IDLE" in the Search Programs list.
+Open PowerShell
+---------------------------------------
 
-The first lines of text displayed will include a version number.
-Make sure it begins with 3.11 or higher.
-
-If your version is too old, download a newer version as above.
+PowerShell is where you type commands to Windows. Press the Windows key, type
+"PowerShell", and press Enter. (On Windows 11, "Terminal" opens the same thing.)
+You'll use it often, so you might want to pin it to the taskbar.
 
 
-Install `music21`
--------------------------------
+Install uv
+---------------------------------------
 
-Open up a command prompt and type:
+uv is a free tool that installs Python and Python packages like `music21`.
+Copy this line into PowerShell and press Enter (if it asks you to agree to
+terms, type Y)::
 
-    pip install music21
+    winget install --id=astral-sh.uv -e
 
-This will download and install `music21`.  If you already
-have `music21` but want to upgrade to the latest version, run:
-
-    pip install --upgrade music21
+When it finishes, close the PowerShell window and open a new one, so that
+PowerShell knows where uv is.
 
 
-To test to see if `music21` has been installed properly, go
-to the start menu and run (either by clicking "Run" in older
-Windows or by typing in the search box) IDLE.  Type
-"`import music21`".  If your system waits for a few seconds and then
-displays "`>>>`" and perhaps a warning about missing packages, then
-you've installed everything properly.  (If the system
-cannot find `music21` then you may have more than one version of
-Python on your system.  Try uninstalling all of them along with `music21`
-and then restarting from scratch).
+Make a folder for `music21`
+---------------------------------------
 
-You should then configure `music21` to find your helper programs
-such as MuseScore or Finale.  In the command prompt, type::
+Type these lines one at a time, pressing Enter after each::
 
-    python3 -m music21.configure
+    mkdir ~\m21play
+    cd ~\m21play
+    uv init --bare
+    uv add music21
+    uv add notebook
 
-Or, in IDLE type::
+This makes a folder called `m21play` (or whatever you want to call your `music21`
+playing around applications) in your home folder (``C:\Users\`` followed by your
+name) and installs Python, `music21`, and Jupyter Notebook
+into it. Just don't call the folder `music21`
+itself.
 
-    import music21
-    music21.configure.run()
+
+Set up music notation
+---------------------------------------
+
+To see notation in the browser, `music21` needs MuseScore -- so download it even if
+you normally use Dorico or Sibelius or Finale. It's free at https://musescore.org;
+install it before going on.
+
+Then run the Configuration Assistant. In the same PowerShell window, type::
+
+    uv run python -m music21.configure
+
+After waiting a few moments to load modules, the Configuration Assistant begins.
+It lists the notation programs it finds on your computer. Type the number of your
+favorite and press Enter: outside of Jupyter, `music21` will open scores there.
+
+Next you will be asked a number of
+questions about working with `music21`. They concern whether `music21` can access
+the Internet, and whether you are willing to comply with the license for
+use of `music21` and the included corpus of scores.  You have to accept the
+license to continue (we need to retain some rights you know!), but you
+don't have to give us access to the Internet.
+
+
+Start Jupyter
+---------------------------------------
+
+Still in the `m21play` folder, type::
+
+    uv run jupyter notebook
+
+Your web browser opens with a list of the files in your folder. Choose
+"New", then "Notebook", and pick the Python kernel if asked. In the first box
+(a "cell"), type::
+
+    from music21 import *
+    n = note.Note('A4')
+    n.pitch.frequency
+
+and press Shift-Enter. You should see `440.0`: `music21` is working. Now try
+`n.show()` in the next cell to see the note as notation.
+
+When you're done, close the browser tab and press Control-C in PowerShell.
+
+
+Coming back later
+---------------------------------------
+
+Open PowerShell and type::
+
+    cd ~\m21play
+    uv run jupyter notebook
+
+To get the newest version of `music21`, type this in the folder (not the jupyter notebook)::
+
+    uv add --upgrade music21
+
+Other packages go in the same way; for instance, `uv add matplotlib` for
+`music21`'s graphs.
+
+If you'd rather use Python without Jupyter, `uv run python` in the folder
+starts it with `music21` ready to import.
+
+If you already have your own Python setup (a virtual environment, conda, and so on),
+`pip install music21` there works too.
 
 
 After Installation
 -------------------------------
 
-After a successful installation, you may proceed to :ref:`Notes <usersGuide_02_notes>`
-to begin using `music21`.
+After a successful installation, go back to :ref:`Chapter 1 <usersGuide_01_installing>`
+of the User's Guide to try out `music21`.
 
 
 Installation Help
 -------------------------------
 
 If you have followed all the instructions and still encounter problems, start over from scratch
-and try it again very carefully.  If you still have problems
-contact the `music21` group and someone should be able to help:
+and try it again very carefully.  If you still have problems ask an AI agent (most know
+`music21` pretty well) or lean on humans and contact the `music21` group. It's a friendly
+group with users always happy to help:
 
 https://groups.google.com/g/music21list

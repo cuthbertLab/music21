@@ -22,8 +22,6 @@ Part of `RELEASING.md` at the repository root::
 
 This file and `removeCorpus()` were reorganized out of the old `dist/dist.py`.
 '''
-import os
-import shutil
 import tarfile
 
 from music21 import __version__ as version
@@ -35,43 +33,34 @@ def removeCorpus():
     create a new music21-noCorpus version.
 
     Return the completed file path of the newly created edition.
-
-    NOTE: this function works only with Posix systems.
     '''
-    fp = getRootFilePath() / 'dist' / ('music21-' + version + '.tar.gz')
-    fpDir, fn = os.path.split(str(fp))
+    distDir = getRootFilePath() / 'dist'
+    srcName = 'music21-' + version
+    dstName = 'music21-noCorpus-' + version
+    fpDst = distDir / (dstName + '.tar.gz')
+    corpusPrefixes = tuple(
+        f'{srcName}/music21/corpus/{d}/'
+        for d in [*getCorpusContentDirs(), '_metadataCache']
+    )
 
-    # this has .tar.gz extension; this is the final completed package
-    fnDst = fn.replace('music21', 'music21-noCorpus')
-    fpDst = os.path.join(fpDir, fnDst)
-    # remove file extensions
-    fnDstDir = fnDst.replace('.tar.gz', '')
-    fpDstDir = os.path.join(fpDir, fnDstDir)
+    # iterating over tar "members" rather than files/filenames in order to preserve
+    # the permissions etc. that the original hatch build set
+    with (tarfile.open(distDir / (srcName + '.tar.gz')) as src,
+          tarfile.open(fpDst, 'w:gz') as dst):
+        for member in src:
+            if member.name.startswith(corpusPrefixes):
+                continue
+            fileObj = src.extractfile(member) if member.isfile() else None
+            member.name = dstName + member.name[len(srcName):]
+            if 'path' in member.pax_headers:
+                # long paths (over 100 characters) and non-ASCII names store a short name
+                # in the tar and the longer name in this "path" header -- but it will be
+                # inaccurate in the new tar (because of the added "noCorpus-" in the path).
+                # Deleting this header will make the dst tar file regenerate it.
+                del member.pax_headers['path']
+            dst.addfile(member, fileObj)
 
-    with tarfile.open(fp) as file:
-        file.extractall(fpDir, filter='data')  # note -- this requires 3.12+ but that's okay
-
-    os.rename(fpDstDir.replace('-noCorpus', ''), fpDstDir)
-
-    # remove files, updates manifest
-    for fn in getCorpusContentDirs():
-        fp = os.path.join(fpDstDir, 'music21', 'corpus', fn)
-        shutil.rmtree(fp)
-
-    fp = os.path.join(fpDstDir, 'music21', 'corpus', '_metadataCache')
-    shutil.rmtree(fp)
-
-    # compress dst dir to dst file path name
-    # need the -C flag to set relative dir
-    # just name of dir
-    cmd = f'tar -C {fpDir} -czf {fpDst} {fnDstDir}/'
-    os.system(cmd)
-
-    # # remove directory that was compressed
-    if os.path.exists(fpDstDir):
-        shutil.rmtree(fpDstDir)
-
-    return fpDst  # full path with extension
+    return fpDst
 
 
 # ------------------------------------------------------------------------------

@@ -739,7 +739,6 @@ class GraphColorGridLegend(Graph):
 
     .. image:: images/GraphColorGridLegend.*
         :width: 600
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
@@ -914,7 +913,6 @@ class GraphHorizontalBar(Graph):
     To make an equally spaced plot, like in a Pitch Space plot, leave empty data in the form:
 
         `('', [], {})`
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'barSpace': 'Amount of vertical space each bar takes; default 8',
@@ -1190,7 +1188,6 @@ class GraphScatterWeighted(Graph):
 
     .. image:: images/GraphScatterWeighted.*
         :width: 600
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'maxDiameter': 'the maximum diameter of any ellipse, default 1.25',
@@ -1456,9 +1453,9 @@ class GraphGroupedVerticalBar(Graph):
     >>> lengths = OrderedDict( [('a', 3), ('b', 2), ('c', 1)] )
     >>> data = [('bar' + str(x), lengths) for x in range(3)]
     >>> data
-    [('bar0', OrderedDict([('a', 3), ('b', 2), ('c', 1)])),
-     ('bar1', OrderedDict([('a', 3), ('b', 2), ('c', 1)])),
-     ('bar2', OrderedDict([('a', 3), ('b', 2), ('c', 1)]))]
+    [('bar0', OrderedDict({'a': 3, 'b': 2, 'c': 1})),
+     ('bar1', OrderedDict({'a': 3, 'b': 2, 'c': 1})),
+     ('bar2', OrderedDict({'a': 3, 'b': 2, 'c': 1}))]
     >>> g.data = data
     >>> g.process()
     '''

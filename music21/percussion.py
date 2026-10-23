@@ -71,7 +71,7 @@ class PercussionChord(chord.ChordBase):
 
     Two PercussionChord objects are equal if their notes are equal *and in the same
     order* (this is different from Chord, but necessary because we cannot compare
-    based just on pitch equality)
+    based just on pitch equality).
 
     >>> pChord == pChord2
     True
@@ -118,7 +118,7 @@ class PercussionChord(chord.ChordBase):
     @notes.setter
     def notes(self, newNotes: Iterable[note.Unpitched|note.Note]) -> None:
         '''
-        Sets notes to an iterable of Note or Unpitched objects
+        Sets notes to an iterable of Note or Unpitched objects.
         '''
         if not common.isIterable(newNotes):
             raise TypeError('notes must be set with an iterable')

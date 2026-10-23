@@ -57,7 +57,7 @@ class DeleteFixer(OMRMidiFixer):
     def fix(self):
         super().fix()
         for (midiRef, omrRef, op) in self.changes:
-            if self.checkIfNoteInstance(midiRef, omrRef) is False:
+            if not self.checkIfNoteInstance(midiRef, omrRef):
                 continue
             # if they are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
@@ -140,7 +140,7 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> fixer3.fix()
     >>> omrNote3.pitch.accidental
 
-    TEST 4 (case 2-1) e.g MIDI = g#, ground truth = a-, OMR = an
+    TEST 4 (case 2-1) e.g. MIDI = g#, ground truth = a-, OMR = an
 
     >>> midiNote4 = note.Note('G#4')
     >>> omrNote4 = note.Note('An4')
@@ -156,7 +156,7 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrNote4.pitch.accidental
     <music21.pitch.Accidental flat>
 
-    TEST 5 (case 2-2) e.g midi = g-, gt = f#, omr = fn
+    TEST 5 (case 2-2) e.g. midi = g-, gt = f#, omr = fn
 
     >>> midiNote5 = note.Note('G-4')
     >>> omrNote5 = note.Note('Fn4')
@@ -237,7 +237,7 @@ class EnharmonicFixer(OMRMidiFixer):
         for (midiRef, omrRef, op) in self.changes:
             omrRef.style.color = 'black'
             # if they're not notes, don't bother with rest
-            if self.checkIfNoteInstance(midiRef, omrRef) is False:
+            if not self.checkIfNoteInstance(midiRef, omrRef):
                 continue
             # if they are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
@@ -253,7 +253,7 @@ class EnharmonicFixer(OMRMidiFixer):
                     omrRef.pitch.accidental = None
                 else:
                     # case 2-1: midi note is sharp, omr note is one step higher and natural,
-                    # should be a flat instead. e.g midi = g#, gt = a-, omr = an
+                    # should be a flat instead. e.g. midi = g#, gt = a-, omr = an
                     # omr note has higher ps than midi-- on a higher
                     # line or space than midi note
                     if omrRef.pitch > midiRef.pitch:
@@ -261,7 +261,7 @@ class EnharmonicFixer(OMRMidiFixer):
                                                   ).isEnharmonic(midiRef.pitch):
                             omrRef.pitch.accidental = pitch.Accidental('flat')
                     # case 2-2: midi note is flat, omr note is one step lower and natural,
-                    # should be a flat instead. e.g midi = g-, gt = f#, omr = fn
+                    # should be a flat instead. e.g. midi = g-, gt = f#, omr = fn
                     # omr note has lower ps than midi-- on a higher line
                     # or space than midi note
                     elif omrRef.pitch < midiRef.pitch:
@@ -399,7 +399,7 @@ class OrnamentFixer(OMRMidiFixer):
         * show: True when note should be colored blue
 
         Returns True if added successfully, or False if there was already an
-        ornament on the note and it wasn't added.
+        ornament on the note, and it wasn't added.
         '''
         if not any(isinstance(e, expressions.Ornament) for e in selectedNote.expressions):
             selectedNote.expressions.append(ornament)

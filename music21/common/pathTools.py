@@ -200,7 +200,7 @@ def cleanpath(path: str|pathlib.Path, *,
 
 
 class Test(unittest.TestCase):
-    def testGetSourcePath(self):
+    def testGetSourcePath(self) -> None:
         fp = getSourceFilePath()
         self.assertIsInstance(fp, pathlib.Path)
 

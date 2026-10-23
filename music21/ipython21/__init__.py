@@ -35,7 +35,7 @@ from music21.ipython21 import ipExtension
 from music21.ipython21 import objects
 from music21.ipython21.ipExtension import load_ipython_extension
 
-def loadNoMagic():
+def loadNoMagic() -> None:
     '''
     Load the magic functions of load_ipython_extension when running Jupyter (was IPython)
     without needing to call a %magic function

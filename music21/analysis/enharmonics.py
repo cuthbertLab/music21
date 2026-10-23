@@ -99,7 +99,7 @@ class EnharmonicSimplifier:
         Returns a score according to the number of sharps and flats in a possible spelling.
         The score is the sum of the flats and sharps + 1, multiplied by the alterationPenalty.
         '''
-        if self.ruleObject.alterationPenalty is False:
+        if not self.ruleObject.alterationPenalty:
             return 1
 
         joinedPossibility = ''.join([p.name for p in possibility])
@@ -114,7 +114,7 @@ class EnharmonicSimplifier:
         the score is given by the number of the lesser used accidental (sharps or flats)
         multiplied by the mixSharpsFlatsPenalty.
         '''
-        if self.ruleObject.mixSharpsFlatsPenalty is False:
+        if not self.ruleObject.mixSharpsFlatsPenalty:
             return 1
 
         joinedPossibility = ''.join([p.name for p in possibility])
@@ -128,7 +128,7 @@ class EnharmonicSimplifier:
         Returns a score based on the number of augmented and diminished intervals between
         successive pitches in the given spelling.
         '''
-        if self.ruleObject.augDimPenalty is False:
+        if not self.ruleObject.augDimPenalty:
             return 1
 
         intervalStr = ''

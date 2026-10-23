@@ -39,7 +39,9 @@ def showImageThroughMuseScore(
     *,
     multipageWidget: bool = False,
     **keywords,
-):
+) -> t.Any:
+    # Returns None in the common cases, but returns the ipywidgets interact
+    # callable in the multipage-widget branch, so the return type is t.Any.
     # noinspection PyPackageRequirements
     from IPython.display import Image, display, HTML  # type: ignore
 
@@ -110,7 +112,7 @@ def showImageThroughMuseScore(
         from ipywidgets import interact  # type: ignore  # pylint: disable=import-error
 
         @interact(page=(1, last_number))
-        def page_display(page=1):
+        def page_display(page: int = 1) -> None:
             inner_page_fp = pages[page]
             if inner_page_fp.exists():
                 display(Image(data=inner_page_fp.read_bytes(), retina=True))
@@ -227,28 +229,3 @@ def htmlOutputForMidi(binaryMidiData: bytes) -> str:
             script.addEventListener("load", function() { play(window.music21); });
         })();
         </script>'''
-
-
-    # def vfshow(self, s):
-    #     '''
-    #     pickle this object and send it to Vexflow
-    #
-    #     Alpha -- does not work too well.
-    #     '''
-    #     import random
-    #     from music21.vexflow import toMusic21j
-    #     from IPython.display import HTML
-    #     vfp = toMusic21j.VexflowPickler()
-    #     vfp.mode = 'jsonSplit'
-    #     outputCode = vfp.fromObject(s)
-    #     idName = 'canvasDiv' + str(random.randint(0, 10000))
-    #     htmlBlock = '<div id="' + idName + '"><canvas/></div>'
-    #     js = '''
-    #     <script>
-    #          data = ''' + outputCode + ''';
-    #          var jpc = new music21.jsonPickle.Converter();
-    #          var streamObj = jpc.run(data);
-    #          streamObj.replaceCanvas("#''' + idName + '''");
-    #     </script>
-    #     '''
-    #     return HTML(htmlBlock + js)

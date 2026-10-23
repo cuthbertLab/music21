@@ -8,7 +8,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Classes for pseudo-m21 objects to inherit from.  The most import attributes that nearly
+Classes for pseudo-m21 objects to inherit from.  The most important attributes that nearly
 everything in music21 -- not just things that live in streams --
 should inherit from are given below.
 
@@ -90,7 +90,7 @@ class ProtoM21Object:
         >>> n.classes
         ('Note', 'NotRest', 'GeneralNote', 'Music21Object', 'ProtoM21Object', 'object')
 
-        Durations are not, but they inherit from ProtoM21Object
+        Durations are not, but they inherit from ProtoM21Object.
 
         >>> d = duration.Duration('half')
         >>> d.classes
@@ -153,7 +153,7 @@ class ProtoM21Object:
         False
 
         For checking if an object is part of any number of objects use `not`
-        with `isdisjoint`.  A little unwiedly but works super fast:
+        with `isdisjoint`.  A little unwieldy but works super fast:
 
         >>> checkClasses = (spanner.Slur, note.NotRest)
         >>> not n.classSet.isdisjoint(checkClasses)

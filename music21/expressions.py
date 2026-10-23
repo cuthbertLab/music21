@@ -58,7 +58,7 @@ def realizeOrnaments(
     keySig: key.KeySignature|None = None
 ):
     '''
-    given a Note or Unpitched with Ornament expressions,
+    Given a Note or Unpitched with Ornament expressions,
     convert them into a list of objects that represents
     the performed version of the object:
 
@@ -149,7 +149,7 @@ class Expression(base.Music21Object):
     @property
     def name(self) -> str:
         '''
-        returns the name of the expression, which is generally the
+        Returns the name of the expression, which is generally the
         class name lowercased and spaces where a new capital occurs.
 
         Subclasses can override this as necessary.
@@ -179,7 +179,6 @@ class RehearsalMark(Expression):
     >>> rm = expressions.RehearsalMark('B')
     >>> rm
     <music21.expressions.RehearsalMark 'B'>
-
     '''
     classSortOrder = -30
     _styleClass = style.TextStylePlacement
@@ -200,7 +199,7 @@ class RehearsalMark(Expression):
     @staticmethod
     def _getNumberingFromContent(c) -> str|None:
         '''
-        if numbering was not set, get it from the content
+        If numbering was not set, get it from the content.
 
         >>> ex = expressions.RehearsalMark()
         >>> ex._getNumberingFromContent('C')
@@ -220,7 +219,6 @@ class RehearsalMark(Expression):
 
         >>> print(ex._getNumberingFromContent('*'))
         None
-
         '''
         if c is None:
             return None
@@ -255,7 +253,7 @@ class RehearsalMark(Expression):
 
     def nextContent(self):
         '''
-        Return the next content based on the numbering
+        Return the next content based on the numbering.
 
         >>> expressions.RehearsalMark('A').nextContent()
         'B'
@@ -458,7 +456,7 @@ class TextExpression(Expression):
     def __init__(self, content=None, **keywords):
         super().__init__(**keywords)
         # numerous properties are inherited from TextFormat
-        # the text string to be displayed; not that line breaks
+        # the text string to be displayed; note that line breaks
         # are given in the xml with this non-printing character: (#)
         if not isinstance(content, str):
             self._content = str(content)
@@ -584,10 +582,10 @@ class Ornament(Expression):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
-        subclassable method call that takes a sourceObject and optional keySig
+        Subclassable method call that takes a sourceObject and optional keySig
         and returns a three-element tuple of a list of notes before the
         "main note" or the result of the expression if it gobbles up the entire note,
         the "main note" itself (or None) to keep processing for ornaments,
@@ -632,9 +630,8 @@ class Ornament(Expression):
         # TODO: remove expressions
         # secondNote.expressions = None
         if isTransposed:
-            if t.TYPE_CHECKING:
-                assert isinstance(secondNote, note.Note)
-            secondNote.transpose(transposeInterval, inPlace=True)
+            secondNoteObj = t.cast('note.Note', secondNote)
+            secondNoteObj.transpose(transposeInterval, inPlace=True)
 
         fillObjects.append(firstNote)
         fillObjects.append(secondNote)
@@ -691,7 +688,7 @@ class GeneralMordent(Ornament):
     @property
     def name(self) -> str:
         '''
-        returns the name of the Mordent/InvertedMordent, which is generally
+        Returns the name of the Mordent/InvertedMordent, which is generally
         the class name lowercased, with spaces where a new capital occurs. The
         name also will include any accidental, if it exists.
 
@@ -705,7 +702,6 @@ class GeneralMordent(Ornament):
         >>> invertedMordent = expressions.InvertedMordent(accidental=sharp)
         >>> invertedMordent.name
         'inverted mordent (sharp)'
-
         '''
         theName: str = super().name
         if self.accidental is not None:
@@ -764,8 +760,7 @@ class GeneralMordent(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
 
         if self._direction == 'up':
             ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
@@ -832,8 +827,7 @@ class GeneralMordent(Ornament):
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
         ornamentalPitch.transpose(transposeInterval, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if ornamentalPitch.microtone.cents != 0:
@@ -915,12 +909,12 @@ class GeneralMordent(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
         Realize a mordent.
 
-        returns a three-element tuple.
+        Returns a three-element tuple.
         The first is a list of the two notes that the beginning of the note were converted to.
         The second is the rest of the note.
         The third is an empty list (since there are no notes at the end of a mordent).
@@ -968,11 +962,10 @@ class GeneralMordent(Ornament):
             # second (middle) note might need an accidental from the keysig (but
             # only if it doesn't already have an accidental, from self.accidental)
             for noteIdx, n in enumerate(mordNotes):
-                if t.TYPE_CHECKING:
-                    assert isinstance(n, note.Note)
+                noteObj = t.cast('note.Note', n)
                 noteNum: int = noteIdx + 1
-                if n.pitch.accidental is None and noteNum == 2:
-                    n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
+                if noteObj.pitch.accidental is None and noteNum == 2:
+                    noteObj.pitch.accidental = currentKeySig.accidentalByStep(noteObj.pitch.step)
 
         inExpressions = -1
         if self in srcObj.expressions:
@@ -1241,7 +1234,7 @@ class WholeStepInvertedMordent(InvertedMordent):
 # ------------------------------------------------------------------------------
 class Trill(Ornament):
     '''
-    A basic trill marker without the trill extension
+    A basic trill marker without the trill extension.
 
     >>> tr = expressions.Trill()
     >>> tr.placement
@@ -1272,7 +1265,6 @@ class Trill(Ornament):
       The size property has been removed and replaced with `.getSize()` (which requires
       a `srcObj` and optional `keySig` param).  Added optional `keySig` param to
       `.realize()` as well.
-
     '''
     _direction: str = 'up'
 
@@ -1288,7 +1280,7 @@ class Trill(Ornament):
     @property
     def name(self) -> str:
         '''
-        returns the name of the Trill, which is generally the class name
+        Returns the name of the Trill, which is generally the class name
         lowercased, with spaces where a new capital occurs. The name also
         will include the accidental, if it exists.
 
@@ -1301,7 +1293,6 @@ class Trill(Ornament):
         >>> doubleSharpedTrill = expressions.Trill(accidental=pitch.Accidental('double-sharp'))
         >>> doubleSharpedTrill.name
         'trill (double-sharp)'
-
         '''
         theName: str = super().name
         if self.accidental:
@@ -1382,8 +1373,7 @@ class Trill(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
 
         if self._direction == 'up':
             ornamentalPitch.transpose(interval.GenericInterval(2), inPlace=True)
@@ -1431,8 +1421,7 @@ class Trill(Ornament):
         transposeInterval: interval.IntervalBase = self.getSize(srcObj, keySig=keySig)
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
         ornamentalPitch.transpose(transposeInterval, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if ornamentalPitch.microtone.cents != 0:
@@ -1482,7 +1471,7 @@ class Trill(Ornament):
         '''
         Updates accidental display for a Trill's ornamental pitch.
         Defined exactly like Pitch.updateAccidentalDisplay, with two changes:
-        Instead of self being the pitch to update, self is an Trill whose
+        Instead of self being the pitch to update, self is a Trill whose
         ornamentalPitch is to be updated; and we pay no attention to ties,
         since ornamental notes cannot be tied.
 
@@ -1583,10 +1572,10 @@ class Trill(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
-        realize a trill.
+        Realize a trill.
 
         Returns a three-element tuple:
 
@@ -1635,7 +1624,7 @@ class Trill(Ornament):
           <music21.note.Note D>], None, [])
 
         This can lead to certain unusual circumstances such as augmented second trills
-        which are technically correct, but probably not what a performer exprects.
+        which are technically correct, but probably not what a performer expects.
 
         >>> k3 = key.Key('E')
         >>> m.replace(k2, k3)
@@ -1714,15 +1703,14 @@ class Trill(Ornament):
             setAccidentalFromKeySig = self._setAccidentalFromKeySig
             if setAccidentalFromKeySig:
                 for n in trillNotes:
-                    if t.TYPE_CHECKING:
-                        assert isinstance(n, note.Note)
-                        assert isinstance(srcObj, note.Note)
-                    if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:
+                    noteObj = t.cast('note.Note', n)
+                    srcNote = t.cast('note.Note', srcObj)
+                    if noteObj.pitch.nameWithOctave != srcNote.pitch.nameWithOctave:
                         # do not correct original note, no matter what.
-                        if n.pitch.accidental is None:
+                        if noteObj.pitch.accidental is None:
                             # correct if there isn't already an accidental (from self.accidental)
-                            n.pitch.accidental = (
-                                currentKeySig.accidentalByStep(n.step)
+                            noteObj.pitch.accidental = (
+                                currentKeySig.accidentalByStep(noteObj.step)
                             )
 
         if inPlace and self in srcObj.expressions:
@@ -1737,16 +1725,15 @@ class Trill(Ornament):
             secondNoteNachschlag.expressions = []
             secondNoteNachschlag.duration.quarterLength = useQL
             if isTransposed:
-                if t.TYPE_CHECKING:
-                    assert isinstance(secondNoteNachschlag, note.Note)
-                    assert isinstance(firstNoteNachschlag, note.Note)
-                secondNoteNachschlag.transpose(transposeIntervalReverse,
-                                                inPlace=True)
+                secondNoteNachschlagObj = t.cast('note.Note', secondNoteNachschlag)
+                firstNoteNachschlagObj = t.cast('note.Note', firstNoteNachschlag)
+                secondNoteNachschlagObj.transpose(transposeIntervalReverse,
+                                                  inPlace=True)
                 if setAccidentalFromKeySig and currentKeySig:
-                    firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
-                        firstNoteNachschlag.step)
-                    secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
-                        secondNoteNachschlag.step)
+                    firstNoteNachschlagObj.pitch.accidental = currentKeySig.accidentalByStep(
+                        firstNoteNachschlagObj.step)
+                    secondNoteNachschlagObj.pitch.accidental = currentKeySig.accidentalByStep(
+                        secondNoteNachschlagObj.step)
 
             nachschlag = [firstNoteNachschlag, secondNoteNachschlag]
 
@@ -1875,9 +1862,9 @@ class Shake(Trill):
 
 class Schleifer(Ornament):
     '''
-    A slide or culee
+    A slide or culee.
 
-    * Changed in v7: size is a Generic second.  removed unused nachschlag component.
+    * Changed in v7: size is a Generic second.  Removed unused nachschlag component.
     '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
@@ -1890,7 +1877,7 @@ class Turn(Ornament):
     '''
     A turn or Gruppetto.
 
-    * Changed in v7: size is a Generic second.  removed unused nachschlag component.
+    * Changed in v7: size is a Generic second.  Removed unused nachschlag component.
     * Changed in v9: Added support for delayed vs non-delayed Turn.
     * Changed in v9: Support upper and lower accidentals on turns. This also adds
       the concept of ornamental pitches that are processed by makeAccidentals.
@@ -1971,7 +1958,7 @@ class Turn(Ornament):
     @property
     def name(self) -> str:
         '''
-        returns the name of the Turn/InvertedTurn, which is generally the class
+        Returns the name of the Turn/InvertedTurn, which is generally the class
         name lowercased, with spaces where a new capital occurs, but also with
         a 'delayed' prefix, if the Turn/InvertedTurn is delayed.  If the delay
         is of a specific duration, the prefix will include that duration. The
@@ -1996,7 +1983,6 @@ class Turn(Ornament):
         ...     delay=1.0, lowerAccidental=pitch.Accidental('double-flat'))
         >>> delayedBy1Turn.name
         'delayed(delayQL=1.0) turn (lower=double-flat)'
-
         '''
         theName: str = super().name
         if self.delay == OrnamentDelay.DEFAULT_DELAY:
@@ -2053,8 +2039,7 @@ class Turn(Ornament):
 
         ornamentalPitch: pitch.Pitch = copy.deepcopy(srcPitch)
         ornamentalPitch.accidental = None
-        if ornamentalPitch.octave is None:
-            ornamentalPitch.octave = ornamentalPitch.implicitOctave
+        ornamentalPitch.octaveIsImplicit = False
 
         accidental: pitch.Accidental|None = None
         if which == 'upper':
@@ -2129,16 +2114,14 @@ class Turn(Ornament):
             srcObj, 'lower', keySig=keySig)
 
         upperPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if upperPitch.octave is None:
-            upperPitch.octave = upperPitch.implicitOctave
+        upperPitch.octaveIsImplicit = False
         upperPitch.transpose(transposeIntervalUp, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if upperPitch.microtone.cents != 0:
             upperPitch.convertMicrotonesToQuarterTones(inPlace=True)
 
         lowerPitch: pitch.Pitch = copy.deepcopy(srcPitch)
-        if lowerPitch.octave is None:
-            lowerPitch.octave = lowerPitch.implicitOctave
+        lowerPitch.octaveIsImplicit = False
         lowerPitch.transpose(transposeIntervalDown, inPlace=True)
         # if there are microtones, see if they can be converted to quarter tones.
         if lowerPitch.microtone.cents != 0:
@@ -2243,9 +2226,9 @@ class Turn(Ornament):
                list[note.Note|note.Unpitched]]:
         # noinspection PyShadowingNames
         '''
-        realize a turn.
+        Realize a turn.
 
-        returns a three-element tuple.
+        Returns a three-element tuple.
         The first element is an empty list because there are no notes at the start of a turn.
         The second element is the original note with a duration equal to the delay (but if there
         is no delay, the second element is None, because the turn "eats up" the entire note).
@@ -2356,9 +2339,7 @@ class Turn(Ornament):
             # half the duration of the srcObj note
             remainderDuration = opFrac(srcObj.duration.quarterLength / 2)
         else:
-            theDelay = self.delay
-            if t.TYPE_CHECKING:
-                assert isinstance(theDelay, (float, Fraction))
+            theDelay = t.cast(float | Fraction, self.delay)
             remainderDuration = theDelay
 
         turnDuration = srcObj.duration.quarterLength - remainderDuration
@@ -2388,9 +2369,8 @@ class Turn(Ornament):
         firstNote.expressions = []
         firstNote.duration.quarterLength = useQL
         if isTransposed:
-            if t.TYPE_CHECKING:
-                assert isinstance(firstNote, note.Note)
-            firstNote.transpose(firstTransposeInterval, inPlace=True)
+            firstNoteObj = t.cast('note.Note', firstNote)
+            firstNoteObj.transpose(firstTransposeInterval, inPlace=True)
 
         secondNote = copy.deepcopy(srcObj)
         secondNote.expressions = []
@@ -2400,9 +2380,8 @@ class Turn(Ornament):
         thirdNote.expressions = []
         thirdNote.duration.quarterLength = useQL
         if isTransposed:
-            if t.TYPE_CHECKING:
-                assert isinstance(thirdNote, note.Note)
-            thirdNote.transpose(secondTransposeInterval, inPlace=True)
+            thirdNoteObj = t.cast('note.Note', thirdNote)
+            thirdNoteObj.transpose(secondTransposeInterval, inPlace=True)
 
         fourthNote = copy.deepcopy(srcObj)
         fourthNote.expressions = []
@@ -2420,11 +2399,10 @@ class Turn(Ornament):
             # first note and third note might need an accidental from the keySig (but
             # only if they don't already have an accidental from upper/lowerAccidental)
             for noteIdx, n in enumerate(turnNotes):
-                if t.TYPE_CHECKING:
-                    assert isinstance(n, note.Note)
+                noteObj = t.cast('note.Note', n)
                 noteNum: int = noteIdx + 1
-                if n.pitch.accidental is None and noteNum in (1, 3):
-                    n.pitch.accidental = currentKeySig.accidentalByStep(n.pitch.step)
+                if noteObj.pitch.accidental is None and noteNum in (1, 3):
+                    noteObj.pitch.accidental = currentKeySig.accidentalByStep(noteObj.pitch.step)
 
         inExpressions = -1
         if self in srcObj.expressions:
@@ -2464,15 +2442,15 @@ class GeneralAppoggiatura(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
-        realize an appoggiatura
+        Realize an appoggiatura.
 
-        returns a three-element tuple.
+        Returns a three-element tuple.
         The first is the list of notes that the grace note was converted to.
-        The second is the rest of the note
-        The third is an empty list (since there are no notes at the end of an appoggiatura)
+        The second is the rest of the note.
+        The third is an empty list (since there are no notes at the end of an appoggiatura).
 
         >>> n1 = note.Note('C4')
         >>> n1.quarterLength = 0.5
@@ -2505,9 +2483,8 @@ class GeneralAppoggiatura(Ornament):
         appoggiaturaNote.duration.quarterLength = newDuration
         isTransposed: bool = not isUnison(transposeInterval)
         if isTransposed:
-            if t.TYPE_CHECKING:
-                assert isinstance(appoggiaturaNote, note.Note)
-            appoggiaturaNote.transpose(transposeInterval, inPlace=True)
+            appoggiaturaNoteObj = t.cast('note.Note', appoggiaturaNote)
+            appoggiaturaNoteObj.transpose(transposeInterval, inPlace=True)
 
         inExpressions = -1
         if self in srcObj.expressions:
@@ -2613,10 +2590,10 @@ class Tremolo(Ornament):
         keySig: key.KeySignature|None = None,
         inPlace: bool = False
     ) -> tuple[list[note.Note|note.Unpitched],
-                note.Note|note.Unpitched|None,
-                list[note.Note|note.Unpitched]]:
+               note.Note|note.Unpitched|None,
+               list[note.Note|note.Unpitched]]:
         '''
-        Realize the ornament
+        Realize the ornament.
 
         >>> n = note.Note(type='quarter')
         >>> trem = expressions.Tremolo()
@@ -2710,8 +2687,8 @@ class TrillExtensionException(exceptions21.Music21Exception):
 
 class TrillExtension(spanner.Spanner):
     '''
-    A wavy line trill extension, placed between two notes. N
-    ote that some MusicXML readers include a trill symbol with the wavy line.
+    A wavy line trill extension, placed between two notes.
+    Note that some MusicXML readers include a trill symbol with the wavy line.
 
     >>> s = stream.Stream()
     >>> s.repeatAppend(note.Note(), 8)
@@ -2734,16 +2711,9 @@ class TrillExtension(spanner.Spanner):
 
         self._placement = None  # can above or below or None, after musicxml
 
-    def _getPlacement(self):
-        return self._placement
-
-    def _setPlacement(self, value):
-        if value is not None and value.lower() not in ['above', 'below']:
-            raise TrillExtensionException(f'incorrect placement value: {value}')
-        if value is not None:
-            self._placement = value.lower()
-
-    placement = property(_getPlacement, _setPlacement, doc='''
+    @property
+    def placement(self):
+        '''
         Get or set the placement as either above, below, or None.
 
         >>> s = stream.Stream()
@@ -2755,7 +2725,15 @@ class TrillExtension(spanner.Spanner):
 
         A setting of None implies that the placement will be determined
         by notation software and no particular placement is demanded.
-        ''')
+        '''
+        return self._placement
+
+    @placement.setter
+    def placement(self, value):
+        if value is not None and value.lower() not in ['above', 'below']:
+            raise TrillExtensionException(f'incorrect placement value: {value}')
+        if value is not None:
+            self._placement = value.lower()
 
 
 class TremoloSpanner(spanner.Spanner):

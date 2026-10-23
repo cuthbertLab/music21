@@ -45,7 +45,6 @@ class ActivityMatch:
 
     .. image:: images/ScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
-
     '''
     def __init__(self, streamObj):
         if not hasattr(streamObj, 'classes') or 'Stream' not in streamObj.classes:
@@ -59,7 +58,6 @@ class ActivityMatch:
         Do the analysis, finding correlations of src with dst
         returns an ordered list of dictionaries, in the form
         {'src': obj, 'dst': [objs]}
-
         '''
         if objNameSrc is None:
             objNameSrc = (note.Note, chord.Chord)

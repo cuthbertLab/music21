@@ -10,20 +10,44 @@ from __future__ import annotations
 
 import collections
 import copy
+import typing as t
 import unittest
 
+from music21 import note
 from music21 import pitch
 from music21 import stream
 from music21 import voiceLeading
 from music21.common.numberTools import opFrac
+from music21.common.types import OffsetQL
 from music21.figuredBass import possibility
+from music21.figuredBass.possibility import Possibility
 from music21.exceptions21 import Music21Exception
+
+if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
+# Voice-leading here works on Possibility tuples (one Pitch per part).
+# (offset, endTime) delimiting a voice-leading moment.
+type OffsetEndTime = tuple[OffsetQL, OffsetQL]
+# (partNumberA, partNumberB) one-indexed voice pair forming a violation.
+type PartPair = tuple[int, int]
+
+
+def _isRest(p: pitch.Pitch) -> bool:
+    '''
+    True if p is the rest placeholder returned by :func:`generalNoteToPitch`
+    (a :class:`~music21.pitch.Pitch` whose ps is
+    :obj:`~music21.figuredBass.possibility.POSSIBILITY_REST_PS`) rather than a
+    sounding pitch. Voice-leading checks skip these.
+    '''
+    return p.ps == possibility.POSSIBILITY_REST_PS
+
 
 # ------------------------------------------------------------------------------
 # Parsing scores into voice leading moments (a.k.a. harmonies)
 
 
-def getVoiceLeadingMoments(music21Stream):
+def getVoiceLeadingMoments(music21Stream: stream.Stream) -> stream.Score:
     '''
     Takes in a :class:`~music21.stream.Stream` and returns a :class:`~music21.stream.Score`
     of the :class:`~music21.stream.Stream` broken up into its voice leading moments.
@@ -43,10 +67,14 @@ def getVoiceLeadingMoments(music21Stream):
             :width: 700
     '''
     allHarmonies = extractHarmonies(music21Stream)
-    allParts = music21Stream.getElementsByClass(stream.Part).stream()
-    newParts = [allParts[i].flatten().getElementsNotOfClass('GeneralNote').stream()
-                for i in range(len(allParts))]
-    paddingLeft = allParts[0].getElementsByClass(stream.Measure).first().paddingLeft
+    allParts: stream.Stream[stream.Part] = music21Stream.getElementsByClass(stream.Part).stream()
+    newParts: list[stream.Stream] = [
+        allParts[i].flatten().getElementsNotOfClass('GeneralNote').stream()
+        for i in range(len(allParts))
+    ]
+    firstMeasure = t.cast('stream.Measure',
+                          allParts[0].getElementsByClass(stream.Measure).first())
+    paddingLeft = firstMeasure.paddingLeft
     for (offsets, notes) in sorted(allHarmonies.items()):
         (initOffset, endTime) = offsets
         for genNoteIndex in range(len(notes)):
@@ -65,7 +93,9 @@ def getVoiceLeadingMoments(music21Stream):
     return newScore
 
 
-def extractHarmonies(music21Stream):
+def extractHarmonies(
+    music21Stream: stream.Stream
+) -> dict[OffsetEndTime, list[note.GeneralNote]]:
     # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Stream` and returns a dictionary whose values
@@ -112,7 +142,9 @@ def extractHarmonies(music21Stream):
     return allHarmonies
 
 
-def createOffsetMapping(music21Part):
+def createOffsetMapping(
+    music21Part: stream.Part
+) -> dict[OffsetEndTime, list[note.GeneralNote]]:
     '''
     Creates an initial offset mapping of a :class:`~music21.stream.Part`.
 
@@ -135,7 +167,7 @@ def createOffsetMapping(music21Part):
     (9.0, 11.0)    [<music21.note.Note B->]
     (11.0, 12.0)   [<music21.note.Note A> ]
     '''
-    currentMapping = collections.defaultdict(list)
+    currentMapping: dict[OffsetEndTime, list[note.GeneralNote]] = collections.defaultdict(list)
     for music21GeneralNote in music21Part.flatten().notesAndRests:
         initOffset = music21GeneralNote.offset
         endTime = initOffset + music21GeneralNote.quarterLength
@@ -143,7 +175,10 @@ def createOffsetMapping(music21Part):
     return currentMapping
 
 
-def correlateHarmonies(currentMapping, music21Part):
+def correlateHarmonies(
+    currentMapping: dict[OffsetEndTime, list[note.GeneralNote]],
+    music21Part: stream.Part
+) -> dict[OffsetEndTime, list[note.GeneralNote]]:
     # noinspection PyShadowingNames
     '''
     Adds a new :class:`~music21.stream.Part` to an existing offset mapping.
@@ -173,7 +208,7 @@ def correlateHarmonies(currentMapping, music21Part):
     (10.5, 11.0)   [<music21.note.Note B-> <music21.note.Note C>]
     (11.0, 12.0)   [<music21.note.Note A>  <music21.note.Note F>]
     '''
-    newMapping = {}
+    newMapping: dict[OffsetEndTime, list[note.GeneralNote]] = {}
 
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
@@ -199,7 +234,12 @@ def correlateHarmonies(currentMapping, music21Part):
 # Generic functions for checking for composition rule violations in streams
 
 
-def checkSinglePossibilities(music21Stream, functionToApply, color='#FF0000', debug=False):
+def checkSinglePossibilities(
+    music21Stream: stream.Score,
+    functionToApply: Callable[[Possibility], list[PartPair]],
+    color: str | None = '#FF0000',
+    debug: bool = False
+) -> None:
     # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in a possibility
@@ -231,15 +271,15 @@ def checkSinglePossibilities(music21Stream, functionToApply, color='#FF0000', de
     .. image:: images/figuredBass/corelli_voiceCrossing.*
             :width: 700
     '''
-    debugInfo = []
-    if debug is True:
+    debugInfo: list[str] = []
+    if debug:
         debugInfo.append('Function To Apply: ' + functionToApply.__name__)
         debugInfo.append(f"{'(Offset, End Time):'!s:25}Part Numbers:")
 
     allHarmonies = sorted(list(extractHarmonies(music21Stream).items()))
     allParts = [p.flatten() for p in music21Stream.getElementsByClass(stream.Part)]
     for (offsets, notes) in allHarmonies:
-        vlm = [generalNoteToPitch(n) for n in notes]
+        vlm = tuple(generalNoteToPitch(n) for n in notes)
         vlm_violations = functionToApply(vlm)
         initOffset = offsets[0]
         for partNumberTuple in vlm_violations:
@@ -250,17 +290,22 @@ def checkSinglePossibilities(music21Stream, functionToApply, color='#FF0000', de
                         initOffset,
                         mustBeginInSpan=False)[0]
                     noteA.style.color = color
-            if debug is True:
+            if debug:
                 debugInfo.append(f'{offsets!s:25}{partNumberTuple!s}')
 
-    if debug is True:
+    if debug:
         if len(debugInfo) == 2:
             debugInfo.append('No violations to report.')
         for lineInfo in debugInfo:
             print(lineInfo)
 
 
-def checkConsecutivePossibilities(music21Stream, functionToApply, color='#FF0000', debug=False):
+def checkConsecutivePossibilities(
+    music21Stream: stream.Score,
+    functionToApply: Callable[[Possibility, Possibility], list[PartPair]],
+    color: str | None = '#FF0000',
+    debug: bool = False
+) -> None:
     # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in two consecutive
@@ -294,19 +339,19 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color='#FF0000
     .. image:: images/figuredBass/checker_parallelOctaves.*
             :width: 700
     '''
-    debugInfo = []
-    if debug is True:
+    debugInfo: list[str] = []
+    if debug:
         debugInfo.append('Function To Apply: ' + functionToApply.__name__)
         debugInfo.append('(Offset A, End Time A):  (Offset B, End Time B): Part Numbers:')
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
     allParts = [p.flatten() for p in music21Stream.getElementsByClass(stream.Part)]
     (previousOffsets, previousNotes) = allHarmonies[0]
-    vlmA = [generalNoteToPitch(n) for n in previousNotes]
+    vlmA = tuple(generalNoteToPitch(n) for n in previousNotes)
     initOffsetA = previousOffsets[0]
 
     for (offsets, notes) in allHarmonies[1:]:
-        vlmB = [generalNoteToPitch(n) for n in notes]
+        vlmB = tuple(generalNoteToPitch(n) for n in notes)
         initOffsetB = offsets[0]
         vlm_violations = functionToApply(vlmA, vlmB)
         for partNumberTuple in vlm_violations:
@@ -316,16 +361,19 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color='#FF0000
                         initOffsetA, initOffsetA, mustBeginInSpan=False).first()
                     noteB = allParts[partNumber - 1].getElementsByOffset(
                         initOffsetB, initOffsetB, mustBeginInSpan=False).first()
+                    if noteA is None or noteB is None:
+                        raise Music21Exception(
+                            'Expected notes to color at the violation offset, but found none')
                     noteA.style.color = color
                     noteB.style.color = color
-            if debug is True:
+            if debug:
                 debugInfo.append(f'{previousOffsets!s:25}{offsets!s:25}{partNumberTuple!s}')
         # Current vlm becomes previous
         previousOffsets = offsets
         vlmA = vlmB
         initOffsetA = initOffsetB
 
-    if debug is True:
+    if debug:
         if len(debugInfo) == 2:
             debugInfo.append('No violations to report.')
         for lineInfo in debugInfo:
@@ -338,7 +386,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color='#FF0000
 # represent two voices which form a voice crossing.
 
 
-def voiceCrossing(possibA):
+def voiceCrossing(possibA: Possibility) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
     two voices which form a voice crossing. The parts from the lowest part to
@@ -359,14 +407,14 @@ def voiceCrossing(possibA):
     >>> checker.voiceCrossing(possibA2)
     []
     '''
-    partViolations = []
+    partViolations: list[PartPair] = []
     for part1Index in range(len(possibA)):
         higherPitch = possibA[part1Index]
-        if not hasattr(higherPitch, 'ps'):
+        if _isRest(higherPitch):
             continue
         for part2Index in range(part1Index + 1, len(possibA)):
             lowerPitch = possibA[part2Index]
-            if not hasattr(lowerPitch, 'ps'):
+            if _isRest(lowerPitch):
                 continue
             if higherPitch < lowerPitch:
                 partViolations.append((part1Index + 1, part2Index + 1))
@@ -376,17 +424,12 @@ def voiceCrossing(possibA):
 # Consecutive Possibility Rule-Checking Methods
 
 
-PITCH_QUARTET_TO_BOOL_TYPE = dict[
-    tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
-    bool
-]
-parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
-parallelOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
-hiddenFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
-hiddenOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+# The speedup tables are shared with figuredBass.possibility: both modules feed the
+# same VoiceLeadingQuartet (in the same pitch order) into the same checks, so a quartet
+# computed by one module is valid for the other.  See possibility.py for the definitions.
 
 
-def parallelFifths(possibA, possibB):
+def parallelFifths(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
     two voices which form parallel fifths.
@@ -428,36 +471,36 @@ def parallelFifths(possibA, possibB):
     >>> checker.parallelFifths(possibA2, possibB2)
     []
     '''
+    partViolations: list[PartPair] = []
     pairsList = possibility.partPairs(possibA, possibB)
-    partViolations = []
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
+        if _isRest(higherPitchA) or _isRest(higherPitchB):
+            continue
         for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
-            try:
-                if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 7:
-                    continue
-                if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 7:
-                    continue
-            except AttributeError:
+            if _isRest(lowerPitchA) or _isRest(lowerPitchB):
+                continue
+            if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 7:
+                continue
+            if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 7:
                 continue
             # Very high probability of ||5, but still not certain.
             pitchQuartet = (lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
-            if pitchQuartet in parallelFifthsTable:
-                hasParallelFifths = parallelFifthsTable[pitchQuartet]
-                if hasParallelFifths:
-                    partViolations.append((pair1Index + 1, pair2Index + 1))
-            vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
-            if vlq.parallelFifth():
+            if pitchQuartet in possibility.parallelFifthsTable:
+                hasParallelFifths = possibility.parallelFifthsTable[pitchQuartet]
+            else:
+                vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
+                hasParallelFifths = vlq.parallelFifth()
+                possibility.parallelFifthsTable[pitchQuartet] = hasParallelFifths
+            if hasParallelFifths:
                 partViolations.append((pair1Index + 1, pair2Index + 1))
-                parallelFifthsTable[pitchQuartet] = True
-            parallelFifthsTable[pitchQuartet] = False
 
     return partViolations
 
 
-def hiddenFifth(possibA, possibB):
+def hiddenFifths(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list with a (highestPart, lowestPart) pair which represents
     a hidden fifth between shared outer parts of possibA and possibB. The
@@ -482,7 +525,7 @@ def hiddenFifth(possibA, possibB):
 
     >>> possibA1 = (E5, E3, C3)
     >>> possibB1 = (A5, F3, D3)
-    >>> checker.hiddenFifth(possibA1, possibB1)
+    >>> checker.hiddenFifths(possibA1, possibB1)
     [(1, 3)]
 
     Here, the soprano and bass parts also move in similar motion, but the
@@ -492,7 +535,7 @@ def hiddenFifth(possibA, possibB):
     >>> Ab5 = pitch.Pitch('A-5')
     >>> possibA2 = (E5, E3, C3)
     >>> possibB2 = (Ab5, F3, D3)
-    >>> checker.hiddenFifth(possibA2, possibB2)
+    >>> checker.hiddenFifths(possibA2, possibB2)
     []
 
     Now, we have the soprano and bass parts again moving to A5 and D3, whose
@@ -502,36 +545,35 @@ def hiddenFifth(possibA, possibB):
     >>> E6 = pitch.Pitch('E6')
     >>> possibA3 = (E6, E3, C3)
     >>> possibB3 = (A5, F3, D3)
-    >>> checker.hiddenFifth(possibA3, possibB3)
+    >>> checker.hiddenFifths(possibA3, possibB3)
     []
+
+    * Changed in v11: renamed from hiddenFifth (singular) to match parallelFifths.
     '''
-    partViolations = []
+    partViolations: list[PartPair] = []
     pairsList = possibility.partPairs(possibA, possibB)
     (highestPitchA, highestPitchB) = pairsList[0]
     (lowestPitchA, lowestPitchB) = pairsList[-1]
+    if any(_isRest(p) for p in (
+            highestPitchA, highestPitchB, lowestPitchA, lowestPitchB)):
+        return partViolations
 
-    try:
-        if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 7:
-            # Very high probability of hidden fifth, but still not certain.
-            pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
-            if pitchQuartet in hiddenFifthsTable:
-                hasHiddenFifth = hiddenFifthsTable[pitchQuartet]
-                if hasHiddenFifth:
-                    partViolations.append((1, len(possibB)))
-                return partViolations
+    if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 7:
+        # Very high probability of hidden fifth, but still not certain.
+        pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
+        if pitchQuartet in possibility.hiddenFifthsTable:
+            hasHiddenFifth = possibility.hiddenFifthsTable[pitchQuartet]
+        else:
             vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
-            if vlq.hiddenFifth():
-                partViolations.append((1, len(possibB)))
-                hiddenFifthsTable[pitchQuartet] = True
-            hiddenFifthsTable[pitchQuartet] = False
-            return partViolations
-    except AttributeError:
-        pass
+            hasHiddenFifth = vlq.hiddenFifth()
+            possibility.hiddenFifthsTable[pitchQuartet] = hasHiddenFifth
+        if hasHiddenFifth:
+            partViolations.append((1, len(possibB)))
 
     return partViolations
 
 
-def parallelOctaves(possibA, possibB):
+def parallelOctaves(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
     two voices which form parallel octaves.
@@ -574,36 +616,36 @@ def parallelOctaves(possibA, possibB):
     >>> checker.parallelOctaves(possibA2, possibB2)
     []
     '''
+    partViolations: list[PartPair] = []
     pairsList = possibility.partPairs(possibA, possibB)
-    partViolations = []
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
+        if _isRest(higherPitchA) or _isRest(higherPitchB):
+            continue
         for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
-            try:
-                if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 0:
-                    continue
-                if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 0:
-                    continue
-            except AttributeError:
+            if _isRest(lowerPitchA) or _isRest(lowerPitchB):
+                continue
+            if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 0:
+                continue
+            if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 0:
                 continue
             # Very high probability of ||8, but still not certain.
             pitchQuartet = (lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
-            if pitchQuartet in parallelOctavesTable:
-                hasParallelOctaves = parallelOctavesTable[pitchQuartet]
-                if hasParallelOctaves:
-                    partViolations.append((pair1Index + 1, pair2Index + 1))
-            vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
-            if vlq.parallelOctave():
+            if pitchQuartet in possibility.parallelOctavesTable:
+                hasParallelOctaves = possibility.parallelOctavesTable[pitchQuartet]
+            else:
+                vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
+                hasParallelOctaves = vlq.parallelOctave()
+                possibility.parallelOctavesTable[pitchQuartet] = hasParallelOctaves
+            if hasParallelOctaves:
                 partViolations.append((pair1Index + 1, pair2Index + 1))
-                parallelOctavesTable[pitchQuartet] = True
-            parallelOctavesTable[pitchQuartet] = False
 
     return partViolations
 
 
-def hiddenOctave(possibA, possibB):
+def hiddenOctaves(possibA: Possibility, possibB: Possibility) -> list[PartPair]:
     '''
     Returns a list with a (highestPart, lowestPart) pair which represents
     a hidden octave between shared outer parts of possibA and possibB. The
@@ -628,7 +670,7 @@ def hiddenOctave(possibA, possibB):
 
     >>> possibA1 = (A5, E3, C3)
     >>> possibB1 = (D6, F3, D3)  # Perfect octave between soprano and bass.
-    >>> checker.hiddenOctave(possibA1, possibB1)
+    >>> checker.hiddenOctaves(possibA1, possibB1)
     [(1, 3)]
 
     Here, the bass part moves up from C3 to D3 but the soprano part moves
@@ -638,31 +680,30 @@ def hiddenOctave(possibA, possibB):
     >>> A6 = pitch.Pitch('A6')
     >>> possibA2 = (A6, E3, C3)
     >>> possibB2 = (D6, F3, D3)
-    >>> checker.hiddenOctave(possibA2, possibB2)
+    >>> checker.hiddenOctaves(possibA2, possibB2)
     []
+
+    * Changed in v11: renamed from hiddenOctave (singular) to match parallelOctaves.
     '''
-    partViolations = []
+    partViolations: list[PartPair] = []
     pairsList = possibility.partPairs(possibA, possibB)
     (highestPitchA, highestPitchB) = pairsList[0]
     (lowestPitchA, lowestPitchB) = pairsList[-1]
+    if any(_isRest(p) for p in (
+            highestPitchA, highestPitchB, lowestPitchA, lowestPitchB)):
+        return partViolations
 
-    try:
-        if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 0:
-            # Very high probability of hidden octave, but still not certain.
-            pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
-            if pitchQuartet in hiddenOctavesTable:
-                hasHiddenOctave = hiddenOctavesTable[pitchQuartet]
-                if hasHiddenOctave:
-                    partViolations.append((1, len(possibB)))
-                return partViolations
+    if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 0:
+        # Very high probability of hidden octave, but still not certain.
+        pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
+        if pitchQuartet in possibility.hiddenOctavesTable:
+            hasHiddenOctave = possibility.hiddenOctavesTable[pitchQuartet]
+        else:
             vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
-            if vlq.hiddenOctave():
-                partViolations.append((1, len(possibB)))
-                hiddenOctavesTable[pitchQuartet] = True
-            hiddenOctavesTable[pitchQuartet] = False
-            return partViolations
-    except AttributeError:
-        pass
+            hasHiddenOctave = vlq.hiddenOctave()
+            possibility.hiddenOctavesTable[pitchQuartet] = hasHiddenOctave
+        if hasHiddenOctave:
+            partViolations.append((1, len(possibB)))
 
     return partViolations
 
@@ -670,23 +711,30 @@ def hiddenOctave(possibA, possibB):
 # Helper Methods
 
 
-def generalNoteToPitch(music21GeneralNote):
+def generalNoteToPitch(music21GeneralNote: note.GeneralNote) -> pitch.Pitch:
     '''
     Takes a :class:`~music21.note.GeneralNote`. If it is a :class:`~music21.note.Note`,
-    returns its pitch. Otherwise, returns the string "RT", a rest placeholder.
+    returns its pitch.
 
     >>> n1 = note.Note('G5')
     >>> c1 = chord.Chord(['C3', 'E3', 'G3'])
 
     >>> figuredBass.checker.generalNoteToPitch(n1)
     <music21.pitch.Pitch G5>
-    >>> figuredBass.checker.generalNoteToPitch(c1)
-    'RT'
+
+    A chord (or rest) becomes the rest placeholder:
+
+    >>> restPlaceholder = figuredBass.checker.generalNoteToPitch(c1)
+    >>> restPlaceholder.ps == figuredBass.possibility.POSSIBILITY_REST_PS
+    True
+    >>> restPlaceholder.ps
+    0.0
     '''
-    if music21GeneralNote.isNote:
+    if isinstance(music21GeneralNote, note.Note):
         return music21GeneralNote.pitch
-    else:
-        return 'RT'
+    restPlaceholder = pitch.Pitch()
+    restPlaceholder.ps = possibility.POSSIBILITY_REST_PS
+    return restPlaceholder
 
 
 _DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments,
@@ -695,7 +743,29 @@ _DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments,
 
 
 class Test(unittest.TestCase):
-    pass
+    def testParallelFifthsCachePopulatesAndIsShared(self):
+        '''
+        The speedup table actually caches (it formerly stored False on every call and
+        never hit), and the table is the one shared with figuredBass.possibility, so a
+        quartet computed in one module is reused by the other.
+        '''
+        # Bass C3->D3 and tenor G3->A3 form a perfect fifth moving in parallel.
+        possibA = (pitch.Pitch('B4'), pitch.Pitch('G3'), pitch.Pitch('C3'))
+        possibB = (pitch.Pitch('A4'), pitch.Pitch('A3'), pitch.Pitch('D3'))
+
+        possibility.parallelFifthsTable.clear()
+        self.assertEqual(parallelFifths(possibA, possibB), [(2, 3)])
+
+        # The quartet was stored as True, not recomputed-and-overwritten-as-False.
+        self.assertEqual(len(possibility.parallelFifthsTable), 1)
+        self.assertEqual(list(possibility.parallelFifthsTable.values()), [True])
+
+        # checker and possibility share one table: value-equal pitches (new objects)
+        # hit the cached entry rather than adding a second one.
+        possibA2 = (pitch.Pitch('B4'), pitch.Pitch('G3'), pitch.Pitch('C3'))
+        possibB2 = (pitch.Pitch('A4'), pitch.Pitch('A3'), pitch.Pitch('D3'))
+        self.assertTrue(possibility.parallelFifths(possibA2, possibB2))
+        self.assertEqual(len(possibility.parallelFifthsTable), 1)
 
 
 if __name__ == '__main__':

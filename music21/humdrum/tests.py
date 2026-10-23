@@ -18,16 +18,20 @@ for the deep-copy round trip.
 from __future__ import annotations
 
 import re
+import typing as t
 import unittest
 
 from music21 import bar
 from music21 import common
 from music21 import dynamics
 from music21 import expressions
+from music21 import note
 from music21 import roman
 from music21 import stream
 from music21.humdrum import testFiles
 from music21.humdrum.spineParser import (
+    GlobalComment,
+    GlobalReference,
     HumdrumDataCollection,
     KernSpine,
     SpineComment,
@@ -81,6 +85,137 @@ class Test(unittest.TestCase):
         self.assertEqual(b.duration.dots, 0)
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
 
+    def testPartialBeamDirections(self):
+        # lowercase `k` is a partial beam to the left, uppercase `K` to the right
+        left = SpineEvent('8ccLk').toNote()
+        self.assertEqual([(bm.type, bm.direction) for bm in left.beams.beamsList],
+                         [('start', None), ('partial', 'left')])
+        right = SpineEvent('8ccLK').toNote()
+        self.assertEqual([(bm.type, bm.direction) for bm in right.beams.beamsList],
+                         [('start', None), ('partial', 'right')])
+
+    def testGraceNoteKeepsWrittenDuration(self):
+        '''
+        A single `q` is a slashed grace note that keeps its written duration.
+        '''
+        n = SpineEvent('16ccq').toNote()
+        self.assertTrue(n.duration.isGrace)
+        self.assertEqual(n.duration.type, '16th')
+        self.assertTrue(n.duration.slash)
+
+    def testUnslashedGraceNote(self):
+        '''
+        `qq` or `Q` marks two kinds of unslashed grace note.
+        '''
+        for contents in ('16ccqq', '16ccQ'):
+            n = SpineEvent(contents).toNote()
+            self.assertTrue(n.duration.isGrace)
+            self.assertEqual(n.duration.type, '16th')
+            self.assertFalse(n.duration.slash)
+
+    def testGraceNoteWithoutDurationDefaultsToEighth(self):
+        '''
+        With no written duration a grace note defaults to an eighth.
+        '''
+        n = SpineEvent('ccq').toNote()
+        self.assertTrue(n.duration.isGrace)
+        self.assertEqual(n.duration.type, 'eighth')
+        self.assertTrue(n.duration.slash)
+
+    def testGraceNoteFromProcessNoteEvent(self):
+        ks = KernSpine()
+        ks.setup()
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('4Cq')
+        self.assertEqual(a.duration.type, 'quarter')
+        self.assertEqual(a.duration.slash, True)
+        # noinspection SpellCheckingInspection
+        a = ks.processNoteEvent('16Cqq')
+        self.assertEqual(a.duration.type, '16th')
+        self.assertEqual(a.duration.slash, False)
+
+    def testChordFromProcessChordEvent(self):
+        ks = KernSpine()
+        ks.setup()
+        c = ks.processChordEvent('8C 8E')
+        self.assertEqual(len(c.notes), 2)
+        self.assertEqual(c.notes[0].duration, c.duration)
+        c = ks.processChordEvent('8C E')
+        self.assertEqual(c.notes[0].duration, c.notes[1].duration)
+
+    def testChordNoteInheritsDefaultDuration(self):
+        '''
+        A note with no written duration takes the given defaultDurationOrNone
+        (the first note's duration in a chord), sharing the same Duration object;
+        a note with its own written duration ignores it.
+        '''
+        ks = KernSpine()
+        ks.setup()
+        c = ks.processChordEvent('8C E 2G')
+        self.assertIs(c.duration, c[0].duration)
+        self.assertEqual(c.notes[0].duration.type, 'eighth')
+        self.assertIs(c[0].duration, c[1].duration)
+        self.assertIsNot(c[0].duration, c[2].duration)
+        self.assertEqual(c.notes[2].duration.type, 'half')
+
+    def testPartiallyNotatedChordDurations(self):
+        '''
+        In a kern chord whose later notes omit a duration (`8C E G`), every note
+        takes the first note's duration instead of defaulting to a quarter; a
+        chord that notates each duration (`8C 2E 2G`) keeps them.
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M4/4
+=1
+8C E G
+8C 2E 2G
+2r
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        chords = list(hdc.stream.recurse().getElementsByClass('Chord'))
+        self.assertEqual(len(chords), 2)
+        partial, fullyNotated = chords
+        self.assertEqual([n.duration.type for n in partial],
+                         ['eighth', 'eighth', 'eighth'])
+        self.assertEqual([n.duration.type for n in fullyNotated],
+                         ['eighth', 'half', 'half'])
+
+    def testChordSharesMatchingDurationObjects(self):
+        '''
+        Chord notes that omit or repeat the first note's duration share its
+        Duration object; a note with a different duration keeps its own (e.g. the
+        held top voice in `4G 4e 2g`).
+        '''
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M4/4
+=1
+8C 8E 8G
+4G 4e 2g
+2r
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        chords = list(hdc.stream.recurse().getElementsByClass('Chord'))
+        self.assertEqual(len(chords), 2)
+        matched, mixed = chords
+
+        # 8C 8E 8G: all three notes share one Duration object
+        matchedDurations = [n.duration for n in matched.notes]
+        self.assertEqual(len({id(d) for d in matchedDurations}), 1)
+
+        # 4G 4e 2g: the two quarters share one object, the half is its own
+        mixedDurations = [n.duration for n in mixed.notes]
+        quarters = [d for d in mixedDurations if d.type == 'quarter']
+        halves = [d for d in mixedDurations if d.type == 'half']
+        self.assertEqual(len(quarters), 2)
+        self.assertEqual(len(halves), 1)
+        self.assertEqual(len({id(d) for d in quarters}), 1)
+
     def testMeasureBoundaries(self):
         m0 = stream.Measure()
         m1 = hdStringToMeasure('=29a;:|:', m0)
@@ -107,7 +242,7 @@ class Test(unittest.TestCase):
 
     def x_testFakePiece(self):
         '''
-        test loading a fake piece with spine paths, lyrics, dynamics, etc.
+        Test loading a fake piece with spine paths, lyrics, dynamics, etc.
         '''
         hdc = HumdrumDataCollection(testFiles.fakeTest)
         hdc.parse()
@@ -199,8 +334,6 @@ class Test(unittest.TestCase):
         spines (split indicator immediately *after* the =2 barline) with a half
         note on each, merges back to one spine before =3, and m3 has a single
         half note.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern
@@ -244,8 +377,6 @@ class Test(unittest.TestCase):
         *before* the =2 barline (the barline therefore appears within both new
         spines).  Humdrum syntax permits this; only adjacency rules constrain
         spine path indicators.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern
@@ -293,8 +424,6 @@ class Test(unittest.TestCase):
         Expected layout: one Part with three Measures, each two quarters long;
         m1 has no voices, m2 and m3 each have two voices with one half note
         each.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern
@@ -341,8 +470,6 @@ class Test(unittest.TestCase):
         '''
         ``**dynam`` events on the same line as a kern note attach at that note's
         offset.  Sanity-check companion to testDynamAttachedMisaligned.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern    **dynam
@@ -372,8 +499,6 @@ class Test(unittest.TestCase):
         event) should still attach -- to the stream at the offset of the most
         recently-sounding note.  Currently fails: misaligned dynamics are
         silently dropped.  See TODO in `SpineCollection.attachNonKernEvents`.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern    **dynam
@@ -406,8 +531,6 @@ class Test(unittest.TestCase):
         attach -- to the stream at the offset of the most recently-sounding
         note.  Currently fails: misaligned harm events are silently dropped.
         See TODO in `SpineCollection.attachNonKernEvents`.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern    **harm
@@ -439,8 +562,6 @@ class Test(unittest.TestCase):
         '''
         Blank lines should not affect parsing.  Same shape as
         testSplitAfterBarline but with blank lines sprinkled throughout.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 
@@ -482,8 +603,6 @@ class Test(unittest.TestCase):
         '''
         Blank lines mixed into a kern + dynam + harm piece should not affect
         which events attach where.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern    **dynam    **harm
@@ -521,8 +640,6 @@ class Test(unittest.TestCase):
         Verify that each lyric syllable from a ``**text`` spine attaches to the
         kern note on the same line.  Existing testLyricsInSpine only checks
         the assembled lyric string; this checks the per-note mapping.
-
-        Test is AI-assisted.
         '''
         krn = re.sub(r'\s\s\s\s+', '\t', r'''
 **kern    **text
@@ -712,24 +829,68 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(md.composer)
         self.assertIn('Palestrina', md.composer)
 
+    def testGlobalEventsReachStream(self):
+        # !! comments become GlobalComment objects in the stream; !!! references
+        # become metadata (known codes proper, unknown ones custom) and do not
+        # stay in the stream; a blank line is ignored without error.
+        src = '\n'.join([
+            '!!!COM: Test Composer',
+            '!!!OTL: Test Title',
+            '!! a global comment here',
+            '',  # blank line in the middle
+            '**kern',
+            '4c',
+            '4d',
+            '*-',
+            '!! comment at the end',
+            '!!!XYZ: trailing free-form ref',
+        ])
+        hdc = HumdrumDataCollection(src)
+        hdc.parse()
+        s = hdc.stream
+
+        # the leading comment lands at 0.0; the trailing one at the end of the
+        # music (the two quarter notes total 2.0), not back at 0.0.
+        flat = s.flatten()
+        commentInfo = [(gc.comment, gc.offset)
+                       for gc in flat.getElementsByClass(GlobalComment)]
+        self.assertEqual(
+            commentInfo,
+            [('a global comment here', 0.0), ('comment at the end', 2.0)])
+
+        # references become metadata only (GlobalReference is not a stream
+        # object), so none of them appear among the stream's elements.
+        self.assertFalse([el for el in s.recurse() if isinstance(el, GlobalReference)])
+        self.assertIsNotNone(s.metadata)
+        self.assertEqual(str(s.metadata.composer), 'Test Composer')
+        self.assertEqual(str(s.metadata.title), 'Test Title')
+        # an unknown code (even trailing) is kept as custom metadata, not lost.
+        self.assertEqual(str(s.metadata.getCustom('XYZ')[0]), 'trailing free-form ref')
+
+        # the blank line did not derail parsing
+        self.assertEqual(len(s.recurse().notes), 2)
+
     def testFlavors(self):
         prevFlavor = flavors['JRP']
-        flavors['JRP'] = False
-        hdc = HumdrumDataCollection(testFiles.dottedTuplet)
-        hdc.parse()
-        c = hdc.stream
-        flavors['JRP'] = True
-        hdc2 = HumdrumDataCollection(testFiles.dottedTuplet)
-        hdc2.parse()
-        d = hdc2.stream
-        flavors['JRP'] = prevFlavor
-        cn = c.parts[0].measure(1).notes[1]
-        dn = d.parts[0].measure(1).notes[1]
+        try:
+            flavors['JRP'] = False
+            hdc = HumdrumDataCollection(testFiles.dottedTuplet)
+            hdc.parse()
+            c = t.cast(stream.Score, hdc.stream)
+            flavors['JRP'] = True
+            hdc2 = HumdrumDataCollection(testFiles.dottedTuplet)
+            hdc2.parse()
+            d = t.cast(stream.Score, hdc2.stream)
+        finally:
+            flavors['JRP'] = prevFlavor
+        cn = c[note.Note][1]
         self.assertEqual(cn.duration.fullName, 'Eighth Triplet (1/2 QL)')
         self.assertEqual(cn.duration.dots, 0)
         self.assertEqual(repr(cn.duration.tuplets[0].durationNormal),
                          "DurationTuple(type='eighth', dots=1, quarterLength=0.75)")
         self.assertEqual(cn.duration.tuplets[0].durationNormal.dots, 1)
+
+        dn = d[note.Note][1]
         self.assertEqual(dn.duration.fullName, 'Dotted Eighth Triplet (1/2 QL)')
         self.assertEqual(dn.duration.dots, 1)
         self.assertEqual(repr(dn.duration.tuplets[0].durationNormal),

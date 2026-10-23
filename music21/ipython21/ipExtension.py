@@ -1,12 +1,20 @@
 from __future__ import annotations
 
+import typing as t
+
 from music21 import common
+
+if t.TYPE_CHECKING:
+    # get_ipython is injected into the global namespace by IPython/Colab at
+    # runtime; declare it here so type checkers know the name exists.
+    def get_ipython() -> t.Any:
+        ...
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 # See converter/subConverters/ConverterIPython for more info.
 
-def load_ipython_extension(ip):
+def load_ipython_extension(ip: t.Any) -> None:
     '''
     Load any necessary notebook extensions.  Currently just
     sets matplotlib to interactive mode.
@@ -33,7 +41,9 @@ def load_ipython_extension(ip):
         pass
 
 
-def inGoogleColabNotebook():
+def inGoogleColabNotebook() -> bool:
+    # the get_ipython() is declared for type checkers, but not pylint.
+    # pylint: disable=used-before-assignment
     if not common.runningInNotebook():
         return False
     try:
@@ -44,7 +54,7 @@ def inGoogleColabNotebook():
     except NameError:
         return False
 
-def notebookVersion():
+def notebookVersion() -> tuple[int, ...]:
     try:
         # noinspection PyPackageRequirements
         import notebook  # type: ignore

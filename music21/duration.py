@@ -52,7 +52,7 @@ import copy
 import fractions
 from functools import lru_cache
 import io
-from math import inf, isnan
+from math import inf, isnan, isfinite
 import typing as t
 import unittest
 
@@ -77,8 +77,8 @@ DENOM_LIMIT = defaults.limitOffsetDenominator
 
 POSSIBLE_DOTS_IN_TUPLETS = (0, 1)
 
-TupletType = t.Literal['start', 'stop', 'startStop', False, None]
-TupletShowOptions = t.Literal['number', 'type', 'both', None]
+type TupletType = t.Literal['start', 'stop', 'startStop', False, None]
+type TupletShowOptions = t.Literal['number', 'type', 'both', None]
 
 class DurationException(exceptions21.Music21Exception):
     pass
@@ -331,7 +331,6 @@ def dottedMatch(qLen: OffsetQLIn,
 
     >>> duration.dottedMatch(0.00001, 2)
     (False, False)
-
     '''
     for dots in range(maxDots + 1):
         # assume qLen has n dots, so find its non-dotted length
@@ -800,7 +799,7 @@ class DurationTuple(t.NamedTuple):
 
     Most Durations have one DurationTuple stored in `.components`.  Tuplet notes
     have a DurationTuple and a Tuplet object. A complex Duration (like
-    a quarter tied to an sixteenth) can have tow or more DurationTuples.
+    a quarter tied to a sixteenth) can have two or more DurationTuples.
 
     A DurationTuple's `quarterLength` is also stored alongside `type` and `dots`
     for quick computation.  For `inexpressible` DurationTuples, `quarterLength`
@@ -872,7 +871,7 @@ def durationTupleFromQuarterLength(ql=1.0) -> DurationTuple:
             return DurationTuple('inexpressible', 0, ql)
 
 
-def durationTupleFromTypeDots(durType='quarter', dots=0):
+def durationTupleFromTypeDots(durType: str = 'quarter', dots: int = 0) -> DurationTuple:
     '''
     Returns a DurationTuple (which knows its quarterLength) for
     a given type and dots (no tuplets)
@@ -1173,7 +1172,7 @@ class Tuplet(prebase.ProtoM21Object):
         return base_rep
 
     def _checkFrozen(self):
-        if self.frozen is True:
+        if self.frozen:
             raise TupletException(
                 'A frozen tuplet (or one attached to a duration) has immutable length.')
 
@@ -1268,10 +1267,9 @@ class Tuplet(prebase.ProtoM21Object):
         >>> a.setDurationType(4.0)
         >>> a.totalTupletLength()
         8.0
-
         '''
         self._checkFrozen()
-        if common.isNum(durType) and not isinstance(durType, str):
+        if not isinstance(durType, str):
             durType = convertQuarterLengthToType(durType)
 
         self.durationActual = durationTupleFromTypeDots(durType, dots)
@@ -1604,7 +1602,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
              expression.  For instance the duration of 0.5 is generally
              an eighth note, but in the middle of a triplet group might be
              better written as a dotted-eighth triplet.  If expressionIsInferred
-             is True then `music21` can change it according to complex.  If
+             is True then `music21` can change it according to context.  If
              False, then the type, dots, and tuplets are considered immutable.
 
              >>> d = duration.Duration(0.5)
@@ -1633,7 +1631,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                  /,
                  *,
                  type: str|None = None,  # pylint: disable=redefined-builtin
-                 dots: int|None = 0,
+                 dots: int = 0,
                  quarterLength: OffsetQLIn|None = None,
                  durationTuple: DurationTuple|None = None,
                  components: Iterable[DurationTuple]|None = None,
@@ -1697,6 +1695,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
 
     # SPECIAL METHODS #
+
     def __eq__(self, other):
         '''
         Two durations are the same if their type, dots, tuplets, and
@@ -1735,9 +1734,46 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> tupDur1.linked = False
         >>> tupDur1 == tupDur2
         False
+
+        If both durations have :attr:`expressionIsInferred` set to True (such as
+        if they were parsed from MIDI), then their expression (type, dots,
+        tuplets, and components) can be freely changed according to context, so
+        only the `quarterLength` needs to match.  Here a plain eighth note is
+        equal to a dotted eighth under a 3:2 triplet, since both span half a
+        quarter length and both are free to be re-expressed:
+
+        >>> plainDur = duration.Duration(0.5)
+        >>> plainDur.type
+        'eighth'
+        >>> altDur = duration.Duration(type='eighth', dots=1)
+        >>> altDur.appendTuplet(duration.Tuplet(3, 2))
+        >>> altDur.quarterLength
+        0.5
+        >>> altDur.expressionIsInferred = True
+        >>> plainDur == altDur
+        True
+
+        But if either duration's expression is *not* inferred, then type, dots,
+        tuplets, and components must all match as before:
+
+        >>> altDur.expressionIsInferred = False
+        >>> plainDur == altDur
+        False
+
+        * Changed in v11: if both durations have `expressionIsInferred` True,
+          only `quarterLength` must match.
         '''
         if type(other) is not type(self):
             return False
+
+        if self.linked != other.linked:
+            return False
+
+        # When both expressions are inferred from quarterLength, callers are
+        # free to re-express the type, dots, tuplets, and components, so only
+        # the quarterLength is meaningful for equality.
+        if self.expressionIsInferred and other.expressionIsInferred:
+            return self.quarterLength == other.quarterLength
 
         if self.isComplex != other.isComplex:
             return False
@@ -1755,13 +1791,11 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             return False
         if self.quarterLength != other.quarterLength:
             return False
-        if self.linked != other.linked:
-            return False
 
         return True
 
     def _reprInternal(self):
-        if self.linked is True:
+        if self.linked:
             return str(self.quarterLength)
         else:
             return f'unlinked type:{self.type} quarterLength:{self.quarterLength}'
@@ -1805,7 +1839,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         self._componentsNeedUpdating = False
 
     # PUBLIC METHODS #
-    def _getLinked(self) -> bool:
+    @property
+    def linked(self) -> bool:
         '''
         Gets or sets the `.linked` property -- if linked (default) then type, dots, tuplets are
         always coherent with quarterLength.  If not, then they are separate.
@@ -1829,20 +1864,19 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         return self._linked
 
-    def _setLinked(self, value: bool):
+    @linked.setter
+    def linked(self, value: bool):
         if value not in (True, False):
             raise TypeError(f'Linked can only be True or False, not {value}')
         if self._quarterLengthNeedsUpdating:
             self._updateQuarterLength()
-        if value is False and self._linked is True:
+        if value is False and self._linked:
             self._unlinkedType = self.type
-        elif value is True and self._linked is False:
+        elif value is True and not self._linked:
             self._quarterLengthNeedsUpdating = True
             self._componentsNeedUpdating = True
 
         self._linked = value
-
-    linked = property(_getLinked, _setLinked)
 
     def addDurationTuple(self,
                          dur: DurationTuple|Duration|str|OffsetQLIn,
@@ -1991,7 +2025,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         ValueError: amountToScale must be greater than zero
 
         Note: for unlinked durations w/ tuplet scaling, amountToScale must already
-        by a Fraction.
+        be a Fraction.
         '''
         if not amountToScale > 0:
             raise ValueError('amountToScale must be greater than zero')
@@ -2043,7 +2077,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def componentIndexAtQtrPosition(self, quarterPosition):
         '''
-        returns the index number of the duration component sounding at
+        Returns the index number of the duration component sounding at
         the given quarter position.
 
         Note that for 0 and the last value, the object is returned.
@@ -2254,7 +2288,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         # create grace duration
         gd: GraceDuration
-        if appoggiatura is True:
+        if appoggiatura:
             gd = AppoggiaturaDuration()
         else:
             gd = GraceDuration()
@@ -2285,7 +2319,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         Returns False if there was no need to inform the client (like nothing has changed)
         or if `.client` is None.  Otherwise returns True.
         '''
-        if self._quarterLengthNeedsUpdating is True:
+        if self._quarterLengthNeedsUpdating:
             old_qtrLength = self._qtrLength
             self._updateQuarterLength()
             if self._qtrLength == old_qtrLength:
@@ -2359,7 +2393,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Advanced Method:
 
-        returns the current components WITHOUT running the component updater.
+        Returns the current components WITHOUT running the component updater.
 
         Needed by some internal methods.  Components are made on the fly.
 
@@ -2386,7 +2420,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def splitDotGroups(self, *, inPlace=False):
         '''
-        splits a dotGroup-duration (of 1 component) into a new duration of two
+        Splits a dotGroup-duration (of 1 component) into a new duration of two
         components.  Returns a new duration
 
         Probably does not handle properly tuplets of dot-groups.
@@ -2475,7 +2509,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         * Changed in v7: made private and faster.
         '''
-        if self.linked is False:
+        if not self.linked:
             return
 
         if self._dotGroups == (0,) and not self.tuplets and len(self.components) == 1:
@@ -2676,7 +2710,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if not common.isNum(value):
             raise TypeError('only numeric dot values can be used with this method.')
 
-        # easter egg
+        # Easter egg
         if value == inf:
             self.type = nextLargerType(self.type)
             self.dots = 0
@@ -2687,7 +2721,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             components[i] = durationTupleFromTypeDots(dt.type, value)
         self._components = tuple(components)
         self._quarterLengthNeedsUpdating = True
-        if self.linked is True:
+        if self.linked:
             self.expressionIsInferred = False
         self.informClient()
 
@@ -2795,7 +2829,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         Returns True if this Duration has more than one DurationTuple object on
         the `component` list.  That is to say if it's a single Duration that
-        need multiple tied noteheads to represent.
+        needs multiple tied noteheads to represent.
 
         >>> aDur = duration.Duration()
         >>> aDur.quarterLength = 1.375
@@ -2879,28 +2913,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             tot += c.quarterLength
         return tot
 
-    def _getQuarterLength(self) -> OffsetQL:
-        if self._quarterLengthNeedsUpdating:
-            self._updateQuarterLength()
-        return self._qtrLength
-
-    def _setQuarterLength(self, value: OffsetQLIn):
-        if self.linked is False:
-            self._qtrLength = value
-        elif (self._qtrLength != value
-                or self._componentsNeedUpdating  # skip a type update for next type check
-                or self.type == 'inexpressible'):
-            value = opFrac(value)
-            if value == 0.0 and self.linked is True:
-                self.clear()
-            self._qtrLength = value
-            self.expressionIsInferred = True
-            self._componentsNeedUpdating = True
-            self._quarterLengthNeedsUpdating = False
-
-            self.informClient()
-
-    quarterLength = property(_getQuarterLength, _setQuarterLength, doc='''
+    @property
+    def quarterLength(self) -> OffsetQL:
+        '''
         Returns the quarter note length or Sets the quarter note length to
         the specified value. May be expressed as a float or Fraction.
 
@@ -2949,7 +2964,32 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> d.quarterLength = 1/3
         >>> d.quarterLength
         Fraction(1, 3)
-        ''')
+        '''
+        if self._quarterLengthNeedsUpdating:
+            self._updateQuarterLength()
+        return self._qtrLength
+
+    @quarterLength.setter
+    def quarterLength(self, value: OffsetQLIn):
+        if not self.linked:
+            # linked durations get this check for free from opFrac below.
+            if not isfinite(value):
+                raise ValueError(
+                    f'quarterLength must be a finite number, not {value!r}'
+                )
+            self._qtrLength = value
+        elif (self._qtrLength != value
+                or self._componentsNeedUpdating  # skip a type update for next type check
+                or self.type == 'inexpressible'):
+            value = opFrac(value)
+            if value == 0.0 and self.linked:
+                self.clear()
+            self._qtrLength = value
+            self.expressionIsInferred = True
+            self._componentsNeedUpdating = True
+            self._quarterLengthNeedsUpdating = False
+
+            self.informClient()
 
     @property
     def tuplets(self) -> tuple[Tuplet, ...]:
@@ -3019,7 +3059,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> a.quarterLength
         0.25
         '''
-        if self.linked is False:
+        if not self.linked:
             if self._unlinkedType is None:  # pragma: no cover
                 raise DurationException(
                     'linked property setter failed to set _unlinkedType, please open a bug report'
@@ -3038,7 +3078,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if value not in ordinalTypeFromNum and value not in ('inexpressible', 'complex'):
             raise ValueError(f'no such type exists: {value}')
 
-        if self.linked is True:
+        if self.linked:
             nt = durationTupleFromTypeDots(value, self.dots)
             self.components = (nt,)
             self._quarterLengthNeedsUpdating = True
@@ -3311,12 +3351,12 @@ class TupletFixer:
         tupletActive = False
         for n in self.streamIn.notesAndRests:
             if not n.duration.tuplets:  # most common case first
-                if tupletActive is True:
+                if tupletActive:
                     self.allTupletGroups.append(currentTupletGroup)
                     currentTupletGroup = []
                     tupletActive = False
                 continue
-            if tupletActive is False:
+            if not tupletActive:
                 tupletActive = True
             currentTupletGroup.append(n)
             if incorporateGroupings and n.duration.tuplets[0].type == 'stop':
@@ -3411,6 +3451,7 @@ class TupletFixer:
         There is a side format of humdrum that the Josquin Research Project uses
         for long notes like the 3%2.
 
+        >>> saved_JRP_flavor = humdrum.spineParser.flavors['JRP']  #_DOCS_HIDE
         >>> humdrum.spineParser.flavors['JRP'] = True
 
         Since Humdrum parsing is going to apply TupletFixer, we will temporarily
@@ -3434,6 +3475,7 @@ class TupletFixer:
         {10.6667 - 12.0} <music21.note.Note F#>
 
         >>> duration.TupletFixer.fixBrokenTupletDuration = saved_fixed_broken
+        >>> humdrum.spineParser.flavors['JRP'] = saved_JRP_flavor  #_DOCS_HIDE
         >>> tf = duration.TupletFixer(m1)
         >>> tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
         >>> tupletGroups
@@ -3476,7 +3518,7 @@ class TupletFixer:
             return
         firstTup = tupletGroup[0].duration.tuplets[0]
         totalTupletDuration = opFrac(firstTup.totalTupletLength())
-        currentTupletDuration = 0.0
+        currentTupletDuration: OffsetQL = 0.0
         smallestTupletTypeOrdinal: int = SMALL_SENTINEL
         largestTupletTypeOrdinal: int = LARGE_SENTINEL
 
@@ -3871,16 +3913,14 @@ class Test(unittest.TestCase):
                          "DurationTuple(type='16th', dots=0, quarterLength=0.25)")
 
     def testUnlinkedTypeA(self):
-        from music21 import duration
-
-        du = duration.Duration()
+        du = Duration()
         du.linked = False
         du.quarterLength = 5.0
         du.type = 'quarter'
         self.assertEqual(du.quarterLength, 5.0)
         self.assertEqual(du.type, 'quarter')
 
-        d = duration.Duration()
+        d = Duration()
         self.assertTrue(d.linked)  # note set
         d.linked = False
         d.type = 'quarter'
@@ -4025,6 +4065,52 @@ class Test(unittest.TestCase):
         # and quarterLength is usually accomplished in multiple
         # attribute assignments that could occur in any order
         self.assertEqual(d.expressionIsInferred, False)
+
+    def testEqualityExpressionIsInferred(self):
+        '''
+        When both durations infer their expression from quarterLength, only
+        quarterLength must match for equality (GH #1970).
+        '''
+        # A plain quarter note and a half note in a 2:1 tuplet both span one
+        # quarter length but differ in type and tuplets.
+        plainDur = Duration(1.0)
+        altDur = Duration('half')
+        altDur.appendTuplet(Tuplet(2, 1))
+        self.assertEqual(altDur.quarterLength, 1.0)
+        self.assertNotEqual(plainDur.type, altDur.type)
+        self.assertNotEqual(plainDur.tuplets, altDur.tuplets)
+
+        # altDur's expression is not inferred (built from a type), so strict
+        # comparison applies and they are not equal.
+        self.assertFalse(altDur.expressionIsInferred)
+        self.assertNotEqual(plainDur, altDur)
+
+        # Marking altDur's expression as inferred relaxes the comparison to
+        # quarterLength only.
+        altDur.expressionIsInferred = True
+        self.assertEqual(plainDur, altDur)
+        self.assertEqual(altDur, plainDur)  # symmetric
+
+        # Differing quarterLength is still unequal even when both are inferred.
+        altDur2 = Duration(2.0)
+        self.assertTrue(altDur2.expressionIsInferred)
+        self.assertNotEqual(plainDur, altDur2)
+
+        # Link status is still checked before the inference shortcut: an
+        # unlinked duration with the same quarterLength is never equal.
+        unlinkedDur = Duration(1.0)
+        unlinkedDur.linked = False
+        self.assertEqual(unlinkedDur.quarterLength, 1.0)
+        self.assertNotEqual(plainDur, unlinkedDur)
+
+        # Inference must be mutual: one inferred, one not -> strict.
+        eighthDur = Duration(0.5)
+        typedQuarter = Duration(type='quarter')
+        self.assertFalse(typedQuarter.expressionIsInferred)
+        # Same type/dots/QL, so equal even without inference relaxation.
+        self.assertEqual(plainDur, typedQuarter)
+        # But an inferred eighth is not equal to a typed quarter.
+        self.assertNotEqual(eighthDur, typedQuarter)
 
     def testExceptions(self):
         '''

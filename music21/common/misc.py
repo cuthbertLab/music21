@@ -13,7 +13,7 @@ If it doesn't fit anywhere else in the common directory, you'll find it here!
 '''
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Sequence
 import copy
 import os
 import platform
@@ -41,6 +41,7 @@ __all__ = [
 from functools import cache
 
 if t.TYPE_CHECKING:
+    from music21 import pitch
     _T = t.TypeVar('_T')
 
 # -----------------------------------------------------------------------------
@@ -105,7 +106,7 @@ def unique(originalList: Iterable, *, key: Callable|None = None) -> list:
 # provide warning strings to users for use in conditional imports
 
 
-def getMissingImportStr(modNameList):
+def getMissingImportStr(modNameList: Sequence[str]) -> str|None:
     '''
     Given a list of missing module names, returns a nicely-formatted message to the user
     that gives instructions on how to expand music21 with optional packages.
@@ -200,7 +201,7 @@ def sortModules(moduleList: Iterable[t.Any]) -> list[object]:
 
 
 # ----------------------------
-def pitchList(pitchL):
+def pitchList(pitchL: Iterable[pitch.Pitch]) -> str:
     '''
     utility method that replicates the previous behavior of
     lists of pitches.
@@ -254,7 +255,12 @@ _IMMUTABLE_DEEPCOPY_TYPES = {
     weakref.ref, property,
 }
 
-def defaultDeepcopy(obj: t.Any, memo=None, *, ignoreAttributes: Iterable[str] = ()):
+def defaultDeepcopy(
+    obj: t.Any,
+    memo: dict[int, t.Any]|None = None,
+    *,
+    ignoreAttributes: Iterable[str] = ()
+) -> t.Any:
     '''
     Unfortunately, it is not possible to do something like::
 
