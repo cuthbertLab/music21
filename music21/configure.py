@@ -1609,6 +1609,7 @@ class Test(unittest.TestCase):
         current = {'musicxmlPath': reader, 'musescoreDirectPNGPath': currentPNGPath}
         newSettings = {}
         with (mock.patch('music21.configure.reload'),
+              mock.patch('music21.configure.writeToUser'),
               mock.patch('music21.environment.set',
                          side_effect=newSettings.__setitem__),
               mock.patch('music21.environment.get', side_effect=current.__getitem__),
