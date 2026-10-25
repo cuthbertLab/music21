@@ -24,6 +24,7 @@ from music21 import instrument
 from music21 import layout
 from music21 import meter
 from music21 import note
+from music21 import pitch
 from music21 import repeat
 from music21 import spanner
 from music21 import stream
@@ -33,7 +34,7 @@ from music21 import tempo
 from music21.musicxml import helpers
 from music21.musicxml import testPrimitive
 from music21.musicxml.m21ToXml import (
-    GeneralObjectExporter, ScoreExporter,
+    GeneralObjectExporter, MeasureExporter, ScoreExporter,
     MusicXMLWarning, MusicXMLExportException
 )
 from music21.musicxml.xmlToM21 import MeasureParser
@@ -228,6 +229,21 @@ class Test(unittest.TestCase):
         v2.id = 'hello'
         xmlOut = self.getXml(m)
         self.assertIn('<voice>hello</voice>', xmlOut)
+
+    def testOctaveOutOfRange(self):
+        MEX = MeasureExporter()
+        with self.assertWarnsRegex(MusicXMLWarning, 'C-1'):
+            mxPitch = MEX.pitchToXml(pitch.Pitch('C', octave=-1))
+        self.assertEqual(mxPitch.findtext('octave'), '0')
+        with self.assertWarnsRegex(MusicXMLWarning, 'G#12'):
+            mxPitch = MEX.pitchToXml(pitch.Pitch('G#', octave=12))
+        self.assertEqual(mxPitch.findtext('octave'), '9')
+
+        up = note.Unpitched()
+        up.displayOctave = -2
+        with self.assertWarns(MusicXMLWarning):
+            mxNote = MEX.unpitchedToXml(up)
+        self.assertEqual(mxNote.findtext('unpitched/display-octave'), '0')
 
     def testUnpitchedGraceInVoice(self):
         '''

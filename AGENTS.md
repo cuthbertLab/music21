@@ -28,6 +28,7 @@
 - No `print()`. Use `environLocal = environment.Environment('moduleName')` and
   `environLocal.printDebug(...)`, or `environLocal.warn(...)` when the user should hear
   about it every time. `test/toggleDebug.py` switches debug output on and off.
+  See the `warnings-and-environment` skill.
 - New exceptions subclass `exceptions21.Music21Exception`.
 - Deprecate a function or method with `@common.deprecated(...)`. Never put it on a
   property: IDEs read every property while inspecting an object, so the warning would
