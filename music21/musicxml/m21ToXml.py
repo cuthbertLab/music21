@@ -241,7 +241,7 @@ def _setTagTextFromAttribute(
     return subElement
 
 
-def _octaveInRange(octave: int|None, name: str) -> int|None:
+def _octaveInRange(octave: int, name: str) -> int:
     '''
     Move an octave into MusicXML's 0-9 range, warning if it had to move.
 
@@ -250,7 +250,7 @@ def _octaveInRange(octave: int|None, name: str) -> int|None:
     >>> musicxml.m21ToXml._octaveInRange(-1, 'C-1')
     0
     '''
-    if octave is None or 0 <= octave <= 9:
+    if 0 <= octave <= 9:
         return octave
     newOctave = min(max(octave, 0), 9)
     warnings.warn(
