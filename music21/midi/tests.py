@@ -508,7 +508,7 @@ class Test(unittest.TestCase):
                  instrument.Flute,
                  instrument.Vibraphone,  # not 10
                  instrument.BassDrum,  # 10
-                 instrument.HiHatCymbal,  # 10
+                 instrument.HiHat,  # 10
                  ]
         iObjs = []
 
@@ -1547,6 +1547,60 @@ class Test(unittest.TestCase):
             ev for ev in mixed_track.events if ev.type is ChannelVoiceMessages.NOTE_ON]
         self.assertEqual(len(note_ons), 3)
         self.assertEqual([ev.pitch for ev in note_ons], [67, 60, 60])
+
+    @staticmethod
+    def _unpitched(midiNumber):
+        u = note.Unpitched()
+        u.storedInstrument = instrument.UnpitchedPercussion()
+        u.storedInstrument.percMapPitch = midiNumber
+        return u
+
+    def testUnmappedPercussionRoundTrip(self):
+        '''
+        22 is not in the GM map; 39 (Hand Clap) is, but has no class.
+        '''
+        m = stream.Measure([
+            instrument.UnpitchedPercussion(),
+            self._unpitched(22),
+            self._unpitched(39),
+            percussion.PercussionChord(
+                [self._unpitched(22), self._unpitched(36), self._unpitched(39)]),
+        ])
+        b = converter.toData(m, fmt='midi')
+        s = converter.parseData(b, fmt='midi')
+        single22, single39, ch = s[note.NotRest]
+        self.assertEqual(single22.storedInstrument.percMapPitch, 22)
+        self.assertEqual(single22.storedInstrument.instrumentName, 'Percussion')
+        self.assertEqual(single39.storedInstrument.percMapPitch, 39)
+        self.assertEqual(single39.storedInstrument.instrumentName, 'Hand Clap')
+        self.assertEqual(
+            [u.storedInstrument.percMapPitch for u in ch.notes], [22, 36, 39])
+
+        tracks = streamHierarchyToMidiTracks(s)
+        note_ons = [
+            ev for ev in tracks[1].events if ev.type is ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual([ev.pitch for ev in note_ons], [22, 39, 22, 36, 39])
+
+    def testTambourineImportsHeadless(self):
+        b = converter.toData(
+            stream.Measure([instrument.UnpitchedPercussion(), self._unpitched(54)]),
+            fmt='midi')
+        s = converter.parseData(b, fmt='midi')
+        tamb = s[note.Unpitched].first().storedInstrument
+        self.assertIsInstance(tamb, instrument.Tambourine)
+        self.assertTrue(tamb.headless)
+
+    def testWhistleRoundTrip(self):
+        b = converter.toData(
+            stream.Measure([instrument.UnpitchedPercussion(), self._unpitched(71)]),
+            fmt='midi')
+        s = converter.parseData(b, fmt='midi')
+        wh = s[note.Unpitched].first().storedInstrument
+        self.assertIsInstance(wh, instrument.Whistle)
+        tracks = streamHierarchyToMidiTracks(s)
+        note_ons = [
+            ev for ev in tracks[1].events if ev.type is ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual([ev.pitch for ev in note_ons], [71])
 
     def testMidiImportLyrics(self):
         lyricFactZh = ['明', '山', '涌', '水', '郁', '郁', '葱', '', '葱',

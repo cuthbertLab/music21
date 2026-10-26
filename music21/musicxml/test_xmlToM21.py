@@ -1737,17 +1737,17 @@ class Test(unittest.TestCase):
         self.assertIsInstance(tmb, instrument.Tambourine)
         self.assertEqual(tmb.percMapPitch, 54)  # 1-indexed
 
-        # An instrument music21 doesn't have yet (Cabasa):
-        scorePart = scorePart.replace('Tambourine', 'Cabasa')
-        scorePart = scorePart.replace('Tamb.', 'Cab.')
-        scorePart = scorePart.replace('55', '70')  # 1-indexed
+        # A number outside the GM percussion map:
+        scorePart = scorePart.replace('Tambourine', 'Hi-Hat Rim')
+        scorePart = scorePart.replace('Tamb.', 'HH Rim')
+        scorePart = scorePart.replace('55', '23')  # 1-indexed
         pp = PartParser()
         mxScorePart = EL(scorePart)
-        msg = '69 does not map to a valid instrument!'
+        msg = '22 does not map to a valid instrument!'
         with self.assertWarnsRegex(MusicXMLWarning, msg):
             unp = pp.getDefaultInstrument(mxScorePart)
         self.assertIsInstance(unp, instrument.UnpitchedPercussion)
-        self.assertEqual(unp.percMapPitch, 69)
+        self.assertEqual(unp.percMapPitch, 22)
 
     def testImportImplicitMeasureNumber(self):
         from music21 import converter

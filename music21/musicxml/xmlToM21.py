@@ -1721,7 +1721,7 @@ class PartParser(XMLParserBase):
                 try:
                     i = pm.midiPitchToInstrument(_adjustMidiData(midiUnpitchedText))
                 except MIDIPercussionException as mpe:
-                    # objects not yet existing in m21 such as Cabasa
+                    # numbers outside the GM percussion map
                     warnings.warn(MusicXMLWarning(mpe), stacklevel=2)
                     i = instrument.UnpitchedPercussion()
                     i.percMapPitch = _adjustMidiData(midiUnpitchedText)
