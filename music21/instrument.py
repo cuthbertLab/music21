@@ -907,12 +907,17 @@ class Shakuhachi(Flute):
 
 class Whistle(MidiPercussionMapMixin, Flute):
     '''
-    A whistle.  By default the referee's kind, without a definite pitch
-    (GM percussion notes 71 short and 72 long); a tin whistle sets `pitched` to True.
+    Small duct flute, from the referee's whistle to the tin whistle.
 
     >>> wh = instrument.Whistle()
+
+    By default a whistle has no definite pitch; a tin whistle sets `pitched` to True.
+
     >>> wh.pitched
     False
+
+    General MIDI has a short and a long whistle sound, chosen by the modifier:
+
     >>> wh.modifier = 'long'
     >>> wh.percMapPitch
     72
@@ -1752,7 +1757,7 @@ class CongaDrum(UnpitchedDrum):
     >>> cd.muted = False
     >>> cd.percMapPitch
     63
-    >>> cd.modifier = 'low'  # or None
+    >>> cd.modifier = 'low'  # or ''
     >>> cd.percMapPitch
     64
 
@@ -1767,7 +1772,7 @@ class CongaDrum(UnpitchedDrum):
         self.instrumentSound = 'drum.conga'
         self.inGMPercMap = True
         self._modifier = 'low'
-        self._modifierToPercMapPitch = {'low': 64, 'high': 63}
+        self._modifierToPercMapPitch = {'low': 64, '': 64, 'high': 63}
         self._percMapPitchToModifier = {64: 'low', 63: 'high', 62: 'high'}
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
@@ -1808,11 +1813,20 @@ class Taiko(UnpitchedDrum):
 
 class Tambourine(UnpitchedDrum):
     '''
-    A tambourine, by default with a head.  MIDI import sets `headless` to True,
-    since GM tambourines usually sound like the headless rock kind.
+    A tambourine, by default with adrum  head (classical style)
+
+    For Rock/pop tambourines (shaker-cymbal type) set
+    headless = True.
 
     >>> instrument.Tambourine().headless
     False
+    >>> instrument.Tambourine().headless = True
+
+    Note that MIDI (like many other formats) does not distinguish
+    between headless and headed tambourines. Even though our default
+    is a headed drum, we import MIDI as headless tambourine, since
+    the majority of MIDI files with tamgourines represent rock/pop
+    styles.
     '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
@@ -1831,8 +1845,14 @@ class Cuica(UnpitchedDrum):
     squeaks and laughs of samba.
 
     >>> cu = instrument.Cuica()
+
+    A cuica can be muted or not (at present, an aspect of the instrument,
+    not the note).  For MIDI output, this changes the MIDI note:
+
     >>> cu.muted
     False
+    >>> cu.percMapPitch
+    79
     >>> cu.muted = True
     >>> cu.percMapPitch
     78
@@ -1861,8 +1881,14 @@ class Surdo(UnpitchedDrum):
     The big Brazilian bass drum that holds down the samba beat.
 
     >>> su = instrument.Surdo()
+
+    A surdo can be muted or not (at present, an aspect of the instrument,
+    not the note).  For MIDI output, this changes the MIDI note:
+
     >>> su.muted
     False
+    >>> su.percMapPitch
+    87
     >>> su.muted = True
     >>> su.percMapPitch
     86
@@ -2835,6 +2861,13 @@ class TestExternal(unittest.TestCase):
 
 
 class Test(unittest.TestCase):
+
+    def testCongaEmptyModifierIsLow(self):
+        cd = CongaDrum()
+        cd.modifier = 'high'
+        cd.modifier = ''
+        self.assertEqual(cd.modifier, 'low')
+        self.assertEqual(cd.percMapPitch, 64)
 
     def testGetAllNamesForInstrumentByClass(self):
         acousticBass = getAllNamesForInstrument(AcousticBass(), SearchLanguage.ENGLISH)
