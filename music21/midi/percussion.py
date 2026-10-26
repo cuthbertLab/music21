@@ -177,7 +177,7 @@ class PercussionMapper:
         >>> other.percMapPitch
         22
 
-        * Changed in v11: GM Level 2, named sounds, and `raiseIfUnmapped`.
+        * Changed in v11: added GM Level 2, named sounds, and `raiseIfUnmapped`.
         '''
 
         if isinstance(midiPitch, int):
@@ -261,6 +261,12 @@ class Test(unittest.TestCase):
         cuica = pm.midiPitchToInstrument(78)
         assert isinstance(cuica, instrument.Cuica)
         self.assertTrue(cuica.muted)
+
+        conga = pm.midiPitchToInstrument(62)
+        assert isinstance(conga, instrument.CongaDrum)
+        self.assertEqual(conga.modifier, 'high')
+        self.assertTrue(conga.muted)
+        self.assertEqual(pm.midiInstrumentToPitch(conga).midi, 62)
 
         bd = instrument.BassDrum()
         bd.modifier = '1'

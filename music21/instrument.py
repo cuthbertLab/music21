@@ -908,7 +908,7 @@ class Shakuhachi(Flute):
 class Whistle(MidiPercussionMapMixin, Flute):
     '''
     A whistle.  By default the referee's kind, without a definite pitch
-    (GM percussion notes 71 short and 72 long); a tin whistle sets `pitched`.
+    (GM percussion notes 71 short and 72 long); a tin whistle sets `pitched` to True.
 
     >>> wh = instrument.Whistle()
     >>> wh.pitched
@@ -1400,10 +1400,11 @@ class Guiro(UnpitchedPercussion):
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
+# For definition of this instrument see James Holland, "Practical Percussion:
+# A Guide to the Instruments and Their Sources," p. 42.
 class Shaker(UnpitchedPercussion):
     '''
-    Rattles that are shaken, among them maracas and caxixi (James Holland,
-    *Practical Percussion: A Guide to the Instruments and Their Sources*, p. 42).
+    Rattles that are shaken, among them maracas and caxixi.
 
     >>> isinstance(instrument.Maracas(), instrument.Shaker)
     True
@@ -1729,6 +1730,35 @@ class Timbales(UnpitchedDrum):
 
 
 class CongaDrum(UnpitchedDrum):
+    '''
+    Single-headed hand drum of Afro-Cuban origin.
+
+    >>> cd = instrument.CongaDrum()
+
+    Music21 knows of two modifiers: 'high' and 'low'.
+
+    >>> cd.modifier = 'high'
+
+    A conga can be muted or not (at present, this is
+    an aspect of the instrument, not the note)
+
+    >>> cd.muted = True
+
+    For MIDI output, the effect of modifier and muted
+    changes the MIDI note
+
+    >>> cd.percMapPitch
+    62
+    >>> cd.muted = False
+    >>> cd.percMapPitch
+    63
+    >>> cd.modifier = 'low'  # or None
+    >>> cd.percMapPitch
+    64
+
+    Note that General MIDI does not distinguish the sound of a
+    muted and unmuted low conga drums.
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1737,9 +1767,19 @@ class CongaDrum(UnpitchedDrum):
         self.instrumentSound = 'drum.conga'
         self.inGMPercMap = True
         self._modifier = 'low'
-        self._modifierToPercMapPitch = {'low': 64, 'mute high': 62, 'open high': 63}
-        self._percMapPitchToModifier = {64: 'low', 62: 'mute high', 63: 'open high'}
+        self._modifierToPercMapPitch = {'low': 64, 'high': 63}
+        self._percMapPitchToModifier = {64: 'low', 63: 'high', 62: 'high'}
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
+
+    # TODO: muting should apply to particular notes, not the instrument
+    @property
+    def muted(self) -> bool:
+        return self.percMapPitch == 62
+
+    @muted.setter
+    def muted(self, value: bool):
+        if self._modifier == 'high':
+            self.percMapPitch = 62 if value else 63
 
 
 class BassDrum(UnpitchedDrum):
