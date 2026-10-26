@@ -26,14 +26,11 @@ from collections import OrderedDict
 from collections.abc import Iterable
 import importlib
 import unittest
-import sys
 import typing as t
-import warnings
 
 from music21 import base
 from music21 import common
 from music21 import environment
-from music21 import exceptions21
 from music21.exceptions21 import InstrumentException
 from music21 import interval
 from music21 import note
@@ -1401,7 +1398,20 @@ class Guiro(UnpitchedPercussion):
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
-class Maracas(UnpitchedPercussion):
+# Maracas and caxixi as kinds of shaker: see James Holland, "Practical Percussion:
+# A Guide to the Instruments and Their Sources," p. 42.
+class Shaker(UnpitchedPercussion):
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Shaker'
+        self.instrumentAbbreviation = 'Shk'
+        self.instrumentSound = 'rattle.shaker'
+        self.inGMPercMap = True
+        self.percMapPitch = 82  # GM Level 2
+
+
+class Maracas(Shaker):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1410,6 +1420,15 @@ class Maracas(UnpitchedPercussion):
         self.percMapPitch = 70
         self.instrumentAbbreviation = 'Mrcs'
         self.instrumentSound = 'rattle.maraca'
+
+
+class Caxixi(Shaker):
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Caxixi'
+        self.instrumentAbbreviation = 'Cax'
+        self.instrumentSound = 'rattle.caxixi'
 
 
 class Vibraslap(UnpitchedPercussion):
@@ -1615,6 +1634,17 @@ class UnpitchedDrum(UnpitchedPercussion):
         super().__init__(**keywords)
         self.instrumentName = 'Drum'
         self.instrumentAbbreviation = 'Dr'
+
+
+class BellTree(UnpitchedPercussion):
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Bell Tree'
+        self.instrumentAbbreviation = 'B Tr'
+        self.instrumentSound = 'metal.bells.bell-tree'
+        self.inGMPercMap = True
+        self.percMapPitch = 84  # GM Level 2
 
 
 class SnareDrum(UnpitchedDrum):
@@ -2747,21 +2777,6 @@ def getAllNamesForInstrument(instrumentClass: Instrument,
     return instrumentNameDict
 
 
-_RENAMED_IN_V11 = {
-    'RideCymbals': 'RideCymbal',
-    'SplashCymbals': 'SplashCymbal',
-}
-
-
-def __getattr__(name: str):
-    if name not in _RENAMED_IN_V11:
-        raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
-    newName = _RENAMED_IN_V11[name]
-    warnings.warn(f'instrument.{name} is deprecated; use instrument.{newName}',
-                  exceptions21.Music21DeprecationWarning, stacklevel=2)
-    return globals()[newName]
-
-
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
     pass
@@ -2769,9 +2784,10 @@ class TestExternal(unittest.TestCase):
 
 class Test(unittest.TestCase):
 
-    def testRenamedClasses(self):
-        with self.assertWarns(exceptions21.Music21DeprecationWarning):
-            self.assertIs(sys.modules[__name__].RideCymbals, RideCymbal)
+    def testShakers(self):
+        self.assertIsInstance(Maracas(), Shaker)
+        self.assertIsInstance(Caxixi(), Shaker)
+        self.assertEqual(Maracas().percMapPitch, 70)
 
     def testGetAllNamesForInstrumentByClass(self):
         acousticBass = getAllNamesForInstrument(AcousticBass(), SearchLanguage.ENGLISH)

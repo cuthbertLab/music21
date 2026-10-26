@@ -87,7 +87,9 @@ class PercussionMapper:
                                 80: i.Triangle,  # Mute Triangle
                                 81: i.Triangle,  # Open Triangle
                                 # GM Level 2
+                                82: i.Shaker,
                                 83: i.SleighBells,  # Jingle Bell
+                                84: i.BellTree,
                                 85: i.Castanets,
                                 86: i.Surdo,  # Mute Surdo
                                 87: i.Surdo,  # Open Surdo
@@ -103,8 +105,6 @@ class PercussionMapper:
                          33: 'Metronome Click',
                          34: 'Metronome Bell',
                          39: 'Hand Clap',
-                         82: 'Shaker',
-                         84: 'Bell Tree',
                          }
 
     # MIDI percussion mappings from https://midi.org/general-midi-level-1 download at
@@ -274,6 +274,8 @@ class Test(unittest.TestCase):
             (73, instrument.Guiro),
             (75, instrument.Claves),
             (78, instrument.Cuica),
+            (82, instrument.Shaker),
+            (84, instrument.BellTree),
             (86, instrument.Surdo),
         ]:
             self.assertIsInstance(pm.midiPitchToInstrument(midiNumber), cls)
