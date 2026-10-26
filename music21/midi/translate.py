@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -450,8 +450,7 @@ def midiEventsToNote(
         nr.pitch.midi = t.cast(int, midiOnEvent.pitch)
     elif isinstance(nr, note.Unpitched):
         onPitch = t.cast(int, midiOnEvent.pitch)
-        nr.storedInstrument = PERCUSSION_MAPPER.midiPitchToInstrument(
-            onPitch, raiseIfUnmapped=False)
+        nr.storedInstrument = _midiNumberToPercussionInstrument(onPitch)
         # TODO: set reasonable displayPitch?
     else:
         raise TranslateException(
@@ -683,8 +682,7 @@ def midiEventsToChord(
         # Construct note.Unpitched objects
         for midi_pitch in pitches:
             unp = note.Unpitched()
-            unp.storedInstrument = PERCUSSION_MAPPER.midiPitchToInstrument(
-                midi_pitch, raiseIfUnmapped=False)
+            unp.storedInstrument = _midiNumberToPercussionInstrument(midi_pitch.midi)
             c.add(unp)
     else:
         c.pitches = tuple(pitches)
@@ -816,6 +814,16 @@ def chordToMidiEvents(
         meOff.correspondingEvent = meOn
 
     return eventList
+
+
+def _midiNumberToPercussionInstrument(midiNumber: int) -> instrument.MidiPercussionMapMixin:
+    '''
+    Instrument for a channel-10 note; GM tambourines are taken to be headless.
+    '''
+    i = PERCUSSION_MAPPER.midiPitchToInstrument(midiNumber, raiseIfUnmapped=False)
+    if isinstance(i, instrument.Tambourine):
+        i.headless = True
+    return i
 
 
 def _get_unpitched_pitch_value(unp: note.Unpitched) -> int:

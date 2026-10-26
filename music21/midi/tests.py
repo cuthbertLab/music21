@@ -1581,6 +1581,16 @@ class Test(unittest.TestCase):
             ev for ev in tracks[1].events if ev.type is ChannelVoiceMessages.NOTE_ON]
         self.assertEqual([ev.pitch for ev in note_ons], [22, 39, 22, 36, 39])
 
+    def testTambourineImportsHeadless(self):
+        b = converter.toData(
+            stream.Measure([instrument.UnpitchedPercussion(), self._unpitched(54)]),
+            fmt='midi')
+        s = converter.parseData(b, fmt='midi')
+        tamb = s[note.Unpitched].first().storedInstrument
+        self.assertIsInstance(tamb, instrument.Tambourine)
+        self.assertTrue(tamb.headless)
+        self.assertFalse(instrument.Tambourine().headless)
+
     def testWhistleRoundTrip(self):
         b = converter.toData(
             stream.Measure([instrument.UnpitchedPercussion(), self._unpitched(71)]),

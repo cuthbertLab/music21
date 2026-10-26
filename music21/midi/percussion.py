@@ -56,7 +56,7 @@ class PercussionMapper:
                                 49: i.CrashCymbals,  # Crash Cymbal 1
                                 50: i.TomTom,  # High Tom
                                 51: i.RideCymbal,  # Ride Cymbal 1
-                                # 52: i.Chinese Cymbal,
+                                52: i.ChineseCymbal,
                                 53: i.RideCymbal,  # Ride Bell
                                 54: i.Tambourine,
                                 55: i.SplashCymbal,
@@ -73,22 +73,24 @@ class PercussionMapper:
                                 66: i.Timbales,  # Low Timbale
                                 67: i.Agogo,  # High Agogo
                                 68: i.Agogo,  # Low Agogo
-                                # 69: i.Cabasa,
+                                69: i.Cabasa,
                                 70: i.Maracas,
                                 71: i.Whistle,  # Short Whistle
                                 72: i.Whistle,  # Long Whistle
-                                # 73: i.Short Guiro,
-                                # 74: i.Long Guiro,
-                                # 75: i.Claves,
+                                73: i.Guiro,  # Short Guiro
+                                74: i.Guiro,  # Long Guiro
+                                75: i.Claves,
                                 76: i.Woodblock,  # Hi Wood Block
                                 77: i.Woodblock,  # Low Wood Block
-                                # 78: i.Mute Cuica,
-                                # 79: i.Open Cuica,
+                                78: i.Cuica,  # Mute Cuica
+                                79: i.Cuica,  # Open Cuica
                                 80: i.Triangle,  # Mute Triangle
                                 81: i.Triangle,  # Open Triangle
                                 # GM Level 2
                                 83: i.SleighBells,  # Jingle Bell
                                 85: i.Castanets,
+                                86: i.Surdo,  # Mute Surdo
+                                87: i.Surdo,  # Open Surdo
                                 }
 
     # sounds in GM Level 1 or GM Level 2 that are not instruments
@@ -139,14 +141,6 @@ class PercussionMapper:
         >>> pm.midiPitchToInstrument(lowPitch)
         Traceback (most recent call last):
         music21.midi.percussion.MIDIPercussionException: 22 does not map to a valid instrument!
-
-        Also, certain GM instruments do not have corresponding music21 instruments,
-        so at present they also raise an exception.
-
-        >>> cabasaPitch = 69
-        >>> pm.midiPitchToInstrument(cabasaPitch)
-        Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: 69 does not map to a valid instrument!
 
         Some music21 Instruments have more than one MidiPitch.  In this case you'll
         get the same Instrument object but with a different modifier
@@ -201,10 +195,10 @@ class PercussionMapper:
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
 
         midiInstrumentObject = midiInstrument()
-        if (isinstance(midiInstrumentObject, instrument.MidiPercussionMapMixin)
-                and midiNumber in midiInstrumentObject._percMapPitchToModifier):
+        if midiNumber in midiInstrumentObject._percMapPitchToModifier:
             midiInstrumentObject.modifier = midiInstrumentObject._percMapPitchToModifier[
                 midiNumber]
+        midiInstrumentObject.percMapPitch = midiNumber
 
         return midiInstrumentObject
 
@@ -256,6 +250,7 @@ class Test(unittest.TestCase):
         for midiNumber in range(27, 88):
             inst = pm.midiPitchToInstrument(midiNumber, raiseIfUnmapped=False)
             self.assertEqual(pm.midiInstrumentToPitch(inst).midi, midiNumber, inst)
+            self.assertNotEqual(inst.instrumentName, 'Percussion', midiNumber)
 
     def testModifiers(self) -> None:
         pm = PercussionMapper()
@@ -272,6 +267,23 @@ class Test(unittest.TestCase):
             inst = pm.midiPitchToInstrument(midiNumber)
             self.assertIsInstance(inst, cls)
             self.assertEqual(inst.modifier, modifier)
+
+        for midiNumber, cls in [
+            (52, instrument.ChineseCymbal),
+            (69, instrument.Cabasa),
+            (73, instrument.Guiro),
+            (75, instrument.Claves),
+            (78, instrument.Cuica),
+            (86, instrument.Surdo),
+        ]:
+            self.assertIsInstance(pm.midiPitchToInstrument(midiNumber), cls)
+        self.assertEqual(pm.midiPitchToInstrument(74).modifier, 'long')
+        cuica = pm.midiPitchToInstrument(78)
+        assert isinstance(cuica, instrument.Cuica)
+        self.assertTrue(cuica.muted)
+        surdo = pm.midiPitchToInstrument(87)
+        assert isinstance(surdo, instrument.Surdo)
+        self.assertFalse(surdo.muted)
 
         bd = instrument.BassDrum()
         bd.modifier = '1'
