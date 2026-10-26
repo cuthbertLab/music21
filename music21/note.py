@@ -1327,7 +1327,7 @@ class NotRest(GeneralNote):
         >>> snare = note.Unpitched()
         >>> snare.storedInstrument = instrument.SnareDrum()
         >>> snare.storedInstrument
-        <music21.instrument.SnareDrum 'Snare Drum'>
+        <music21.instrument.SnareDrum 'Snare Drum' acoustic>
         >>> snare
         <music21.note.Unpitched 'Snare Drum'>
         '''

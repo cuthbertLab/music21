@@ -415,7 +415,7 @@ def midiEventsToNote(
     Access the `storedInstrument`:
 
     >>> unp.storedInstrument
-    <music21.instrument.TomTom 'Tom-Tom'>
+    <music21.instrument.TomTom 'Tom-Tom' low>
 
     And with values that cannot be translated, a generic
     :class:`~music21.instrument.UnpitchedPercussion` instance is given:
@@ -819,15 +819,15 @@ def chordToMidiEvents(
 
 
 def _get_unpitched_pitch_value(unp: note.Unpitched) -> int:
-    unpitched_instrument: instrument.UnpitchedPercussion|None
-    if isinstance(unp.storedInstrument, instrument.UnpitchedPercussion):
+    unpitched_instrument: instrument.MidiPercussionMapMixin|None
+    if isinstance(unp.storedInstrument, instrument.MidiPercussionMapMixin):
         unpitched_instrument = unp.storedInstrument
     else:
         if unp._chordAttached is not None:
             unpitched_instrument = unp._chordAttached.getContextByClass(
-                instrument.UnpitchedPercussion)
+                instrument.MidiPercussionMapMixin)
         else:
-            unpitched_instrument = unp.getContextByClass(instrument.UnpitchedPercussion)
+            unpitched_instrument = unp.getContextByClass(instrument.MidiPercussionMapMixin)
     if unpitched_instrument is not None and unpitched_instrument.percMapPitch is not None:
         return unpitched_instrument.percMapPitch
     return 60  # e.g. lossy instrument recognition from musicxml

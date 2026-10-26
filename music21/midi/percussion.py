@@ -10,7 +10,6 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
-import typing as t
 import unittest
 
 from music21 import pitch
@@ -152,14 +151,14 @@ class PercussionMapper:
         >>> acousticBassDrumPitch = pitch.Pitch(35)
         >>> acousticBDInstrument = pm.midiPitchToInstrument(acousticBassDrumPitch)
         >>> acousticBDInstrument
-        <music21.instrument.BassDrum 'Bass Drum'>
+        <music21.instrument.BassDrum 'Bass Drum' acoustic>
         >>> acousticBDInstrument.modifier
         'acoustic'
 
         >>> oneBassDrumPitch = pitch.Pitch(36)
         >>> oneBDInstrument = pm.midiPitchToInstrument(oneBassDrumPitch)
         >>> oneBDInstrument
-        <music21.instrument.BassDrum 'Bass Drum'>
+        <music21.instrument.BassDrum 'Bass Drum' 1>
         >>> oneBDInstrument.modifier
         '1'
 
@@ -199,13 +198,10 @@ class PercussionMapper:
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
 
         midiInstrumentObject = midiInstrument()
-        if (midiInstrumentObject.inGMPercMap is True
-                and hasattr(midiInstrumentObject, '_percMapPitchToModifier')):
-            midiUnpitchedPercussion = t.cast(
-                instrument.UnpitchedPercussion, midiInstrumentObject)
-            if midiNumber in midiUnpitchedPercussion._percMapPitchToModifier:
-                modifier = midiUnpitchedPercussion._percMapPitchToModifier[midiNumber]
-                midiUnpitchedPercussion.modifier = modifier
+        if (isinstance(midiInstrumentObject, instrument.MidiPercussionMapMixin)
+                and midiNumber in midiInstrumentObject._percMapPitchToModifier):
+            midiInstrumentObject.modifier = midiInstrumentObject._percMapPitchToModifier[
+                midiNumber]
 
         return midiInstrumentObject
 
@@ -235,10 +231,10 @@ class PercussionMapper:
         music21.midi.percussion.MIDIPercussionException: <music21.instrument.Bagpipes 'Bagpipes'>
             is not in the GM Percussion Map!
         '''
-        if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
+        if (not isinstance(midiInstrument, instrument.MidiPercussionMapMixin)
+                or midiInstrument.percMapPitch is None):
             raise MIDIPercussionException(f'{midiInstrument!r} is not in the GM Percussion Map!')
-        percInstrument = t.cast(instrument.Percussion, midiInstrument)
-        midiPitch = t.cast(int, percInstrument.percMapPitch)
+        midiPitch = midiInstrument.percMapPitch
         pitchObject = pitch.Pitch()
         pitchObject.midi = midiPitch
         return pitchObject

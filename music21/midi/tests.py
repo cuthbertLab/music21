@@ -1548,21 +1548,23 @@ class Test(unittest.TestCase):
         self.assertEqual(len(note_ons), 3)
         self.assertEqual([ev.pitch for ev in note_ons], [67, 60, 60])
 
+    @staticmethod
+    def _unpitched(midiNumber):
+        u = note.Unpitched()
+        u.storedInstrument = instrument.UnpitchedPercussion()
+        u.storedInstrument.percMapPitch = midiNumber
+        return u
+
     def testUnmappedPercussionRoundTrip(self):
         '''
         22 is not in the GM map; 39 (Hand Clap) is, but has no class.
         '''
-        def unp(midiNumber):
-            u = note.Unpitched()
-            u.storedInstrument = instrument.UnpitchedPercussion()
-            u.storedInstrument.percMapPitch = midiNumber
-            return u
-
         m = stream.Measure([
             instrument.UnpitchedPercussion(),
-            unp(22),
-            unp(39),
-            percussion.PercussionChord([unp(22), unp(36), unp(39)]),
+            self._unpitched(22),
+            self._unpitched(39),
+            percussion.PercussionChord(
+                [self._unpitched(22), self._unpitched(36), self._unpitched(39)]),
         ])
         b = converter.toData(m, fmt='midi')
         s = converter.parseData(b, fmt='midi')
@@ -1578,6 +1580,18 @@ class Test(unittest.TestCase):
         note_ons = [
             ev for ev in tracks[1].events if ev.type is ChannelVoiceMessages.NOTE_ON]
         self.assertEqual([ev.pitch for ev in note_ons], [22, 39, 22, 36, 39])
+
+    def testWhistleRoundTrip(self):
+        b = converter.toData(
+            stream.Measure([instrument.UnpitchedPercussion(), self._unpitched(71)]),
+            fmt='midi')
+        s = converter.parseData(b, fmt='midi')
+        wh = s[note.Unpitched].first().storedInstrument
+        self.assertIsInstance(wh, instrument.Whistle)
+        tracks = streamHierarchyToMidiTracks(s)
+        note_ons = [
+            ev for ev in tracks[1].events if ev.type is ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual([ev.pitch for ev in note_ons], [71])
 
     def testMidiImportLyrics(self):
         lyricFactZh = ['明', '山', '涌', '水', '郁', '郁', '葱', '', '葱',

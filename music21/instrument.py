@@ -60,7 +60,7 @@ def unbundleInstruments(streamIn: stream.Stream,
     >>> s.append(up2)
     >>> s2 = instrument.unbundleInstruments(s)
     >>> s2.show('text')
-    {0.0} <music21.instrument.BassDrum 'Bass Drum'>
+    {0.0} <music21.instrument.BassDrum 'Bass Drum' acoustic>
     {0.0} <music21.note.Unpitched 'Bass Drum'>
     {1.0} <music21.instrument.Cowbell 'Cowbell'>
     {1.0} <music21.note.Unpitched 'Cowbell'>
@@ -316,6 +316,80 @@ class Instrument(base.Music21Object):
             return 0
             # raise InstrumentException('we are out of midi channels and this '
             #            'was not already detected PROGRAM BUG!')
+
+
+class MidiPercussionMapMixin(Instrument):
+    '''
+    Base for instruments that appear in the General MIDI percussion map
+    (MIDI channel 10), whether or not they are unpitched percussion.
+
+    >>> wh = instrument.Whistle()
+    >>> isinstance(wh, instrument.MidiPercussionMapMixin)
+    True
+    >>> wh.percMapPitch
+    71
+
+    The repr shows the modifier, if any:
+
+    >>> instrument.BongoDrums()
+    <music21.instrument.BongoDrums 'Bongo Drums' high>
+    '''
+    def __init__(self, **keywords) -> None:
+        super().__init__(**keywords)
+        self.percMapPitch: int|None = None
+        self._modifier: str|None = None
+        self._modifierToPercMapPitch: dict[str, int] = {}
+        self._percMapPitchToModifier: dict[int, str] = {}
+
+    def _reprInternal(self):
+        if self._modifier is None:
+            return super()._reprInternal()
+        return f'{super()._reprInternal()} {self._modifier}'
+
+    @property
+    def modifier(self) -> str|None:
+        '''
+        Returns or sets the modifier for this instrument.  A modifier could
+        be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
+
+        If the modifier is in the object's ._modifierToPercMapPitch dictionary
+        then changing the modifier also changes the .percMapPitch for the object
+
+        >>> bd = instrument.BongoDrums()
+        >>> bd.modifier
+        'high'
+
+        >>> bd.percMapPitch
+        60
+        >>> bd.modifier = 'low'
+        >>> bd.percMapPitch
+        61
+
+        Variations on modifiers can also be used and they get normalized:
+
+        >>> wb1 = instrument.Woodblock()
+        >>> wb1.percMapPitch
+        76
+        >>> wb1.modifier = 'LO'
+        >>> wb1.percMapPitch
+        77
+        >>> wb1.modifier  # n.b. -- not LO
+        'low'
+        '''
+        return self._modifier
+
+    @modifier.setter
+    def modifier(self, modifier: str):
+        modifier = modifier.lower().strip()
+
+        if self.inGMPercMap is True and modifier in self._modifierToPercMapPitch:
+            self.percMapPitch = self._modifierToPercMapPitch[modifier]
+
+            # normalize modifiers
+            if self.percMapPitch in self._percMapPitchToModifier:
+                modifier = self._percMapPitchToModifier[self.percMapPitch]
+
+        self._modifier = modifier
 
 
 # ------------------------------------------------------------------------------
@@ -830,7 +904,7 @@ class Shakuhachi(Flute):
         self.midiProgram = 77
 
 
-class Whistle(Flute):
+class Whistle(MidiPercussionMapMixin, Flute):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -838,7 +912,6 @@ class Whistle(Flute):
         self.instrumentAbbreviation = 'Whs'
         self.instrumentSound = 'wind.flutes.whistle'
         self.inGMPercMap = True
-        # TODO: why is this not inheriting from UnpitchedPercussion if we're giving it percMapPitch?
         self.percMapPitch = 71
         self.midiProgram = 78
 
@@ -1105,8 +1178,6 @@ class Tuba(BrassInstrument):
 class Percussion(Instrument):
     def __init__(self, **keywords):
         super().__init__(**keywords)
-        self.inGMPercMap = False
-        self.percMapPitch = None
         self.instrumentName = 'Percussion'
         self.instrumentAbbreviation = 'Perc'
 
@@ -1115,59 +1186,10 @@ class PitchedPercussion(Percussion):
     pass
 
 
-class UnpitchedPercussion(Percussion):
+class UnpitchedPercussion(MidiPercussionMapMixin, Percussion):
     def __init__(self, **keywords):
         super().__init__(**keywords)
-        self._modifier = None
-        self._modifierToPercMapPitch = {}
-        self._percMapPitchToModifier = {}
         self.midiChannel = 9  # 0-indexed, i.e. MIDI channel 10
-
-    @property
-    def modifier(self):
-        '''
-        Returns or sets the modifier for this instrument.  A modifier could
-        be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
-
-        If the modifier is in the object's ._modifierToPercMapPitch dictionary
-        then changing the modifier also changes the .percMapPitch for the object
-
-        >>> bd = instrument.BongoDrums()
-        >>> bd.modifier
-        'high'
-
-        >>> bd.percMapPitch
-        60
-        >>> bd.modifier = 'low'
-        >>> bd.percMapPitch
-        61
-
-        Variations on modifiers can also be used and they get normalized:
-
-        >>> wb1 = instrument.Woodblock()
-        >>> wb1.percMapPitch
-        76
-        >>> wb1.modifier = 'LO'
-        >>> wb1.percMapPitch
-        77
-        >>> wb1.modifier  # n.b. -- not LO
-        'low'
-        '''
-        return self._modifier
-
-    @modifier.setter
-    def modifier(self, modifier):
-        modifier = modifier.lower().strip()
-        # BEN: to-do, pull out hyphens, spaces, etc.
-
-        if self.inGMPercMap is True and modifier.lower() in self._modifierToPercMapPitch:
-            self.percMapPitch = self._modifierToPercMapPitch[modifier.lower()]
-
-            # normalize modifiers
-            if self.percMapPitch in self._percMapPitchToModifier:
-                modifier = self._percMapPitchToModifier[self.percMapPitch]
-
-        self._modifier = modifier
 
 
 class Vibraphone(PitchedPercussion):
