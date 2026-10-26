@@ -1548,6 +1548,37 @@ class Test(unittest.TestCase):
         self.assertEqual(len(note_ons), 3)
         self.assertEqual([ev.pitch for ev in note_ons], [67, 60, 60])
 
+    def testUnmappedPercussionRoundTrip(self):
+        '''
+        22 is not in the GM map; 39 (Hand Clap) is, but has no class.
+        '''
+        def unp(midiNumber):
+            u = note.Unpitched()
+            u.storedInstrument = instrument.UnpitchedPercussion()
+            u.storedInstrument.percMapPitch = midiNumber
+            return u
+
+        m = stream.Measure([
+            instrument.UnpitchedPercussion(),
+            unp(22),
+            unp(39),
+            percussion.PercussionChord([unp(22), unp(36), unp(39)]),
+        ])
+        b = converter.toData(m, fmt='midi')
+        s = converter.parseData(b, fmt='midi')
+        single22, single39, ch = s[note.NotRest]
+        self.assertEqual(single22.storedInstrument.percMapPitch, 22)
+        self.assertEqual(single22.storedInstrument.instrumentName, 'Percussion')
+        self.assertEqual(single39.storedInstrument.percMapPitch, 39)
+        self.assertEqual(single39.storedInstrument.instrumentName, 'Hand Clap')
+        self.assertEqual(
+            [u.storedInstrument.percMapPitch for u in ch.notes], [22, 36, 39])
+
+        tracks = streamHierarchyToMidiTracks(s)
+        note_ons = [
+            ev for ev in tracks[1].events if ev.type is ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual([ev.pitch for ev in note_ons], [22, 39, 22, 36, 39])
+
     def testMidiImportLyrics(self):
         lyricFactZh = ['明', '山', '涌', '水', '郁', '郁', '葱', '', '葱',
                        '钟', '灵', '毓', '秀', '海', '天', '', '东',

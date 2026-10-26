@@ -42,7 +42,7 @@ from music21.midi.base import (
     MidiTrack, DeltaTime, MidiFile, MidiEvent,
     ChannelVoiceMessages, MetaEvents, putNumbersAsList, getNumber, putNumber,
 )
-from music21.midi.percussion import MIDIPercussionException, PercussionMapper
+from music21.midi.percussion import PercussionMapper
 
 
 
@@ -450,11 +450,8 @@ def midiEventsToNote(
         nr.pitch.midi = t.cast(int, midiOnEvent.pitch)
     elif isinstance(nr, note.Unpitched):
         onPitch = t.cast(int, midiOnEvent.pitch)
-        try:
-            i = PERCUSSION_MAPPER.midiPitchToInstrument(onPitch)
-        except MIDIPercussionException:
-            i = instrument.UnpitchedPercussion()
-        nr.storedInstrument = i
+        nr.storedInstrument = PERCUSSION_MAPPER.midiPitchToInstrument(
+            onPitch, raiseIfUnmapped=False)
         # TODO: set reasonable displayPitch?
     else:
         raise TranslateException(
@@ -686,11 +683,8 @@ def midiEventsToChord(
         # Construct note.Unpitched objects
         for midi_pitch in pitches:
             unp = note.Unpitched()
-            try:
-                i = PERCUSSION_MAPPER.midiPitchToInstrument(midi_pitch)
-            except MIDIPercussionException:
-                i = instrument.UnpitchedPercussion()
-            unp.storedInstrument = i
+            unp.storedInstrument = PERCUSSION_MAPPER.midiPitchToInstrument(
+                midi_pitch, raiseIfUnmapped=False)
             c.add(unp)
     else:
         c.pitches = tuple(pitches)

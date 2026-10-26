@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Ben Houge
 #
-# Copyright:    Copyright © 2012, 2017 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2012-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -45,7 +45,6 @@ class PercussionMapper:
                                 36: i.BassDrum,  # Bass Drum 1
                                 37: i.SnareDrum,  # Side Stick
                                 38: i.SnareDrum,  # Acoustic Snare
-                                # 39: i.Hand Clap,
                                 40: i.SnareDrum,  # Electric Snare
                                 41: i.TomTom,  # Low Floor Tom
                                 42: i.HiHatCymbal,  # Closed Hi Hat
@@ -90,12 +89,31 @@ class PercussionMapper:
                                 81: i.Triangle,  # Open Triangle
                                 }
 
+    # sounds in GM Level 1 or GM Level 2 that are not instruments
+    namedSoundMapping = {27: 'High Q',
+                         28: 'Slap',
+                         29: 'Scratch Push',
+                         30: 'Scratch Pull',
+                         31: 'Sticks',
+                         32: 'Square Click',
+                         33: 'Metronome Click',
+                         34: 'Metronome Bell',
+                         39: 'Hand Clap',
+                         82: 'Shaker',
+                         84: 'Bell Tree',
+                         }
+
     # MIDI percussion mappings from https://midi.org/general-midi-level-1 download at
     # https://drive.google.com/file/d/1TTM2HI2JAp_XiTJYEJ8gPNvuJpIjJiTP/view?pli=1
     # formerly at:
     # https://www.midi.org/specifications/item/gm-level-1-sound-set
 
-    def midiPitchToInstrument(self, midiPitch: int|pitch.Pitch) -> instrument.Instrument:
+    def midiPitchToInstrument(
+        self,
+        midiPitch: int|pitch.Pitch,
+        *,
+        raiseIfUnmapped: bool = True,
+    ) -> instrument.Instrument:
         '''
         Takes a pitch.Pitch object or int ranging from 0-127 and returns
         the corresponding instrument in the GM Percussion Map.
@@ -112,13 +130,13 @@ class PercussionMapper:
         >>> moreCowbell
         <music21.instrument.Cowbell 'Cowbell'>
 
-        The standard GM Percussion list goes from 35 to 81;
+        The GM Percussion lists go from 27 to 87;
         pitches outside this range raise an exception.
 
-        >>> bassDrum1Pitch = pitch.Pitch('B-1')
-        >>> pm.midiPitchToInstrument(bassDrum1Pitch)
+        >>> lowPitch = pitch.Pitch('B-0')
+        >>> pm.midiPitchToInstrument(lowPitch)
         Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: 34 does not map to a valid instrument!
+        music21.midi.percussion.MIDIPercussionException: 22 does not map to a valid instrument!
 
         Also, certain GM instruments do not have corresponding music21 instruments,
         so at present they also raise an exception.
@@ -144,6 +162,26 @@ class PercussionMapper:
         <music21.instrument.BassDrum 'Bass Drum'>
         >>> oneBDInstrument.modifier
         '1'
+
+        Sounds in the map that are not instruments give an UnpitchedPercussion
+        object with a name:
+
+        >>> clap = pm.midiPitchToInstrument(39)
+        >>> clap
+        <music21.instrument.UnpitchedPercussion 'Hand Clap'>
+        >>> clap.percMapPitch
+        39
+
+        With `raiseIfUnmapped=False`, any other number gives an UnpitchedPercussion
+        object that keeps the number:
+
+        >>> other = pm.midiPitchToInstrument(22, raiseIfUnmapped=False)
+        >>> other
+        <music21.instrument.UnpitchedPercussion 'Percussion'>
+        >>> other.percMapPitch
+        22
+
+        * Changed in v11: named sounds that are not instruments; `raiseIfUnmapped`.
         '''
 
         if isinstance(midiPitch, int):
@@ -151,6 +189,12 @@ class PercussionMapper:
         else:
             midiNumber = midiPitch.midi
         if midiNumber not in self.reverseInstrumentMapping:
+            if midiNumber in self.namedSoundMapping or not raiseIfUnmapped:
+                generic = instrument.UnpitchedPercussion()
+                generic.percMapPitch = midiNumber
+                if midiNumber in self.namedSoundMapping:
+                    generic.instrumentName = self.namedSoundMapping[midiNumber]
+                return generic
             raise MIDIPercussionException(f'{midiNumber!r} does not map to a valid instrument!')
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
 
