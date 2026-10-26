@@ -26,11 +26,14 @@ from collections import OrderedDict
 from collections.abc import Iterable
 import importlib
 import unittest
+import sys
 import typing as t
+import warnings
 
 from music21 import base
 from music21 import common
 from music21 import environment
+from music21 import exceptions21
 from music21.exceptions21 import InstrumentException
 from music21 import interval
 from music21 import note
@@ -1422,20 +1425,20 @@ class SizzleCymbal(Cymbals):
         self.instrumentSound = 'metal.cymbal.sizzle'
 
 
-class SplashCymbals(Cymbals):
+class SplashCymbal(Cymbals):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
-        self.instrumentName = 'Splash Cymbals'
+        self.instrumentName = 'Splash Cymbal'
         self.instrumentAbbreviation = 'Spl Cym'
         self.instrumentSound = 'metal.cymbal.splash'
 
 
-class RideCymbals(Cymbals):
+class RideCymbal(Cymbals):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
-        self.instrumentName = 'Ride Cymbals'
+        self.instrumentName = 'Ride Cymbal'
         self.instrumentAbbreviation = 'Ride Cym'
         self.instrumentSound = 'metal.cymbal.ride'
 
@@ -2589,12 +2592,31 @@ def getAllNamesForInstrument(instrumentClass: Instrument,
     return instrumentNameDict
 
 
+_RENAMED_IN_V11 = {
+    'RideCymbals': 'RideCymbal',
+    'SplashCymbals': 'SplashCymbal',
+}
+
+
+def __getattr__(name: str):
+    if name not in _RENAMED_IN_V11:
+        raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
+    newName = _RENAMED_IN_V11[name]
+    warnings.warn(f'instrument.{name} is deprecated; use instrument.{newName}',
+                  exceptions21.Music21DeprecationWarning, stacklevel=2)
+    return globals()[newName]
+
+
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
     pass
 
 
 class Test(unittest.TestCase):
+
+    def testRenamedClasses(self):
+        with self.assertWarns(exceptions21.Music21DeprecationWarning):
+            self.assertIs(sys.modules[__name__].RideCymbals, RideCymbal)
 
     def testGetAllNamesForInstrumentByClass(self):
         acousticBass = getAllNamesForInstrument(AcousticBass(), SearchLanguage.ENGLISH)
