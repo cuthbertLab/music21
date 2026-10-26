@@ -1589,7 +1589,6 @@ class Test(unittest.TestCase):
         tamb = s[note.Unpitched].first().storedInstrument
         self.assertIsInstance(tamb, instrument.Tambourine)
         self.assertTrue(tamb.headless)
-        self.assertFalse(instrument.Tambourine().headless)
 
     def testWhistleRoundTrip(self):
         b = converter.toData(

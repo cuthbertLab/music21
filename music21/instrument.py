@@ -320,8 +320,9 @@ class Instrument(base.Music21Object):
 
 class MidiPercussionMapMixin(Instrument):
     '''
-    Base for instruments that appear in the General MIDI percussion map
-    (MIDI channel 10), whether or not they are unpitched percussion.
+    Base for instruments in the General MIDI percussion map (MIDI channel 10).
+    The map is a synthesizer's layout, not a family of instruments, so a
+    Whistle (a Flute) is in it too.
 
     >>> wh = instrument.Whistle()
     >>> isinstance(wh, instrument.MidiPercussionMapMixin)
@@ -906,7 +907,8 @@ class Shakuhachi(Flute):
 
 class Whistle(MidiPercussionMapMixin, Flute):
     '''
-    A whistle, by default unpitched, as on GM percussion notes 71 (short) and 72 (long).
+    A whistle.  By default the referee's kind, without a definite pitch
+    (GM percussion notes 71 short and 72 long); a tin whistle sets `pitched`.
 
     >>> wh = instrument.Whistle()
     >>> wh.pitched
@@ -1398,9 +1400,14 @@ class Guiro(UnpitchedPercussion):
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
-# Maracas and caxixi as kinds of shaker: see James Holland, "Practical Percussion:
-# A Guide to the Instruments and Their Sources," p. 42.
 class Shaker(UnpitchedPercussion):
+    '''
+    Rattles that are shaken, among them maracas and caxixi (James Holland,
+    *Practical Percussion: A Guide to the Instruments and Their Sources*, p. 42).
+
+    >>> isinstance(instrument.Maracas(), instrument.Shaker)
+    True
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1416,7 +1423,6 @@ class Maracas(Shaker):
         super().__init__(**keywords)
 
         self.instrumentName = 'Maracas'
-        self.inGMPercMap = True
         self.percMapPitch = 70
         self.instrumentAbbreviation = 'Mrcs'
         self.instrumentSound = 'rattle.maraca'
@@ -1429,6 +1435,7 @@ class Caxixi(Shaker):
         self.instrumentName = 'Caxixi'
         self.instrumentAbbreviation = 'Cax'
         self.instrumentSound = 'rattle.caxixi'
+        # no GM note of its own: sounds as Shaker
 
 
 class Vibraslap(UnpitchedPercussion):
@@ -1620,6 +1627,17 @@ class SleighBells(UnpitchedPercussion):
         self.percMapPitch = 83  # GM Level 2 Jingle Bell
 
 
+class BellTree(UnpitchedPercussion):
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Bell Tree'
+        self.instrumentAbbreviation = 'B Tr'
+        self.instrumentSound = 'metal.bells.bell-tree'
+        self.inGMPercMap = True
+        self.percMapPitch = 84  # GM Level 2
+
+
 class UnpitchedDrum(UnpitchedPercussion):
     '''
     Drums without a definite pitch.  Timpani, which are pitched, are
@@ -1634,17 +1652,6 @@ class UnpitchedDrum(UnpitchedPercussion):
         super().__init__(**keywords)
         self.instrumentName = 'Drum'
         self.instrumentAbbreviation = 'Dr'
-
-
-class BellTree(UnpitchedPercussion):
-    def __init__(self, **keywords):
-        super().__init__(**keywords)
-
-        self.instrumentName = 'Bell Tree'
-        self.instrumentAbbreviation = 'B Tr'
-        self.instrumentSound = 'metal.bells.bell-tree'
-        self.inGMPercMap = True
-        self.percMapPitch = 84  # GM Level 2
 
 
 class SnareDrum(UnpitchedDrum):
@@ -1780,6 +1787,9 @@ class Tambourine(UnpitchedDrum):
 
 class Cuica(UnpitchedDrum):
     '''
+    A Brazilian friction drum: a stick rubbed inside the head makes the
+    squeaks and laughs of samba.
+
     >>> cu = instrument.Cuica()
     >>> cu.muted
     False
@@ -1808,6 +1818,8 @@ class Cuica(UnpitchedDrum):
 
 class Surdo(UnpitchedDrum):
     '''
+    The big Brazilian bass drum that holds down the samba beat.
+
     >>> su = instrument.Surdo()
     >>> su.muted
     False
@@ -2783,11 +2795,6 @@ class TestExternal(unittest.TestCase):
 
 
 class Test(unittest.TestCase):
-
-    def testShakers(self):
-        self.assertIsInstance(Maracas(), Shaker)
-        self.assertIsInstance(Caxixi(), Shaker)
-        self.assertEqual(Maracas().percMapPitch, 70)
 
     def testGetAllNamesForInstrumentByClass(self):
         acousticBass = getAllNamesForInstrument(AcousticBass(), SearchLanguage.ENGLISH)

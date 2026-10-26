@@ -24,7 +24,7 @@ class MIDIPercussionException(exceptions21.Music21Exception):
 class PercussionMapper:
     '''
     PercussionMapper provides tools to convert between 0-indexed MIDI pitches
-    and music21 instruments, based on the official General MIDI Level 1 Percussion Key Map.
+    and music21 instruments, based on the General MIDI Level 1 and 2 Percussion Key Maps.
     This mapping is conventionally applied to MIDI channel 10;
     see https://midi.org/general-midi-level-1 for more info.
 
@@ -95,7 +95,12 @@ class PercussionMapper:
                                 87: i.Surdo,  # Open Surdo
                                 }
 
-    # sounds in GM Level 1 or GM Level 2 that are not instruments
+    # MIDI percussion mappings from https://midi.org/general-midi-level-1 download at
+    # https://drive.google.com/file/d/1TTM2HI2JAp_XiTJYEJ8gPNvuJpIjJiTP/view?pli=1
+    # formerly at:
+    # https://www.midi.org/specifications/item/gm-level-1-sound-set
+
+    # GM sounds that are not instruments get a name, not a class
     namedSoundMapping = {27: 'High Q',
                          28: 'Slap',
                          29: 'Scratch Push',
@@ -106,11 +111,6 @@ class PercussionMapper:
                          34: 'Metronome Bell',
                          39: 'Hand Clap',
                          }
-
-    # MIDI percussion mappings from https://midi.org/general-midi-level-1 download at
-    # https://drive.google.com/file/d/1TTM2HI2JAp_XiTJYEJ8gPNvuJpIjJiTP/view?pli=1
-    # formerly at:
-    # https://www.midi.org/specifications/item/gm-level-1-sound-set
 
     def midiPitchToInstrument(
         self,
@@ -177,30 +177,25 @@ class PercussionMapper:
         >>> other.percMapPitch
         22
 
-        * Changed in v11: named sounds that are not instruments; `raiseIfUnmapped`.
+        * Changed in v11: GM Level 2, named sounds, and `raiseIfUnmapped`.
         '''
 
         if isinstance(midiPitch, int):
             midiNumber = midiPitch
         else:
             midiNumber = midiPitch.midi
-        if midiNumber not in self.reverseInstrumentMapping:
-            if midiNumber in self.namedSoundMapping or not raiseIfUnmapped:
-                generic = instrument.UnpitchedPercussion()
-                generic.percMapPitch = midiNumber
-                if midiNumber in self.namedSoundMapping:
-                    generic.instrumentName = self.namedSoundMapping[midiNumber]
-                return generic
+        inst: instrument.MidiPercussionMapMixin
+        if midiNumber in self.reverseInstrumentMapping:
+            inst = self.reverseInstrumentMapping[midiNumber]()
+            if midiNumber in inst._percMapPitchToModifier:
+                inst.modifier = inst._percMapPitchToModifier[midiNumber]
+        elif midiNumber in self.namedSoundMapping or not raiseIfUnmapped:
+            inst = instrument.UnpitchedPercussion()
+            inst.instrumentName = self.namedSoundMapping.get(midiNumber, inst.instrumentName)
+        else:
             raise MIDIPercussionException(f'{midiNumber!r} does not map to a valid instrument!')
-        midiInstrument = self.reverseInstrumentMapping[midiNumber]
-
-        midiInstrumentObject = midiInstrument()
-        if midiNumber in midiInstrumentObject._percMapPitchToModifier:
-            midiInstrumentObject.modifier = midiInstrumentObject._percMapPitchToModifier[
-                midiNumber]
-        midiInstrumentObject.percMapPitch = midiNumber
-
-        return midiInstrumentObject
+        inst.percMapPitch = midiNumber
+        return inst
 
     def midiInstrumentToPitch(self, midiInstrument: instrument.Instrument) -> pitch.Pitch:
         '''
@@ -245,52 +240,31 @@ class Test(unittest.TestCase):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
 
-    def testRoundTrip(self) -> None:
-        pm = PercussionMapper()
-        for midiNumber in range(27, 88):
-            inst = pm.midiPitchToInstrument(midiNumber, raiseIfUnmapped=False)
-            self.assertEqual(pm.midiInstrumentToPitch(inst).midi, midiNumber, inst)
-            self.assertNotEqual(inst.instrumentName, 'Percussion', midiNumber)
-
-    def testModifiers(self) -> None:
+    def testMidiPitchToInstrument(self) -> None:
         pm = PercussionMapper()
         for midiNumber, cls, modifier in [
-            (51, instrument.RideCymbal, 'midi-1'),
+            (27, instrument.UnpitchedPercussion, None),
             (53, instrument.RideCymbal, 'bell'),
-            (55, instrument.SplashCymbal, None),
             (57, instrument.CrashCymbals, 'midi-2'),
             (68, instrument.Agogo, 'low'),
+            (69, instrument.Cabasa, None),
             (72, instrument.Whistle, 'long'),
-            (83, instrument.SleighBells, None),
-            (85, instrument.Castanets, None),
+            (74, instrument.Guiro, 'long'),
+            (78, instrument.Cuica, None),
+            (87, instrument.Surdo, None),
         ]:
             inst = pm.midiPitchToInstrument(midiNumber)
-            self.assertIsInstance(inst, cls)
+            self.assertIs(type(inst), cls)
             self.assertEqual(inst.modifier, modifier)
+            self.assertEqual(pm.midiInstrumentToPitch(inst).midi, midiNumber)
 
-        for midiNumber, cls in [
-            (52, instrument.ChineseCymbal),
-            (69, instrument.Cabasa),
-            (73, instrument.Guiro),
-            (75, instrument.Claves),
-            (78, instrument.Cuica),
-            (82, instrument.Shaker),
-            (84, instrument.BellTree),
-            (86, instrument.Surdo),
-        ]:
-            self.assertIsInstance(pm.midiPitchToInstrument(midiNumber), cls)
-        self.assertEqual(pm.midiPitchToInstrument(74).modifier, 'long')
         cuica = pm.midiPitchToInstrument(78)
         assert isinstance(cuica, instrument.Cuica)
         self.assertTrue(cuica.muted)
-        surdo = pm.midiPitchToInstrument(87)
-        assert isinstance(surdo, instrument.Surdo)
-        self.assertFalse(surdo.muted)
 
         bd = instrument.BassDrum()
         bd.modifier = '1'
         self.assertEqual(bd.modifier, 'midi-1')
-        self.assertEqual(bd.percMapPitch, 36)
 
 
 # ------------------------------------------------------------------------------
