@@ -55,15 +55,15 @@ class PercussionMapper:
                                 48: i.TomTom,  # Hi-Mid Tom
                                 49: i.CrashCymbals,  # Crash Cymbal 1
                                 50: i.TomTom,  # High Tom
-                                # 51: i.Ride Cymbal 1,
+                                51: i.RideCymbal,  # Ride Cymbal 1
                                 # 52: i.Chinese Cymbal,
-                                # 53: i.Ride Bell,
+                                53: i.RideCymbal,  # Ride Bell
                                 54: i.Tambourine,
-                                # 55: i.Splash Cymbal,
+                                55: i.SplashCymbal,
                                 56: i.Cowbell,
                                 57: i.CrashCymbals,  # Crash Cymbal 2
                                 58: i.Vibraslap,
-                                # 59: i.Ride Cymbal 2,
+                                59: i.RideCymbal,  # Ride Cymbal 2
                                 60: i.BongoDrums,  # Hi Bongo
                                 61: i.BongoDrums,  # Low Bongo
                                 62: i.CongaDrum,  # Mute Hi Conga
@@ -86,6 +86,9 @@ class PercussionMapper:
                                 # 79: i.Open Cuica,
                                 80: i.Triangle,  # Mute Triangle
                                 81: i.Triangle,  # Open Triangle
+                                # GM Level 2
+                                83: i.SleighBells,  # Jingle Bell
+                                85: i.Castanets,
                                 }
 
     # sounds in GM Level 1 or GM Level 2 that are not instruments
@@ -112,7 +115,7 @@ class PercussionMapper:
         midiPitch: int|pitch.Pitch,
         *,
         raiseIfUnmapped: bool = True,
-    ) -> instrument.Instrument:
+    ) -> instrument.MidiPercussionMapMixin:
         '''
         Takes a pitch.Pitch object or int ranging from 0-127 and returns
         the corresponding instrument in the GM Percussion Map.
@@ -158,9 +161,9 @@ class PercussionMapper:
         >>> oneBassDrumPitch = pitch.Pitch(36)
         >>> oneBDInstrument = pm.midiPitchToInstrument(oneBassDrumPitch)
         >>> oneBDInstrument
-        <music21.instrument.BassDrum 'Bass Drum' 1>
+        <music21.instrument.BassDrum 'Bass Drum' midi-1>
         >>> oneBDInstrument.modifier
-        '1'
+        'midi-1'
 
         Sounds in the map that are not instruments give an UnpitchedPercussion
         object with a name:
@@ -247,6 +250,33 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self) -> None:
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
+
+    def testRoundTrip(self) -> None:
+        pm = PercussionMapper()
+        for midiNumber in range(27, 88):
+            inst = pm.midiPitchToInstrument(midiNumber, raiseIfUnmapped=False)
+            self.assertEqual(pm.midiInstrumentToPitch(inst).midi, midiNumber, inst)
+
+    def testModifiers(self) -> None:
+        pm = PercussionMapper()
+        for midiNumber, cls, modifier in [
+            (51, instrument.RideCymbal, 'midi-1'),
+            (53, instrument.RideCymbal, 'bell'),
+            (55, instrument.SplashCymbal, None),
+            (57, instrument.CrashCymbals, 'midi-2'),
+            (68, instrument.Agogo, 'low'),
+            (72, instrument.Whistle, 'long'),
+            (83, instrument.SleighBells, None),
+            (85, instrument.Castanets, None),
+        ]:
+            inst = pm.midiPitchToInstrument(midiNumber)
+            self.assertIsInstance(inst, cls)
+            self.assertEqual(inst.modifier, modifier)
+
+        bd = instrument.BassDrum()
+        bd.modifier = '1'
+        self.assertEqual(bd.modifier, 'midi-1')
+        self.assertEqual(bd.percMapPitch, 36)
 
 
 # ------------------------------------------------------------------------------

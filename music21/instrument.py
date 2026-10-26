@@ -908,14 +908,29 @@ class Shakuhachi(Flute):
 
 
 class Whistle(MidiPercussionMapMixin, Flute):
+    '''
+    A whistle, by default unpitched, as on GM percussion notes 71 (short) and 72 (long).
+
+    >>> wh = instrument.Whistle()
+    >>> wh.pitched
+    False
+    >>> wh.modifier = 'long'
+    >>> wh.percMapPitch
+    72
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
         self.instrumentName = 'Whistle'
         self.instrumentAbbreviation = 'Whs'
         self.instrumentSound = 'wind.flutes.whistle'
+        self.pitched = False
         self.inGMPercMap = True
-        self.percMapPitch = 71
+        self._modifier = 'short'
+        # TODO: short and long should come from the duration of each note
+        self._modifierToPercMapPitch = {'short': 71, 'long': 72}
+        self._percMapPitchToModifier = {71: 'short', 72: 'long'}
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
         self.midiProgram = 78
 
 
@@ -1345,6 +1360,8 @@ class Castanets(UnpitchedPercussion):
         self.instrumentName = 'Castanets'
         self.instrumentAbbreviation = 'Cas'
         self.instrumentSound = 'wood.castanets'
+        self.inGMPercMap = True
+        self.percMapPitch = 85  # GM Level 2
 
 
 class Maracas(UnpitchedPercussion):
@@ -1396,14 +1413,9 @@ class CrashCymbals(Cymbals):
         self.instrumentAbbreviation = 'Cym'
         self.instrumentSound = 'metal.cymbal.crash'
         self.inGMPercMap = True
-        self._modifier = '1'
-
-        self._modifierToPercMapPitch = {'1': 49,
-                                        '2': 57,
-                                        }
-        self._percMapPitchToModifier = {49: '1',
-                                        57: '2',
-                                        }
+        self._modifier = 'midi-1'
+        self._modifierToPercMapPitch = {'midi-1': 49, 'midi-2': 57, '1': 49, '2': 57}
+        self._percMapPitchToModifier = {49: 'midi-1', 57: 'midi-2'}
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
@@ -1432,6 +1444,8 @@ class SplashCymbal(Cymbals):
         self.instrumentName = 'Splash Cymbal'
         self.instrumentAbbreviation = 'Spl Cym'
         self.instrumentSound = 'metal.cymbal.splash'
+        self.inGMPercMap = True
+        self.percMapPitch = 55
 
 
 class RideCymbal(Cymbals):
@@ -1441,6 +1455,14 @@ class RideCymbal(Cymbals):
         self.instrumentName = 'Ride Cymbal'
         self.instrumentAbbreviation = 'Ride Cym'
         self.instrumentSound = 'metal.cymbal.ride'
+        self.inGMPercMap = True
+        self._modifier = 'midi-1'
+        # TODO: bell is misplaced as a modifier alone -- it should be a technique
+        #    that applies to particular notes or not
+        self._modifierToPercMapPitch = {'midi-1': 51, 'midi-2': 59, 'bell': 53,
+                                        '1': 51, '2': 59}
+        self._percMapPitchToModifier = {51: 'midi-1', 59: 'midi-2', 53: 'bell'}
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
 class HiHatCymbal(Cymbals):
@@ -1504,7 +1526,10 @@ class Agogo(UnpitchedPercussion):
         self.instrumentAbbreviation = 'Ago'
         self.instrumentSound = 'metal.bells.agogo'
         self.inGMPercMap = True
-        self.percMapPitch = 67
+        self._modifier = 'high'
+        self._modifierToPercMapPitch = {'high': 67, 'low': 68}
+        self._percMapPitchToModifier = {67: 'high', 68: 'low'}
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
         self.midiProgram = 113
 
 
@@ -1524,6 +1549,8 @@ class SleighBells(UnpitchedPercussion):
         self.instrumentName = 'Sleigh Bells'
         self.instrumentAbbreviation = 'Slgh Bl'
         self.instrumentSound = 'metal.bells.sleigh-bells'
+        self.inGMPercMap = True
+        self.percMapPitch = 83  # GM Level 2 Jingle Bell
 
 
 class SnareDrum(UnpitchedPercussion):
@@ -1623,8 +1650,8 @@ class BassDrum(UnpitchedPercussion):
         self.instrumentSound = 'drum.bass-drum'
         self.inGMPercMap = True
         self._modifier = 'acoustic'
-        self._modifierToPercMapPitch = {'acoustic': 35, '1': 36}
-        self._percMapPitchToModifier = {35: 'acoustic', 36: '1'}
+        self._modifierToPercMapPitch = {'acoustic': 35, 'midi-1': 36, '1': 36}
+        self._percMapPitchToModifier = {35: 'acoustic', 36: 'midi-1'}
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
