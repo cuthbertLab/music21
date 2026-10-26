@@ -508,7 +508,7 @@ class Test(unittest.TestCase):
                  instrument.Flute,
                  instrument.Vibraphone,  # not 10
                  instrument.BassDrum,  # 10
-                 instrument.HiHatCymbal,  # 10
+                 instrument.HiHat,  # 10
                  ]
         iObjs = []
 

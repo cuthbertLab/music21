@@ -334,6 +334,8 @@ class MidiPercussionMapMixin(Instrument):
 
     >>> instrument.BongoDrums()
     <music21.instrument.BongoDrums 'Bongo Drums' high>
+
+    * New in v11: was part of UnpitchedPercussion
     '''
     def __init__(self, **keywords) -> None:
         super().__init__(**keywords)
@@ -343,9 +345,10 @@ class MidiPercussionMapMixin(Instrument):
         self._percMapPitchToModifier: dict[int, str] = {}
 
     def _reprInternal(self):
+        baseRepr = super()._reprInternal()
         if self._modifier is None:
-            return super()._reprInternal()
-        return f'{super()._reprInternal()} {self._modifier}'
+            return baseRepr
+        return f'{baseRepr} {self._modifier}'
 
     @property
     def modifier(self) -> str|None:
@@ -1507,6 +1510,11 @@ class SizzleCymbal(Cymbals):
 
 
 class SplashCymbal(Cymbals):
+    '''
+    A mounted splash cymbal.
+
+    * Changed in v11: was formerly plural "SplashCymbals"
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1518,6 +1526,11 @@ class SplashCymbal(Cymbals):
 
 
 class RideCymbal(Cymbals):
+    '''
+    A mounted ride cymbal.
+
+    * Changed in v11: was formerly plural "RideCymbals"
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1545,11 +1558,16 @@ class ChineseCymbal(Cymbals):
         self.percMapPitch = 52
 
 
-class HiHatCymbal(Cymbals):
+class HiHat(Cymbals):
+    '''
+    A pair of mounted hi-hat cymbals (also spelled "high hat", "hihat", etc.).
+
+    * Changed in v11: was formerly "HiHatCymbal"
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
-        self.instrumentName = 'Hi-Hat Cymbal'
+        self.instrumentName = 'Hi-Hat'
         self.instrumentSound = 'metal.hi-hat'
         self.inGMPercMap = True
 
@@ -1813,7 +1831,7 @@ class Taiko(UnpitchedDrum):
 
 class Tambourine(UnpitchedDrum):
     '''
-    A tambourine, by default with adrum  head (classical style)
+    A tambourine, by default with a drum head (classical style)
 
     For Rock/pop tambourines (shaker-cymbal type) set
     headless = True.
@@ -1825,7 +1843,7 @@ class Tambourine(UnpitchedDrum):
     Note that MIDI (like many other formats) does not distinguish
     between headless and headed tambourines. Even though our default
     is a headed drum, we import MIDI as headless tambourine, since
-    the majority of MIDI files with tamgourines represent rock/pop
+    the majority of MIDI files with tambourines represent rock/pop
     styles.
     '''
     def __init__(self, **keywords):

@@ -633,7 +633,7 @@ def midiEventsToChord(
 
     >>> me2.channel = 10
     >>> midi.translate.midiEventsToChord([tne1, tne2])
-    <music21.percussion.PercussionChord [Tom-Tom Hi-Hat Cymbal]>
+    <music21.percussion.PercussionChord [Tom-Tom Hi-Hat]>
 
     * Changed in v7: Uses the last DeltaTime in the list to get the end time.
     * Changed in v7.3: Returns a :class:`~music21.percussion.PercussionChord` if

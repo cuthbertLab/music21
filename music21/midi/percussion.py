@@ -46,11 +46,11 @@ class PercussionMapper:
                                 38: i.SnareDrum,  # Acoustic Snare
                                 40: i.SnareDrum,  # Electric Snare
                                 41: i.TomTom,  # Low Floor Tom
-                                42: i.HiHatCymbal,  # Closed Hi Hat
+                                42: i.HiHat,  # Closed Hi Hat
                                 43: i.TomTom,  # High Floor Tom
-                                44: i.HiHatCymbal,  # Pedal Hi-Hat
+                                44: i.HiHat,  # Pedal Hi-Hat
                                 45: i.TomTom,  # Low Tom
-                                46: i.HiHatCymbal,  # Open Hi-Hat
+                                46: i.HiHat,  # Open Hi-Hat
                                 47: i.TomTom,  # Low-Mid Tom
                                 48: i.TomTom,  # Hi-Mid Tom
                                 49: i.CrashCymbals,  # Crash Cymbal 1
@@ -178,6 +178,7 @@ class PercussionMapper:
         22
 
         * Changed in v11: added GM Level 2, named sounds, and `raiseIfUnmapped`.
+          Modifiers '1' and '2' become 'midi-1' and 'midi-2'.
         '''
 
         if isinstance(midiPitch, int):
