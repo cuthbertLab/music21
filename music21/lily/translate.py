@@ -793,7 +793,7 @@ class LilypondConverter:
         elif el.text is None:
             text = ''
         else:
-            text = '"' + el.text + '"'
+            text = lyo.LyObject().quoteString(el.text).rstrip()
             # TODO: composite
             if el.syllabic == 'end':
                 text = text + '__'
@@ -2425,14 +2425,14 @@ class LilypondConverter:
             if skipWriting is False:
                 fileName = self.writeLyFile(ext='ly', fp=fileName)
 
-        lilyCommand = '"' + LILYEXEC + '" '
+        lilyCommand = [LILYEXEC]
         if format is not None:
-            lilyCommand += '-f ' + format + ' '
+            lilyCommand += ['-f', format]
         if backend is not None:
-            lilyCommand += self.backendString + backend + ' '
+            lilyCommand.append(self.backendString + backend)
 
-        lilyCommand += '-o ' + str(fileName) + ' ' + str(fileName)
-        os.system(lilyCommand)
+        lilyCommand += ['-o', str(fileName), str(fileName)]
+        subprocess.run(lilyCommand, check=False)
 
         try:
             os.remove(str(fileName) + '.eps')
@@ -2595,6 +2595,36 @@ class Test(unittest.TestCase):
             r'\override Stem.color = "darkgreen"' '\n'
             "c' 4  "
         )
+
+    def testTextStaysInsideStrings(self):
+        from music21 import metadata
+
+        schemeCall = '\\" #(system "touch x") %'
+        escaped = r'"\\\" #(system \"touch x\") %"'
+
+        md = metadata.Metadata()
+        md.title = schemeCall
+        lpHeader = LilypondConverter().setHeaderFromMetadata(md)
+        self.assertIn('title = ' + escaped, str(lpHeader))
+
+        lpLyric = LilypondConverter().lyLyricElementFromM21Lyric(note.Lyric(schemeCall))
+        self.assertEqual(str(lpLyric).strip(), escaped)
+
+    def testRunThroughLilyNoShell(self):
+        import tempfile
+        from unittest import mock
+
+        lpc = LilypondConverter()
+        lpc.loadObjectFromScore(stream.Stream([note.Note()]), makeNotation=False)
+        with tempfile.TemporaryDirectory() as tempDir:
+            fp = pathlib.Path(tempDir, 'x;touch y;#.ly')
+            with (mock.patch.object(lpc, 'findLilyExec', return_value='lilypond'),
+                  mock.patch('os.system') as mockSystem,
+                  mock.patch('subprocess.run') as mockRun):
+                with self.assertRaises(LilyTranslateException):  # no output was made
+                    lpc.runThroughLily(format='pdf', backend='ps', fileName=fp)
+            mockSystem.assert_not_called()
+            self.assertIn(str(fp), mockRun.call_args.args[0])
 
 class TestExternal(unittest.TestCase):
     show = True
