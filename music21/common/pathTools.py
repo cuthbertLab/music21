@@ -195,9 +195,10 @@ def cleanpath(path: str|pathlib.Path, *,
     path = os.path.expanduser(path)
     parts = pathlib.PurePath(path).parts
     canNormalize = True
-    if os.pardir in parts:
-        throughLastPardir = parts[:len(parts) - parts[::-1].index(os.pardir)]
-        canNormalize = os.path.isdir(os.path.join(*throughLastPardir))
+    if '..' in parts:
+        lastDotdotIndex = max(i for i, part in enumerate(parts) if part == '..')
+        throughLastDotdot = parts[:lastDotdotIndex + 1]
+        canNormalize = os.path.isdir(os.path.join(*throughLastDotdot))
 
     if canNormalize:
         path = os.path.normpath(path)
