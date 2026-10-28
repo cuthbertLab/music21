@@ -25,6 +25,7 @@ from __future__ import annotations
 import io
 import os
 import pathlib
+import stat
 import sys
 import tempfile
 import unittest
@@ -173,12 +174,12 @@ class _EnvironmentCore:
         ]:
             self._keysToPaths.append(pathKey)
 
+        self.defaultRootTempDir = None
         # defines all valid keys in ref
         self._loadDefaults(forcePlatform=forcePlatform)
         # read will only overwrite values if set in field
         if forcePlatform is None:  # only read if not forcing platform
             self.read()  # load a stored file if available
-        self.defaultRootTempDir = None
 
     # SPECIAL METHODS #
 
@@ -446,6 +447,22 @@ class _EnvironmentCore:
         else:
             return False
 
+    def _isSafeTempDir(self, path: pathlib.Path) -> bool:
+        '''
+        Return True if `path` is accessible and no other user can change it.
+
+        On Unix it must be a real directory (not a link) that this user owns and
+        that no one else can write to.
+        '''
+        if not self._checkAccessibility(path):
+            return False
+        if common.getPlatform() == 'win':
+            return True
+        pathStat = os.lstat(path)
+        return (stat.S_ISDIR(pathStat.st_mode)
+                and pathStat.st_uid == os.getuid()
+                and not pathStat.st_mode & 0o022)
+
     def toSettingsXML(self, ref=None):
         '''
         Convert a ref dictionary to an xml.etree.ElementTree.Element object
@@ -519,48 +536,36 @@ class _EnvironmentCore:
         >>> e.getDefaultRootTempDir() == pathlib.Path(tempFile) / 'music21'
         True
 
-        If failed to create the subdirectory (OSError is raised), this function
-        will return (1), for Linux and Mac platforms, a subdirectory under the
-        system temp directory which is named with 'music21-userid-$UID' or (2),
-        for other platforms, a temporary directory which is created by
-        tempfile.mkdtemp(prefix="music21-"), which is named with 'music21-'
-        plus 8 hashed codes, and (3) if failing for both above, it will return
-        the directory from tempfile.gettempdir(). The location of this directory
-        depends on OS.
+        If that subdirectory cannot be used, this function returns (1), for
+        Linux and Mac platforms, a subdirectory under the system temp directory
+        named 'music21-userid-$UID', or (2) a new directory created by
+        tempfile.mkdtemp(prefix="music21-"). On Linux and Mac, a directory is
+        used only if this user owns it and no one else can write to it, since
+        the system temp directory may be shared with other users.
 
         Note the temporary directory may be different in each python session.
+
+        * Changed in v10.5.2: directories other users could change are not used.
         '''
         if self._checkAccessibility(self.defaultRootTempDir):
             return self.defaultRootTempDir
 
-        # this returns the root temp dir; this does not create a new dir
-        self.defaultRootTempDir = pathlib.Path(tempfile.gettempdir()) / 'music21'
+        systemTempDir = pathlib.Path(tempfile.gettempdir())
+        candidates = [systemTempDir / 'music21']
+        if common.getPlatform() in ['nix', 'darwin']:
+            candidates.append(systemTempDir / f'music21-userid-{os.getuid()}')
 
-        # if this path already exists, readable and writable, we have nothing more to do
-        if self._checkAccessibility(self.defaultRootTempDir):
-            return self.defaultRootTempDir
-        else:
-            # make this directory as a temp directory
+        for candidate in candidates:
             try:
-                self.defaultRootTempDir.mkdir()
+                candidate.mkdir(mode=0o700)
             except OSError:  # directory already exists or permission denied
-                if common.getPlatform() in ['nix', 'darwin']:
-                    uid = os.getuid()
-                    dir_path = pathlib.Path(tempfile.gettempdir()) / f'music21-userid-{uid}'
-                else:
-                    dir_path = pathlib.Path(tempfile.mkdtemp(prefix='music21-'))
+                pass
+            if self._isSafeTempDir(candidate):
+                self.defaultRootTempDir = candidate
+                return candidate
 
-                if self._checkAccessibility(dir_path):
-                    self.defaultRootTempDir = dir_path
-                else:
-                    try:
-                        dir_path.mkdir()
-                        self.defaultRootTempDir = dir_path
-                    except OSError:  # pragma: no cover
-                        # Give up and use /tmp
-                        self.defaultRootTempDir = pathlib.Path(tempfile.gettempdir())
-
-            return self.defaultRootTempDir
+        self.defaultRootTempDir = pathlib.Path(tempfile.mkdtemp(prefix='music21-'))
+        return self.defaultRootTempDir
 
     def getKeysToPaths(self):
         '''
@@ -620,6 +625,11 @@ class _EnvironmentCore:
     def getSettingsPath(self):
         '''
         Return a pathlib.Path object to the '.music21rc' object
+
+        On Linux and Mac without a writable HOME (as for many web servers), the file
+        is kept in this user's music21 temp directory.
+
+        * Changed in v11: no longer uses the shared /tmp directory.
         '''
         platform = common.getPlatform()
         if 'USERPROFILE' in os.environ:
@@ -642,7 +652,7 @@ class _EnvironmentCore:
             if 'HOME' in os.environ and os.access(os.environ['HOME'], os.W_OK):
                 directory = pathlib.Path(os.environ['HOME'])
             else:
-                directory = pathlib.Path('/tmp/')
+                directory = self.getDefaultRootTempDir()
             return directory / '.music21rc'
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
@@ -919,8 +929,8 @@ class Environment:
         This method is only called if the no scratch directory preference has
         been set.
 
-        If not able to create a 'music21' directory, the standard default is
-        returned.
+        If a 'music21' directory cannot be used, another temporary directory
+        only this user can change is returned.
 
         Returns a pathlib.Path
         '''
@@ -1435,8 +1445,6 @@ def get(key):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-    import stat
-
     def stringFromTree(self, settingsTree):
         etIndent(settingsTree.getroot())
         bio = io.BytesIO()
@@ -1615,8 +1623,6 @@ class Test(unittest.TestCase):
         'os.getuid can be called only on Unix platforms'
     )
     def testGetDefaultRootTempDir(self):
-        import stat
-
         e = Environment()
         oldScratchDir = e['directoryScratch']
         oldTempDir = None
@@ -1656,6 +1662,51 @@ class Test(unittest.TestCase):
                 empty = len(os.listdir(newTempDir)) == 0
                 if not tmp and empty:
                     os.rmdir(newTempDir)
+
+    @unittest.skipUnless(
+        common.getPlatform() in ['nix', 'darwin'],
+        'Windows gives each user a private temp folder'
+    )
+    def testDefaultRootTempDirNotShared(self):
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as parent:
+            shared = pathlib.Path(parent, 'music21')
+            shared.mkdir()
+            shared.chmod(0o777)  # as if another user made it for everyone
+            with mock.patch.object(tempfile, 'tempdir', parent):
+                chosen = _EnvironmentCore().getDefaultRootTempDir()
+            self.assertNotEqual(chosen, shared)
+            self.assertEqual(chosen.stat().st_mode & 0o077, 0)
+
+    @unittest.skipUnless(
+        common.getPlatform() in ['nix', 'darwin'],
+        'os.getuid can be called only on Unix platforms'
+    )
+    def testDefaultRootTempDirKeepsPermissions(self):
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as parent:
+            existing = pathlib.Path(parent, 'music21')
+            existing.mkdir()
+            existing.chmod(0o755)
+            with mock.patch.object(tempfile, 'tempdir', parent):
+                chosen = _EnvironmentCore().getDefaultRootTempDir()
+            self.assertEqual(chosen, existing)
+            self.assertEqual(stat.S_IMODE(existing.stat().st_mode), 0o755)
+
+    @unittest.skipUnless(
+        common.getPlatform() in ['nix', 'darwin'],
+        'Windows does not use HOME'
+    )
+    def testSettingsPathWithoutHome(self):
+        from unittest import mock
+
+        core = _EnvironmentCore()
+        with mock.patch.dict(os.environ):
+            os.environ.pop('HOME', None)
+            settingsPath = core.getSettingsPath()
+        self.assertEqual(settingsPath.parent, core.getDefaultRootTempDir())
 
 # -----------------------------------------------------------------------------
 
