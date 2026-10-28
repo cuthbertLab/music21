@@ -629,7 +629,7 @@ class _EnvironmentCore:
         On Linux and Mac without a writable HOME (as for many web servers), the file
         is kept in this user's music21 temp directory.
 
-        * Changed in v11: no longer uses the shared /tmp directory.
+        * Changed in v10.5.2: no longer uses the shared /tmp directory.
         '''
         platform = common.getPlatform()
         if 'USERPROFILE' in os.environ:

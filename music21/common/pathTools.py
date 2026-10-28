@@ -184,7 +184,7 @@ def cleanpath(path: str|pathlib.Path, *,
     A '..' is collapsed only if the folders before it exist, as the operating system
     requires, so text such as 'tinyNotation: /../../x.xml' does not become a real path.
 
-    * Changed in v11: '..' after a missing folder is no longer collapsed.
+    * Changed in v10.5.2: '..' after a missing folder is no longer collapsed.
     '''
     if isinstance(path, pathlib.Path):
         path = str(path)
