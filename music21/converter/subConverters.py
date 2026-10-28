@@ -1227,8 +1227,12 @@ class ConverterClercqTemperley(SubConverter):
     registerFormats = ('cttxt', 'har', 'clercqTemperley')
     registerInputExtensions = ('cttxt', 'har', 'clercqTemperley')
 
-    def parseData(self, strData: str|pathlib.Path, number=None):
+    def parseData(self, strData: str, number=None):
         from music21.romanText import clercqTemperley
+        # CTSong opens anything else as a file; if this test changes, update CTSong.parse too
+        if not (isinstance(strData, str) and '|' in strData and 'S:' in strData):
+            raise clercqTemperley.CTSongException(
+                'Clercq-Temperley data must contain "|" and "S:"')
         ctSong = clercqTemperley.CTSong(strData)
         self.stream = ctSong.toPart()
 
@@ -1236,7 +1240,9 @@ class ConverterClercqTemperley(SubConverter):
                   filePath: pathlib.Path|str,
                   number=None,
                   **keywords):
-        self.parseData(filePath)
+        from music21.romanText import clercqTemperley
+        ctSong = clercqTemperley.CTSong(filePath)
+        self.stream = ctSong.toPart()
 
 
 class ConverterCapella(SubConverter):
@@ -1566,6 +1572,22 @@ class Test(unittest.TestCase):
         text_stream = StringIO()
         s.write('romanText', text_stream)
         self.assertTrue(text_stream.getvalue().endswith(rntxt))
+
+    def testClercqTemperleyDataNotOpenedAsFile(self):
+        import tempfile
+        from music21 import roman
+        from music21.romanText import clercqTemperley
+
+        with tempfile.TemporaryDirectory() as tempDir:
+            fp = pathlib.Path(tempDir, 'song.cttxt')
+            fp.write_text('S: [C] I | IV | V | I |', encoding='utf-8')
+            with self.assertRaises(clercqTemperley.CTSongException):
+                ConverterClercqTemperley().parseData(str(fp))
+
+            ctConverter = ConverterClercqTemperley()
+            ctConverter.parseFile(fp)
+            figures = [rn.figure for rn in ctConverter.stream[roman.RomanNumeral]]
+            self.assertEqual(figures, ['I', 'IV', 'V', 'I'])
 
 class TestExternal(unittest.TestCase):
     show = True

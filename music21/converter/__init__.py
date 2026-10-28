@@ -1392,6 +1392,10 @@ def parse(value: bundles.MetadataEntry|bytes|str|pathlib.Path|list|tuple,
     # a midi string, must come before os.path.exists test
     elif not isinstance(value, bytes) and valueStr.startswith('MThd'):
         return parseData(value, number=number, format=format, **keywords)
+    elif (isinstance(value, str)
+          and Converter().formatFromHeader(value.lstrip())[0] is not None):
+        # 'tinyNotation: ...' is data even if it contains a path
+        return parseData(value, number=number, format=format, **keywords)
     elif (not isinstance(value, bytes)
           and _osCanLoad(valueStr)):
         return parseFile(valueStr, number=number, format=format,
@@ -2227,6 +2231,29 @@ class Test(unittest.TestCase):
             parse(str(fp))
         with self.assertRaises(FileNotFoundError):
             parse('nonexistent_path_ending_in_correct_extension.musicxml')
+
+    def testDataNotReadAsPath(self):
+        '''
+        Data whose '/..' segments cancel out to a real path must not read that file.
+        '''
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tempDir:
+            fp = pathlib.Path(tempDir, 'other.tntxt')
+            fp.write_text('3/4 f#2.', encoding='utf-8')
+            toRoot = '/..' * 30
+
+            s = parse('tinyNotation: ' + toRoot + str(fp))
+            self.assertNotIn('F#', [n.name for n in s.recurse().notes])
+            with self.assertRaises(FileNotFoundError):
+                parse('c4 ' + toRoot + str(fp), format='tinyNotation')
+
+            s = parse(str(fp), storePickle=False)
+            self.assertEqual(s.recurse().notes.first().name, 'F#')
+            with mock.patch.dict(os.environ, {'HOME': tempDir, 'USERPROFILE': tempDir}):
+                s = parse('~/other.tntxt', storePickle=False)
+            self.assertEqual(s.recurse().notes.first().name, 'F#')
 
     def testParseURL(self):
         '''
