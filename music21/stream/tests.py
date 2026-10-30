@@ -1463,6 +1463,18 @@ class Test(unittest.TestCase):
                          [2.0, 3.0, 4.0])
         self.assertIs(p.beatAndMeasureFromOffset(6.75)[1], m2)
 
+    def testSplitMeasureKeepsRightBarline(self):
+        '''
+        The second half of a split measure ends with the measure's right
+        barline.
+        '''
+        m = Measure([meter.TimeSignature('4/4'), note.Note(type='whole')])
+        m.rightBarline = bar.Barline('final')
+        left, right = m.splitAtQuarterLength(1.0)
+        self.assertIsNone(left.rightBarline)
+        self.assertIsNone(right.leftBarline)
+        self.assertEqual(right.rightBarline.type, 'final')
+
     def testStripTiesScore(self):
         '''
         Test stripTies using the Score method
