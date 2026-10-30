@@ -328,13 +328,17 @@ class Test(unittest.TestCase):
              (4, 1, True, 1), (5, 1, False, 2),
              (6, 5, True, 2), (7, 5, False, 3)],
         )
+        def voices(part):
+            return [(list(v.groups), [n.nameWithOctave for n in v.notes])
+                    for v in part.measure(2).voices]
+
         treble, bass = hf1.stream.parts
         self.assertEqual(
-            [(list(v.groups), [n.nameWithOctave for n in v.notes]) for v in treble.measure(2).voices],
+            voices(treble),
             [(['voice1'], ['A#4']), (['voice2'], ['B#4']), (['voice3'], ['F#4'])],
         )
         self.assertEqual(
-            [(list(v.groups), [n.nameWithOctave for n in v.notes]) for v in bass.measure(2).voices],
+            voices(bass),
             [(['voice1'], ['F3']), (['voice2'], ['G3'])],
         )
 
