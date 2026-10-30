@@ -884,14 +884,11 @@ class Environment:
 
         Must call write() to make permanent:
 
-        >>> from pathlib import Path
         >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a['graphicsPath'] = '/test&Encode'
-        >>> str(a['graphicsPath'])
-        '/test&Encode'
-        >>> isinstance(a['graphicsPath'], Path)
-        True
+        >>> a['graphicsPath']
+        PosixPath('/test&Encode')
 
         >>> a['autoDownload'] = 'asdf'
         Traceback (most recent call last):
