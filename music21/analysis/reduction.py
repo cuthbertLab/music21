@@ -141,19 +141,21 @@ class ReductiveNote(prebase.ProtoM21Object):
         '''
         Produce a new note, a deep copy of the supplied note
         and with the specified modifications.
+
+        From a chord, takes the note named by the specification's pitch,
+        or else the highest note.
         '''
         n = None
         if self._note.isChord:
             # need to permit specification by pitch
-            if 'pitch' in self._parameters:
+            if self._parameters['pitch'] is not None:
                 p = pitch.Pitch(self._parameters['pitch'])
                 for sub in self._note:  # iterate over components
                     if p.name.lower() == sub.pitch.name.lower():
                         # copy the component
                         n = copy.deepcopy(sub)
-            else:  # get first, or get entire chord?
-                # n = copy.deepcopy(self._note.pitches[0])
-                n = copy.deepcopy(self._note.pitches[0])
+            else:
+                n = copy.deepcopy(max(self._note, key=lambda sub: sub.pitch.ps))
         else:
             n = copy.deepcopy(self._note)
         # always clear certain parameters
@@ -958,6 +960,30 @@ class Test(unittest.TestCase):
         match = post.parts[0].flatten().notes
         self.assertEqual(len(match), 3)
         # post.show()
+
+    def testChordWithoutPitchTakesHighest(self):
+        c = chord.Chord(['E4', 'B4', 'G4'], quarterLength=2)
+        rn = ReductiveNote('::/o:5', c, 0, 0.0)
+        n, unused_te = rn.getNoteAndTextExpression()
+        self.assertEqual(n.nameWithOctave, 'B5')
+        self.assertEqual(n.quarterLength, 2)
+
+        rn = ReductiveNote('::/p:g', c, 0, 0.0)
+        n, unused_te = rn.getNoteAndTextExpression()
+        self.assertEqual(n.nameWithOctave, 'G4')
+
+        rn = ReductiveNote('::/tb:x', c, 0, 0.0)
+        n, unused_te = rn.getNoteAndTextExpression()
+        self.assertEqual(n.nameWithOctave, 'B4')
+
+        rn = ReductiveNote('::/p:d', c, 0, 0.0)
+        with self.assertRaises(ReductiveEventException):
+            rn.getNoteAndTextExpression()
+
+        cMajor = chord.Chord(['C4', 'E4', 'G4'])
+        rn = ReductiveNote('::/tb:x', cMajor, 0, 0.0)
+        n, unused_te = rn.getNoteAndTextExpression()
+        self.assertEqual(n.nameWithOctave, 'G4')
 
     # def testExtractionC(self):
     #     from music21 import analysis
