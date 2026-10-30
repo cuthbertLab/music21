@@ -1046,7 +1046,7 @@ class Sieve:
             try:
                 self._cmpIntersection()
                 self._expType = 'simple'  # only if successful
-            except TypeError:  # attempted intersection of complemented
+            except (TypeError, ResidualException):  # attempted intersection of complemented
                 try:
                     self._cmpSegment()
                 except IndexError:  # no segments available
@@ -2122,6 +2122,15 @@ class Test(unittest.TestCase):
                          '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, '
                          'A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, '
                          'G~5, A5, B`5, C6]')
+
+    def testIntersectComplementUnbracketed(self):
+        # an unbracketed intersection with a complemented residual
+        # should evaluate the same as the bracketed form
+        z = list(range(24))
+        for formula in ('3@1&-4@2', '-4@2&3@1'):
+            self.assertEqual(Sieve(formula, z=z)(),
+                             Sieve(f'({formula})', z=z)())
+        self.assertEqual(Sieve('3@1&-4@2', z=z)(), [1, 4, 7, 13, 16, 19])
 
 # sieve that breaks LCM
 # >>> t = sieve.Sieve((3, 99, 123123, 2433, 2050))
