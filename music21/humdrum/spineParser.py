@@ -1168,6 +1168,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self._spineType: str = ''
 
         self.isFirstVoice: bool = False
+        self.voiceNumber: int = 0
 
     def _reprInternal(self) -> str:
         representation = ': ' + str(self.id)
@@ -1911,9 +1912,14 @@ class SpineCollection(prebase.ProtoM21Object):
         sub-spines and put them in their proper location.
         '''
         for thisSpine in self.spines:
+            if thisSpine.parentSpine is None:
+                self.numberVoices(thisSpine, 1)
+
+        def depth(spine: HumdrumSpine) -> int:
+            return 0 if spine.parentSpine is None else depth(spine.parentSpine) + 1
+
+        for thisSpine in sorted(self.spines, key=depth, reverse=True):
             # removeSpines = []
-            if thisSpine.parentSpine is not None:
-                continue
             if not thisSpine.childSpines:
                 continue
 
@@ -1931,7 +1937,8 @@ class SpineCollection(prebase.ProtoM21Object):
                         self.performSpineInsertion(thisSpine, newStream, i)
                         insertPoints.remove(i)
                     lastLineNumber = lineNumber
-                    del self.humdrumLineNumbers[el]
+                    if thisSpine.parentSpine is None:
+                        del self.humdrumLineNumbers[el]
                 newStream.coreAppend(el)
                 # newStream.append(el)
             newStream.coreElementsChanged()
@@ -1946,6 +1953,47 @@ class SpineCollection(prebase.ProtoM21Object):
             #    # needed for some tests
             #    self.removeSpineById(removeMe)
 
+    def numberVoices(self, thisSpine: HumdrumSpine, nextNumber: int) -> int:
+        '''
+        Sets the `voiceNumber` of every sub-spine below `thisSpine` and
+        returns the next voice number not yet used.
+
+        The sub-spines of a top-level spine are voices 1, 2, ... at each
+        split.  When a sub-spine splits again, its first sub-spine keeps
+        its voice number and the others get new numbers from `nextNumber` on.
+
+        Here spine 0 splits into spines 1 and 2, and spine 2 splits again
+        into spines 3 and 4:
+
+        >>> sc = humdrum.spineParser.SpineCollection()
+        >>> spines = [sc.addSpine() for i in range(5)]
+        >>> for child in spines[1:3]:
+        ...     child.parentSpine = spines[0]
+        >>> for child in spines[3:5]:
+        ...     child.parentSpine = spines[2]
+        >>> spines[0].childSpineInsertPoints[5] = (spines[1], spines[2])
+        >>> spines[2].childSpineInsertPoints[6] = (spines[3], spines[4])
+        >>> sc.numberVoices(spines[0], 1)
+        4
+        >>> [s.voiceNumber for s in spines[1:]]
+        [1, 2, 2, 3]
+
+        AI-assisted (Claude).
+        '''
+        afterAll = nextNumber
+        for childSpines in thisSpine.childSpineInsertPoints.values():
+            if thisSpine.parentSpine is None:
+                numbers = list(range(1, len(childSpines) + 1))
+                after = len(childSpines) + 1
+            else:
+                after = nextNumber + len(childSpines) - 1
+                numbers = [thisSpine.voiceNumber] + list(range(nextNumber, after))
+            for child, number in zip(childSpines, numbers):
+                child.voiceNumber = number
+                after = self.numberVoices(child, after)
+            afterAll = max(afterAll, after)
+        return afterAll
+
     def performSpineInsertion(
         self,
         thisSpine: HumdrumSpine,
@@ -1959,16 +2007,15 @@ class SpineCollection(prebase.ProtoM21Object):
         newStream.coreElementsChanged()  # update highestTime
         startPoint = newStream.highestTime
         childrenToInsert = thisSpine.childSpineInsertPoints[insertionPoint]
-        voiceNumber = 0
         for insertSpine in childrenToInsert:
             # removeSpines.append(insertSpine.id)
-            voiceNumber += 1
-            voiceStr = 'voice' + str(voiceNumber)
+            voiceStr = 'voice' + str(insertSpine.voiceNumber)
             for insertEl in insertSpine.stream:
                 if not insertSpine.isFirstVoice and isinstance(insertEl, stream.Measure):
                     pass  # only insert one measure object per spine
                 else:
-                    insertEl.groups.append(voiceStr)
+                    if not insertEl.groups:
+                        insertEl.groups.append(voiceStr)
                     # newStream.insert(startPoint + insertEl.offset, insertEl)
                     newStream.coreInsert(startPoint + insertEl.offset, insertEl)
         newStream.coreElementsChanged()  # call between coreInsert and coreAppend
