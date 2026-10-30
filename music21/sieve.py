@@ -583,14 +583,11 @@ class Residual:
             segmentFormat = self._segmentFormat
 
         subset = []
-        if self._m == 0:
-            return subset  # empty
-
-        n = (n + self._shift) % self._m  # check for n >= m
-
-        for value in z:
-            if n == value % self._m:
-                subset.append(value)
+        if self._m != 0:
+            n = (n + self._shift) % self._m  # check for n >= m
+            for value in z:
+                if n == value % self._m:
+                    subset.append(value)
         if self._neg:  # find opposite
             compSet = copy.deepcopy(z)
             for value in subset:
@@ -2034,6 +2031,15 @@ class Test(unittest.TestCase):
             # environLocal.printDebug(['testSieveParse', arg])
             testObj = Sieve(arg)
             dummy = testObj(0, list(range(30)))
+
+    def testComplementOfEmptyResidual(self):
+        z = list(range(6))
+        self.assertEqual(Residual(0, 0).segment(0, z), [])
+        self.assertEqual(Residual(0, 0, neg=True).segment(0, z), z)
+        self.assertEqual(Sieve('-0@0', z).segment('exp'), z)
+        self.assertEqual(Sieve('-0@0', z).segment('cmp'), z)
+        self.assertEqual(Residual(0, 0).segment(0, z, 'bin'), [0] * 6)
+        self.assertEqual(Sieve('-0@0|3@1', z).segment('exp'), z)
 
     def testSievePitch(self):
         unused_testObj = PitchSieve('-5 | 4 & 4sub3 & 6', 'b3', 'f#4')
