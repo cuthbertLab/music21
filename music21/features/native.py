@@ -4,7 +4,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,6 +18,7 @@ import unittest
 
 from music21 import environment
 from music21.features import base as featuresModule
+from music21 import harmony
 from music21 import text
 
 environLocal = environment.Environment('features.native')
@@ -763,6 +764,8 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
         lastHarm = None
 
         for thisHarm in harms:
+            if isinstance(thisHarm, harmony.NoChord):
+                continue
             if lastHarm is None:
                 lastHarm = thisHarm
             else:
@@ -933,6 +936,28 @@ featureExtractors = [
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+
+    def testChordBassMotionNoChord(self):
+        from music21 import features
+        from music21 import stream
+
+        def motionVector(figures):
+            s = stream.Stream()
+            for figure in figures:
+                if figure == 'N.C.':
+                    s.append(harmony.NoChord())
+                else:
+                    s.append(harmony.ChordSymbol(figure))
+            return features.native.ChordBassMotionFeature(s).extract().vector
+
+        for figures in (['C', 'N.C.', 'G', 'C'],
+                        ['N.C.', 'C', 'G', 'C'],
+                        ['C', 'G', 'C', 'N.C.']):
+            vector = motionVector(figures)
+            self.assertEqual(vector[5], 0.5)
+            self.assertEqual(vector[7], 0.5)
+            self.assertEqual(sum(vector), 1.0)
+        self.assertEqual(motionVector(['C', 'N.C.']), [1.0] + [0.0] * 11)
 
     def testIncorrectlySpelledTriadPrevalence(self):
         from music21 import stream
