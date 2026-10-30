@@ -247,6 +247,41 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, G4, D5, C6]')
         self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c6')), '[D3, C4, G4, D5, C6]')
 
+    def testOctaveRepeatingScaleGivenAWholeOctave(self):
+        sc = scale.OctaveRepeatingScale('c4', ['m3', 'M2', 'm3', 'M2', 'M2'])
+        self.assertEqual(self.pitchOut(sc.pitches), '[C4, E-4, F4, A-4, B-4, C5]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c5')),
+                         '[C3, E-3, F3, A-3, B-3, C4, E-4, F4, A-4, B-4, C5]')
+        self.assertEqual(str(sc.nextPitch('b-4')), 'C5')
+        self.assertEqual(str(sc.nextPitch('c5')), 'E-5')
+        self.assertEqual(str(sc.nextPitch('c5', Direction.DESCENDING)), 'B-4')
+
+        fifthAndFourth = scale.OctaveRepeatingScale('c4', ['P5', 'P4'])
+        self.assertEqual(fifthAndFourth.getScaleDegreeFromPitch('c'), 1)
+
+        octaves = scale.OctaveRepeatingScale('c4', ['P8'])
+        self.assertEqual(self.pitchOut(octaves.getPitches('c3', 'c6')), '[C3, C4, C5, C6]')
+        self.assertEqual(str(octaves.nextPitch('c5')), 'C6')
+        self.assertEqual(str(octaves.nextPitch('c5', Direction.DESCENDING)), 'C4')
+
+    def testOctaveRepeatingScaleStepsReachingAnEnharmonicOctave(self):
+        thirds = scale.OctaveRepeatingScale('c4', ['M3', 'M3', 'M3'])
+        wholeTones = scale.OctaveRepeatingScale('c4', ['M2'] * 6)
+        self.assertEqual(self.pitchOut(thirds.getPitches('c4', 'c6')),
+                         '[C4, E4, G#4, C5, E5, G#5, C6]')
+        self.assertEqual(self.pitchOut(wholeTones.getPitches('c4', 'c5')),
+                         '[C4, D4, E4, F#4, G#4, A#4, C5]')
+        for unused_x in range(20):
+            self.assertEqual(str(thirds.nextPitch('g#4')), 'C5')
+            self.assertEqual(str(thirds.nextPitch('c5')), 'E5')
+            self.assertEqual(str(thirds.nextPitch('c5', Direction.DESCENDING)), 'G#4')
+            self.assertEqual(thirds.getScaleDegreeFromPitch('c'), 1)
+
+            self.assertEqual(str(wholeTones.nextPitch('a#4')), 'C5')
+            self.assertEqual(str(wholeTones.nextPitch('c5')), 'D5')
+            self.assertEqual(str(wholeTones.nextPitch('c5', Direction.DESCENDING)), 'A#4')
+            self.assertEqual(wholeTones.getScaleDegreeFromPitch('c'), 1)
+
     def testOctatonicModesDoNotSharePitchDegreeCache(self):
         sc1 = scale.OctatonicScale('C', mode=1)
         sc2 = scale.OctatonicScale('C', mode=2)
