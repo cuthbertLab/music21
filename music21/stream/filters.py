@@ -359,7 +359,7 @@ class OffsetFilter(StreamFilter):
         self.offsetStart = opFrac(offsetStart)
         self.zeroLengthSearch: bool = True
         if offsetEnd is None:
-            self.offsetEnd = offsetStart
+            self.offsetEnd = self.offsetStart
         else:
             self.offsetEnd = opFrac(offsetEnd)
             if offsetEnd > offsetStart:
