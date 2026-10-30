@@ -9047,20 +9047,35 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         if numSuffix is not None or (fixZeros and foundMeasureNumber == 0):
             prevMeas = myStream.getElementBeforeOffset(myMeas.offset, classList=['Measure'])
             if prevMeas:
-                ts2 = prevMeas.getContextByClass(meter.TimeSignature)
-                if not ts2:
+                segments: list[tuple[meter.TimeSignature, OffsetQL]] = []
+                contextTs = prevMeas.getContextByClass(meter.TimeSignature)
+                if contextTs is not None:
+                    segments.append((contextTs, 0.0))
+                for ts in prevMeas.getElementsByClass(meter.TimeSignature):
+                    tsOffset = prevMeas.elementOffset(ts)
+                    if segments and segments[-1][1] == tsOffset:
+                        segments.pop()
+                    segments.append((ts, tsOffset))
+                if not segments or segments[0][1] != 0:
                     raise StreamException(
                         'beatAndMeasureFromOffset: partial measure found, '
                         + 'but could not find a time signature for the preceding measure')
                 # foundMeasureNumber = prevMeas.number
 
-                # need this for chorales 197 and 280, where we
-                # have a full-length measure followed by a pickup in
-                # a new time signature
-                if prevMeas.highestTime == ts2.barDuration.quarterLength:
-                    padBeats = ts2.beatCount
-                else:
-                    padBeats = ts2.getBeatProportion(prevMeas.highestTime) - 1
+                segmentEnds = [start for unused_ts, start in segments[1:]]
+                segmentEnds.append(prevMeas.highestTime)
+                padBeats = 0
+                for (ts, start), end in zip(segments, segmentEnds):
+                    segmentLength = opFrac(end - start)
+                    # need this for chorales 197 and 280, where we
+                    # have a full-length measure followed by a pickup in
+                    # a new time signature
+                    if segmentLength == ts.barDuration.quarterLength:
+                        padBeats += ts.beatCount
+                    else:
+                        padBeats += ts.getBeatProportion(segmentLength) - 1
+                if myMeas.timeSignature is None:
+                    myBeat = segments[-1][0].getBeatProportion(searchOffset - myMeas.offset)
                 return (myBeat + padBeats, prevMeas)
             else:
                 # partial measure at start of piece
