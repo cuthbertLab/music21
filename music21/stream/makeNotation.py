@@ -1327,10 +1327,14 @@ def makeTies(
                 else:
                     # mNext has no voices but this one does
                     if mHasVoices:
-                        # internalize all components in a voice
-                        moveNotesToVoices(mNext)
-                        # place in first voice
-                        dst = mNext.voices[0]
+                        # internalize all components in a voice, once
+                        if not mNext.hasVoices():
+                            moveNotesToVoices(mNext)
+                        # place in a voice of the same id, made if missing
+                        dst = mNext.voices.getElementById(vId)
+                        if dst is None:
+                            dst = stream.Voice(id=vId)
+                            mNext.insert(0, dst)
                     else:  # no voices in either
                         dst = None
 
@@ -2370,6 +2374,40 @@ class Test(unittest.TestCase):
         remainder = m2.getElementsByClass(note.Note).first()
         self.assertEqual(remainder.duration.quarterLength, 1.0)
         self.assertEqual(remainder.tie.type, 'stop')
+
+    def testMakeTiesKeepsVoicesInNextMeasure(self):
+        '''
+        Voices running into a measure that has none continue there in
+        voices of the same ids; notes the measure already holds keep a
+        voice of their own.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import stream
+
+        def tiedInto(nextMeasureNotes):
+            m1 = stream.Measure(number=1)
+            m1.insert(0, meter.TimeSignature('2/4'))
+            for voiceId, pitchName in (('1', 'C5'), ('2', 'C4')):
+                v = stream.Voice(id=voiceId)
+                v.append(note.Note(pitchName, quarterLength=4.0))
+                m1.insert(0, v)
+            m2 = stream.Measure(number=2)
+            for n in nextMeasureNotes:
+                m2.append(n)
+            p = stream.Part()
+            p.insert(0, m1)
+            p.insert(2, m2)
+            p.makeTies(inPlace=True)
+            return {v.id: [n.nameWithOctave for n in v.notes] for v in m2.voices}
+
+        self.assertEqual(tiedInto([]), {'1': ['C5'], '2': ['C4']})
+
+        kept = tiedInto([note.Note('G4', quarterLength=2.0)])
+        self.assertEqual(kept['1'], ['C5'])
+        self.assertEqual(kept['2'], ['C4'])
+        self.assertEqual(len(kept), 3)
+        self.assertIn(['G4'], kept.values())
 
     def testConsolidateCompletedTupletsNoFalsePositive(self):
         from fractions import Fraction
