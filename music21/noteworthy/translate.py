@@ -5,7 +5,7 @@
 # Authors:      Jordi Bartolome
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -58,6 +58,7 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # |Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
 from __future__ import annotations
 
+import re
 import unittest
 
 from music21 import bar
@@ -82,6 +83,8 @@ from music21 import stream
 from music21 import tempo
 from music21 import tie
 
+from music21.common.numberTools import opFrac
+from music21.common.types import OffsetQL
 from music21.noteworthy.dictionaries import dictionaries
 
 environLocal = environment.Environment('noteworthy.translate')
@@ -108,9 +111,10 @@ class NoteworthyTranslator:
         self.currentClef = 'TREBLE'
         self.currentKey = key.KeySignature(0)
 
-        self.withinSlur = False
-        self.beginningSlurNote = None
-        self.withinTie = False
+        self.slurStarts: dict[int, note.GeneralNote] = {}
+        self.tiedPositions: set[str] = set()
+        self.positionMeasure: stream.Measure|None = None
+        self.measurePosition: OffsetQL = 0.0
 
         self.lyricPosition = 0
         self.lyrics = []
@@ -204,6 +208,9 @@ class NoteworthyTranslator:
                     self.lyricPosition += 1
                 elif command == 'Rest':
                     self.translateRest(attributes)
+                elif command == 'RestChord':
+                    self.translateRestChord(attributes)
+                    self.lyricPosition += 1
                 elif command == 'SongInfo':
                     self.createSongInfo(attributes)
                 elif command == 'StaffInstrument':
@@ -245,16 +252,11 @@ class NoteworthyTranslator:
         '''
         parts = durationInfo.split(',')
         lengthNote = parts[0]
-        thisNoteIsSlurred = False
         durationObject = duration.Duration(dictionaries['dictionaryNoteLength'][lengthNote])
 
         for kk in parts:
             if kk == 'Grace':
                 durationObject = durationObject.getGraceDuration()
-            elif kk == 'Slur':
-                if not self.withinSlur:
-                    self.beginningSlurNote = generalNote
-                thisNoteIsSlurred = True
             elif kk == 'Dotted':
                 durationObject.dots = 1
             elif kk == 'DblDotted':
@@ -266,46 +268,37 @@ class NoteworthyTranslator:
 
         generalNote.duration = durationObject
 
-        # if Slur
-        if self.withinSlur and not thisNoteIsSlurred:
-            music21SlurObj = spanner.Slur(self.beginningSlurNote, generalNote)
-            self.currentMeasure.append(music21SlurObj)
-            self.withinSlur = False
-        elif thisNoteIsSlurred:
-            self.withinSlur = True
-        else:
-            self.withinSlur = False
-
     def setTieFromPitchInfo(self, noteOrChord, pitchInfo):
         '''
-        sets the tie status for a noteOrChord from the pitchInfo
+        Sets the ties of a note or chord from its Pos info.  A position ending
+        in ``^`` is tied to the next note at that position, whatever group or
+        voice it comes in.
+
+        >>> nwt = noteworthy.translate.NoteworthyTranslator()
+        >>> c = chord.Chord('C5 E5')
+        >>> nwt.setTieFromPitchInfo(c, '1^,3')
+        >>> [n.tie for n in c]
+        [<music21.tie.Tie start>, None]
+        >>> c = chord.Chord('C5 E5')
+        >>> nwt.setTieFromPitchInfo(c, '1,3')
+        >>> [n.tie for n in c]
+        [<music21.tie.Tie stop>, None]
         '''
-        thisNoteBeginsATie = False
-        thisNoteIsTied = False
-
-        if pitchInfo[-1] == '^':
-            if self.withinTie is False:
-                thisNoteBeginsATie = True
-            thisNoteIsTied = True
-            self.withinTie = True
-
-        achord = noteOrChord if isinstance(noteOrChord, chord.Chord) else None
-
-        # if Tied
-        if thisNoteBeginsATie:
-            if achord is not None:
-                for n in achord:
-                    n.tie = tie.Tie('start')
+        notes = list(noteOrChord) if isinstance(noteOrChord, chord.Chord) else [noteOrChord]
+        for n, posInfo in zip(notes, pitchInfo.split(',')):
+            tiedOn = posInfo.endswith('^')
+            position = re.search(r'-?\d+', posInfo).group()
+            tiedFrom = position in self.tiedPositions
+            if tiedFrom and tiedOn:
+                n.tie = tie.Tie('continue')
+            elif tiedOn:
+                n.tie = tie.Tie('start')
+            elif tiedFrom:
+                n.tie = tie.Tie('stop')
+            if tiedOn:
+                self.tiedPositions.add(position)
             else:
-                noteOrChord.tie = tie.Tie('start')
-
-        if self.withinTie is True and thisNoteIsTied is False:
-            if achord is not None:
-                for n in achord:
-                    n.tie = tie.Tie('stop')
-            else:
-                noteOrChord.tie = tie.Tie('stop')
-            self.withinTie = False
+                self.tiedPositions.discard(position)
 
     def getPitchFromPositionInfo(self, posInfo):
         # noinspection PyShadowingNames
@@ -484,24 +477,8 @@ class NoteworthyTranslator:
         # pitchInfo
         self.setTieFromPitchInfo(n, pitchInfo)
 
-        # if Lyrics
-        if self.lyrics and self.lyricPosition < len(self.lyrics):
-            n.addLyric(self.lyrics[self.lyricPosition])
-
-        self.getShortestStream().append(n)
-
-    # Returns the shortest stream. It can be the shortest Voice
-    # or current measure if no voice.
-    def getShortestStream(self):
-        if self.currentMeasure.isFlat:
-            # O(1) in most cases.
-            return self.currentMeasure
-
-        # O(n) only if voices already exist.
-        return min(
-            self.currentMeasure.getElementsByClass(stream.Voice),
-            key=lambda v: v.quarterLength
-        )
+        self.addCurrentLyric(n)
+        self.appendSimultaneous([(n, durationInfo)])
 
     def translateChord(self, attributes):
         r'''
@@ -520,76 +497,127 @@ class NoteworthyTranslator:
         >>> measure[1]
         <music21.chord.Chord C5 E5 G#5>
         '''
-        durationInfos = attributes['Dur']
-        pitchInfos = attributes['Pos']
-        currentDuration = self.getShortestStream().duration
-        isRestChord = 'Dur2' in attributes
-        i = 0
+        groups = list(zip(attributes['Dur'], attributes['Pos']))
+        if 'Dur2' in attributes:
+            groups.append((attributes['Dur2'], attributes['Pos2']))
+        chords = [(self.createChord(durationInfo, pitchInfo), durationInfo)
+                  for durationInfo, pitchInfo in groups]
+        self.addCurrentLyric(chords[0][0])
+        self.appendSimultaneous(chords)
 
-        def getVoiceAtDuration(inner_self, voiceId, dur):
-            # first check if voice already exists in measure
-            voice = None
-            voices = inner_self.currentMeasure.getElementsByClass(stream.Voice)
-            voice = voices.getElementById(voiceId)
+    def translateRestChord(self, attributes: dict[str, str]) -> None:
+        '''
+        Translation of a NWC rest chord: a rest and the chord sounding with it.
 
-            # otherwise create it
-            if voice is None:
-                voice = stream.Voice()
-                voice.id = voiceId
-                # if creating the first voice, add current measure contents to it
-                if len(voices) == 0:
-                    notes = []
-                    for item in inner_self.currentMeasure:
-                        if isinstance(item, note.GeneralNote):
-                            notes.append(item)
-                    if notes:
-                        voice.append(notes)
-                        inner_self.currentMeasure.remove(notes)
+        >>> nwt = noteworthy.translate.NoteworthyTranslator()
+        >>> nwt.currentMeasure = stream.Measure()
+        >>> nwt.translateRestChord({'Dur': 'Half', 'Dur2': '4th', 'Pos2': '-1,1'})
+        >>> nwt.currentMeasure.show('text')
+        {0.0} <music21.stream.Voice 0>
+            {0.0} <music21.chord.Chord A4 C5>
+        {0.0} <music21.stream.Voice 1>
+            {0.0} <music21.note.Rest half>
 
-                inner_self.currentMeasure.append(voice)
+        * New in v11.
+        '''
+        c = self.createChord(attributes['Dur2'], attributes['Pos2'])
+        r = note.Rest()
+        self.setDurationForObject(r, attributes['Dur'])
+        self.addCurrentLyric(c)
+        self.appendSimultaneous([(c, attributes['Dur2']), (r, attributes['Dur'])])
 
+    def createChord(self, durationInfo: str, pitchInfo: str) -> chord.Chord:
+        '''
+        Returns a chord from the Dur and Pos info of one group of NWC chord notes.
 
-            cd = dur.quarterLength
-            vd = voice.quarterLength
-            # if current voice is late, add rest
-            if cd - vd > 0:
-                rest = note.Rest()
-                rest.quarterLength = cd - vd
-                rest.stepShift = 3
-                voice.append(rest)
+        >>> nwt = noteworthy.translate.NoteworthyTranslator()
+        >>> nwt.createChord('8th', '-1,1^')
+        <music21.chord.Chord A4 C5>
 
-            return voice
+        * New in v11.
+        '''
+        c = chord.Chord()
+        self.setDurationForObject(c, durationInfo)
+        c.pitches = self.getMultiplePitchesFromPositionInfo(pitchInfo)
+        self.setTieFromPitchInfo(c, pitchInfo)
+        return c
 
+    def addCurrentLyric(self, generalNote: note.GeneralNote) -> None:
+        '''
+        Gives a note or chord the current lyric syllable, if there is one.
 
-        for d in durationInfos:
-            c = chord.Chord()   # note!
-            # durationInfo
-            self.setDurationForObject(c, d)
+        * New in v11.
+        '''
+        if self.lyrics and self.lyricPosition < len(self.lyrics):
+            generalNote.addLyric(self.lyrics[self.lyricPosition])
 
-            # pitchInfo
-            p = pitchInfos[durationInfos.index(d)]
-            c.pitches = self.getMultiplePitchesFromPositionInfo(p)
-            self.setTieFromPitchInfo(c, p)
+    def appendSimultaneous(self, generalNotes: list[tuple[note.GeneralNote, str]]) -> None:
+        '''
+        Places notes, chords or rests, each with its Dur info, at the current
+        position in the measure, and moves the position on by the shortest of
+        them.  When more than one starts together, or a voice is still
+        sounding, each goes in a voice that is free at that position.  A slur
+        in the Dur info runs to the next note or rest in the same voice.
 
-            # if Lyrics
-            if self.lyrics and self.lyricPosition < len(self.lyrics):
-                c.addLyric(self.lyrics[self.lyricPosition])
+        >>> nwt = noteworthy.translate.NoteworthyTranslator()
+        >>> nwt.currentMeasure = stream.Measure()
+        >>> nwt.appendSimultaneous([(note.Note('C5', type='half'), 'Half'),
+        ...                         (note.Note('A4'), '4th')])
+        >>> nwt.appendSimultaneous([(note.Note('B4'), '4th')])
+        >>> nwt.currentMeasure.show('text')
+        {0.0} <music21.stream.Voice 0>
+            {0.0} <music21.note.Note C>
+        {0.0} <music21.stream.Voice 1>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note B>
 
-            if len(durationInfos) == 1 and isRestChord is not None:
-                self.getShortestStream().append(c)
+        * New in v11.
+        '''
+        measure = self.currentMeasure
+        if self.positionMeasure is not measure:
+            self.positionMeasure = measure
+            self.measurePosition = measure.highestTime
+        offset = self.measurePosition
+
+        voices = list(measure.voices)
+        if not voices and len(generalNotes) > 1:
+            firstVoice = stream.Voice(id=0)
+            notes = [(n.offset, n) for n in measure.getElementsByClass(note.GeneralNote)]
+            measure.remove([n for unused, n in notes])
+            for noteOffset, n in notes:
+                firstVoice.insert(noteOffset, n)
+            measure.insert(0, firstVoice)
+            voices.append(firstVoice)
+        # the voices free at the offset, those that end there first
+        freeVoices = sorted((v for v in voices if v.highestTime <= offset),
+                            key=lambda v: -v.highestTime)
+        for gn, durationInfo in generalNotes:
+            if not voices:
+                measure.insert(offset, gn)
+                voiceId = 0
             else:
-                v = getVoiceAtDuration(self, i, currentDuration)
-                v.append(c)
+                if freeVoices:
+                    voice = freeVoices.pop(0)
+                else:
+                    voice = stream.Voice(id=len(voices))
+                    measure.insert(0, voice)
+                    voices.append(voice)
+                voice.insert(offset, gn)
+                voiceId = voice.id
+            self.setSlur(gn, voiceId, 'Slur' in durationInfo.split(','))
+        self.measurePosition = opFrac(offset + min(gn.quarterLength for gn, unused in generalNotes))
 
-            i += 1
+    def setSlur(self, generalNote: note.GeneralNote, voiceId: int, slurred: bool) -> None:
+        '''
+        Starts, continues or ends a slur in one voice: a slur runs from the
+        first slurred note in a row to the next note that is not slurred.
 
-        if isRestChord:
-            restDurInfo = attributes['Dur2']
-            r = note.Rest()
-            r.stepShift = 3
-            self.setDurationForObject(r, restDurInfo)
-            v = getVoiceAtDuration(self, i, currentDuration)
-            v.append(r)
+        * New in v11.
+        '''
+        if slurred:
+            self.slurStarts.setdefault(voiceId, generalNote)
+        elif voiceId in self.slurStarts:
+            self.currentMeasure.append(spanner.Slur(self.slurStarts.pop(voiceId), generalNote))
 
     def translateRest(self, attributes):
         r'''
@@ -611,8 +639,7 @@ class NoteworthyTranslator:
 
         r = note.Rest()
         self.setDurationForObject(r, durationInfo)
-
-        self.getShortestStream().append(r)
+        self.appendSimultaneous([(r, durationInfo)])
 
     def createClef(self, attributes):
         r'''
@@ -993,6 +1020,138 @@ class Test(unittest.TestCase):
         self.assertEqual(str(myScore[note.Note].first().name), 'E')
         self.assertEqual(str(myScore[clef.Clef].first()),
                          '<music21.clef.BassClef>')
+
+    @staticmethod
+    def firstMeasureContents(lines: list[str]) -> list[tuple[float, float, str]]:
+        '''
+        The offset, length and pitches of each note and rest in the first measure.
+
+        AI-assisted (Claude).
+        '''
+        s = NoteworthyTranslator().parseList(['|AddStaff|', '|Clef|Type:Treble'] + lines)
+        m = s.parts.first().getElementsByClass(stream.Measure).first()
+        return sorted((float(e.getOffsetInHierarchy(m)), float(e.quarterLength),
+                       ' '.join(p.nameWithOctave for p in e.pitches) or 'rest')
+                      for e in m.recurse().notesAndRests)
+
+    def testChordWithTwoDurations(self):
+        self.assertEqual(self.firstMeasureContents([
+            '|Note|Dur:4th|Pos:0',
+            '|Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo'
+            + '|Dur2:8th,DblDotted|Pos2:3x',
+            '|Note|Dur:4th|Pos:-5',
+        ]), [
+            (0.0, 1.0, 'B4'),
+            (1.0, 0.5, 'E4 F4 G-4 A#4 B##4 C--5 D5'),
+            (1.0, 0.875, 'E5'),
+            (1.5, 1.0, 'D4'),
+        ])
+
+    def testRestChord(self):
+        self.assertEqual(self.firstMeasureContents([
+            '|Note|Dur:4th|Pos:0',
+            '|RestChord|Dur:Half|Opts:Stem=Up|Dur2:4th|Pos2:-1,1',
+            '|RestChord|Dur:4th|Dur2:4th|Pos2:-5',
+            '|Note|Dur:4th|Pos:0',
+        ]), [
+            (0.0, 1.0, 'B4'),
+            (1.0, 1.0, 'A4 C5'),
+            (1.0, 2.0, 'rest'),
+            (2.0, 1.0, 'D4'),
+            (2.0, 1.0, 'rest'),
+            (3.0, 1.0, 'B4'),
+        ])
+
+    def testNotesAfterGroupsFollowThePosition(self):
+        self.assertEqual(self.firstMeasureContents([
+            '|Chord|Dur:8th|Pos:-4|Dur2:8th,DblDotted|Pos2:3',
+            '|Note|Dur:4th|Pos:-5',
+            '|Note|Dur:4th|Pos:-4',
+        ]), [
+            (0.0, 0.5, 'E4'),
+            (0.0, 0.875, 'E5'),
+            (0.5, 1.0, 'D4'),
+            (1.5, 1.0, 'E4'),
+        ])
+        self.assertEqual(self.firstMeasureContents([
+            '|RestChord|Dur:Half|Dur2:4th|Pos2:-1,1',
+            '|Note|Dur:Half|Pos:0',
+            '|Note|Dur:4th|Pos:1',
+        ]), [
+            (0.0, 1.0, 'A4 C5'),
+            (0.0, 2.0, 'rest'),
+            (1.0, 2.0, 'B4'),
+            (3.0, 1.0, 'C5'),
+        ])
+        # notes moved into the first voice keep their offsets
+        self.assertEqual(self.firstMeasureContents([
+            '|Note|Dur:4th,Triplet|Pos:0',
+            '|Note|Dur:4th,Triplet|Pos:1',
+            '|Note|Dur:4th,Triplet|Pos:2',
+            '|Chord|Dur:4th|Pos:-1|Dur2:Half|Pos2:3',
+        ]), [
+            (0.0, 2 / 3, 'B4'),
+            (2 / 3, 2 / 3, 'C5'),
+            (4 / 3, 2 / 3, 'D5'),
+            (2.0, 1.0, 'A4'),
+            (2.0, 2.0, 'E5'),
+        ])
+
+    @staticmethod
+    def parseTreble(lines: list[str]) -> stream.Score:
+        return NoteworthyTranslator().parseList(['|AddStaff|', '|Clef|Type:Treble'] + lines)
+
+    def testTiesFollowTheirPositions(self):
+        def ties(lines):
+            return sorted((n.pitch.nameWithOctave, float(c.getOffsetInHierarchy(s)),
+                           n.tie.type if n.tie else None)
+                          for s in [self.parseTreble(lines)]
+                          for c in s.recurse().getElementsByClass(chord.Chord)
+                          for n in c)
+
+        self.assertEqual(ties([
+            '|Chord|Dur:4th|Pos:1^|Dur2:4th|Pos2:3',
+            '|Chord|Dur:4th|Pos:1|Dur2:4th|Pos2:3',
+        ]), [('C5', 0.0, 'start'), ('C5', 1.0, 'stop'), ('E5', 0.0, None), ('E5', 1.0, None)])
+        self.assertEqual(ties([
+            '|Chord|Dur:4th|Pos:1^|Dur2:4th|Pos2:3^',
+            '|Chord|Dur:4th|Pos:1|Dur2:4th|Pos2:3',
+        ]), [('C5', 0.0, 'start'), ('C5', 1.0, 'stop'),
+             ('E5', 0.0, 'start'), ('E5', 1.0, 'stop')])
+
+    def testSlursStayInTheirVoice(self):
+        def slurs(lines):
+            return [[repr(e) for e in sl.getSpannedElements()]
+                    for sl in self.parseTreble(lines).recurse().getElementsByClass(spanner.Slur)]
+
+        self.assertEqual(slurs([
+            '|RestChord|Dur:Half|Dur2:4th,Slur|Pos2:-1,1',
+            '|Note|Dur:4th|Pos:0',
+        ]), [['<music21.chord.Chord A4 C5>', '<music21.note.Note B>']])
+        self.assertEqual(slurs([
+            '|Chord|Dur:4th,Slur|Pos:1|Dur2:4th|Pos2:3',
+            '|Chord|Dur:4th|Pos:1|Dur2:4th|Pos2:3',
+        ]), [['<music21.chord.Chord C5>', '<music21.chord.Chord C5>']])
+
+    def testRestChordFromBinary(self):
+        import struct
+        from music21.noteworthy import binaryTranslate
+        # a rest chord in a version 1.75 file: object type 18, visibility, ten
+        # data bytes (the rest's duration first, the number of notes ninth),
+        # then a quarter note at staff position 0
+        for restDuration, dumped, restLength in (
+                (1, '|RestChord|Dur:Half|Dur2:4th|Pos2:0', 2.0),
+                (2, '|RestChord|Dur:4th|Dur2:4th|Pos2:0', 1.0)):
+            data = struct.pack('<hB10s', 18, 0, bytes([restDuration, 0, 0, 0, 0, 0, 0, 0, 1, 0]))
+            data += struct.pack('<hB6sbB', 8, 0, bytes([2, 0, 0, 0, 0, 0]), 0, 5)
+            nwcc = binaryTranslate.NWCConverter()
+            nwcc.version = 175
+            nwcc.fileContents = data
+            restChord = binaryTranslate.NWCObject(parserParent=nwcc)
+            restChord.parse()
+            self.assertEqual(restChord.dumpMethod(restChord), dumped)
+            self.assertEqual(self.firstMeasureContents([dumped]),
+                             [(0.0, 1.0, 'B4'), (0.0, restLength, 'rest')])
 
     def testKeySignatureAtBeginning(self):
         '''
