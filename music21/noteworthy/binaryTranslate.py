@@ -1295,23 +1295,13 @@ class NWCObject:
         self.data2.append(rest)
 
         def dump(inner_self):
-            build = '|Chord'
-            notes = {}
-            for d in inner_self.data2:
-                if notes.get(d.durationStr) is None:
-                    notes[d.durationStr] = []
-
-                notes[d.durationStr].append(d.alterationStr + str(d.pos) + d.tieInfo)
-
-            i = 0
-            for n in notes:
-                if i == len(notes) - 1:
-                    build += '|Dur2:' + n + '|Pos2:' + ','.join(notes[n])
-                else:
-                    build += '|Dur:' + n + '|Pos:' + ','.join(notes[n])
-                i += 1
-
-            return build
+            *chordNotes, chordRest = inner_self.data2
+            if not chordNotes:
+                return '|Rest|Dur:' + chordRest.durationStr
+            return ('|RestChord|Dur:' + chordRest.durationStr
+                    + '|Dur2:' + chordNotes[0].durationStr
+                    + '|Pos2:' + ','.join(d.alterationStr + str(d.pos) + d.tieInfo
+                                          for d in chordNotes))
 
         self.dumpMethod = dump
 
