@@ -1207,6 +1207,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                         storedRight = thisKey
                     storedLeft = None
                 else:
+                    if storedRight is not None:
+                        yield (storedRight, None)
                     storedRight = thisKey
             elif thisKey.hand == 'left':
                 if storedRight is not None:
@@ -1220,6 +1222,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                         storedLeft = thisKey
                     storedRight = None
                 else:
+                    if storedLeft is not None:
+                        yield (None, storedLeft)
                     storedLeft = thisKey
 
         if storedRight:
@@ -2438,6 +2442,63 @@ class Test(unittest.TestCase):
             part = stream.PartStaff()
             m = stream.Measure(number=1)
             if pitchName == 'C3':
+                m.append(key.KeySignature(2))
+                m.append(meter.TimeSignature('4/4'))
+            m.append(note.Note(pitchName, quarterLength=4.0))
+            part.append(m)
+            score.insert(0, part)
+        brailleLines = keyboardPartsToBraille(score).splitlines()
+        self.assertEqual(brailleLines[0].strip('⠀'), '⠩⠩⠼⠙⠲')
+
+    def testYieldCombinedGroupingKeysSameHandInARow(self):
+        '''
+        Keys of one hand that come in a row are each yielded, paired with None.
+
+        AI-assisted (Claude).
+        '''
+        sig = Affinity.SIGNATURE
+        ttext = Affinity.TTEXT
+        notes = Affinity.NOTEGROUP
+        for handKeys, expected in (
+            ([(sig, 'right'), (notes, 'right'), (notes, 'left')],
+             [((sig, 'right'), None),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'left'), (notes, 'right'), (notes, 'left')],
+             [(None, (sig, 'left')),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'left'), (ttext, 'left'), (notes, 'right'), (notes, 'left')],
+             [(None, (sig, 'left')),
+              (None, (ttext, 'left')),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'right'), (ttext, 'right'), (notes, 'right'), (notes, 'left')],
+             [((sig, 'right'), None),
+              ((ttext, 'right'), None),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'right'), (sig, 'left'), (notes, 'right'), (notes, 'left')],
+             [((sig, 'right'), (sig, 'left')),
+              ((notes, 'right'), (notes, 'left'))]),
+        ):
+            bgs = BrailleGrandSegment()
+            for affinity, hand in handKeys:
+                bgs[SegmentKey(1, 0, affinity, hand)] = BrailleElementGrouping()
+            pairs = [
+                tuple(None if k is None else (k.affinity, k.hand) for k in pair)
+                for pair in bgs.yieldCombinedGroupingKeys()
+            ]
+            self.assertEqual(pairs, expected)
+
+    def testGrandSegmentHeadingFromRightHand(self):
+        '''
+        A key and time signature in only the right hand of a keyboard part
+        go into the heading.
+        '''
+        from music21.braille.translate import keyboardPartsToBraille
+
+        score = stream.Score()
+        for pitchName in ('C5', 'C3'):
+            part = stream.PartStaff()
+            m = stream.Measure(number=1)
+            if pitchName == 'C5':
                 m.append(key.KeySignature(2))
                 m.append(meter.TimeSignature('4/4'))
             m.append(note.Note(pitchName, quarterLength=4.0))
