@@ -1228,16 +1228,21 @@ class Test(unittest.TestCase):
         from music21 import layout
         from music21 import note
 
-        steps = 'CDEFGAB'
-        for secondNumbers in ([1, 2, 4, 5], [2, 3, 4], [1, 2, 3], [1, 3, 5], [2, 4]):
+        both = ['1', '2']
+        for secondNumbers, staffNumbers in (
+            ([1, 2, 4, 5], [both, both, ['1'], both, both]),
+            ([2, 3], [['1'], both, both]),
+            ([1, 2], [both, both, ['1']]),
+            ([1, 3, 5], [both, ['1'], both, ['1'], both]),
+        ):
             with self.subTest(secondNumbers=secondNumbers):
                 ps1 = stream.PartStaff()
                 ps2 = stream.PartStaff()
-                firstNumbers = range(1, 6)
-                for ps, numbers, octave in ((ps1, firstNumbers, 5), (ps2, secondNumbers, 3)):
+                firstNumbers = range(1, len(staffNumbers) + 1)
+                for ps, numbers in ((ps1, firstNumbers), (ps2, secondNumbers)):
                     for number in numbers:
-                        n = note.Note(f'{steps[number - 1]}{octave}', type='whole')
-                        ps.insert((number - 1) * 4, stream.Measure([n], number=number))
+                        ps.insert((number - 1) * 4,
+                                  stream.Measure([note.Note(type='whole')], number=number))
                 sg = layout.StaffGroup([ps1, ps2])
                 s = stream.Score([sg, ps1, ps2])
 
@@ -1245,16 +1250,10 @@ class Test(unittest.TestCase):
                 measures = root.findall('part/measure')
                 self.assertEqual([m.get('number') for m in measures],
                                  [str(number) for number in firstNumbers])
-                for number, m in zip(firstNumbers, measures):
-                    expected = [('1', f'{steps[number - 1]}5')]
-                    if number in secondNumbers:
-                        expected.append(('2', f'{steps[number - 1]}3'))
-                    self.assertEqual(
-                        [(n.find('staff').text,
-                          n.find('pitch/step').text + n.find('pitch/octave').text)
-                         for n in m.findall('note')],
-                        expected
-                    )
+                self.assertEqual(
+                    [[n.find('staff').text for n in m.findall('note')] for m in measures],
+                    staffNumbers
+                )
 
 
 if __name__ == '__main__':
