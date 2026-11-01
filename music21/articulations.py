@@ -438,8 +438,10 @@ class Fingering(TechnicalIndication):
     Other articulations, e.g., accents, apply to the whole chord and will,
     therefore, only be associated with the first note of a chord when serializing.
     Since chords store all articulations in an ordered list, Fingerings
-    are mapped implicitly to the notes of a chord in order. Superfluous
-    Fingerings will be ignored and may be discarded when serializing.
+    are mapped implicitly to the notes of a chord in order, from the lowest
+    note up: MusicXML import stores them so, and export writes a chord's
+    notes from lowest to highest. Superfluous Fingerings will be ignored
+    and may be discarded when serializing.
     '''
     def __init__(self, fingerNumber=None, **keywords):
         super().__init__(**keywords)
