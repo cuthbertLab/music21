@@ -12,6 +12,7 @@ from xml.etree.ElementTree import (
 
 from music21 import articulations
 from music21 import chord
+from music21 import clef
 from music21 import common
 from music21 import converter
 from music21 import corpus
@@ -1221,6 +1222,22 @@ class Test(unittest.TestCase):
         half_note.style.stemStyle.color = 'red'
         xmlOut = GeneralObjectExporter().parse(one_note_tune).decode('utf-8')
         self.assertIn('<stem color="#FF0000">up</stem>', xmlOut)
+
+    def testRestStepShiftInOctaveClef(self):
+        for clefClass, displayStep, displayOctave in (
+            (clef.Treble8vbClef, 'D', '4'),
+            (clef.Treble8vaClef, 'D', '6'),
+            (clef.Bass8vbClef, 'F', '2'),
+            (clef.Bass8vaClef, 'F', '4'),
+        ):
+            m = stream.Measure()
+            m.append(clefClass())
+            r = note.Rest()
+            r.stepShift = 2
+            m.append(r)
+            tree = self.getET(m)
+            self.assertEqual(tree.find('.//display-step').text, displayStep)
+            self.assertEqual(tree.find('.//display-octave').text, displayOctave)
 
 
 class TestExternal(unittest.TestCase):

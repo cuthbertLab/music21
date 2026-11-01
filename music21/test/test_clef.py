@@ -7,6 +7,7 @@ from music21 import clef
 from music21 import meter
 from music21.musicxml.xmlToM21 import MeasureParser
 from music21 import note
+from music21 import pitch
 from music21 import stream
 
 
@@ -119,6 +120,24 @@ class Test(unittest.TestCase):
         m.makeBeams(inPlace=True)
 
         self.assertEqual(m.notes[0].stemDirection, 'down')
+
+    def testOctaveClefLowestLine(self):
+        self.assertEqual(clef.Treble8vbClef().lowestLine, 24)
+        self.assertEqual(clef.Treble8vaClef().lowestLine, 38)
+        self.assertEqual(clef.Bass8vbClef().lowestLine, 12)
+        self.assertEqual(clef.Bass8vaClef().lowestLine, 26)
+
+    def testOctaveClefStemDirection(self):
+        # pitches just below, and on, the middle line of each staff
+        for clefClass, belowMiddle, onMiddle in (
+            (clef.Treble8vbClef, 'A3', 'B3'),
+            (clef.Treble8vaClef, 'A5', 'B5'),
+            (clef.Bass8vbClef, 'C2', 'D2'),
+            (clef.Bass8vaClef, 'C4', 'D4'),
+        ):
+            clefObj = clefClass()
+            self.assertEqual(clefObj.getStemDirectionForPitches(pitch.Pitch(belowMiddle)), 'up')
+            self.assertEqual(clefObj.getStemDirectionForPitches(pitch.Pitch(onMiddle)), 'down')
 
 
 if __name__ == '__main__':

@@ -501,7 +501,6 @@ class Treble8vaClef(TrebleClef):
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.octaveChange = 1
-        self.lowestLine = (7 * 3) + 3
 
 
 class GSopranoClef(GClef):
@@ -692,8 +691,8 @@ class Bass8vbClef(FClef):
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 4
-        self.octaveChange = -1
         self.lowestLine = (7 * 2) + 5
+        self.octaveChange = -1
 
 
 class Bass8vaClef(FClef):
@@ -708,8 +707,8 @@ class Bass8vaClef(FClef):
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 4
-        self.octaveChange = 1
         self.lowestLine = (7 * 2) + 5
+        self.octaveChange = 1
 
 
 class SubBassClef(FClef):
