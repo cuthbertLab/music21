@@ -913,6 +913,9 @@ class AbstractHarmonicMinorScale(AbstractScale):
     second to a leading tone.
 
     mode is not used
+
+    * Changed in v11: the interval list ends with A2 and m2.
+      `alteredDegrees` are not used.
     '''
     def __init__(self, mode: str|None = None, **keywords) -> None:
         super().__init__(**keywords)
