@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2007-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2007-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1288,8 +1288,9 @@ class LilypondConverter:
         if noteOrRest.hasStyleInformation:
             if noteOrRest.style.color and noteOrRest.style.hideObjectOnPrint is False:
                 # LilyPond 2.22 (January 2021) supports hex values
-                noteheadColor = rf'\override NoteHead.color = "{noteOrRest.style.color}"' + '\n'
-                stemColor = rf'\override Stem.color = "{noteOrRest.style.color}"' + '\n'
+                color = lyo.LyObject().quoteString(noteOrRest.style.color).rstrip()
+                noteheadColor = rf'\override NoteHead.color = {color}' + '\n'
+                stemColor = rf'\override Stem.color = {color}' + '\n'
                 simpleElementParts.append(noteheadColor)
                 simpleElementParts.append(stemColor)
 
@@ -2651,6 +2652,18 @@ class Test(unittest.TestCase):
             r'\override NoteHead.color = "darkgreen"' '\n'
             r'\override Stem.color = "darkgreen"' '\n'
             "c' 4  "
+        )
+
+    def testColorStaysInsideString(self):
+        n = note.Note()
+        n.style.color = 'red\\" #(system "touch x") "'
+        sm = LilypondConverter().lySimpleMusicFromNoteOrRest(n)
+        escaped = r'"red\\\" #(system \"touch x\") \""'
+        self.assertEqual(
+            sm.stringOutput(),
+            r'\override NoteHead.color = ' + escaped + '\n'
+            + r'\override Stem.color = ' + escaped + '\n'
+            + "c' 4  "
         )
 
     def testMetronomeMark(self):
