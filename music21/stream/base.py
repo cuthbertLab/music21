@@ -7,7 +7,7 @@
 #               Joséphine Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -10339,6 +10339,9 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
           x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons=True)
           will give you the number of P1s in the piece, because there could be
           d2's in there as well.
+        * A Chord counts as a unison of the Chord before it if both have the
+          same pitches, in any order.  A skipped unison still lasts until its
+          own end, so the next note follows it without a `None` between.
 
         See test.TestStream.testFindConsecutiveNotes() for usage details.
 
@@ -10367,9 +10370,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         * Changed in v8: all parameters are keyword only.
 
         OMIT_FROM_DOCS
-
-        N.B. for chords, currently, only the first pitch is tested for unison.
-        this is a bug TODO: FIX
 
         (\*\*keywords is there so that other methods that pass along dicts to
         findConsecutiveNotes don't have to remove
@@ -10419,6 +10419,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                             or e.pitch.pitchClass != lastPitches[0].pitchClass
                             or (not skipOctaves
                                 and e.pitch.ps != lastPitches[0].ps)):
+                        lastEnd = max(lastEnd, opFrac(e.offset + e.duration.quarterLength))
                         continue
                     if not getOverlaps and e.offset < lastEnd:
                         continue
@@ -10440,11 +10441,12 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                             lastWasNone = True
                             lastPitches = ()
                     # if we have a chord
-                    elif (not (skipUnisons
-                               and len(lastPitches) == len(e.pitches)
-                               and (p.ps for p in e.pitches) == (p.ps for p in lastPitches)
-                               )
-                          and (getOverlaps or e.offset >= lastEnd)):
+                    elif (skipUnisons
+                          and len(lastPitches) == len(e.pitches)
+                          and (sorted(p.ps for p in e.pitches)
+                               == sorted(p.ps for p in lastPitches))):
+                        lastEnd = max(lastEnd, opFrac(e.offset + e.duration.quarterLength))
+                    elif getOverlaps or e.offset >= lastEnd:
                         returnList.append(e)
                         if e.offset < lastEnd:  # is an overlap
                             continue

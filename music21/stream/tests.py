@@ -1089,6 +1089,64 @@ class Test(unittest.TestCase):
 
         self.assertEqual([repr(x) for x in consec3], expected2 + ['None'] + expected2)
 
+    def testFindConsecutiveNotesChordUnisons(self):
+        '''
+        A repeated Chord, with its pitches in any order, is skipped as a
+        unison; a rest after it still gives a None.
+        '''
+        ch1 = chord.Chord('C4 E4 G4')
+        ch2 = chord.Chord('C4 E4 G4')
+        ch3 = chord.Chord('C4 E4 A4')
+        s = Stream([ch1, ch2, ch3])
+        self.assertEqual(s.findConsecutiveNotes(), [ch1, ch2, ch3])
+        self.assertEqual(s.findConsecutiveNotes(skipUnisons=True), [ch1, ch3])
+
+        chords = [chord.Chord('C4 E4 G4'), chord.Chord('C4 E4 G4'), chord.Chord('C4 E4 A4')]
+        s2 = Stream()
+        s2.append([chords[0], chords[1], note.Rest(), chords[2]])
+        self.assertEqual(s2.findConsecutiveNotes(skipUnisons=True),
+                         [chords[0], None, chords[2]])
+
+        ch4 = chord.Chord('C4 E4 G4')
+        s3 = Stream()
+        s3.append([ch4, chord.Chord('G4 C4 E4')])
+        self.assertEqual(s3.findConsecutiveNotes(skipUnisons=True), [ch4])
+
+    def testFindConsecutiveNotesSkippedUnisonKeepsContinuity(self):
+        '''
+        A skipped unison lasts until its own end, so the next note follows
+        without a None, while a rest or a gap after it still gives a None.
+        '''
+        s = Stream()
+        s.append([note.Note('C4'), note.Note('C4'), note.Note('D4')])
+        consec = s.findConsecutiveNotes(skipUnisons=True)
+        self.assertEqual([repr(x) for x in consec],
+                         ['<music21.note.Note C>', '<music21.note.Note D>'])
+
+        s2 = Stream()
+        s2.append([note.Note('C4'), note.Note('C4'), note.Rest(), note.Note('D4')])
+        consec2 = s2.findConsecutiveNotes(skipUnisons=True)
+        self.assertEqual([repr(x) for x in consec2],
+                         ['<music21.note.Note C>', 'None', '<music21.note.Note D>'])
+
+        s3 = Stream()
+        s3.append([note.Note('C4'), note.Note('C5'), note.Note('D4')])
+        consec3 = s3.findConsecutiveNotes(skipUnisons=True, skipOctaves=True)
+        self.assertEqual([x.nameWithOctave for x in consec3], ['C4', 'D4'])
+
+        s4 = Stream()
+        s4.insert(0, note.Note('C4'))
+        s4.insert(1, note.Note('C4'))
+        s4.insert(3, note.Note('D4'))
+        consec4 = s4.findConsecutiveNotes(skipUnisons=True)
+        self.assertEqual([repr(x) for x in consec4],
+                         ['<music21.note.Note C>', 'None', '<music21.note.Note D>'])
+
+        s5 = Stream()
+        s5.append([note.Note('C4'), note.Note('C4'), note.Note('E4')])
+        intervals = s5.melodicIntervals(skipUnisons=True)
+        self.assertEqual([i.name for i in intervals], ['M3'])
+
     def testMelodicIntervals(self):
         c4 = note.Note('C4')
         d5 = note.Note('D5')
