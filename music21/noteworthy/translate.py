@@ -53,9 +53,6 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # low priority:
 # |MPC|Controller:vol|Style:Linear Sweep|TimeRes:Whole|SweepRes:1|
 #                        Pt1:0,127|Pt2:8,30|Pos:8|Wide:Y|Placement:BestFitForward
-#
-# Pos2? Dur2?
-# |Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
 from __future__ import annotations
 
 import re
@@ -101,12 +98,12 @@ class NoteworthyTranslator:
     stores all the data about the current parse context (whether we're in a slur, tuplet, etc.)
     '''
 
-    def __init__(self):
-        self.currentPart = None
-        self.currentMeasure = None
+    def __init__(self) -> None:
+        self.currentPart: stream.Part|None = None
+        self.currentMeasure: stream.Measure = stream.Measure()
         self.measureNumber = 0
         self.currentEnding = 1
-        self.repeatedMeasures = []
+        self.repeatedMeasures: list[stream.Measure] = []
         self.score = stream.Score()
 
         self.currentClef = 'TREBLE'
@@ -118,9 +115,9 @@ class NoteworthyTranslator:
         self.measurePosition: OffsetQL = 0.0
 
         self.lyricPosition = 0
-        self.lyrics = []
+        self.lyrics: list[str] = []
 
-        self.activeAccidentals = {}
+        self.activeAccidentals: dict[str, str] = {}
 
     def parseFile(self, filePath):
         try:
@@ -243,7 +240,7 @@ class NoteworthyTranslator:
 
         DurationInfo is a string like:
 
-            Whole,Dotted,Slur
+            Whole,Dotted
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> n = note.Note()
@@ -1150,7 +1147,6 @@ class Test(unittest.TestCase):
             (1.0, 2.0, 'B4'),
             (3.0, 1.0, 'C5'),
         ])
-        # notes moved into the first voice keep their offsets
         self.assertEqual(self.firstMeasureContents([
             '|Note|Dur:4th,Triplet|Pos:0',
             '|Note|Dur:4th,Triplet|Pos:1',
@@ -1271,11 +1267,13 @@ class Test(unittest.TestCase):
                 self.assertEqual(s.recurse().getElementsByClass(note.Note).first().offset, 1.0)
 
     def testRestChordFromBinary(self):
+        '''
+        Reads a rest chord from a version 1.75 file: object type 18,
+        visibility, ten data bytes (the rest's duration first, the number of
+        notes ninth), then a quarter note at staff position 0.
+        '''
         import struct
         from music21.noteworthy import binaryTranslate
-        # a rest chord in a version 1.75 file: object type 18, visibility, ten
-        # data bytes (the rest's duration first, the number of notes ninth),
-        # then a quarter note at staff position 0
         for restDuration, dumped, restLength in (
                 (1, '|RestChord|Dur:Half|Dur2:4th|Pos2:0', 2.0),
                 (2, '|RestChord|Dur:4th|Dur2:4th|Pos2:0', 1.0)):
