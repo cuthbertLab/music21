@@ -38,6 +38,7 @@ from collections.abc import Sequence
 import copy
 import dataclasses
 import enum
+import math
 import typing as t
 
 from music21 import common
@@ -1445,11 +1446,12 @@ class IntervalNetwork:
         AI-assisted (Claude).
         '''
         pitchOrigin.octaveIsImplicit = False
+        span = self._searchSpan()
         realizedPitches, realizedNodes = self.realize(
             pitchReference,
             nodeName,
-            minPitch=pitchOrigin.transpose(-12, inPlace=False),
-            maxPitch=pitchOrigin.transpose(12, inPlace=False),
+            minPitch=pitchOrigin.transpose(-span, inPlace=False),
+            maxPitch=pitchOrigin.transpose(span, inPlace=False),
             direction=direction,
             alteredDegrees=alteredDegrees,
         )
@@ -1470,6 +1472,22 @@ class IntervalNetwork:
         if alteredDegrees and degree in alteredDegrees:
             return found.transpose(alteredDegrees[degree]['interval'].reverse())
         return found
+
+    def _searchSpan(self) -> int:
+        '''
+        Return how many semitones either side of a pitch to realize so that
+        its neighbors on the network are included: an octave, or the widest
+        edge if that is wider.
+
+        >>> net = scale.intervalNetwork.IntervalNetwork(['M2', 'M2', 'm2'])
+        >>> net._searchSpan()
+        12
+        >>> net = scale.intervalNetwork.IntervalNetwork(['m10'])
+        >>> net._searchSpan()
+        15
+        '''
+        widest = max((abs(e.interval.semitones) for e in self.edges.values()), default=0)
+        return max(12, math.ceil(widest))
 
     # TODO: need to collect intervals as well
 
@@ -2532,10 +2550,9 @@ class IntervalNetwork:
         octaveWasImplicit = pitchTargetObj.octaveIsImplicit
         pitchTargetObj.octaveIsImplicit = False
 
-        # try an octave spread first
-        # if a scale degree is larger than an octave this will fail
-        minPitch = pitchTargetObj.transpose(-12, inPlace=False)
-        maxPitch = pitchTargetObj.transpose(12, inPlace=False)
+        span = self._searchSpan()
+        minPitch = pitchTargetObj.transpose(-span, inPlace=False)
+        maxPitch = pitchTargetObj.transpose(span, inPlace=False)
 
         realizedPitches, realizedNodes = self.realize(pitchReference,
                                                       nodeObj,
@@ -2607,10 +2624,9 @@ class IntervalNetwork:
         # don't alter permanently, in case a Pitch object was passed in.
         octaveWasImplicit = pitchTargetObj.octaveIsImplicit
         pitchTargetObj.octaveIsImplicit = False
-        # try an octave spread first
-        # if a scale degree is larger than an octave this will fail
-        minPitch = pitchTargetObj.transpose(-12, inPlace=False)
-        maxPitch = pitchTargetObj.transpose(12, inPlace=False)
+        span = self._searchSpan()
+        minPitch = pitchTargetObj.transpose(-span, inPlace=False)
+        maxPitch = pitchTargetObj.transpose(span, inPlace=False)
 
         realizedPitches, realizedNodes = self.realize(pitchReference,
                                                       nodeId,
