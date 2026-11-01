@@ -7931,6 +7931,14 @@ class Test(unittest.TestCase):
         qj.getElementsByClass(Measure)[1].insert(0, key.KeySignature(5))
         unused_qj2 = qj.invertDiatonic(note.Note('F4'), inPlace=False)
 
+    def testInvertDiatonicBelowOctaveZero(self):
+        s = Stream()
+        s.append(note.Note('E4'))
+        inverted = s.invertDiatonic(note.Note('C2'))
+        invertedPitch = inverted[note.Note].first().pitch
+        self.assertEqual(invertedPitch.step, 'A')
+        self.assertEqual(invertedPitch.octave, -1)
+
     def testMeasuresA(self):
         s = corpus.parse('bwv66.6')
         ex = s.parts[0].measures(3, 6)
