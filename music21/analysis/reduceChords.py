@@ -5,7 +5,7 @@
 # Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2013-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -92,7 +92,7 @@ class ChordReducer:
             if not all(isinstance(x, chord.Chord) for x in forbiddenChords):
                 raise ChordReducerException('All forbiddenChords must be Chords')
             intervalClassSets = []
-            for x in allowableChords:
+            for x in forbiddenChords:
                 intervalClassSet = self._getIntervalClassSet(x.pitches)
                 intervalClassSets.append(intervalClassSet)
             forbiddenChords = frozenset(intervalClassSets)
@@ -761,6 +761,44 @@ class Test(unittest.TestCase):
             parts.append(stream.Part([inst, note.Note('C4', type='whole')]))
         score = stream.Score(parts)
         self.assertEqual(score.asTimespans().allParts(), parts)
+
+    def testForbiddenChords(self):
+        '''
+        A verticality whose interval classes match a forbidden chord loses its
+        upper timespans, even when it is consonant or listed in allowableChords.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import instrument
+
+        def makeScore():
+            upper = stream.Part([instrument.Instrument(),
+                                 stream.Measure([chord.Chord('E4 G4', type='whole')])])
+            lower = stream.Part([instrument.Instrument(),
+                                 stream.Measure([note.Note('C3', type='whole')])])
+            return stream.Score([upper, lower])
+
+        def reducedPitches(reduction):
+            return [c.pitches for c in reduction.recurse().getElementsByClass(chord.Chord)]
+
+        reduction = ChordReducer().run(makeScore())
+        self.assertEqual(reducedPitches(reduction),
+                         [(pitch.Pitch('C3'), pitch.Pitch('E4'), pitch.Pitch('G4'))])
+
+        reduction = ChordReducer().run(makeScore(),
+                                       forbiddenChords=[chord.Chord('C E G')])
+        self.assertEqual(reducedPitches(reduction), [(pitch.Pitch('C3'),)])
+
+        reduction = ChordReducer().run(makeScore(),
+                                       allowableChords=[chord.Chord('C D E')],
+                                       forbiddenChords=[chord.Chord('C E G')])
+        self.assertEqual(reducedPitches(reduction), [(pitch.Pitch('C3'),)])
+
+        reduction = ChordReducer().run(makeScore(),
+                                       allowableChords=[chord.Chord('C E G')],
+                                       forbiddenChords=[chord.Chord('C D E')])
+        self.assertEqual(reducedPitches(reduction),
+                         [(pitch.Pitch('C3'), pitch.Pitch('E4'), pitch.Pitch('G4'))])
 
 
 class TestExternal(unittest.TestCase):
