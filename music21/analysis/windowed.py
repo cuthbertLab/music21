@@ -5,7 +5,7 @@
 # Authors:      Jared Sadoian
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -20,6 +20,7 @@ and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classe
 '''
 from __future__ import annotations
 
+import copy
 import unittest
 import warnings
 
@@ -222,9 +223,15 @@ class WindowedAnalysis:
             for i in range(maxWindowCount):
                 # get all participants, combine into a single
                 current = stream.Stream()
+                appendedIds = set()
                 for dataStream, participants in overlapped:
-                    if i in participants:
-                        for m in dataStream:
+                    if i not in participants:
+                        continue
+                    for m in dataStream:
+                        if id(m) in appendedIds:
+                            current.append(copy.deepcopy(m))
+                        else:
+                            appendedIds.add(id(m))
                             current.append(m)
                 try:
                     data[i], color[i] = self.processor.process(current)
@@ -429,6 +436,26 @@ class Test(unittest.TestCase):
         # window size of 8 gets 1 solutions
         a, unused_b, unused_c = wa2.process(8, 8, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 1)
+
+    def testAdjacentAverage(self):
+        '''
+        Each minimum window gathers every window of the given size holding
+        it, and the windowed stream itself is unchanged.
+        '''
+        from music21 import note
+        s = stream.Stream()
+        for _ in range(5):
+            s.append(note.Note('C'))
+        wa = WindowedAnalysis(s, MockObjectProcessor())
+
+        data, unused_color = wa.analyze(2, windowType='adjacentAverage')
+        self.assertEqual(data, [2, 4, 4, 4, 2])
+        data, unused_color = wa.analyze(3, windowType='adjacentAverage')
+        self.assertEqual(data, [3, 6, 9, 6, 3])
+        data, unused_color = wa.analyze(5, windowType='adjacentAverage')
+        self.assertEqual(data, [5, 5, 5, 5, 5])
+        self.assertEqual(len(wa._windowedStream), 5)
+        self.assertEqual(len(wa._windowedStream.recurse().notes), 5)
 
 
     def testVariableWindowing(self):
