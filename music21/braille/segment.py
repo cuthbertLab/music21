@@ -2481,10 +2481,11 @@ class Test(unittest.TestCase):
             bgs = BrailleGrandSegment()
             for affinity, hand in handKeys:
                 bgs[SegmentKey(1, 0, affinity, hand)] = BrailleElementGrouping()
-            pairs = [
-                tuple(None if k is None else (k.affinity, k.hand) for k in pair)
-                for pair in bgs.yieldCombinedGroupingKeys()
-            ]
+            pairs = []
+            for rightKey, leftKey in bgs.yieldCombinedGroupingKeys():
+                right = None if rightKey is None else (rightKey.affinity, rightKey.hand)
+                left = None if leftKey is None else (leftKey.affinity, leftKey.hand)
+                pairs.append((right, left))
             self.assertEqual(pairs, expected)
 
     def testGrandSegmentHeadingFromRightHand(self):
