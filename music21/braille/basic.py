@@ -5,7 +5,7 @@
 #               Bo-cheng (Sponge) Jhan (Clef routines)
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-26 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 r'''
@@ -730,10 +730,10 @@ def noteToBraille(
     allTuplets = music21Note.duration.tuplets
     if allTuplets:
         if beamStatus['beamStart']:
-            if allTuplets[0].fullName == 'Triplet' and allTuplets[0].tupletActualShow != 'none':
+            if allTuplets[0].fullName == 'Triplet' and allTuplets[0].tupletActualShow is not None:
                 noteTrans.append(symbols['triplet'])  # dot 2-3
             else:
-                if allTuplets[0].tupletActualShow == 'none':
+                if allTuplets[0].tupletActualShow is None:
                     noteTrans.append(symbols['transcriber-added_sign'])
                     music21Note.editorial.brailleEnglish.append(
                         f'transcriber-added {symbols["transcriber-added_sign"]}')
@@ -1714,7 +1714,17 @@ class BrailleBasicException(exceptions21.Music21Exception):
 
 
 class Test(unittest.TestCase):
-    pass
+    def testTupletWithHiddenNumber(self):
+        def tupletStart(quarterLength, tupletActualShow):
+            n = note.Note('C4', quarterLength=quarterLength)
+            n.duration.tuplets[0].tupletActualShow = tupletActualShow
+            n.beamStart = True
+            return n
+
+        self.assertEqual(noteToBraille(tupletStart(1 / 3, 'number')), '⠆⠐⠙')
+        self.assertEqual(noteToBraille(tupletStart(1 / 3, None)), '⠐⠸⠒⠄⠐⠙')
+        self.assertEqual(noteToBraille(tupletStart(0.2, 'number')), '⠸⠢⠄⠐⠽')
+        self.assertEqual(noteToBraille(tupletStart(0.2, None)), '⠐⠸⠢⠄⠐⠽')
 
 
 if __name__ == '__main__':
