@@ -5,7 +5,7 @@
 # Authors:      Jacob Tyler Walls
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2020-22 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2020-26 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -413,21 +413,7 @@ class PartStaffExporterMixin:
             targetNumber = targetMeasure.get('number')
             sourceNumber = sourceMeasure.get('number')
 
-            # 99% of the time we expect identical sets of measure numbers
-            # So walking through each should yield the same numbers, whether ints or strings
-            if targetNumber == sourceNumber:
-                # No gaps found: move all contents
-                self.moveMeasureContents(sourceMeasure, targetMeasure, staffNum)
-                sourceMeasure = None
-                continue
-
-            # Or, gap in measure numbers in the subsequent part: keep iterating through target
-            if (sourceNumber is not None
-                    and targetNumber is not None
-                    and helpers.measureNumberComesBefore(targetNumber, sourceNumber)):
-                continue  # sourceMeasure is not None!
-
-            # Or, gap in measure numbers in target: record necessary insertions until gap is closed
+            # Gap in measure numbers in target: record necessary insertions until gap is closed
             while (sourceNumber is not None
                    and targetNumber is not None
                    and helpers.measureNumberComesBefore(sourceNumber, targetNumber)):
@@ -439,6 +425,21 @@ class PartStaffExporterMixin:
                     sourceMeasure = next(sourceMeasures)
                 except StopIteration:
                     return insertions
+                sourceNumber = sourceMeasure.get('number')
+
+            # 99% of the time we expect identical sets of measure numbers
+            # So walking through each should yield the same numbers, whether ints or strings
+            if targetNumber == sourceNumber:
+                self.moveMeasureContents(sourceMeasure, targetMeasure, staffNum)
+                sourceMeasure = None
+                continue
+
+            # Or, gap in measure numbers in the subsequent part: keep iterating through target
+            if (sourceNumber is not None
+                    and targetNumber is not None
+                    and helpers.measureNumberComesBefore(targetNumber, sourceNumber)):
+                continue  # sourceMeasure is not None!
+
             raise MusicXMLExportException(
                 'joinPartStaffs() was unable to order the measures '
                 f'{targetNumber}, {sourceNumber}')  # pragma: no cover
@@ -1181,6 +1182,41 @@ class Test(unittest.TestCase):
             [r.get('direction') for r in root.findall('.//repeat')],
             ['forward', 'backward']
         )
+
+    def testJoinPartStaffsMeasureMissingFromFirstStaff(self):
+        '''
+        A measure missing from the first PartStaff holds only the second staff;
+        the measures after it join both staves.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import layout
+        from music21 import note
+
+        both = ['1', '2']
+        for firstNumbers, staffNumbers in (
+            ([1, 2, 4, 5], [both, both, ['2'], both, both]),
+            ([2, 3], [['2'], both, both]),
+            ([1, 3, 5], [both, ['2'], both, ['2'], both]),
+        ):
+            with self.subTest(firstNumbers=firstNumbers):
+                ps1 = stream.PartStaff()
+                ps2 = stream.PartStaff()
+                secondNumbers = range(1, len(staffNumbers) + 1)
+                for ps, numbers in ((ps1, firstNumbers), (ps2, secondNumbers)):
+                    for number in numbers:
+                        ps.append(stream.Measure([note.Note(type='whole')], number=number))
+                sg = layout.StaffGroup([ps1, ps2])
+                s = stream.Score([sg, ps1, ps2])
+
+                root = self.getET(s)
+                measures = root.findall('part/measure')
+                self.assertEqual([m.get('number') for m in measures],
+                                 [str(number) for number in secondNumbers])
+                self.assertEqual(
+                    [[n.find('staff').text for n in m.findall('note')] for m in measures],
+                    staffNumbers
+                )
 
 
 if __name__ == '__main__':
