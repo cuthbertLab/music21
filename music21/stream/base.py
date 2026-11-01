@@ -10479,6 +10479,8 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         the second note, but if skipRests is set to True or there is a gap
         in the Stream, then these two numbers
         will be different).
+        Offsets are measured from the start of this Stream, so the intervals
+        of a Part with Measures stand at their offsets in the Part.
 
         See :meth:`~music21.stream.Stream.findConsecutiveNotes` in this class for
         a discussion of what is meant by default for "consecutive notes", and
@@ -10526,6 +10528,11 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             return self.cloneEmpty(derivationMethod='melodicIntervals')
 
         returnStream = self.cloneEmpty(derivationMethod='melodicIntervals')
+        containerOffsets = {id(self): 0.0}
+        for container in self.recurse(streamsOnly=True):
+            containerOffsets[id(container)] = opFrac(
+                containerOffsets[id(container.activeSite)] + container.offset)
+
         for thisNote, nextNote in zip(returnList, returnList[1:]):
             # returnList could contain None to represent a rest
             if thisNote is None or nextNote is None:
@@ -10543,9 +10550,11 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                 noteEnd = nextNote
             # Prefer Note objects over Pitch objects so that noteStart is set correctly
             returnInterval = interval.Interval(noteStart, noteEnd)
-            returnInterval.offset = opFrac(thisNote.offset + thisNote.quarterLength)
+            thisOffset = containerOffsets[id(thisNote.activeSite)] + thisNote.offset
+            nextOffset = containerOffsets[id(nextNote.activeSite)] + nextNote.offset
+            returnInterval.offset = opFrac(thisOffset + thisNote.quarterLength)
             returnInterval.duration = duration.Duration(opFrac(
-                nextNote.offset - returnInterval.offset))
+                nextOffset - returnInterval.offset))
             returnStream.insert(returnInterval)
 
         return returnStream
