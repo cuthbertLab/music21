@@ -2167,14 +2167,12 @@ def prepareBeamedNotes(music21Measure):
             pass
 
         startNote.beamStart = True
-        try:
+        if startIndex > 0:
             beforeStartNote = allNotesAndRests[startIndex - 1]
             if (isinstance(beforeStartNote, note.Rest)
                     and int(beforeStartNote.beat) == int(startNote.beat)
                     and beforeStartNote.quarterLength == startNote.quarterLength):
                 startNote.beamContinue = True
-        except IndexError:  # startNote is first note of measure.
-            pass
         for noteIndex in range(startIndex + 1, stopIndex + 1):
             allNotesAndRests[noteIndex].beamContinue = True
 
@@ -2460,6 +2458,37 @@ class Test(unittest.TestCase):
             seg[SegmentKey(1, 0, Affinity.NOTEGROUP, None)].append(clefClass())
             seg.addGroupingAttributes()
             self.assertEqual(seg.descendingChords, descending)
+
+    def testBeamedNotesAtMeasureStart(self):
+        '''
+        A beam group that starts the measure has no rest before it, even when
+        the measure ends with a rest of the same value.  A rest just before a
+        group still continues the beam.
+        '''
+        m = stream.Measure()
+        m.append(meter.TimeSignature('3/8'))
+        notes = [note.Note(pitchName, quarterLength=0.25) for pitchName in 'CDEFG']
+        m.append(notes)
+        m.append(note.Rest(quarterLength=0.25))
+        notes[0].beams.fill('16th', 'start')
+        notes[1].beams.fill('16th', 'continue')
+        notes[2].beams.fill('16th', 'stop')
+        prepareBeamedNotes(m)
+        self.assertTrue(notes[0].beamStart)
+        self.assertFalse(notes[0].beamContinue)
+        self.assertTrue(notes[1].beamContinue)
+
+        m = stream.Measure()
+        m.append(meter.TimeSignature('3/8'))
+        m.append(note.Rest(quarterLength=0.25))
+        notes = [note.Note(pitchName, quarterLength=0.25) for pitchName in 'CDEFG']
+        m.append(notes)
+        notes[0].beams.fill('16th', 'start')
+        notes[1].beams.fill('16th', 'continue')
+        notes[2].beams.fill('16th', 'stop')
+        prepareBeamedNotes(m)
+        self.assertTrue(notes[0].beamStart)
+        self.assertTrue(notes[0].beamContinue)
 
 
 if __name__ == '__main__':
