@@ -689,12 +689,13 @@ class TimespanTree(trees.OffsetTree):
         Used by reduceChords.  May disappear at any time without a deprecation
         notice.
         '''
-        partwiseTimespanTrees = {}
-        for part in self.allParts():
-            partwiseTimespanTrees[part] = TimespanTree()
+        partwiseTimespans = {part: [] for part in self.allParts()}
         for timespan in self:
-            partwiseTimespanTree = partwiseTimespanTrees[timespan.part]
-            partwiseTimespanTree.insert(timespan)
+            partwiseTimespans[timespan.part].append(timespan)
+        partwiseTimespanTrees = {}
+        for part, timespans in partwiseTimespans.items():
+            partwiseTimespanTrees[part] = TimespanTree()
+            partwiseTimespanTrees[part].insert(timespans)
         return partwiseTimespanTrees
 
     @staticmethod
@@ -846,6 +847,16 @@ class Test(unittest.TestCase):
         self.assertEqual(list(emptyTree.iterateVerticalities()), [])
         self.assertEqual(list(emptyTree.iterateVerticalities(reverse=True)), [])
         self.assertEqual(list(emptyTree.iterateVerticalitiesNwise()), [])
+
+    def testToPartwiseTimespanTrees(self):
+        from music21 import corpus
+        from music21 import note
+        score = corpus.parse('bwv66.6')
+        scoreTree = score.asTimespans(classList=(note.Note,))
+        partwise = scoreTree.toPartwiseTimespanTrees()
+        self.assertEqual(list(partwise), list(score.parts))
+        for part, subtree in partwise.items():
+            self.assertEqual(list(subtree), [ts for ts in scoreTree if ts.part is part])
 
     def testTimespanTree(self):
         for attempt in range(100):
