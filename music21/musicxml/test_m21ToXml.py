@@ -1239,6 +1239,21 @@ class Test(unittest.TestCase):
             self.assertEqual(tree.find('.//display-step').text, displayStep)
             self.assertEqual(tree.find('.//display-octave').text, displayOctave)
 
+    def testNoteTooLongForMeasures(self):
+        xmlString = '''<?xml version="1.0"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name>x</part-name></score-part></part-list>
+  <part id="P1"><measure number="1">
+    <attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time>
+    </attributes>
+    <note><pitch><step>C</step><octave>4</octave></pitch><duration>99999999</duration></note>
+  </measure></part>
+</score-partwise>'''
+        s = converter.parse(xmlString, format='musicxml')
+        gex = GeneralObjectExporter(s)
+        with self.assertRaisesRegex(stream.StreamException, 'more than 100000 measures'):
+            gex.parse()
+
 
 class TestExternal(unittest.TestCase):
     show = True
