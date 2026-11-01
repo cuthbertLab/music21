@@ -110,7 +110,7 @@ class NoteworthyTranslator:
         self.currentKey = key.KeySignature(0)
 
         self.openSlurs: list[tuple[note.GeneralNote, stream.Measure, OffsetQL]] = []
-        self.tiedSteps: dict[tuple[str, int], tuple[stream.Measure, OffsetQL]] = {}
+        self.tiedSteps: dict[tuple[str, int], tuple[stream.Measure|None, OffsetQL]] = {}
         self.positionMeasure: stream.Measure|None = None
         self.measurePosition: OffsetQL = 0.0
 
@@ -294,10 +294,8 @@ class NoteworthyTranslator:
             tiedFrom = False
             if step in self.tiedSteps:
                 tiedMeasure, tiedEnd = self.tiedSteps.pop(step)
-                if tiedMeasure is self.currentMeasure:
-                    tiedFrom = (tiedEnd == offset)
-                else:
-                    tiedFrom = (offset == 0)
+                tiedFrom = ((tiedMeasure is None or tiedMeasure is self.currentMeasure)
+                            and tiedEnd == offset)
             if tiedFrom and tiedOn:
                 n.tie = tie.Tie('continue')
             elif tiedOn:
@@ -851,7 +849,9 @@ class NoteworthyTranslator:
 
     def createBarlines(self, attributes):
         r'''
-        Translates bar lines into music21.
+        Translates bar lines into music21.  Open ties that end at the bar
+        line carry over to the start of the next measure; other open ties
+        are dropped.
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentPart = stream.Part()
@@ -863,6 +863,10 @@ class NoteworthyTranslator:
         <music21.bar.Repeat direction=start>
         '''
         self.activeAccidentals = {}
+        measureEnd = self.currentMeasure.highestTime
+        self.tiedSteps = {step: (None, 0.0)
+                          for step, (tiedMeasure, tiedEnd) in self.tiedSteps.items()
+                          if tiedMeasure is self.currentMeasure and tiedEnd == measureEnd}
 
         if 'Style' not in attributes:
             # pure barline
@@ -1204,6 +1208,23 @@ class Test(unittest.TestCase):
             '|Note|Dur:4th|Pos:2',
             '|Note|Dur:4th|Pos:1',
         ]), [(0.0, 'start'), (1.0, None), (2.0, None)])
+        self.assertEqual(ties([
+            '|Note|Dur:Whole|Pos:1^',
+            '|Bar|',
+            '|Note|Dur:Whole|Pos:1',
+        ]), [(0.0, 'start'), (4.0, 'stop')])
+        self.assertEqual(ties([
+            '|Note|Dur:Whole|Pos:1^',
+            '|Bar|',
+            '|Note|Dur:Whole|Pos:2',
+            '|Bar|',
+            '|Note|Dur:Whole|Pos:1',
+        ]), [(0.0, 'start'), (4.0, None), (8.0, None)])
+        self.assertEqual(ties([
+            '|Chord|Dur:4th|Pos:1^|Dur2:Half|Pos2:3',
+            '|Bar|',
+            '|Note|Dur:4th|Pos:1',
+        ]), [(0.0, 'start'), (0.0, None), (2.0, None)])
         self.assertEqual(ties([
             '|Note|Dur:4th|Pos:1^',
             '|AddStaff|',
