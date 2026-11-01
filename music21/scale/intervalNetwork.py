@@ -1264,6 +1264,15 @@ class IntervalNetwork:
     ) -> pitch.Pitch:
         '''
         Given a node and alteredDegrees get the unaltered pitch, or return the current object
+
+        >>> net = scale.intervalNetwork.IntervalNetwork(['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2'])
+        >>> raisedSeventh = {7: {'direction': scale.Direction.BI,
+        ...                      'interval': interval.Interval('a1')}}
+        >>> seventh = net.nodes[5]
+        >>> seventh.degree
+        7
+        >>> net.getUnalteredPitch(pitch.Pitch('G#4'), seventh, alteredDegrees=raisedSeventh)
+        <music21.pitch.Pitch G4>
         '''
         if not alteredDegrees:
             return pitchObj

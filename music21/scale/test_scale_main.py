@@ -351,6 +351,17 @@ class Test(unittest.TestCase):
         descending = sc.getPitches('c#4', 'g#4', direction=Direction.DESCENDING)
         self.assertEqual(self.pitchOut(descending), '[G-4, F4, E-4, D-4]')
 
+    def testHarmonicMinorMatch(self):
+        aMinor = scale.HarmonicMinorScale('a4')
+        matches = aMinor.match(['G#4', 'G4', 'F4'])
+        self.assertEqual(self.pitchOut(matches['matched']), '[G#4, F4]')
+        self.assertEqual(self.pitchOut(matches['notMatched']), '[G4]')
+
+        eFlatMinor = scale.HarmonicMinorScale('e-4')
+        matches = eFlatMinor.match(['D4', 'D-4', 'C-4'])
+        self.assertEqual(self.pitchOut(matches['matched']), '[D4, C-4]')
+        self.assertEqual(self.pitchOut(matches['notMatched']), '[D-4]')
+
     def testDeriveHarmonicMinor(self):
         sc = scale.HarmonicMinorScale()
         self.assertEqual(sc.derive(['C', 'D', 'E-', 'B']).name, 'C harmonic minor')
