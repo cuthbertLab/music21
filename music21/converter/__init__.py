@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -215,7 +215,7 @@ class ArchiveManager:
                     # Noteflight bug for untitled files puts filename as just '.xml'
                     continue
 
-                post = f.read(subFp)
+                post = common.readZipMember(f, subFp, ArchiveManagerException)
                 if isinstance(post, bytes):
                     foundEncoding = re.match(br"encoding=[\'\"](\S*?)[\'\"]", post[:1000])
                     if foundEncoding:
@@ -245,14 +245,13 @@ class ArchiveManager:
                 # but that was removed in Python 3.6 and while it is supposed
                 # to be fixed with io.TextIOWrapper, there are no docs that
                 # show how to do so.  -- hopefully fixed -- no problems for years, maybe okay.
+                memberData = common.readZipMember(f, subFp, ArchiveManagerException)
                 try:
-                    with f.open(subFp, 'r') as zipOpen:
-                        lines = list(io.TextIOWrapper(zipOpen, newline=None))
+                    lines = list(io.TextIOWrapper(io.BytesIO(memberData), newline=None))
                 except UnicodeDecodeError:
                     # python3 UTF-8 failed to read haydn/opus103/movement1.zip
-                    with f.open(subFp, 'r') as zipOpen:
-                        lines = list(io.TextIOWrapper(zipOpen, newline=None,
-                                                      encoding='ISO-8859-1'))
+                    lines = list(io.TextIOWrapper(io.BytesIO(memberData), newline=None,
+                                                  encoding='ISO-8859-1'))
                 # environLocal.printDebug(['subFp', subFp, len(lines)])
                 post.append(''.join(lines))
 
@@ -1643,6 +1642,28 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
+
+    def testArchiveMemberSizeLimit(self):
+        '''
+        An archive member that uncompresses to more than
+        common.fileTools.MAX_UNCOMPRESSED_BYTES raises ArchiveManagerException.
+        '''
+        from unittest import mock
+
+        fp = environLocal.getTempFile('.mxl')
+        try:
+            with zipfile.ZipFile(fp, 'w', zipfile.ZIP_DEFLATED) as zf:
+                zf.writestr('score.xml', '<score-partwise/>' + ' ' * 2000)
+                zf.writestr('part01', 'x' * 2000)
+            am = ArchiveManager(fp)
+            with mock.patch.object(common.fileTools, 'MAX_UNCOMPRESSED_BYTES', 1000):
+                for dataFormat in ('musicxml', 'musedata'):
+                    with self.assertRaisesRegex(ArchiveManagerException, 'more than 1000 bytes'):
+                        am.getData(dataFormat)
+            self.assertEqual(len(am.getData('musicxml')), 2017)
+            self.assertEqual(am.getData('musedata'), ['x' * 2000])
+        finally:
+            os.remove(fp)
 
     def testConversionMX(self):
         from music21.musicxml import testPrimitive
