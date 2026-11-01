@@ -139,6 +139,18 @@ class Test(unittest.TestCase):
             self.assertEqual(clefObj.getStemDirectionForPitches(pitch.Pitch(belowMiddle)), 'up')
             self.assertEqual(clefObj.getStemDirectionForPitches(pitch.Pitch(onMiddle)), 'down')
 
+    def testOctaveClefsAreNotPlainClefs(self):
+        for clefClass in (clef.Treble8vbClef, clef.Treble8vaClef):
+            clefObj = clefClass()
+            self.assertIsInstance(clefObj, clef.GClef)
+            self.assertNotIsInstance(clefObj, clef.TrebleClef)
+            self.assertEqual(clefObj.line, 2)
+        for clefClass in (clef.Bass8vbClef, clef.Bass8vaClef):
+            clefObj = clefClass()
+            self.assertIsInstance(clefObj, clef.FClef)
+            self.assertNotIsInstance(clefObj, clef.BassClef)
+            self.assertEqual(clefObj.line, 4)
+
 
 if __name__ == '__main__':
     import music21
