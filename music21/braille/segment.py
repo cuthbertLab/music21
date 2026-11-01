@@ -28,7 +28,6 @@ from music21 import bar
 from music21 import base
 from music21 import chord
 from music21 import clef
-from music21 import duration
 from music21 import dynamics
 from music21 import environment
 from music21 import exceptions21
@@ -2388,10 +2387,10 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
         break
 
     rest0Length = music21Measure.duration.quarterLength - endOffsetZero
-    r0 = note.Rest(duration=duration.Duration(rest0Length))
+    r0 = note.Rest(quarterLength=rest0Length)
     leftMeasure.insert(endOffsetZero, r0)
 
-    r1 = note.Rest(duration=duration.Duration(endOffsetZero))
+    r1 = note.Rest(quarterLength=endOffsetZero)
     rightMeasure.insert(0.0, r1)
 
     ts0_delete = False

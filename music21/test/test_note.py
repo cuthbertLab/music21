@@ -4,6 +4,7 @@ import copy
 import unittest
 
 from music21 import articulations
+from music21 import chord
 from music21 import corpus
 from music21.duration import DurationTuple
 from music21 import expressions
@@ -75,6 +76,22 @@ class Test(unittest.TestCase):
         a.name = 'D'
         b = copy.deepcopy(a)
         self.assertEqual(b.name, a.name)
+
+    def testZeroQuarterLength(self):
+        for obj in (note.Rest(quarterLength=0.0),
+                    note.Rest(0),
+                    note.Note('C4', quarterLength=0),
+                    note.Unpitched(quarterLength=0),
+                    chord.Chord(['C4', 'E4'], quarterLength=0)):
+            self.assertEqual(obj.quarterLength, 0.0)
+            self.assertEqual(obj.duration.type, 'zero')
+
+        for obj in (note.Rest(),
+                    note.Rest(quarterLength=None),
+                    note.Note('C4', type=None),
+                    chord.Chord(['C4', 'E4'])):
+            self.assertEqual(obj.quarterLength, 1.0)
+            self.assertEqual(obj.duration.type, 'quarter')
 
     def testMusicXMLFermata(self):
         a = corpus.parse('bach/bwv5.7')
