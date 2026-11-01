@@ -417,6 +417,34 @@ class Test(unittest.TestCase):
         sc.nextPitch('a4')
         self.assertEqual(self.pitchOut(sc.pitches), '[G4, A4, B-4, C5, D5, E-5, F#5, G5]')
 
+    def testNextPitchOnCycleWiderThanOctave(self):
+        '''
+        nextPitch finds the neighbors on cycles whose step is wider than an
+        octave, including from D#5 and F--5, the enharmonics of E-5 one
+        letter lower and one higher.
+        '''
+        ninths = scale.CyclicalScale('c4', ['M9'])
+        self.assertEqual(str(ninths.nextPitch('b3')), 'C4')
+        self.assertEqual(str(ninths.nextPitch('b3', Direction.DESCENDING)), 'B-2')
+        self.assertEqual(str(ninths.nextPitch('d#5')), 'E6')
+        self.assertEqual(str(ninths.nextPitch('d#5', Direction.DESCENDING)), 'D5')
+
+        tenths = scale.CyclicalScale('c4', ['m10'])
+        self.assertEqual(str(tenths.nextPitch('d4')), 'E-5')
+        self.assertEqual(str(tenths.nextPitch('d4', Direction.DESCENDING)), 'C4')
+        self.assertEqual(str(tenths.nextPitch('d#5')), 'G-6')
+        self.assertEqual(str(tenths.nextPitch('f--5', Direction.DESCENDING)), 'C4')
+
+        ninthsAndSeconds = scale.CyclicalScale('c4', ['M9', 'm2'])
+        self.assertEqual(str(ninthsAndSeconds.nextPitch('e6')), 'F6')
+        self.assertEqual(str(ninthsAndSeconds.nextPitch('e6', Direction.DESCENDING)), 'E-5')
+        self.assertEqual(str(ninthsAndSeconds.nextPitch('d#5')), 'F6')
+
+    def testNeighborNodeIdsWiderThanOctave(self):
+        net = scale.CyclicalScale('c4', ['M9']).abstract._net
+        self.assertEqual(net.getNeighborNodeIds('c4', Terminus.LOW, 'b3'),
+                         (Terminus.LOW, Terminus.LOW))
+
     def testDeriveByDegree(self):
         sc1 = scale.MajorScale()
         self.assertEqual(str(sc1.deriveByDegree(7, 'G#')),
