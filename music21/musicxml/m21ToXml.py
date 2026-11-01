@@ -4563,7 +4563,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         mxNoteList = []
         if isinstance(c, chord.Chord):
-            c.sortAscending()
+            c.sortAscending(inPlace=True)
 
         for i, n in enumerate(c):
             if 'Unpitched' in n.classSet:

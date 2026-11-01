@@ -1020,6 +1020,59 @@ class Test(unittest.TestCase):
                     arpNum = arp.get('number')
                     self.assertEqual(arpNum, '1')
 
+    def testChordWrittenLowestToHighest(self):
+        c1 = chord.Chord(['G4', 'E4', 'C4'])
+        c1.expressions.append(expressions.ArpeggioMark('non-arpeggio'))
+        c2 = chord.Chord(['A4', 'F4', 'D4'])
+        m = stream.Measure([c1, c2])
+        m.insert(0, spanner.Slur([c1, c2]))
+        x = self.getET(stream.Score([stream.Part([m])]))
+
+        mxNotes = x.findall('part/measure/note')
+        self.assertEqual([mxNote.find('pitch/step').text for mxNote in mxNotes],
+                         ['C', 'E', 'G', 'D', 'F', 'A'])
+        self.assertEqual(mxNotes[0].find('notations/non-arpeggiate').get('type'), 'bottom')
+        self.assertEqual(mxNotes[2].find('notations/non-arpeggiate').get('type'), 'top')
+        self.assertEqual(mxNotes[0].find('notations/slur').get('type'), 'start')
+        self.assertEqual(mxNotes[3].find('notations/slur').get('type'), 'stop')
+
+    def testChordFingeringsFollowTheirNotes(self):
+        '''
+        A chord whose notes a file gives out of order keeps each fingering
+        on its note when written again.
+
+        AI-assisted (Claude).
+        '''
+        def mxNote(step, finger, inChord):
+            chordTag = '<chord/>' if inChord else ''
+            return (f'<note>{chordTag}<pitch><step>{step}</step><octave>4</octave></pitch>'
+                    '<duration>1</duration><type>quarter</type><notations><technical>'
+                    f'<fingering>{finger}</fingering></technical></notations></note>')
+
+        xml = ('<score-partwise version="4.0"><part-list><score-part id="P1">'
+               '<part-name>P</part-name></score-part></part-list><part id="P1">'
+               '<measure number="1"><attributes><divisions>1</divisions></attributes>'
+               + mxNote('E', 3, False) + mxNote('C', 1, True) + mxNote('G', 5, True)
+               + '</measure></part></score-partwise>')
+        s = converter.parse(xml, format='musicxml')
+        x = self.getET(s)
+        mxNotes = x.findall('part/measure/note')
+        self.assertEqual([(n.find('pitch/step').text,
+                           n.find('notations/technical/fingering').text)
+                          for n in mxNotes],
+                         [('C', '1'), ('E', '3'), ('G', '5')])
+
+        c = chord.Chord(['G4', 'E4', 'C4'])
+        c.articulations = [articulations.Fingering(1),
+                           articulations.Accent(),
+                           articulations.Fingering(3)]
+        x = self.getET(stream.Score([stream.Part([stream.Measure([c])])]))
+        mxNotes = x.findall('part/measure/note')
+        self.assertEqual([(n.find('pitch/step').text,
+                           n.findtext('notations/technical/fingering'))
+                          for n in mxNotes],
+                         [('C', '1'), ('E', '3'), ('G', None)])
+        self.assertIsNotNone(mxNotes[0].find('notations/articulations/accent'))
 
     def testArpeggioMarkSpannersOnNotes(self):
         # one note alone: no number
