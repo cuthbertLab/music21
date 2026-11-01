@@ -35,10 +35,10 @@ from music21.exceptions21 import InstrumentException
 from music21 import interval
 from music21 import note
 from music21 import pitch
-from music21.tree.trees import OffsetTree
 
 if t.TYPE_CHECKING:
     from music21 import stream
+    from music21.common.types import OffsetQL
 
 environLocal = environment.Environment('instrument')
 
@@ -2185,12 +2185,15 @@ def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
         substreams = returnObj.getElementsByClass(stream.Stream)
 
     for sub in substreams:
-        oTree = OffsetTree(sub[Instrument].stream())
-        for o in oTree:
-            if len(o) == 1:
+        instrumentsByOffset: dict[OffsetQL, list[Instrument]] = {}
+        for inst in sub[Instrument]:
+            instOffset = inst.getOffsetInHierarchy(sub)
+            instrumentsByOffset.setdefault(instOffset, []).append(inst)
+        for atOffset in instrumentsByOffset.values():
+            if len(atOffset) == 1:
                 continue
-            notNonePartNames = {i.partName for i in o if i.partName is not None}
-            notNoneInstNames = {i.instrumentName for i in o if i.instrumentName is not None}
+            notNonePartNames = {i.partName for i in atOffset if i.partName is not None}
+            notNoneInstNames = {i.instrumentName for i in atOffset if i.instrumentName is not None}
 
             # Proceed only if 0-1 part name AND 0-1 instrument name candidates
             if len(notNonePartNames) > 1 or len(notNoneInstNames) > 1:
@@ -2203,25 +2206,25 @@ def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
             for iName in notNoneInstNames:
                 instrumentName = iName
 
-            classes = {inst.__class__ for inst in o}
+            classes = {inst.__class__ for inst in atOffset}
             # Case: 2+ instances of the same class
             if len(classes) == 1:
                 surviving = None
                 # Treat first as the surviving instance and standardize name
-                for inst in o:
+                for inst in atOffset:
                     inst.partName = partName
                     inst.instrumentName = instrumentName
                     surviving = inst
                     break
                 # Remove remaining instruments
-                for inst in o:
+                for inst in atOffset:
                     if inst is surviving:
                         continue
                     sub.remove(inst, recurse=True)
             # Case: mixed classes: standardize names
             # Remove instances of generic `Instrument` if found
             else:
-                for inst in o:
+                for inst in atOffset:
                     if inst.__class__ == Instrument:
                         sub.remove(inst, recurse=True)
                     else:
@@ -3161,6 +3164,53 @@ class Test(unittest.TestCase):
                           getAllNamesForInstrument,
                           inst,
                           language='finnish')
+
+    def testDeduplicateKeepsInstrumentsAtDifferentOffsets(self):
+        '''
+        AI-assisted (Claude).
+        '''
+        from music21 import stream
+
+        p = stream.Part()
+        m1 = stream.Measure(number=1)
+        m1.insert(0, Instrument())
+        m1.insert(0, Piano())
+        m1.append(note.Note(type='whole'))
+        m2 = stream.Measure(number=2)
+        melody = Instrument()
+        melody.partName = 'Melody'
+        m2.insert(0, melody)
+        m2.append(note.Note(type='whole'))
+        p.append([m1, m2])
+
+        deduplicate(p, inPlace=True)
+        self.assertEqual(
+            [(inst.classes[0], inst.partName, inst.getOffsetInHierarchy(p))
+                for inst in p[Instrument]],
+            [('Piano', None, 0.0), ('Instrument', 'Melody', 4.0)]
+        )
+
+    def testDeduplicateByOffset(self):
+        '''
+        Instruments are deduplicated within each offset: a part name on an
+        instrument at another offset does not stop deduplication, and the
+        same instrument at two offsets is kept at both.
+        '''
+        from music21 import stream
+
+        def dedupedInstruments(offsetsAndInstruments):
+            p = stream.Part()
+            for offset, inst in offsetsAndInstruments:
+                p.insert(offset, inst)
+            deduplicate(p, inPlace=True)
+            return [(inst.classes[0], inst.getOffsetInHierarchy(p)) for inst in p[Instrument]]
+
+        viola = Viola()
+        viola.partName = 'X'
+        self.assertEqual(dedupedInstruments([(0, Violin()), (0, Violin()), (4, viola)]),
+                         [('Violin', 0.0), ('Viola', 4.0)])
+        self.assertEqual(dedupedInstruments([(0, Violin()), (4, Violin())]),
+                         [('Violin', 0.0), ('Violin', 4.0)])
 
 
 # ------------------------------------------------------------------------------

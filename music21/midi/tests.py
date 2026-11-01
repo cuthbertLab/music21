@@ -32,6 +32,7 @@ from music21.midi.translate import (
     midiEventToInstrument,
     midiEventsToNote,
     midiFileToStream,
+    midiTrackToStream,
     noteToMidiEvents,
     packetStorageFromSubstreamList,
     prepareStreamForMidi,
@@ -1691,6 +1692,40 @@ class Test(unittest.TestCase):
         c = ChannelVoiceMessages.NOTE_OFF
         self.assertIn(c, ChannelVoiceMessages)
         self.assertTrue(c in ChannelVoiceMessages)
+
+    def testProgramChangeAfterTrackName(self):
+        '''
+        A program change after the start of a track adds an instrument there
+        and leaves the one named by the track at the start.
+
+        AI-assisted (Claude).
+        '''
+        mt = MidiTrack(1)
+
+        def addEvent(ticks: int, eventType, data=None, midiPitch=None):
+            mt.events.append(DeltaTime(mt, time=ticks, channel=1))
+            me = MidiEvent(mt, type=eventType, channel=1)
+            if data is not None:
+                me.data = data
+            if midiPitch is not None:
+                me.pitch = midiPitch
+                me.velocity = 90
+            mt.events.append(me)
+
+        addEvent(0, MetaEvents.SEQUENCE_TRACK_NAME, data=b'Melody')
+        addEvent(0, ChannelVoiceMessages.NOTE_ON, midiPitch=60)
+        addEvent(2048, ChannelVoiceMessages.NOTE_OFF, midiPitch=60)
+        addEvent(0, ChannelVoiceMessages.PROGRAM_CHANGE, data=40)
+        addEvent(0, ChannelVoiceMessages.NOTE_ON, midiPitch=62)
+        addEvent(2048, ChannelVoiceMessages.NOTE_OFF, midiPitch=62)
+        addEvent(0, MetaEvents.END_OF_TRACK, data=b'')
+
+        p = midiTrackToStream(mt, ticksPerQuarter=1024)
+        self.assertEqual(
+            [(inst.classes[0], inst.partName, inst.getOffsetInHierarchy(p))
+                for inst in p[instrument.Instrument]],
+            [('Instrument', 'Melody', 0.0), ('Violin', None, 2.0)]
+        )
 
 
 # ------------------------------------------------------------------------------
