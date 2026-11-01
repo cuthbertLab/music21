@@ -4,7 +4,7 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2019 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2019-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -567,8 +567,13 @@ class TsvHandler:
         with open(fileName, 'r', encoding='utf-8') as f:
             tsvreader = csv.reader(f, delimiter='\t', quotechar='"')
             # The first row is the header
-            self._get_heading_indices(next(tsvreader))
-            return list(tsvreader)
+            self._get_heading_indices([cell.strip() for cell in next(tsvreader)])
+            rows = []
+            for row in tsvreader:
+                cells = [cell.strip() for cell in row]
+                if any(cells):
+                    rows.append(cells)
+            return rows
 
     def _makeTabChord(self, row: list[str]) -> TabChordBase:
         '''
@@ -1368,6 +1373,36 @@ class Test(unittest.TestCase):
         first_ending, second_ending = rb_iter
         _test_ending_contents(first_ending, ['2a'])
         _test_ending_contents(second_ending, ['2b'])
+
+    def testWhitespaceRows(self) -> None:
+        '''
+        AI-assisted (Claude) regression coverage for whitespace in DCML TSV files.
+        '''
+        # https://github.com/cuthbertLab/music21/issues/1541
+        import os
+        path = common.getSourceFilePath() / 'romanText' / 'tsvEg_v2_repeats.tsv'
+        text = path.read_text(encoding='utf-8')
+        clean = TsvHandler(path, dcml_version=2).toM21Stream()
+        expected = [rn.figure for rn in clean[roman.RomanNumeral]]
+        paddedLines = []
+        for line in text.splitlines():
+            paddedCells = [f' {cell} ' for cell in line.split('\t')]
+            paddedLines.append('\t'.join(paddedCells))
+        padded = '\n'.join(paddedLines)
+        variants = {
+            'blank line': text + '\n',
+            'tabs only': text + '\t\t\t\t\t\n',
+            'padded cells': padded + '\n\t\t\t\t\t\t\n',
+        }
+        tempFile = environment.Environment().getTempFile()
+        try:
+            for name, variant in variants.items():
+                with open(tempFile, 'w', encoding='utf-8') as f:
+                    f.write(variant)
+                parsed = TsvHandler(tempFile, dcml_version=2).toM21Stream()
+                self.assertEqual([rn.figure for rn in parsed[roman.RomanNumeral]], expected, name)
+        finally:
+            os.remove(tempFile)
 
 # ------------------------------------------------------------------------------
 
