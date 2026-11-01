@@ -4653,7 +4653,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             # placing missing objects in outer container, not Measure
             found = startMeasure.getContextByClass(className)
             if found is not None:
-                if startMeasure is not None:
+                if found.priority >= startMeasure.priority:
                     found.priority = startMeasure.priority - 1
                     # TODO: This should not change global priority on found, but
                     #   instead priority, like offset, should be a per-site attribute

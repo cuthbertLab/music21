@@ -8032,6 +8032,28 @@ class Test(unittest.TestCase):
         self.assertIn(m2b, mm5)
         self.assertIn(m3, mm5)
 
+    def testMeasuresKeepsSourceOrder(self):
+        '''
+        Collecting a time signature for an excerpt keeps it before the notes
+        of its own measure, as in Humdrum files, where priority is the line number.
+        '''
+        p = Part()
+        for i in range(1, 4):
+            m = Measure(number=i)
+            m.priority = 10 * i
+            n = note.Note(type='whole')
+            n.priority = 10 * i + 2
+            m.insert(0, n)
+            p.append(m)
+        m1 = p.getElementsByClass(Measure).first()
+        ts = meter.TimeSignature('4/4')
+        ts.priority = 11
+        m1.insert(0, ts)
+        for number in (2, 3):
+            excerpt = p.measures(number, number)
+            self.assertIs(excerpt.first(), ts)
+            self.assertIs(m1.first(), ts)
+
     def testChordifyF(self):
         # testing chordify handling of triplets
         from music21.musicxml import testPrimitive
