@@ -32,6 +32,7 @@ musicxmlVersion = '4.0'
 meterNumerator = 4
 meterDenominator = 'quarter'
 meterDenominatorBeatType = 4  # musicxml representation
+maxMeterNumerator = 10_000
 
 limitOffsetDenominator = 65535  # > CD track level precision.
 # allows for tuples up to n:x within m:y within l:z within k:w where x,y,z <=100 and w<=44

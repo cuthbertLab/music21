@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -585,6 +585,9 @@ class TimeSignature(TimeSignatureBase):
         6
 
         Loading destroys all preexisting internal representations
+
+        The numerator, summed if the value has several parts, can be at most
+        `defaults.maxMeterNumerator` (10,000).  A larger one raises a TimeSignatureException.
         '''
         # create parallel MeterSequence objects to provide all data
         # these all refer to the same .numerator/.denominator
@@ -600,7 +603,13 @@ class TimeSignature(TimeSignatureBase):
             value = '2/2'
             self.symbol = 'cut'
 
-        self.displaySequence = MeterSequence(value)
+        displaySequence = MeterSequence(value)
+        if displaySequence.numerator > defaults.maxMeterNumerator:
+            raise TimeSignatureException(
+                'cannot make a TimeSignature with a numerator above '
+                f'{defaults.maxMeterNumerator}: {value}'
+            )
+        self.displaySequence = displaySequence
 
         # get simple representation; presently, only slashToTuple
         # supports the fast/slow indication
@@ -1295,11 +1304,17 @@ class TimeSignature(TimeSignatureBase):
             # provide a partition for each flattened division
             accentCount = len(ms.flatten())
             # environLocal.printDebug(['got accentCount', accentCount, 'ms: ', ms])
-            divStep = self.barDuration.quarterLength / accentCount
+            msDepth = ms.depth
+            levelStarts = []
+            for level in range(msDepth):
+                levelStarts.append({start for start, unused_end in ms.getLevelSpan(level)})
+            lowestSpans = ms.getLevelSpan(msDepth - 1)
             weightInts = [0] * accentCount  # weights as integer/depth counts
             for i in range(accentCount):
-                ql = opFrac(i * divStep)
-                weightInts[i] = ms.offsetToDepth(ql, align='quantize', index=i)
+                lowestStart = lowestSpans[i][0]
+                for starts in levelStarts:
+                    if lowestStart in starts:
+                        weightInts[i] += 1
 
             maxInt = max(weightInts)
             weightValues = {}  # reference dictionary
