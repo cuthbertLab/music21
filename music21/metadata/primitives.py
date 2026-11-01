@@ -398,8 +398,9 @@ class Date(prebase.ProtoM21Object):
 
         >>> a.datetime
         Traceback (most recent call last):
-        TypeError: function missing required argument 'day' (pos 3)
+        TypeError: ... missing required argument 'day' (pos 3)
         '''
+        # When 3.15 is the minimum change ... to datetime()
         post = []
         # order here is order for datetime
         # TODO: need defaults for incomplete times.

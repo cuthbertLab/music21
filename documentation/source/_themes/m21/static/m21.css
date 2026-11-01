@@ -119,6 +119,20 @@ div.sphinxsidebar {
     text-align: left;
     }
 
+/* on big screens the sidebar takes the space the body (max 800px) leaves unused:
+   window - 2 * 80px body margin - 840px body with padding - 75px gap */
+@media (min-width: 1400px) {
+    :root {
+        --m21-sidebar-width: clamp(300px, calc(100vw - 1075px), 600px);
+        }
+    div.sphinxsidebar {
+        width: var(--m21-sidebar-width);
+        }
+    div.bodywrapper {
+        margin-right: calc(var(--m21-sidebar-width) + 75px);
+        }
+    }
+
 div.sphinxsidebar h3, div.sphinxsidebar h4 {
     margin: 1em 0 0.5em 0;
     font-size: 1em;

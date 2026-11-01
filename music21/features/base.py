@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -1234,7 +1234,7 @@ def extractorsById(idOrList: str|Iterable[str],
     for lib in libraries:
         if lib.lower() in ['jsymbolic', 'all']:
             featureExtractors += jSymbolic.featureExtractors
-        elif lib.lower() in ['native', 'all']:
+        if lib.lower() in ['native', 'all']:
             featureExtractors += native.featureExtractors
 
     ids: Iterable[str] = [idOrList] if isinstance(idOrList, str) else idOrList
@@ -1489,6 +1489,17 @@ class Test(unittest.TestCase):
 
         for fp in (fp1, fp2, fp3):
             os.remove(fp)
+
+    def testExtractorsByIdLibraryAll(self):
+        from music21.features import jSymbolic
+        from music21.features import native
+
+        allExtractors = extractorsById('all', library='all')
+        self.assertEqual(allExtractors, extractorsById('all'))
+        self.assertIn(native.ChordBassMotionFeature, allExtractors)
+        self.assertIn(jSymbolic.PitchClassDistributionFeature, allExtractors)
+        self.assertEqual(extractorsById('cs12', library='all'),
+                         [native.ChordBassMotionFeature])
 
     def testFeatureFail(self):
         from music21 import features

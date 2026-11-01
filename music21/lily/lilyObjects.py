@@ -260,14 +260,14 @@ class LyObject(prebase.ProtoM21Object):
     def quoteString(self, stringIn: str) -> str:
         r'''
         returns a string that is quoted with
-        internal quotation marks backslash'd out
+        internal quotation marks and backslashes backslash'd out
         and an extra space at the end.
 
         >>> m = lily.lilyObjects.LyObject()
         >>> print(m.quoteString(r'Hello "there"!'))
         "Hello \"there\"!"
         '''
-        stringNew = stringIn.replace('"', r'\"')
+        stringNew = stringIn.replace('\\', '\\\\').replace('"', r'\"')
         return '"' + stringNew + '" '
 
     # noinspection GrazieInspection

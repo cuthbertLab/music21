@@ -392,6 +392,7 @@ class CTSong(prebase.ProtoM21Object):
         >>> s.lines[-1]
         'S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'
         '''
+        # if this test changes, update ConverterClercqTemperley.parseData too
         if isinstance(textFile, str) and '|' in textFile and 'S:' in textFile:
             lines = textFile.split('\n')
         else:

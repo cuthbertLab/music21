@@ -13,7 +13,6 @@ Simple storage for data defaults used throughout music21.
 '''
 from __future__ import annotations
 
-import unittest
 from music21 import _version
 
 
@@ -113,15 +112,6 @@ abcVersionDefault = (1, 3, 0)
 # ----------------------------------------------------------------||||||||||||--
 
 
-class Test(unittest.TestCase):
-    '''
-    Unit tests
-    '''
-    def testTest(self):
-        self.assertEqual(1, 1)
-
-
-# ----------------------------------------------------------------||||||||||||--
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest()

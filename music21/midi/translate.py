@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -42,7 +42,7 @@ from music21.midi.base import (
     MidiTrack, DeltaTime, MidiFile, MidiEvent,
     ChannelVoiceMessages, MetaEvents, putNumbersAsList, getNumber, putNumber,
 )
-from music21.midi.percussion import MIDIPercussionException, PercussionMapper
+from music21.midi.percussion import PercussionMapper
 
 
 
@@ -415,7 +415,7 @@ def midiEventsToNote(
     Access the `storedInstrument`:
 
     >>> unp.storedInstrument
-    <music21.instrument.TomTom 'Tom-Tom'>
+    <music21.instrument.TomTom 'Tom-Tom' low>
 
     And with values that cannot be translated, a generic
     :class:`~music21.instrument.UnpitchedPercussion` instance is given:
@@ -450,11 +450,7 @@ def midiEventsToNote(
         nr.pitch.midi = t.cast(int, midiOnEvent.pitch)
     elif isinstance(nr, note.Unpitched):
         onPitch = t.cast(int, midiOnEvent.pitch)
-        try:
-            i = PERCUSSION_MAPPER.midiPitchToInstrument(onPitch)
-        except MIDIPercussionException:
-            i = instrument.UnpitchedPercussion()
-        nr.storedInstrument = i
+        nr.storedInstrument = _midiNumberToPercussionInstrument(onPitch)
         # TODO: set reasonable displayPitch?
     else:
         raise TranslateException(
@@ -637,7 +633,7 @@ def midiEventsToChord(
 
     >>> me2.channel = 10
     >>> midi.translate.midiEventsToChord([tne1, tne2])
-    <music21.percussion.PercussionChord [Tom-Tom Hi-Hat Cymbal]>
+    <music21.percussion.PercussionChord [Tom-Tom Hi-Hat]>
 
     * Changed in v7: Uses the last DeltaTime in the list to get the end time.
     * Changed in v7.3: Returns a :class:`~music21.percussion.PercussionChord` if
@@ -686,11 +682,7 @@ def midiEventsToChord(
         # Construct note.Unpitched objects
         for midi_pitch in pitches:
             unp = note.Unpitched()
-            try:
-                i = PERCUSSION_MAPPER.midiPitchToInstrument(midi_pitch)
-            except MIDIPercussionException:
-                i = instrument.UnpitchedPercussion()
-            unp.storedInstrument = i
+            unp.storedInstrument = _midiNumberToPercussionInstrument(midi_pitch.midi)
             c.add(unp)
     else:
         c.pitches = tuple(pitches)
@@ -824,16 +816,26 @@ def chordToMidiEvents(
     return eventList
 
 
+def _midiNumberToPercussionInstrument(midiNumber: int) -> instrument.MidiPercussionMapMixin:
+    '''
+    Instrument for a channel-10 note; GM tambourines are taken to be headless.
+    '''
+    i = PERCUSSION_MAPPER.midiPitchToInstrument(midiNumber, raiseIfUnmapped=False)
+    if isinstance(i, instrument.Tambourine):
+        i.headless = True
+    return i
+
+
 def _get_unpitched_pitch_value(unp: note.Unpitched) -> int:
-    unpitched_instrument: instrument.UnpitchedPercussion|None
-    if isinstance(unp.storedInstrument, instrument.UnpitchedPercussion):
+    unpitched_instrument: instrument.MidiPercussionMapMixin|None
+    if isinstance(unp.storedInstrument, instrument.MidiPercussionMapMixin):
         unpitched_instrument = unp.storedInstrument
     else:
         if unp._chordAttached is not None:
             unpitched_instrument = unp._chordAttached.getContextByClass(
-                instrument.UnpitchedPercussion)
+                instrument.MidiPercussionMapMixin)
         else:
-            unpitched_instrument = unp.getContextByClass(instrument.UnpitchedPercussion)
+            unpitched_instrument = unp.getContextByClass(instrument.MidiPercussionMapMixin)
     if unpitched_instrument is not None and unpitched_instrument.percMapPitch is not None:
         return unpitched_instrument.percMapPitch
     return 60  # e.g. lossy instrument recognition from musicxml

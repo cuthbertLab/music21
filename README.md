@@ -42,6 +42,8 @@ See: https://groups.google.com/forum/#!forum/music21list
 
 Please note the required AI declarations there.  The world is changing fast, so please review it from time to time for recent changes.
 
+The process of creating a new music21 version/release is in [RELEASING.md](RELEASING.md).
+
 ## Community Code of Conduct<a name="community-code-of-conduct"></a> ##
 
 `Music21` encourages contributions, discussions, and usage from all people interested in

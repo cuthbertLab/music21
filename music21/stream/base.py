@@ -7,7 +7,7 @@
 #               Joséphine Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -3321,7 +3321,10 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             sRight.insert(0, eRight)
 
         for target in targetMove:
-            sRight.insert(target.getOffsetBySite(sLeft) - quarterLength, target)
+            if any(target is e for e in sLeft._endElements):
+                sRight.storeAtEnd(target)
+            else:
+                sRight.insert(target.getOffsetBySite(sLeft) - quarterLength, target)
             sLeft.remove(target)
 
         return base._SplitTuple([sLeft, sRight])
@@ -4650,7 +4653,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             # placing missing objects in outer container, not Measure
             found = startMeasure.getContextByClass(className)
             if found is not None:
-                if startMeasure is not None:
+                if found.priority >= startMeasure.priority:
                     found.priority = startMeasure.priority - 1
                     # TODO: This should not change global priority on found, but
                     #   instead priority, like offset, should be a per-site attribute
@@ -9044,20 +9047,35 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         if numSuffix is not None or (fixZeros and foundMeasureNumber == 0):
             prevMeas = myStream.getElementBeforeOffset(myMeas.offset, classList=['Measure'])
             if prevMeas:
-                ts2 = prevMeas.getContextByClass(meter.TimeSignature)
-                if not ts2:
+                segments: list[tuple[meter.TimeSignature, OffsetQL]] = []
+                contextTs = prevMeas.getContextByClass(meter.TimeSignature)
+                if contextTs is not None:
+                    segments.append((contextTs, 0.0))
+                for ts in prevMeas.getElementsByClass(meter.TimeSignature):
+                    tsOffset = prevMeas.elementOffset(ts)
+                    if segments and segments[-1][1] == tsOffset:
+                        segments.pop()
+                    segments.append((ts, tsOffset))
+                if not segments or segments[0][1] != 0:
                     raise StreamException(
                         'beatAndMeasureFromOffset: partial measure found, '
                         + 'but could not find a time signature for the preceding measure')
                 # foundMeasureNumber = prevMeas.number
 
-                # need this for chorales 197 and 280, where we
-                # have a full-length measure followed by a pickup in
-                # a new time signature
-                if prevMeas.highestTime == ts2.barDuration.quarterLength:
-                    padBeats = ts2.beatCount
-                else:
-                    padBeats = ts2.getBeatProportion(prevMeas.highestTime) - 1
+                segmentEnds = [start for unused_ts, start in segments[1:]]
+                segmentEnds.append(prevMeas.highestTime)
+                padBeats = 0
+                for (ts, start), end in zip(segments, segmentEnds):
+                    segmentLength = opFrac(end - start)
+                    # need this for chorales 197 and 280, where we
+                    # have a full-length measure followed by a pickup in
+                    # a new time signature
+                    if segmentLength == ts.barDuration.quarterLength:
+                        padBeats += ts.beatCount
+                    else:
+                        padBeats += ts.getBeatProportion(segmentLength) - 1
+                if myMeas.timeSignature is None:
+                    myBeat = segments[-1][0].getBeatProportion(searchOffset - myMeas.offset)
                 return (myBeat + padBeats, prevMeas)
             else:
                 # partial measure at start of piece
@@ -10321,6 +10339,9 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
           x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons=True)
           will give you the number of P1s in the piece, because there could be
           d2's in there as well.
+        * A Chord counts as a unison of the Chord before it if both have the
+          same pitches, in any order.  A skipped unison still lasts until its
+          own end, so the next note follows it without a `None` between.
 
         See test.TestStream.testFindConsecutiveNotes() for usage details.
 
@@ -10349,9 +10370,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         * Changed in v8: all parameters are keyword only.
 
         OMIT_FROM_DOCS
-
-        N.B. for chords, currently, only the first pitch is tested for unison.
-        this is a bug TODO: FIX
 
         (\*\*keywords is there so that other methods that pass along dicts to
         findConsecutiveNotes don't have to remove
@@ -10401,6 +10419,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                             or e.pitch.pitchClass != lastPitches[0].pitchClass
                             or (not skipOctaves
                                 and e.pitch.ps != lastPitches[0].ps)):
+                        lastEnd = max(lastEnd, opFrac(e.offset + e.duration.quarterLength))
                         continue
                     if not getOverlaps and e.offset < lastEnd:
                         continue
@@ -10422,11 +10441,12 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                             lastWasNone = True
                             lastPitches = ()
                     # if we have a chord
-                    elif (not (skipUnisons
-                               and len(lastPitches) == len(e.pitches)
-                               and (p.ps for p in e.pitches) == (p.ps for p in lastPitches)
-                               )
-                          and (getOverlaps or e.offset >= lastEnd)):
+                    elif (skipUnisons
+                          and len(lastPitches) == len(e.pitches)
+                          and (sorted(p.ps for p in e.pitches)
+                               == sorted(p.ps for p in lastPitches))):
+                        lastEnd = max(lastEnd, opFrac(e.offset + e.duration.quarterLength))
+                    elif getOverlaps or e.offset >= lastEnd:
                         returnList.append(e)
                         if e.offset < lastEnd:  # is an overlap
                             continue
@@ -10459,6 +10479,8 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
         the second note, but if skipRests is set to True or there is a gap
         in the Stream, then these two numbers
         will be different).
+        Offsets are measured from the start of this Stream, so the intervals
+        of a Part with Measures stand at their offsets in the Part.
 
         See :meth:`~music21.stream.Stream.findConsecutiveNotes` in this class for
         a discussion of what is meant by default for "consecutive notes", and
@@ -10506,6 +10528,11 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
             return self.cloneEmpty(derivationMethod='melodicIntervals')
 
         returnStream = self.cloneEmpty(derivationMethod='melodicIntervals')
+        containerOffsets = {id(self): 0.0}
+        for container in self.recurse(streamsOnly=True):
+            containerOffsets[id(container)] = opFrac(
+                containerOffsets[id(container.activeSite)] + container.offset)
+
         for thisNote, nextNote in zip(returnList, returnList[1:]):
             # returnList could contain None to represent a rest
             if thisNote is None or nextNote is None:
@@ -10523,9 +10550,11 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                 noteEnd = nextNote
             # Prefer Note objects over Pitch objects so that noteStart is set correctly
             returnInterval = interval.Interval(noteStart, noteEnd)
-            returnInterval.offset = opFrac(thisNote.offset + thisNote.quarterLength)
+            thisOffset = containerOffsets[id(thisNote.activeSite)] + thisNote.offset
+            nextOffset = containerOffsets[id(nextNote.activeSite)] + nextNote.offset
+            returnInterval.offset = opFrac(thisOffset + thisNote.quarterLength)
             returnInterval.duration = duration.Duration(opFrac(
-                nextNote.offset - returnInterval.offset))
+                nextOffset - returnInterval.offset))
             returnStream.insert(returnInterval)
 
         return returnStream

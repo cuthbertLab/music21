@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2007-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2007-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -796,7 +796,7 @@ class LilypondConverter:
         elif el.text is None:
             text = ''
         else:
-            text = '"' + el.text + '"'
+            text = lyo.LyObject().quoteString(el.text).rstrip()
             # TODO: composite
             if el.syllabic == 'end':
                 text = text + '__'
@@ -1288,8 +1288,9 @@ class LilypondConverter:
         if noteOrRest.hasStyleInformation:
             if noteOrRest.style.color and noteOrRest.style.hideObjectOnPrint is False:
                 # LilyPond 2.22 (January 2021) supports hex values
-                noteheadColor = rf'\override NoteHead.color = "{noteOrRest.style.color}"' + '\n'
-                stemColor = rf'\override Stem.color = "{noteOrRest.style.color}"' + '\n'
+                color = lyo.LyObject().quoteString(noteOrRest.style.color).rstrip()
+                noteheadColor = rf'\override NoteHead.color = {color}' + '\n'
+                stemColor = rf'\override Stem.color = {color}' + '\n'
                 simpleElementParts.append(noteheadColor)
                 simpleElementParts.append(stemColor)
 
@@ -2483,14 +2484,14 @@ class LilypondConverter:
             if skipWriting is False:
                 fileName = self.writeLyFile(ext='ly', fp=fileName)
 
-        lilyCommand = '"' + LILYEXEC + '" '
+        lilyCommand = [LILYEXEC]
         if format is not None:
-            lilyCommand += '-f ' + format + ' '
+            lilyCommand += ['-f', format]
         if backend is not None:
-            lilyCommand += self.backendString + backend + ' '
+            lilyCommand.append(self.backendString + backend)
 
-        lilyCommand += '-o ' + str(fileName) + ' ' + str(fileName)
-        os.system(lilyCommand)
+        lilyCommand += ['-o', str(fileName), str(fileName)]
+        subprocess.run(lilyCommand, check=False)
 
         try:
             os.remove(str(fileName) + '.eps')
@@ -2653,6 +2654,18 @@ class Test(unittest.TestCase):
             "c' 4  "
         )
 
+    def testColorStaysInsideString(self):
+        n = note.Note()
+        n.style.color = 'red\\" #(system "touch x") "'
+        sm = LilypondConverter().lySimpleMusicFromNoteOrRest(n)
+        escaped = r'"red\\\" #(system \"touch x\") \""'
+        self.assertEqual(
+            sm.stringOutput(),
+            r'\override NoteHead.color = ' + escaped + '\n'
+            + r'\override Stem.color = ' + escaped + '\n'
+            + "c' 4  "
+        )
+
     def testMetronomeMark(self):
         mm = tempo.MetronomeMark(number=87, referent=note.Note(type='quarter'))
         lpEmbeddedScm = LilypondConverter().lyEmbeddedScmFromMetronomeMark(mm)
@@ -2671,6 +2684,34 @@ class Test(unittest.TestCase):
         lpc = LilypondConverter()
         lpc.loadObjectFromScore(s, makeNotation=False)
         self.assertIn(r'\tempo 4  = 87', str(lpc.topLevelObject))
+
+    def testTextStaysInsideStrings(self):
+        schemeCall = '\\" #(system "touch x") %'
+        escaped = r'"\\\" #(system \"touch x\") %"'
+
+        md = metadata.Metadata()
+        md.title = schemeCall
+        lpHeader = LilypondConverter().setHeaderFromMetadata(md)
+        self.assertIn('title = ' + escaped, str(lpHeader))
+
+        lpLyric = LilypondConverter().lyLyricElementFromM21Lyric(note.Lyric(schemeCall))
+        self.assertEqual(str(lpLyric).strip(), escaped)
+
+    def testRunThroughLilyNoShell(self):
+        import tempfile
+        from unittest import mock
+
+        lpc = LilypondConverter()
+        lpc.loadObjectFromScore(stream.Stream([note.Note()]), makeNotation=False)
+        with tempfile.TemporaryDirectory() as tempDir:
+            fp = pathlib.Path(tempDir, 'x;touch y;#.ly')
+            with (mock.patch.object(lpc, 'findLilyExec', return_value='lilypond'),
+                  mock.patch('os.system') as mockSystem,
+                  mock.patch('subprocess.run') as mockRun):
+                with self.assertRaises(LilyTranslateException):  # no output was made
+                    lpc.runThroughLily(format='pdf', backend='ps', fileName=fp)
+            mockSystem.assert_not_called()
+            self.assertIn(str(fp), mockRun.call_args.args[0])
 
 class TestExternal(unittest.TestCase):
     show = True

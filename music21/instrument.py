@@ -60,7 +60,7 @@ def unbundleInstruments(streamIn: stream.Stream,
     >>> s.append(up2)
     >>> s2 = instrument.unbundleInstruments(s)
     >>> s2.show('text')
-    {0.0} <music21.instrument.BassDrum 'Bass Drum'>
+    {0.0} <music21.instrument.BassDrum 'Bass Drum' acoustic>
     {0.0} <music21.note.Unpitched 'Bass Drum'>
     {1.0} <music21.instrument.Cowbell 'Cowbell'>
     {1.0} <music21.note.Unpitched 'Cowbell'>
@@ -316,6 +316,84 @@ class Instrument(base.Music21Object):
             return 0
             # raise InstrumentException('we are out of midi channels and this '
             #            'was not already detected PROGRAM BUG!')
+
+
+class MidiPercussionMapMixin(Instrument):
+    '''
+    Base for instruments in the General MIDI percussion map (MIDI channel 10).
+    The map is a synthesizer's layout, not a family of instruments, so a
+    Whistle (a Flute) is in it too.
+
+    >>> wh = instrument.Whistle()
+    >>> isinstance(wh, instrument.MidiPercussionMapMixin)
+    True
+    >>> wh.percMapPitch
+    71
+
+    The repr shows the modifier, if any:
+
+    >>> instrument.BongoDrums()
+    <music21.instrument.BongoDrums 'Bongo Drums' high>
+
+    * New in v11: was part of UnpitchedPercussion
+    '''
+    def __init__(self, **keywords) -> None:
+        super().__init__(**keywords)
+        self.percMapPitch: int|None = None
+        self._modifier: str|None = None
+        self._modifierToPercMapPitch: dict[str, int] = {}
+        self._percMapPitchToModifier: dict[int, str] = {}
+
+    def _reprInternal(self):
+        baseRepr = super()._reprInternal()
+        if self._modifier is None:
+            return baseRepr
+        return f'{baseRepr} {self._modifier}'
+
+    @property
+    def modifier(self) -> str|None:
+        '''
+        Returns or sets the modifier for this instrument.  A modifier could
+        be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
+
+        If the modifier is in the object's ._modifierToPercMapPitch dictionary
+        then changing the modifier also changes the .percMapPitch for the object
+
+        >>> bd = instrument.BongoDrums()
+        >>> bd.modifier
+        'high'
+
+        >>> bd.percMapPitch
+        60
+        >>> bd.modifier = 'low'
+        >>> bd.percMapPitch
+        61
+
+        Variations on modifiers can also be used and they get normalized:
+
+        >>> wb1 = instrument.Woodblock()
+        >>> wb1.percMapPitch
+        76
+        >>> wb1.modifier = 'LO'
+        >>> wb1.percMapPitch
+        77
+        >>> wb1.modifier  # n.b. -- not LO
+        'low'
+        '''
+        return self._modifier
+
+    @modifier.setter
+    def modifier(self, modifier: str):
+        modifier = modifier.lower().strip()
+
+        if self.inGMPercMap is True and modifier in self._modifierToPercMapPitch:
+            self.percMapPitch = self._modifierToPercMapPitch[modifier]
+
+            # normalize modifiers
+            if self.percMapPitch in self._percMapPitchToModifier:
+                modifier = self._percMapPitchToModifier[self.percMapPitch]
+
+        self._modifier = modifier
 
 
 # ------------------------------------------------------------------------------
@@ -830,16 +908,36 @@ class Shakuhachi(Flute):
         self.midiProgram = 77
 
 
-class Whistle(Flute):
+class Whistle(MidiPercussionMapMixin, Flute):
+    '''
+    Small duct flute, from the referee's whistle to the tin whistle.
+
+    >>> wh = instrument.Whistle()
+
+    By default a whistle has no definite pitch; a tin whistle sets `pitched` to True.
+
+    >>> wh.pitched
+    False
+
+    General MIDI has a short and a long whistle sound, chosen by the modifier:
+
+    >>> wh.modifier = 'long'
+    >>> wh.percMapPitch
+    72
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
         self.instrumentName = 'Whistle'
         self.instrumentAbbreviation = 'Whs'
         self.instrumentSound = 'wind.flutes.whistle'
+        self.pitched = False
         self.inGMPercMap = True
-        # TODO: why is this not inheriting from UnpitchedPercussion if we're giving it percMapPitch?
-        self.percMapPitch = 71
+        self._modifier = 'short'
+        # TODO: short and long should come from the duration of each note
+        self._modifierToPercMapPitch = {'short': 71, 'long': 72}
+        self._percMapPitchToModifier = {71: 'short', 72: 'long'}
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
         self.midiProgram = 78
 
 
@@ -1105,8 +1203,6 @@ class Tuba(BrassInstrument):
 class Percussion(Instrument):
     def __init__(self, **keywords):
         super().__init__(**keywords)
-        self.inGMPercMap = False
-        self.percMapPitch = None
         self.instrumentName = 'Percussion'
         self.instrumentAbbreviation = 'Perc'
 
@@ -1115,59 +1211,10 @@ class PitchedPercussion(Percussion):
     pass
 
 
-class UnpitchedPercussion(Percussion):
+class UnpitchedPercussion(MidiPercussionMapMixin, Percussion):
     def __init__(self, **keywords):
         super().__init__(**keywords)
-        self._modifier = None
-        self._modifierToPercMapPitch = {}
-        self._percMapPitchToModifier = {}
         self.midiChannel = 9  # 0-indexed, i.e. MIDI channel 10
-
-    @property
-    def modifier(self):
-        '''
-        Returns or sets the modifier for this instrument.  A modifier could
-        be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
-
-        If the modifier is in the object's ._modifierToPercMapPitch dictionary
-        then changing the modifier also changes the .percMapPitch for the object
-
-        >>> bd = instrument.BongoDrums()
-        >>> bd.modifier
-        'high'
-
-        >>> bd.percMapPitch
-        60
-        >>> bd.modifier = 'low'
-        >>> bd.percMapPitch
-        61
-
-        Variations on modifiers can also be used and they get normalized:
-
-        >>> wb1 = instrument.Woodblock()
-        >>> wb1.percMapPitch
-        76
-        >>> wb1.modifier = 'LO'
-        >>> wb1.percMapPitch
-        77
-        >>> wb1.modifier  # n.b. -- not LO
-        'low'
-        '''
-        return self._modifier
-
-    @modifier.setter
-    def modifier(self, modifier):
-        modifier = modifier.lower().strip()
-        # BEN: to-do, pull out hyphens, spaces, etc.
-
-        if self.inGMPercMap is True and modifier.lower() in self._modifierToPercMapPitch:
-            self.percMapPitch = self._modifierToPercMapPitch[modifier.lower()]
-
-            # normalize modifiers
-            if self.percMapPitch in self._percMapPitchToModifier:
-                modifier = self._percMapPitchToModifier[self.percMapPitch]
-
-        self._modifier = modifier
 
 
 class Vibraphone(PitchedPercussion):
@@ -1320,17 +1367,84 @@ class Castanets(UnpitchedPercussion):
         self.instrumentName = 'Castanets'
         self.instrumentAbbreviation = 'Cas'
         self.instrumentSound = 'wood.castanets'
+        self.inGMPercMap = True
+        self.percMapPitch = 85  # GM Level 2
 
 
-class Maracas(UnpitchedPercussion):
+class Cabasa(UnpitchedPercussion):
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Cabasa'
+        self.instrumentAbbreviation = 'Cab'
+        self.instrumentSound = 'rattle.cabasa'
+        self.inGMPercMap = True
+        self.percMapPitch = 69
+
+
+class Claves(UnpitchedPercussion):
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Claves'
+        self.instrumentAbbreviation = 'Clv'
+        self.instrumentSound = 'wood.claves'
+        self.inGMPercMap = True
+        self.percMapPitch = 75
+
+
+class Guiro(UnpitchedPercussion):
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Guiro'
+        self.instrumentAbbreviation = 'Gro'
+        self.instrumentSound = 'wood.guiro'
+        self.inGMPercMap = True
+        self._modifier = 'short'
+        # TODO: short and long should come from the duration of each note
+        self._modifierToPercMapPitch = {'short': 73, 'long': 74}
+        self._percMapPitchToModifier = {73: 'short', 74: 'long'}
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
+
+
+# For definition of this instrument see James Holland, "Practical Percussion:
+# A Guide to the Instruments and Their Sources," p. 42.
+class Shaker(UnpitchedPercussion):
+    '''
+    Rattles that are shaken, among them maracas and caxixi.
+
+    >>> isinstance(instrument.Maracas(), instrument.Shaker)
+    True
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Shaker'
+        self.instrumentAbbreviation = 'Shk'
+        self.instrumentSound = 'rattle.shaker'
+        self.inGMPercMap = True
+        self.percMapPitch = 82  # GM Level 2
+
+
+class Maracas(Shaker):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
         self.instrumentName = 'Maracas'
-        self.inGMPercMap = True
         self.percMapPitch = 70
         self.instrumentAbbreviation = 'Mrcs'
         self.instrumentSound = 'rattle.maraca'
+
+
+class Caxixi(Shaker):
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Caxixi'
+        self.instrumentAbbreviation = 'Cax'
+        self.instrumentSound = 'rattle.caxixi'
+        # no GM note of its own: sounds as Shaker
 
 
 class Vibraslap(UnpitchedPercussion):
@@ -1371,14 +1485,9 @@ class CrashCymbals(Cymbals):
         self.instrumentAbbreviation = 'Cym'
         self.instrumentSound = 'metal.cymbal.crash'
         self.inGMPercMap = True
-        self._modifier = '1'
-
-        self._modifierToPercMapPitch = {'1': 49,
-                                        '2': 57,
-                                        }
-        self._percMapPitchToModifier = {49: '1',
-                                        57: '2',
-                                        }
+        self._modifier = 'midi-1'
+        self._modifierToPercMapPitch = {'midi-1': 49, 'midi-2': 57, '1': 49, '2': 57}
+        self._percMapPitchToModifier = {49: 'midi-1', 57: 'midi-2'}
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
@@ -1400,29 +1509,65 @@ class SizzleCymbal(Cymbals):
         self.instrumentSound = 'metal.cymbal.sizzle'
 
 
-class SplashCymbals(Cymbals):
+class SplashCymbal(Cymbals):
+    '''
+    A mounted splash cymbal.
+
+    * Changed in v11: was formerly plural "SplashCymbals"
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
-        self.instrumentName = 'Splash Cymbals'
+        self.instrumentName = 'Splash Cymbal'
         self.instrumentAbbreviation = 'Spl Cym'
         self.instrumentSound = 'metal.cymbal.splash'
+        self.inGMPercMap = True
+        self.percMapPitch = 55
 
 
-class RideCymbals(Cymbals):
+class RideCymbal(Cymbals):
+    '''
+    A mounted ride cymbal.
+
+    * Changed in v11: was formerly plural "RideCymbals"
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
-        self.instrumentName = 'Ride Cymbals'
+        self.instrumentName = 'Ride Cymbal'
         self.instrumentAbbreviation = 'Ride Cym'
         self.instrumentSound = 'metal.cymbal.ride'
+        self.inGMPercMap = True
+        self._modifier = 'midi-1'
+        # TODO: bell is misplaced as a modifier alone -- it should be a technique
+        #    that applies to particular notes or not
+        self._modifierToPercMapPitch = {'midi-1': 51, 'midi-2': 59, 'bell': 53,
+                                        '1': 51, '2': 59}
+        self._percMapPitchToModifier = {51: 'midi-1', 59: 'midi-2', 53: 'bell'}
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
-class HiHatCymbal(Cymbals):
+class ChineseCymbal(Cymbals):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
-        self.instrumentName = 'Hi-Hat Cymbal'
+        self.instrumentName = 'Chinese Cymbal'
+        self.instrumentAbbreviation = 'Chin Cym'
+        self.instrumentSound = 'metal.cymbal.chinese'
+        self.inGMPercMap = True
+        self.percMapPitch = 52
+
+
+class HiHat(Cymbals):
+    '''
+    A pair of mounted hi-hat cymbals (also spelled "high hat", "hihat", etc.).
+
+    * Changed in v11: was formerly "HiHatCymbal"
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Hi-Hat'
         self.instrumentSound = 'metal.hi-hat'
         self.inGMPercMap = True
 
@@ -1479,7 +1624,10 @@ class Agogo(UnpitchedPercussion):
         self.instrumentAbbreviation = 'Ago'
         self.instrumentSound = 'metal.bells.agogo'
         self.inGMPercMap = True
-        self.percMapPitch = 67
+        self._modifier = 'high'
+        self._modifierToPercMapPitch = {'high': 67, 'low': 68}
+        self._percMapPitchToModifier = {67: 'high', 68: 'low'}
+        self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
         self.midiProgram = 113
 
 
@@ -1499,9 +1647,38 @@ class SleighBells(UnpitchedPercussion):
         self.instrumentName = 'Sleigh Bells'
         self.instrumentAbbreviation = 'Slgh Bl'
         self.instrumentSound = 'metal.bells.sleigh-bells'
+        self.inGMPercMap = True
+        self.percMapPitch = 83  # GM Level 2 Jingle Bell
 
 
-class SnareDrum(UnpitchedPercussion):
+class BellTree(UnpitchedPercussion):
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Bell Tree'
+        self.instrumentAbbreviation = 'B Tr'
+        self.instrumentSound = 'metal.bells.bell-tree'
+        self.inGMPercMap = True
+        self.percMapPitch = 84  # GM Level 2
+
+
+class UnpitchedDrum(UnpitchedPercussion):
+    '''
+    Drums without a definite pitch.  Timpani, which are pitched, are
+    :class:`PitchedPercussion` instead.
+
+    >>> isinstance(instrument.SnareDrum(), instrument.UnpitchedDrum)
+    True
+    >>> isinstance(instrument.Timpani(), instrument.UnpitchedDrum)
+    False
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+        self.instrumentName = 'Drum'
+        self.instrumentAbbreviation = 'Dr'
+
+
+class SnareDrum(UnpitchedDrum):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1521,7 +1698,7 @@ class SnareDrum(UnpitchedPercussion):
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
-class TenorDrum(UnpitchedPercussion):
+class TenorDrum(UnpitchedDrum):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1530,7 +1707,7 @@ class TenorDrum(UnpitchedPercussion):
         self.instrumentSound = 'drum.tenor-drum'
 
 
-class BongoDrums(UnpitchedPercussion):
+class BongoDrums(UnpitchedDrum):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1545,7 +1722,7 @@ class BongoDrums(UnpitchedPercussion):
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
-class TomTom(UnpitchedPercussion):
+class TomTom(UnpitchedDrum):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1561,7 +1738,7 @@ class TomTom(UnpitchedPercussion):
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
-class Timbales(UnpitchedPercussion):
+class Timbales(UnpitchedDrum):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1575,7 +1752,36 @@ class Timbales(UnpitchedPercussion):
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
-class CongaDrum(UnpitchedPercussion):
+class CongaDrum(UnpitchedDrum):
+    '''
+    Single-headed hand drum of Afro-Cuban origin.
+
+    >>> cd = instrument.CongaDrum()
+
+    Music21 knows of two modifiers: 'high' and 'low'.
+
+    >>> cd.modifier = 'high'
+
+    A conga can be muted or not (at present, this is
+    an aspect of the instrument, not the note)
+
+    >>> cd.muted = True
+
+    For MIDI output, the effect of modifier and muted
+    changes the MIDI note
+
+    >>> cd.percMapPitch
+    62
+    >>> cd.muted = False
+    >>> cd.percMapPitch
+    63
+    >>> cd.modifier = 'low'  # or ''
+    >>> cd.percMapPitch
+    64
+
+    Note that General MIDI does not distinguish the sound of a
+    muted and unmuted low conga drums.
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1584,12 +1790,22 @@ class CongaDrum(UnpitchedPercussion):
         self.instrumentSound = 'drum.conga'
         self.inGMPercMap = True
         self._modifier = 'low'
-        self._modifierToPercMapPitch = {'low': 64, 'mute high': 62, 'open high': 63}
-        self._percMapPitchToModifier = {64: 'low', 62: 'mute high', 63: 'open high'}
+        self._modifierToPercMapPitch = {'low': 64, '': 64, 'high': 63}
+        self._percMapPitchToModifier = {64: 'low', 63: 'high', 62: 'high'}
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
+    # TODO: muting should apply to particular notes, not the instrument
+    @property
+    def muted(self) -> bool:
+        return self.percMapPitch == 62
 
-class BassDrum(UnpitchedPercussion):
+    @muted.setter
+    def muted(self, value: bool):
+        if self._modifier == 'high':
+            self.percMapPitch = 62 if value else 63
+
+
+class BassDrum(UnpitchedDrum):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1598,12 +1814,12 @@ class BassDrum(UnpitchedPercussion):
         self.instrumentSound = 'drum.bass-drum'
         self.inGMPercMap = True
         self._modifier = 'acoustic'
-        self._modifierToPercMapPitch = {'acoustic': 35, '1': 36}
-        self._percMapPitchToModifier = {35: 'acoustic', 36: '1'}
+        self._modifierToPercMapPitch = {'acoustic': 35, 'midi-1': 36, '1': 36}
+        self._percMapPitchToModifier = {35: 'acoustic', 36: 'midi-1'}
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
-class Taiko(UnpitchedPercussion):
+class Taiko(UnpitchedDrum):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1613,7 +1829,23 @@ class Taiko(UnpitchedPercussion):
         self.midiProgram = 116
 
 
-class Tambourine(UnpitchedPercussion):
+class Tambourine(UnpitchedDrum):
+    '''
+    A tambourine, by default with a drum head (classical style)
+
+    For Rock/pop tambourines (shaker-cymbal type) set
+    headless = True.
+
+    >>> instrument.Tambourine().headless
+    False
+    >>> instrument.Tambourine().headless = True
+
+    Note that MIDI (like many other formats) does not distinguish
+    between headless and headed tambourines. Even though our default
+    is a headed drum, we import MIDI as headless tambourine, since
+    the majority of MIDI files with tambourines represent rock/pop
+    styles.
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
@@ -1622,6 +1854,80 @@ class Tambourine(UnpitchedPercussion):
         self.instrumentSound = 'drum.tambourine'
         self.inGMPercMap = True
         self.percMapPitch = 54
+        self.headless = False
+
+
+class Cuica(UnpitchedDrum):
+    '''
+    A Brazilian friction drum: a stick rubbed inside the head makes the
+    squeaks and laughs of samba.
+
+    >>> cu = instrument.Cuica()
+
+    A cuica can be muted or not (at present, an aspect of the instrument,
+    not the note).  For MIDI output, this changes the MIDI note:
+
+    >>> cu.muted
+    False
+    >>> cu.percMapPitch
+    79
+    >>> cu.muted = True
+    >>> cu.percMapPitch
+    78
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Cuica'
+        self.instrumentAbbreviation = 'Cui'
+        self.instrumentSound = 'drum.cuica'
+        self.inGMPercMap = True
+        self.percMapPitch = 79
+
+    # TODO: muting should apply to particular notes, not the instrument
+    @property
+    def muted(self) -> bool:
+        return self.percMapPitch == 78
+
+    @muted.setter
+    def muted(self, value: bool):
+        self.percMapPitch = 78 if value else 79
+
+
+class Surdo(UnpitchedDrum):
+    '''
+    The big Brazilian bass drum that holds down the samba beat.
+
+    >>> su = instrument.Surdo()
+
+    A surdo can be muted or not (at present, an aspect of the instrument,
+    not the note).  For MIDI output, this changes the MIDI note:
+
+    >>> su.muted
+    False
+    >>> su.percMapPitch
+    87
+    >>> su.muted = True
+    >>> su.percMapPitch
+    86
+    '''
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
+
+        self.instrumentName = 'Surdo'
+        self.instrumentAbbreviation = 'Sur'
+        self.instrumentSound = 'drum.surdo'
+        self.inGMPercMap = True
+        self.percMapPitch = 87  # GM Level 2
+
+    # TODO: muting should apply to particular notes, not the instrument
+    @property
+    def muted(self) -> bool:
+        return self.percMapPitch == 86
+
+    @muted.setter
+    def muted(self, value: bool):
+        self.percMapPitch = 86 if value else 87
 
 
 class Whip(UnpitchedPercussion):
@@ -2573,6 +2879,13 @@ class TestExternal(unittest.TestCase):
 
 
 class Test(unittest.TestCase):
+
+    def testCongaEmptyModifierIsLow(self):
+        cd = CongaDrum()
+        cd.modifier = 'high'
+        cd.modifier = ''
+        self.assertEqual(cd.modifier, 'low')
+        self.assertEqual(cd.percMapPitch, 64)
 
     def testGetAllNamesForInstrumentByClass(self):
         acousticBass = getAllNamesForInstrument(AcousticBass(), SearchLanguage.ENGLISH)

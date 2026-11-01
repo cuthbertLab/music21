@@ -68,12 +68,12 @@ def testImports():
     try:
         import scipy  # type: ignore  # noqa: F401
     except ImportError as e:
-        raise ImportError('pip install scipy : needed for running test suites') from e
+        raise ImportError('scipy is needed for test suites; run uv sync') from e
 
     try:
         from Levenshtein import StringMatcher  # type: ignore  # noqa: F401
     except ImportError as e:
-        raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
+        raise ImportError('python-Levenshtein is needed for test suites; run uv sync') from e
 
     from music21.lily.translate import LilypondConverter, LilyTranslateException
     try:

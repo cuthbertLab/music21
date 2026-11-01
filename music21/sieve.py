@@ -583,14 +583,11 @@ class Residual:
             segmentFormat = self._segmentFormat
 
         subset = []
-        if self._m == 0:
-            return subset  # empty
-
-        n = (n + self._shift) % self._m  # check for n >= m
-
-        for value in z:
-            if n == value % self._m:
-                subset.append(value)
+        if self._m != 0:
+            n = (n + self._shift) % self._m  # check for n >= m
+            for value in z:
+                if n == value % self._m:
+                    subset.append(value)
         if self._neg:  # find opposite
             compSet = copy.deepcopy(z)
             for value in subset:
@@ -1049,7 +1046,7 @@ class Sieve:
             try:
                 self._cmpIntersection()
                 self._expType = 'simple'  # only if successful
-            except TypeError:  # attempted intersection of complemented
+            except (TypeError, ResidualException):  # attempted intersection of complemented
                 try:
                     self._cmpSegment()
                 except IndexError:  # no segments available
@@ -2006,9 +2003,6 @@ class PitchSieve:
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def testDummy(self):
-        self.assertEqual(True, True)
-
     def pitchOut(self, listIn):
         out = '['
         for p in listIn:
@@ -2037,6 +2031,15 @@ class Test(unittest.TestCase):
             # environLocal.printDebug(['testSieveParse', arg])
             testObj = Sieve(arg)
             dummy = testObj(0, list(range(30)))
+
+    def testComplementOfEmptyResidual(self):
+        z = list(range(6))
+        self.assertEqual(Residual(0, 0).segment(0, z), [])
+        self.assertEqual(Residual(0, 0, neg=True).segment(0, z), z)
+        self.assertEqual(Sieve('-0@0', z).segment('exp'), z)
+        self.assertEqual(Sieve('-0@0', z).segment('cmp'), z)
+        self.assertEqual(Residual(0, 0).segment(0, z, 'bin'), [0] * 6)
+        self.assertEqual(Sieve('-0@0|3@1', z).segment('exp'), z)
 
     def testSievePitch(self):
         unused_testObj = PitchSieve('-5 | 4 & 4sub3 & 6', 'b3', 'f#4')
@@ -2119,6 +2122,15 @@ class Test(unittest.TestCase):
                          '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, '
                          'A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, '
                          'G~5, A5, B`5, C6]')
+
+    def testIntersectComplementUnbracketed(self):
+        # an unbracketed intersection with a complemented residual
+        # should evaluate the same as the bracketed form
+        z = list(range(24))
+        for formula in ('3@1&-4@2', '-4@2&3@1'):
+            self.assertEqual(Sieve(formula, z=z)(),
+                             Sieve(f'({formula})', z=z)())
+        self.assertEqual(Sieve('3@1&-4@2', z=z)(), [1, 4, 7, 13, 16, 19])
 
 # sieve that breaks LCM
 # >>> t = sieve.Sieve((3, 99, 123123, 2433, 2050))

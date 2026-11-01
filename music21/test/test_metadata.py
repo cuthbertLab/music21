@@ -7,6 +7,7 @@ import unittest
 from music21 import converter
 from music21 import corpus
 from music21 import metadata
+from music21 import stream
 from music21.musicxml import testFiles as mTF
 
 
@@ -184,6 +185,24 @@ class Test(unittest.TestCase):
                 re.compile('(.*)canon(.*)'),
             ),
             (True, 'movementName'),
+        )
+
+    def testMetadataSearchUncompilablePattern(self):
+        md = metadata.Metadata()
+        md['title'] = metadata.Text('Der Fisch(?) Concelebrant (4-5), S. 7')
+        self.assertEqual(
+            md.search('Der Fisch(?) Concelebrant (4-5), S. 7', field='title'),
+            (True, 'title'),
+        )
+        self.assertEqual(md.search('Runckelstube(?)', field='title'), (False, None))
+        o = stream.Opus()
+        for title in ('Der Fisch(?) Concelebrant (4-5), S. 7', 'Mai cai  vgl. Kopie)'):
+            s = stream.Score()
+            s.insert(0, metadata.Metadata(title=title))
+            o.insert(0, s)
+        self.assertEqual(
+            o.getScoreByTitle('Mai cai  vgl. Kopie)').metadata.title,
+            'Mai cai  vgl. Kopie)',
         )
 
     def testRichMetadata02(self):

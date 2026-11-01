@@ -6,7 +6,7 @@
 #               Greg Chapman
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -707,7 +707,7 @@ class Metadata(base.Music21Object):
          ('copyright', '© 2014, Creative Commons License (CC-BY)'),
          ('corpusFilePath', 'corelli/opus3no1/1grave.xml'),
          ('fileFormat', 'musicxml'),
-         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
+         ('filePath', '...1grave.xml'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
          ('software', 'Dolet...'),
          ('software', 'Finale...'),
@@ -720,7 +720,7 @@ class Metadata(base.Music21Object):
          ('corpusFilePath', 'corelli/opus3no1/1grave.xml'),
          ('dateCreated', '1689/--/-- or earlier'),
          ('fileFormat', 'musicxml'),
-         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
+         ('filePath', '...1grave.xml'),
          ('localeOfComposition', 'Rome'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
          ('software', 'Dolet...'),
@@ -1228,8 +1228,12 @@ class Metadata(base.Music21Object):
         # look for regex characters
         elif (isinstance(query, str)
               and any(character in query for character in '*.|+?{}')):
-            useRegex = True
-            reQuery = re.compile(query, flags=re.IGNORECASE)
+            try:
+                reQuery = re.compile(query, flags=re.IGNORECASE)
+            except re.error:
+                pass
+            else:
+                useRegex = True
 
         if useRegex and reQuery is not None:
             for value, innerField in valueFieldPairs:

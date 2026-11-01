@@ -6,7 +6,7 @@
 #               Michael Scott Asato Cuthbert
 #               Dylan Nagler
 #
-# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -701,9 +701,9 @@ def reBar(music21Part: stream.Part, *, inPlace: bool = False) -> stream.Part|Non
             if lastTimeSignature.barDuration.quarterLength != m2.highestTime:
                 try:
                     m2.timeSignature = m2.bestTimeSignature()
-                except exceptions21.StreamException as e:
-                    raise ABCTranslateException(
-                        f'Problem with measure {music21Measure.number} ({music21Measure!r}): {e}')
+                except meter.MeterException:
+                    pass
+            if m2.timeSignature is not None:
                 if measureIndex != len(allMeasures) - 1:
                     if allMeasures[measureIndex + 1].timeSignature is None:
                         allMeasures[measureIndex + 1].timeSignature = lastTimeSignature
@@ -1230,6 +1230,21 @@ w:first second third
         notes = converter.parse('L:1/8\na-a-a', format='abc')
         ties = [n.tie.type for n in notes.flatten().notesAndRests]
         self.assertListEqual(ties, ['start', 'continue', 'stop'])
+
+    def testReBarKeepsOverflowWithNoBestTimeSignature(self):
+        from music21 import converter
+        s = converter.parse('M:2/4\nL:1/8\nK:C\nabcd e5/4 | abcd e5/4 |', format='abc')
+        measures = s.parts.first().getElementsByClass(stream.Measure)
+        self.assertEqual([m.number for m in measures], [0, 1, 2, 3])
+        self.assertEqual([n.name for n in measures[1].notes], ['E'])
+        self.assertEqual(measures[1].highestTime, 0.625)
+        self.assertEqual([n.name for n in measures[3].notes], ['E'])
+
+        s = converter.parse('M:2/4\nL:1/8\nK:C\nabcd e5/4 | abcd | abcdef |', format='abc')
+        measures = s.parts.first().getElementsByClass(stream.Measure)
+        self.assertEqual([m.number for m in measures], [0, 1, 2, 3, 4])
+        self.assertEqual([n.name for n in measures[4].notes], ['E', 'F'])
+        self.assertEqual(measures[4].timeSignature.ratioString, '1/4')
 
     def xtestMergeScores(self):
         from music21 import corpus

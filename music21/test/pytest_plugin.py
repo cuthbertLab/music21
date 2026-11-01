@@ -13,6 +13,7 @@ except ImportError:
 
 import music21
 from music21.test.testRunner import stripAddresses
+from music21.test.testRunner import windowsPaths
 
 @pytest.fixture(scope='session')
 def doctest_namespace() -> dict[str, Any]:
@@ -64,4 +65,4 @@ def pytest_collection_modifyitems(config, items) -> None:
             example.want = stripAddresses(example.want, '0x...')
 
             if windows:
-                example.want = example.want.replace('PosixPath', 'WindowsPath')
+                example.want = windowsPaths(example.want)

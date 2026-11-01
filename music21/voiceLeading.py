@@ -102,7 +102,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     * Changed in v11: all four notes are now required arguments and can no
       longer be set later; they are always present as :class:`~music21.note.Note`
-      objects. `analyticKey` renamed to `key`. `vIntervals` and ``hIntervals` are now tuples.
+      objects. `analyticKey` renamed to `key`. `vIntervals` and `hIntervals` are now tuples.
     '''
 
     _DOC_ATTR: dict[str, str] = {

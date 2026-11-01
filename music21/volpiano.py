@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2017-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,6 +19,7 @@ This module will move to a medren package hopefully by v7.
 from __future__ import annotations
 
 import enum
+import unittest
 
 from music21 import bar
 from music21 import base
@@ -192,7 +193,6 @@ def toPart(volpianoText, *, breaksToLayout=False):
     p = stream.Part()
     m = stream.Measure()
 
-    currentMeasure = m
     currentNeumeSpanner = None
     noteThatWouldGoInSpanner = None
     lastClef = clef.TrebleClef()
@@ -217,14 +217,14 @@ def toPart(volpianoText, *, breaksToLayout=False):
                 else:
                     breakToken = breakClass()  # pylint: disable=not-callable
 
-            currentMeasure.append(breakToken)
+            m.append(breakToken)
 
         continuousNumberOfBreakTokens = 0
 
         if token == '-':
             noteThatWouldGoInSpanner = None
             if currentNeumeSpanner:
-                currentMeasure.append(currentNeumeSpanner)
+                m.append(currentNeumeSpanner)
                 currentNeumeSpanner = None
             continue
 
@@ -295,7 +295,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
     if continuousNumberOfBreakTokens > 0:
         breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
         breakToken = breakClass()
-        currentMeasure.append(breakToken)
+        m.append(breakToken)
 
     if m:
         p.append(m)
@@ -456,8 +456,18 @@ def fromStream(s, *, layoutToBreaks=False):
     return ''.join(volpianoTokens)
 
 
+class Test(unittest.TestCase):
+    def testBreaksAndNeumesAfterBarline(self):
+        part = toPart('1---e-3-ef-g-7-e-4-gh--j-77')
+        self.assertEqual(
+            [[type(el).__name__ for el in m.getElementsByClass([Neume, LineBreak, PageBreak])]
+             for m in part.getElementsByClass(stream.Measure)],
+            [[], ['Neume', 'LineBreak'], ['Neume', 'PageBreak']])
+        self.assertEqual(fromStream(part), '1---e----3ef-g7---e----4gh-j77---')
+
+
 if __name__ == '__main__':
     import music21
     # allow things like "fromStream" to be called in doctests as "fromStream"
     # and not just "volpiano.fromStream"
-    music21.mainTest('importPlusRelative')
+    music21.mainTest(Test, 'importPlusRelative')

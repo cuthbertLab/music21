@@ -725,6 +725,31 @@ class Chord(ChordBase):
     False
     >>> c1 != c2
     True
+
+    **Empty chords**
+
+    A chord with no pitches is False, so `if not c:` finds one:
+
+    >>> emptyChord = chord.Chord()
+    >>> len(emptyChord)
+    0
+    >>> bool(emptyChord)
+    False
+    >>> bool(c1)
+    True
+
+    Most methods still answer:
+
+    >>> emptyChord.commonName
+    'empty chord'
+    >>> emptyChord.quality
+    'other'
+
+    But calling `root()` on an empty chord raises an exception:
+
+    >>> emptyChord.root()
+    Traceback (most recent call last):
+    music21.chord.ChordException: no pitches in chord <music21.chord.Chord ...>
     '''
     # CLASS VARIABLES #
     isChord = True
@@ -3714,7 +3739,7 @@ class Chord(ChordBase):
         >>> c2c
         <music21.chord.Chord C2 E3 G4 C5>
 
-        Pitches with extreme octaves (whose `.nameWithOctave`s
+        Pitches with extreme octaves (whose `.nameWithOctave` strings
         look identical) are still distinguished.
 
         >>> p1 = pitch.Pitch('B')

@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2014 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010, 2014, 2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1510,7 +1510,7 @@ class MuseDataFile(prebase.ProtoM21Object):
         commentToggle = False
 
         lines = []
-        srcLines = input_str.split('\n')
+        srcLines = input_str.replace('\r\n', '\n').split('\n')
         # lastLineIndex = len(srcLines) - 1
         for i, line in enumerate(srcLines):
             # environLocal.printDebug(['reading line', i, line])
@@ -1764,6 +1764,18 @@ class Test(unittest.TestCase):
     #     self.assertEqual(mdpObjs[0].getKeyParameters(), -3)
     #     self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '3/4')
     #     self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
+
+    def testReadCrlf(self):
+        fp = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01' / '01.md'
+        text = fp.read_bytes().replace(b'\r\n', b'\n').decode('latin-1')
+        lfWork = MuseDataWork()
+        lfWork.addString(text)
+        crlfWork = MuseDataWork()
+        crlfWork.addString(text.replace('\n', '\r\n'))
+        crlfPart = crlfWork.getParts()[0]
+        self.assertEqual(crlfPart.src, lfWork.getParts()[0].src)
+        self.assertEqual(crlfPart.getWorkTitle(), 'Clarinet Quintet')
+        self.assertEqual(crlfPart.getMovementTitle(), 'Trio II')
 
     def testLoadFromFile(self):
         fp = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive')

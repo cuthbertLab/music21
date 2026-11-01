@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2016 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2006-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -98,7 +98,21 @@ def fixDoctests(doctestSuite: doctest._DocTestSuite) -> None:
         for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
             if windows:
-                example.want = example.want.replace('PosixPath', 'WindowsPath')
+                example.want = windowsPaths(example.want)
+
+
+def windowsPaths(want: str) -> str:
+    '''
+    Change the PosixPaths a doctest expects into WindowsPaths that may start
+    with a drive.
+
+    >>> from music21.test.testRunner import windowsPaths
+    >>> windowsPaths("PosixPath('/Applications/Finale Reader.app')")
+    "WindowsPath('...Applications/Finale Reader.app')"
+    >>> windowsPaths("PosixPath('scores/a.xml')")
+    "WindowsPath('scores/a.xml')"
+    '''
+    return want.replace("PosixPath('/", "WindowsPath('...").replace('PosixPath', 'WindowsPath')
 
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')

@@ -1948,9 +1948,6 @@ def seekChordTablesAddress(c: chord.Chord) -> ChordTableAddress:
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def testDummy(self):
-        self.assertEqual(True, True)
-
     def testTnIndexToChordInfo(self):
         for key, value in tnIndexToChordInfo.items():
             self.assertEqual(len(key), 3)

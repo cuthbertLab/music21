@@ -1089,6 +1089,64 @@ class Test(unittest.TestCase):
 
         self.assertEqual([repr(x) for x in consec3], expected2 + ['None'] + expected2)
 
+    def testFindConsecutiveNotesChordUnisons(self):
+        '''
+        A repeated Chord, with its pitches in any order, is skipped as a
+        unison; a rest after it still gives a None.
+        '''
+        ch1 = chord.Chord('C4 E4 G4')
+        ch2 = chord.Chord('C4 E4 G4')
+        ch3 = chord.Chord('C4 E4 A4')
+        s = Stream([ch1, ch2, ch3])
+        self.assertEqual(s.findConsecutiveNotes(), [ch1, ch2, ch3])
+        self.assertEqual(s.findConsecutiveNotes(skipUnisons=True), [ch1, ch3])
+
+        chords = [chord.Chord('C4 E4 G4'), chord.Chord('C4 E4 G4'), chord.Chord('C4 E4 A4')]
+        s2 = Stream()
+        s2.append([chords[0], chords[1], note.Rest(), chords[2]])
+        self.assertEqual(s2.findConsecutiveNotes(skipUnisons=True),
+                         [chords[0], None, chords[2]])
+
+        ch4 = chord.Chord('C4 E4 G4')
+        s3 = Stream()
+        s3.append([ch4, chord.Chord('G4 C4 E4')])
+        self.assertEqual(s3.findConsecutiveNotes(skipUnisons=True), [ch4])
+
+    def testFindConsecutiveNotesSkippedUnisonKeepsContinuity(self):
+        '''
+        A skipped unison lasts until its own end, so the next note follows
+        without a None, while a rest or a gap after it still gives a None.
+        '''
+        s = Stream()
+        s.append([note.Note('C4'), note.Note('C4'), note.Note('D4')])
+        consec = s.findConsecutiveNotes(skipUnisons=True)
+        self.assertEqual([repr(x) for x in consec],
+                         ['<music21.note.Note C>', '<music21.note.Note D>'])
+
+        s2 = Stream()
+        s2.append([note.Note('C4'), note.Note('C4'), note.Rest(), note.Note('D4')])
+        consec2 = s2.findConsecutiveNotes(skipUnisons=True)
+        self.assertEqual([repr(x) for x in consec2],
+                         ['<music21.note.Note C>', 'None', '<music21.note.Note D>'])
+
+        s3 = Stream()
+        s3.append([note.Note('C4'), note.Note('C5'), note.Note('D4')])
+        consec3 = s3.findConsecutiveNotes(skipUnisons=True, skipOctaves=True)
+        self.assertEqual([x.nameWithOctave for x in consec3], ['C4', 'D4'])
+
+        s4 = Stream()
+        s4.insert(0, note.Note('C4'))
+        s4.insert(1, note.Note('C4'))
+        s4.insert(3, note.Note('D4'))
+        consec4 = s4.findConsecutiveNotes(skipUnisons=True)
+        self.assertEqual([repr(x) for x in consec4],
+                         ['<music21.note.Note C>', 'None', '<music21.note.Note D>'])
+
+        s5 = Stream()
+        s5.append([note.Note('C4'), note.Note('C4'), note.Note('E4')])
+        intervals = s5.melodicIntervals(skipUnisons=True)
+        self.assertEqual([i.name for i in intervals], ['M3'])
+
     def testMelodicIntervals(self):
         c4 = note.Note('C4')
         d5 = note.Note('D5')
@@ -1120,6 +1178,20 @@ class Test(unittest.TestCase):
         s1 = converter.parse("tinynotation: 3/4 c4 d' r b b'", makeNotation=False)
         intS1 = s1.melodicIntervals()
         self.assertEqual(len(intS1), 2)
+
+    def testMelodicIntervalsInMeasures(self):
+        m1 = Measure([note.Note('C4', type='half'), note.Note('D4', type='half')])
+        m2 = Measure([note.Note('F4', type='half'), note.Note('G4', type='half')])
+        p = Part()
+        p.append([m1, m2])
+        intervals = p.melodicIntervals()
+        self.assertEqual([i.offset for i in intervals], [2.0, 4.0, 6.0])
+        self.assertEqual([i.quarterLength for i in intervals], [0.0, 0.0, 0.0])
+
+        s = converter.parse('tinynotation: 4/4 c2 r2 f1 g1')
+        withGap = s.melodicIntervals(skipRests=True)
+        self.assertEqual([(i.name, i.offset, i.quarterLength) for i in withGap],
+                         [('P4', 2.0, 2.0), ('M2', 8.0, 0.0)])
 
     def testStripTiesBuiltA(self):
         s1 = Stream()
@@ -1396,6 +1468,84 @@ class Test(unittest.TestCase):
         l2 = len(s.getElementsByOffset(0.0, mustBeginInSpan=False))
         self.assertEqual(l1, 3)
         self.assertEqual(l2, 3)
+
+    def testGetElementsByOffsetFloatAtFraction(self):
+        '''
+        A float offset is found where the fraction it stands for is,
+        whether or not an end is given.
+        '''
+        from fractions import Fraction
+        s = Stream()
+        n = note.Note()
+        s.insert(Fraction(5, 6), n)
+        at = 1 / 3 + 0.5  # slightly below 5/6
+        self.assertEqual(list(s.getElementsByOffset(at)), [n])
+        self.assertEqual(list(s.getElementsByOffset(at, at)), [n])
+
+        # extendTies looks where each note ends, so it ties across
+        # a note that starts on a triplet
+        s = Stream()
+        s.insert(0, note.Note('C4', quarterLength=Fraction(1, 3)))
+        first = note.Note('D4', quarterLength=0.5)
+        second = note.Note('D4', quarterLength=Fraction(1, 6))
+        s.insert(Fraction(1, 3), first)
+        s.insert(Fraction(5, 6), second)
+        s.extendTies()
+        self.assertEqual(first.tie.type, 'start')
+        self.assertEqual(second.tie.type, 'stop')
+
+    def testBeatAndMeasureFromOffsetPartialAfterNewMeter(self):
+        '''
+        The second half of a measure split in two counts its beats on in
+        the time signature the first half opens with.
+        '''
+        p = Part()
+        m1 = Measure(number=1)
+        m1.append(meter.TimeSignature('4/4'))
+        m1.append(note.Note(type='whole'))
+        m2 = Measure(number=2)
+        m2.append(meter.TimeSignature('6/8'))
+        m2.append(note.Note(quarterLength=1.5))
+        m3 = Measure(number=2)
+        m3.numberSuffix = 'X1'
+        m3.append(note.Note(quarterLength=1.5))
+        p.append([m1, m2, m3])
+        beat, measure = p.beatAndMeasureFromOffset(5.5)
+        self.assertEqual(beat, 2.0)
+        self.assertIs(measure, m2)
+
+    def testBeatAndMeasureFromOffsetPartialAfterMeterChangeAtSplit(self):
+        '''
+        Where the meter changes at the split, the first half counts its
+        beats in the old meter and the second half in the new one.
+        '''
+        p = Part()
+        m1 = Measure(number=1)
+        m1.append(meter.TimeSignature('4/4'))
+        m1.append(note.Note(type='whole'))
+        m2 = Measure(number=2)
+        m2.append(note.Note(type='half'))
+        m2.insert(2, meter.TimeSignature('12/16'))
+        m3 = Measure(number=2)
+        m3.numberSuffix = 'X1'
+        m3.append(note.Note(quarterLength=0.75))
+        m3.append(note.Note(quarterLength=0.75))
+        p.append([m1, m2, m3])
+        self.assertEqual([p.beatAndMeasureFromOffset(offset)[0] for offset in (5, 6, 6.75)],
+                         [2.0, 3.0, 4.0])
+        self.assertIs(p.beatAndMeasureFromOffset(6.75)[1], m2)
+
+    def testSplitMeasureKeepsRightBarline(self):
+        '''
+        The second half of a split measure ends with the measure's right
+        barline.
+        '''
+        m = Measure([meter.TimeSignature('4/4'), note.Note(type='whole')])
+        m.rightBarline = bar.Barline('final')
+        left, right = m.splitAtQuarterLength(1.0)
+        self.assertIsNone(left.rightBarline)
+        self.assertIsNone(right.leftBarline)
+        self.assertEqual(right.rightBarline.type, 'final')
 
     def testStripTiesScore(self):
         '''
@@ -7881,6 +8031,28 @@ class Test(unittest.TestCase):
         self.assertIn(m2a, mm5)
         self.assertIn(m2b, mm5)
         self.assertIn(m3, mm5)
+
+    def testMeasuresKeepsSourceOrder(self):
+        '''
+        Collecting a time signature for an excerpt keeps it before the notes
+        of its own measure, as in Humdrum files, where priority is the line number.
+        '''
+        p = Part()
+        for i in range(1, 4):
+            m = Measure(number=i)
+            m.priority = 10 * i
+            n = note.Note(type='whole')
+            n.priority = 10 * i + 2
+            m.insert(0, n)
+            p.append(m)
+        m1 = p.getElementsByClass(Measure).first()
+        ts = meter.TimeSignature('4/4')
+        ts.priority = 11
+        m1.insert(0, ts)
+        for number in (2, 3):
+            excerpt = p.measures(number, number)
+            self.assertIs(excerpt.first(), ts)
+            self.assertIs(m1.first(), ts)
 
     def testChordifyF(self):
         # testing chordify handling of triplets

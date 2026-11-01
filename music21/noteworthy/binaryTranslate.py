@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2006-2013 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2006-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -192,6 +192,7 @@ from __future__ import annotations
 import pathlib
 import struct
 from typing import TypedDict
+import unittest
 
 from music21 import environment
 from music21 import exceptions21
@@ -1339,9 +1340,22 @@ class NWCObject:
                   ]
 
 
+class Test(unittest.TestCase):
+
+    def testClefNames(self):
+        for clefType, clefName in ((3, 'Tenor'), (4, 'Percussion')):
+            nwcc = NWCConverter()
+            nwcc.version = 201
+            # object type 0 (clef), visibility, clef type, no octave shift
+            nwcc.fileContents = struct.pack('<hBhh', 0, 0, clefType, 0)
+            clefObject = NWCObject(parserParent=nwcc)
+            clefObject.parse()
+            self.assertEqual(clefObject.dumpMethod(clefObject), f'|Clef|Type:{clefName}|')
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)
     # fp = '/Users/cuthbert/Desktop/395.nwc'
     # fp = 'http://www.cpdl.org/brianrussell/358.nwc'
     # from music21 import converter

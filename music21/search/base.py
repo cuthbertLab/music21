@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2013, 2017 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2013, 2017-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1304,16 +1304,16 @@ def mostCommonMeasureRhythms(
                 'number': 1,
                 'rhythmString': rhythmString,
             }
-            measureNotes = thisMeasure.notes
-            for measureNote in measureNotes:
-                if isinstance(measureNote, note.Note):
-                    firstNote = t.cast(note.Note, measureNotes[0])
-                    distanceToTranspose = 72 - firstNote.pitch.ps
+            for measureNote in thisMeasure.notes:
+                if isinstance(measureNote, (note.Note, chord.Chord)):
+                    referencePs = min(p.ps for p in measureNote.pitches)
+                    distanceToTranspose = 72 - referencePs
                     thisMeasureCopy = copy.deepcopy(thisMeasure)
-                    for transposableNote in thisMeasureCopy.notes:
+                    for transposableNote in thisMeasureCopy.getElementsByClass(
+                        (note.Note, chord.Chord)
+                    ):
                         # TODO: Transpose Diatonic
-                        nn = t.cast(note.Note, transposableNote)
-                        nn.transpose(distanceToTranspose, inPlace=True)
+                        transposableNote.transpose(distanceToTranspose, inPlace=True)
                     newDict['rhythm'] = thisMeasureCopy
                     break
             else:
@@ -1334,6 +1334,24 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self) -> None:
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
+
+    def testMostCommonMeasureRhythmsChord(self) -> None:
+        def firstRhythm(elements: list[note.GeneralNote]) -> list[str]:
+            s: Stream = Stream([Measure(elements)])
+            rhythmMeasure = mostCommonMeasureRhythms(s)[0]['rhythm']
+            return [' '.join(p.nameWithOctave for p in n.pitches) or n.classes[0]
+                    for n in rhythmMeasure.notesAndRests]
+
+        self.assertEqual(firstRhythm([chord.Chord(['E4', 'G4']), note.Note('D4')]),
+                         ['C5 E-5', 'B-4'])
+        self.assertEqual(firstRhythm([chord.Chord(['E4', 'G4']), chord.Chord(['D4', 'F4'])]),
+                         ['C5 E-5', 'B-4 C#5'])
+        self.assertEqual(firstRhythm([note.Rest(), chord.Chord(['E4', 'G4'])]),
+                         ['Rest', 'C5 E-5'])
+        self.assertEqual(firstRhythm([note.Unpitched(), note.Note('D4')]),
+                         ['Unpitched', 'C5'])
+        self.assertEqual(firstRhythm([note.Note('D4'), note.Unpitched()]),
+                         ['C5', 'Unpitched'])
 
 
 # ------------------------------------------------------------------------------

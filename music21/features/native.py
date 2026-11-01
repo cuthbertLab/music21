@@ -4,7 +4,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,6 +18,7 @@ import unittest
 
 from music21 import environment
 from music21.features import base as featuresModule
+from music21 import harmony
 from music21 import text
 
 environLocal = environment.Environment('features.native')
@@ -102,37 +103,24 @@ class QualityFeature(featuresModule.FeatureExtractor):
     def process(self) -> None:
         '''
         Do processing necessary, storing result in feature.
+
+        The piece's Keys decide the result when they are all major or all
+        minor, as in transposing parts that state different keys;
+        otherwise the piece is analyzed.
         '''
         if self.data is None or self.feature is None:  # pragma: no cover
             raise ValueError('Cannot process without a data instance or feature.')
 
         allKeys = self.data['flat.getElementsByClass(Key)']
-        if len(allKeys) == 1:
-            k0 = allKeys[0]
-            if k0.mode == 'major':
-                self.feature.vector[0] = 0
-                return
-            elif k0.mode == 'minor':
-                self.feature.vector[0] = 1
-                return
+        seenModes = {k.mode for k in allKeys}
+        if seenModes == {'major'}:
+            self.feature.vector[0] = 0
+            return
+        elif seenModes == {'minor'}:
+            self.feature.vector[0] = 1
+            return
 
-        useKey = None
-        if len(allKeys) == 1:
-            useKey = allKeys[0]
-        elif len(allKeys) > 1:
-            seen_modes = set()
-            for k in allKeys:
-                seen_modes.add(k.mode)
-            if len(seen_modes) == 1:
-                # there might, for instance be lots of different parts
-                # all giving the same mode.  (maybe not the same key
-                # because of transposition).  It doesn't matter which
-                # key we use for this.
-                useKey = allKeys[0]
-            # else -- back to analysis.
-
-        if useKey is None:
-            useKey = self.data['flat.analyzedKey']
+        useKey = self.data['flat.analyzedKey']
 
         analyzedMode = useKey.mode
         if analyzedMode == 'major':
@@ -732,12 +720,12 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
     fe = features.native.ChordBassMotionFeature(s)
     fe.extract().vector
 
-    [0.0, 0.0, 0.0, 0.0416..., 0.0416..., 0.166..., 0.0, 0.54166..., 0.0, 0.0, 0.2083... 0.0]
+    [0.0, 0.0, 0.2083..., 0.0, 0.0, 0.54166..., 0.0, 0.166..., 0.0416..., 0.0416..., 0.0, 0.0]
 
     For comparison, the Beatles Here Comes the Sun has more tone motion
 
-    [0.0, 0.05..., 0.14..., 0.03..., 0.06..., 0.3..., 0.008..., 0.303...,
-     0.0, 0.0, 0.07..., 0.008...]
+    [0.0, 0.008..., 0.07..., 0.0, 0.0, 0.303..., 0.008..., 0.3...,
+     0.06..., 0.03..., 0.14..., 0.05...]
 
     Post 1990s music has a lot more semitone motion.
     '''
@@ -763,6 +751,8 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
         lastHarm = None
 
         for thisHarm in harms:
+            if isinstance(thisHarm, harmony.NoChord):
+                continue
             if lastHarm is None:
                 lastHarm = thisHarm
             else:
@@ -779,7 +769,7 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
                 if lastBass.pitchClass == thisBass.pitchClass:
                     pass
                 else:
-                    halfStepMotion = (lastBass.pitchClass - thisBass.pitchClass) % 12
+                    halfStepMotion = (thisBass.pitchClass - lastBass.pitchClass) % 12
                     totMotion[halfStepMotion] += 1
                     totalHarmonicMotion += 1
                     lastHarm = thisHarm
@@ -934,6 +924,28 @@ featureExtractors = [
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
+    def testChordBassMotionNoChord(self):
+        from music21 import features
+        from music21 import stream
+
+        def motionVector(figures):
+            s = stream.Stream()
+            for figure in figures:
+                if figure == 'N.C.':
+                    s.append(harmony.NoChord())
+                else:
+                    s.append(harmony.ChordSymbol(figure))
+            return features.native.ChordBassMotionFeature(s).extract().vector
+
+        for figures in (['C', 'N.C.', 'G', 'C'],
+                        ['N.C.', 'C', 'G', 'C'],
+                        ['C', 'G', 'C', 'N.C.']):
+            vector = motionVector(figures)
+            self.assertEqual(vector[5], 0.5)
+            self.assertEqual(vector[7], 0.5)
+            self.assertEqual(sum(vector), 1.0)
+        self.assertEqual(motionVector(['C', 'N.C.']), [1.0] + [0.0] * 11)
+
     def testIncorrectlySpelledTriadPrevalence(self):
         from music21 import stream
         from music21 import features
@@ -947,6 +959,22 @@ class Test(unittest.TestCase):
 
         fe = features.native.IncorrectlySpelledTriadPrevalence(s)
         self.assertEqual(str(fe.extract().vector[0]), '0.5')
+
+    def testChordBassMotionFeature(self):
+        '''
+        C up to D is index 2, D down to B is index 9, and B down to B- is
+        index 11.
+        '''
+        from music21 import features
+        from music21 import stream
+
+        s = stream.Stream()
+        for figure in ['C', 'D', 'B', 'B-']:
+            s.append(harmony.ChordSymbol(figure))
+        fe = features.native.ChordBassMotionFeature(s)
+        third = 1 / 3
+        self.assertEqual(fe.extract().vector,
+                         [0.0, 0.0, third, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, third, 0.0, third])
 
     def testLandiniCadence(self):
         from music21 import converter
@@ -963,6 +991,25 @@ class Test(unittest.TestCase):
         s = converter.parse('tinynotation: 3/4 f#4 e a g2')
         fe = features.native.LandiniCadence(s)
         self.assertEqual(fe.extract().vector[0], 0)
+
+    def testQualityModalKey(self):
+        '''
+        A Key with a mode other than major or minor is analyzed, here as
+        d minor; a major Key is used as stated.
+        '''
+        from music21 import converter
+        from music21 import features
+        from music21 import key
+
+        s = converter.parse("tinynotation: 4/4 d4 f a d' c' b a f e d2.")
+        dorian = key.Key('d', 'dorian')
+        s.measure(1).insert(0, dorian)
+        fe = features.native.QualityFeature(s)
+        self.assertEqual(fe.extract().vector, [1])
+
+        s.measure(1).replace(dorian, key.Key('F'))
+        fe = features.native.QualityFeature(s)
+        self.assertEqual(fe.extract().vector, [0])
 
 
 if __name__ == '__main__':

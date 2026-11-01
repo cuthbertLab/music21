@@ -1721,7 +1721,7 @@ class PartParser(XMLParserBase):
                 try:
                     i = pm.midiPitchToInstrument(_adjustMidiData(midiUnpitchedText))
                 except MIDIPercussionException as mpe:
-                    # objects not yet existing in m21 such as Cabasa
+                    # numbers outside the GM percussion map
                     warnings.warn(MusicXMLWarning(mpe), stacklevel=2)
                     i = instrument.UnpitchedPercussion()
                     i.percMapPitch = _adjustMidiData(midiUnpitchedText)
@@ -5193,6 +5193,16 @@ class MeasureParser(XMLParserBase):
                 rb.completeStatus = True
 
             # set number; '' or None is interpreted as 1
+
+        # a barline may also carry a segno or coda (MusicXML allows both inside <barline>);
+        # put them in the measure where the barline is, as a direction would
+        for tag, markClass in (('segno', repeat.Segno), ('coda', repeat.Coda)):
+            mxMark = mxBarline.find(tag)
+            if mxMark is not None:
+                rm = markClass()
+                synchronizeIds(mxMark, rm)
+                self.setPosition(mxMark, rm)
+                self.insertCoreAndRef(self.offsetMeasureNote, None, rm)
 
         if barline.location == 'left':
             # environLocal.printDebug(['setting left barline', barline])

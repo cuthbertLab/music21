@@ -199,9 +199,9 @@ humdrumInstruments: dict[str, str] = {
     'marac': 'Maracas',
     'marim': 'Marimba',
     'piatt': 'Cymbals',  # ; piatti (It.); cymbales (Fr.); Becken (Ger.); kymbos (Gk.)
-    'ridec': 'RideCymbals',  # (kit)
+    'ridec': 'RideCymbal',  # (kit)
     'sdrum': 'SnareDrum',  # (kit)
-    'spshc': 'SplashCymbals',  # (kit)
+    'spshc': 'SplashCymbal',  # (kit)
     'steel': 'SteelDrum',  # , tinpanny
     # *Itabla    tabla
     'tambn': 'Tambourine',  # , timbrel; tamburino (It.); Tamburin (Ger.)
