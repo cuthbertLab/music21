@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 from music21 import articulations
 from music21 import bar
 from music21 import chord
+from music21 import clef
 from music21 import common
 from music21 import defaults
 from music21 import duration
@@ -1867,6 +1868,20 @@ class Test(unittest.TestCase):
         codas = s.parts.first().measure(2)[repeat.Coda]
         self.assertEqual(len(codas), 1)
         self.assertEqual(codas.first().offset, 0.0)
+
+    def testRestOnMiddleLineOfOctaveClef(self):
+        MP = MeasureParser()
+        for clefObj, displayStep, displayOctave in (
+            (clef.Treble8vbClef(), 'B', 3),
+            (clef.Treble8vaClef(), 'B', 5),
+            (clef.Bass8vbClef(), 'D', 2),
+            (clef.Bass8vaClef(), 'D', 4),
+        ):
+            MP.lastClefs[1] = clefObj
+            mxRest = self.EL(f'<note><rest><display-step>{displayStep}</display-step>'
+                             f'<display-octave>{displayOctave}</display-octave></rest>'
+                             '<duration>5</duration><type>eighth</type></note>')
+            self.assertEqual(MP.xmlToRest(mxRest).stepShift, 0)
 
 
 if __name__ == '__main__':

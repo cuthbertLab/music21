@@ -98,7 +98,7 @@ class ProtoM21Object:
 
         Having quick access to these things as strings makes it easier to do comparisons:
 
-        Example: find GClefs that are not Treble clefs (or treble 8vb, etc.):
+        Example: find GClefs that are not Treble clefs:
 
         >>> s = stream.Stream()
         >>> s.insert(10, clef.GClef())
@@ -113,6 +113,7 @@ class ProtoM21Object:
         >>> s2.show('text')
         {10.0} <music21.clef.GClef>
         {30.0} <music21.clef.FrenchViolinClef>
+        {40.0} <music21.clef.Treble8vbClef>
 
         * Changed in v2: returns a tuple, not a list.
         '''

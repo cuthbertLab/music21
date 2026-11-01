@@ -321,8 +321,8 @@ class ChordReducer:
         >>> cws = cr.computeMeasureChordWeights(s)
         >>> for pcs in sorted(cws):
         ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
-            (0, 4, 7)  3.0
-        (0, 11, 4, 5)  1.0
+        (0, 4, 5, 11)  1.0
+        (0, 4, 7)  3.0
 
         Add beatStrength:
 
@@ -330,8 +330,8 @@ class ChordReducer:
         ...     weightAlgorithm=cr.quarterLengthBeatStrength)
         >>> for pcs in sorted(cws):
         ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
-            (0, 4, 7)  2.2
-        (0, 11, 4, 5)  0.5
+        (0, 4, 5, 11)  0.5
+        (0, 4, 7)  2.2
 
         Give extra weight to the last element in a measure:
 
@@ -339,8 +339,8 @@ class ChordReducer:
         ...     weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
         >>> for pcs in sorted(cws):
         ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
-            (0, 4, 7)  3.0
-        (0, 11, 4, 5)  0.5
+        (0, 4, 5, 11)  0.5
+        (0, 4, 7)  3.0
 
         Make consonance count a lot:
 
@@ -348,8 +348,8 @@ class ChordReducer:
         ...     weightAlgorithm=cr.qlbsmpConsonance)
         >>> for pcs in sorted(cws):
         ...     print(f'{pcs!r:18}  {cws[pcs]:2.1f}')
-             (0, 4, 7)  3.0
-         (0, 11, 4, 5)  0.1
+        (0, 4, 5, 11)  0.1
+        (0, 4, 7)  3.0
         '''
         if weightAlgorithm is None:
             weightAlgorithm = self.quarterLengthOnly
@@ -358,7 +358,7 @@ class ChordReducer:
         self.numberOfElementsInMeasure = len(measureObject)
         for i, c in enumerate(measureObject):
             self.positionInMeasure = i
-            p = tuple({x.pitchClass for x in c.pitches})
+            p = tuple(sorted({x.pitchClass for x in c.pitches}))
             if p not in presentPCs:
                 presentPCs[p] = 0.0
             presentPCs[p] += weightAlgorithm(c)
@@ -579,7 +579,7 @@ class ChordReducer:
         currentGreedyChordPCs = None
         currentGreedyChordNewLength = 0.0
         for c in measureObject.getElementsByClass(note.NotRest):
-            p = tuple({x.pitchClass for x in c.pitches})
+            p = tuple(sorted({x.pitchClass for x in c.pitches}))
             if p in trimmedMaxChords and p != currentGreedyChordPCs:
                 # keep this chord
                 if currentGreedyChord is None and c.offset != 0.0:
@@ -736,6 +736,15 @@ class Test(unittest.TestCase):
         c3 = chord.Chord('C4 E4 G4 C5')
         for c in [c1, c2, c3]:
             s.append(c)
+
+    def testSamePitchClassesInAnyOrder(self):
+        m = stream.Measure([meter.TimeSignature('4/4'),
+                            chord.Chord('B3 D#4', type='half'),
+                            chord.Chord('D#3 B3', type='half')])
+        cr = ChordReducer()
+        self.assertEqual(cr.computeMeasureChordWeights(m.notes), {(3, 11): 4.0})
+        reduced = cr.reduceMeasureToNChords(m, 2, weightAlgorithm=cr.qlbsmpConsonance)
+        self.assertEqual([c.quarterLength for c in reduced.notes], [4.0])
 
     def testPartsWithoutPartId(self):
         # parts from MIDI files often have no partId; this used to raise

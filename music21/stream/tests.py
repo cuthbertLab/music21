@@ -1089,6 +1089,64 @@ class Test(unittest.TestCase):
 
         self.assertEqual([repr(x) for x in consec3], expected2 + ['None'] + expected2)
 
+    def testFindConsecutiveNotesChordUnisons(self):
+        '''
+        A repeated Chord, with its pitches in any order, is skipped as a
+        unison; a rest after it still gives a None.
+        '''
+        ch1 = chord.Chord('C4 E4 G4')
+        ch2 = chord.Chord('C4 E4 G4')
+        ch3 = chord.Chord('C4 E4 A4')
+        s = Stream([ch1, ch2, ch3])
+        self.assertEqual(s.findConsecutiveNotes(), [ch1, ch2, ch3])
+        self.assertEqual(s.findConsecutiveNotes(skipUnisons=True), [ch1, ch3])
+
+        chords = [chord.Chord('C4 E4 G4'), chord.Chord('C4 E4 G4'), chord.Chord('C4 E4 A4')]
+        s2 = Stream()
+        s2.append([chords[0], chords[1], note.Rest(), chords[2]])
+        self.assertEqual(s2.findConsecutiveNotes(skipUnisons=True),
+                         [chords[0], None, chords[2]])
+
+        ch4 = chord.Chord('C4 E4 G4')
+        s3 = Stream()
+        s3.append([ch4, chord.Chord('G4 C4 E4')])
+        self.assertEqual(s3.findConsecutiveNotes(skipUnisons=True), [ch4])
+
+    def testFindConsecutiveNotesSkippedUnisonKeepsContinuity(self):
+        '''
+        A skipped unison lasts until its own end, so the next note follows
+        without a None, while a rest or a gap after it still gives a None.
+        '''
+        s = Stream()
+        s.append([note.Note('C4'), note.Note('C4'), note.Note('D4')])
+        consec = s.findConsecutiveNotes(skipUnisons=True)
+        self.assertEqual([repr(x) for x in consec],
+                         ['<music21.note.Note C>', '<music21.note.Note D>'])
+
+        s2 = Stream()
+        s2.append([note.Note('C4'), note.Note('C4'), note.Rest(), note.Note('D4')])
+        consec2 = s2.findConsecutiveNotes(skipUnisons=True)
+        self.assertEqual([repr(x) for x in consec2],
+                         ['<music21.note.Note C>', 'None', '<music21.note.Note D>'])
+
+        s3 = Stream()
+        s3.append([note.Note('C4'), note.Note('C5'), note.Note('D4')])
+        consec3 = s3.findConsecutiveNotes(skipUnisons=True, skipOctaves=True)
+        self.assertEqual([x.nameWithOctave for x in consec3], ['C4', 'D4'])
+
+        s4 = Stream()
+        s4.insert(0, note.Note('C4'))
+        s4.insert(1, note.Note('C4'))
+        s4.insert(3, note.Note('D4'))
+        consec4 = s4.findConsecutiveNotes(skipUnisons=True)
+        self.assertEqual([repr(x) for x in consec4],
+                         ['<music21.note.Note C>', 'None', '<music21.note.Note D>'])
+
+        s5 = Stream()
+        s5.append([note.Note('C4'), note.Note('C4'), note.Note('E4')])
+        intervals = s5.melodicIntervals(skipUnisons=True)
+        self.assertEqual([i.name for i in intervals], ['M3'])
+
     def testMelodicIntervals(self):
         c4 = note.Note('C4')
         d5 = note.Note('D5')
@@ -1120,6 +1178,20 @@ class Test(unittest.TestCase):
         s1 = converter.parse("tinynotation: 3/4 c4 d' r b b'", makeNotation=False)
         intS1 = s1.melodicIntervals()
         self.assertEqual(len(intS1), 2)
+
+    def testMelodicIntervalsInMeasures(self):
+        m1 = Measure([note.Note('C4', type='half'), note.Note('D4', type='half')])
+        m2 = Measure([note.Note('F4', type='half'), note.Note('G4', type='half')])
+        p = Part()
+        p.append([m1, m2])
+        intervals = p.melodicIntervals()
+        self.assertEqual([i.offset for i in intervals], [2.0, 4.0, 6.0])
+        self.assertEqual([i.quarterLength for i in intervals], [0.0, 0.0, 0.0])
+
+        s = converter.parse('tinynotation: 4/4 c2 r2 f1 g1')
+        withGap = s.melodicIntervals(skipRests=True)
+        self.assertEqual([(i.name, i.offset, i.quarterLength) for i in withGap],
+                         [('P4', 2.0, 2.0), ('M2', 8.0, 0.0)])
 
     def testStripTiesBuiltA(self):
         s1 = Stream()
@@ -7859,6 +7931,14 @@ class Test(unittest.TestCase):
         qj.getElementsByClass(Measure)[1].insert(0, key.KeySignature(5))
         unused_qj2 = qj.invertDiatonic(note.Note('F4'), inPlace=False)
 
+    def testInvertDiatonicBelowOctaveZero(self):
+        s = Stream()
+        s.append(note.Note('E4'))
+        inverted = s.invertDiatonic(note.Note('C2'))
+        invertedPitch = inverted[note.Note].first().pitch
+        self.assertEqual(invertedPitch.step, 'A')
+        self.assertEqual(invertedPitch.octave, -1)
+
     def testMeasuresA(self):
         s = corpus.parse('bwv66.6')
         ex = s.parts[0].measures(3, 6)
@@ -7959,6 +8039,28 @@ class Test(unittest.TestCase):
         self.assertIn(m2a, mm5)
         self.assertIn(m2b, mm5)
         self.assertIn(m3, mm5)
+
+    def testMeasuresKeepsSourceOrder(self):
+        '''
+        Collecting a time signature for an excerpt keeps it before the notes
+        of its own measure, as in Humdrum files, where priority is the line number.
+        '''
+        p = Part()
+        for i in range(1, 4):
+            m = Measure(number=i)
+            m.priority = 10 * i
+            n = note.Note(type='whole')
+            n.priority = 10 * i + 2
+            m.insert(0, n)
+            p.append(m)
+        m1 = p.getElementsByClass(Measure).first()
+        ts = meter.TimeSignature('4/4')
+        ts.priority = 11
+        m1.insert(0, ts)
+        for number in (2, 3):
+            excerpt = p.measures(number, number)
+            self.assertIs(excerpt.first(), ts)
+            self.assertIs(m1.first(), ts)
 
     def testChordifyF(self):
         # testing chordify handling of triplets

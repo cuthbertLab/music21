@@ -776,7 +776,7 @@ class PartReduction:
                             dsFirst['span'] = targetSpan
                             dsFirst['weight'] = targetToWeight(tar)
                             finalBundle.append(dsFirst)
-                        elif t == 0 and ds['eStart'] != targetStart:
+                        elif i == 0 and ds['eStart'] != targetStart:
                             # add two, one for the empty region, one for target
                             # adjust span of first; weight is not known
                             # (hangs over from last)
@@ -1127,9 +1127,11 @@ class Test(unittest.TestCase):
         '''
         Utility function to compare known data but not compare floating point weights.
         '''
+        self.assertEqual(len(match), len(target))
         for partId, b in enumerate(target):
             a = match[partId]
             self.assertEqual(a[0], b[0])
+            self.assertEqual(len(a[1]), len(b[1]))
             for i, dataMatch in enumerate(a[1]):  # second item has data
                 dataTarget = b[1][i]
                 # start
@@ -1190,6 +1192,50 @@ class Test(unittest.TestCase):
         if show:
             p = graph.plot.Dolan(s, title='Dynamics')
             p.run()
+
+    def testPartReductionSpanBeforeFirstDynamic(self):
+        '''
+        The second measure is mf until its p.
+        '''
+        from music21 import analysis
+        from music21 import dynamics
+        p = stream.Part()
+        p.id = 'solo'
+        p.append(note.Note(quarterLength=4))
+        p.append(note.Note(quarterLength=4))
+        p.insert(0, dynamics.Dynamic('mf'))
+        p.insert(6, dynamics.Dynamic('p'))
+        p.makeMeasures(inPlace=True)
+        s = stream.Score([p])
+
+        pr = analysis.reduction.PartReduction(s)
+        pr.process()
+        match = pr.getGraphHorizontalBarWeightedData()
+        target = [('solo', [[0.0, 4.0, 1.0, '#666666'],
+                            [4.0, 2.0, 1.0, '#666666'],
+                            [6.0, 2.0, 0.35 / 0.55, '#666666']])]
+        self._matchWeightedData(match, target)
+
+    def testPartReductionSpanBeforeLateDynamic(self):
+        from music21 import analysis
+        from music21 import dynamics
+        p = stream.Part()
+        p.id = 'solo'
+        p.append(note.Note(quarterLength=4))
+        p.append(note.Note(quarterLength=4))
+        p.insert(2, dynamics.Dynamic('mf'))
+        p.makeMeasures(inPlace=True)
+        s = stream.Score([p])
+
+        def spans(pr):
+            pr.process()
+            return [(start, span) for start, span, unused_weight, unused_color
+                    in pr.getGraphHorizontalBarWeightedData()[0][1]]
+
+        self.assertEqual(spans(analysis.reduction.PartReduction(s)),
+                         [(0.0, 2.0), (2.0, 2.0), (4.0, 4.0)])
+        self.assertEqual(spans(analysis.reduction.PartReduction(s, fillByMeasure=False)),
+                         [(0.0, 2.0), (2.0, 6.0)])
 
 
     def testPartReductionC(self):
@@ -1367,10 +1413,12 @@ class Test(unittest.TestCase):
         target = pr.getGraphHorizontalBarWeightedData()
         match = [(0, [[0.0, 2.0, 0.3888888888888, '#666666'],
                       [2.0, 2.0, 1.0, '#666666'],
+                      [4.0, 2.0, 1.0, '#666666'],
                       [6.0, 2.0, 0.166666666667, '#666666'],
                       [8.0, 4.0, 0.166666666667, '#666666']]),
                  (1, [[0.0, 2.0, 0.6111111111111112, '#666666'],
                       [2.0, 2.0, 0.7777777777777776, '#666666'],
+                      [4.0, 2.0, 0.7777777777777776, '#666666'],
                       [6.0, 2.0, 0.611111111111111, '#666666'],
                       [8.0, 4.0, 0.611111111111111, '#666666']])]
         self._matchWeightedData(match, target)

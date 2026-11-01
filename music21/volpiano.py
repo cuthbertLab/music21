@@ -368,9 +368,9 @@ def fromStream(s, *, layoutToBreaks=False):
         elClasses = el.classes
         if 'Clef' in elClasses:
             lastClef = el
-            if 'TrebleClef' in elClasses:
+            if isinstance(el, (clef.TrebleClef, clef.Treble8vbClef, clef.Treble8vaClef)):
                 ap('1---')
-            elif 'BassClef' in elClasses:
+            elif isinstance(el, (clef.BassClef, clef.Bass8vbClef, clef.Bass8vaClef)):
                 ap('2---')
             else:
                 error(el, ErrorLevel.WARN)
@@ -464,6 +464,17 @@ class Test(unittest.TestCase):
              for m in part.getElementsByClass(stream.Measure)],
             [[], ['Neume', 'LineBreak'], ['Neume', 'PageBreak']])
         self.assertEqual(fromStream(part), '1---e----3ef-g7---e----4gh-j77---')
+
+    def testOctaveClefsWritePlainClef(self):
+        for clefClass, volpianoClef in (
+            (clef.Treble8vbClef, '1---'),
+            (clef.Treble8vaClef, '1---'),
+            (clef.Bass8vbClef, '2---'),
+            (clef.Bass8vaClef, '2---'),
+        ):
+            self.assertTrue(fromStream(stream.Stream([clefClass()])).startswith(volpianoClef))
+        self.assertEqual(fromStream(stream.Stream([clef.Bass8vbClef(), note.Note('G1')])),
+                         fromStream(stream.Stream([clef.BassClef(), note.Note('G2')])))
 
 
 if __name__ == '__main__':
