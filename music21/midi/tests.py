@@ -1696,7 +1696,7 @@ class Test(unittest.TestCase):
     def testProgramChangeAfterTrackName(self):
         '''
         A program change after the start of a track adds an instrument there
-        and leaves the one named by the track at the start.
+        and keeps the instrument at the start.
 
         AI-assisted (Claude).
         '''
@@ -1712,7 +1712,8 @@ class Test(unittest.TestCase):
                 me.velocity = 90
             mt.events.append(me)
 
-        addEvent(0, MetaEvents.SEQUENCE_TRACK_NAME, data=b'Melody')
+        addEvent(0, MetaEvents.SEQUENCE_TRACK_NAME, data=b'Viola')
+        addEvent(0, ChannelVoiceMessages.PROGRAM_CHANGE, data=41)
         addEvent(0, ChannelVoiceMessages.NOTE_ON, midiPitch=60)
         addEvent(2048, ChannelVoiceMessages.NOTE_OFF, midiPitch=60)
         addEvent(0, ChannelVoiceMessages.PROGRAM_CHANGE, data=40)
@@ -1724,7 +1725,7 @@ class Test(unittest.TestCase):
         self.assertEqual(
             [(inst.classes[0], inst.partName, inst.getOffsetInHierarchy(p))
                 for inst in p[instrument.Instrument]],
-            [('Instrument', 'Melody', 0.0), ('Violin', None, 2.0)]
+            [('Viola', 'Viola', 0.0), ('Violin', None, 2.0)]
         )
 
 

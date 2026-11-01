@@ -3174,12 +3174,10 @@ class Test(unittest.TestCase):
         p = stream.Part()
         m1 = stream.Measure(number=1)
         m1.insert(0, Instrument())
-        m1.insert(0, Piano())
+        m1.insert(0, Viola())
         m1.append(note.Note(type='whole'))
         m2 = stream.Measure(number=2)
-        melody = Instrument()
-        melody.partName = 'Melody'
-        m2.insert(0, melody)
+        m2.insert(0, Violin())
         m2.append(note.Note(type='whole'))
         p.append([m1, m2])
 
@@ -3187,7 +3185,7 @@ class Test(unittest.TestCase):
         self.assertEqual(
             [(inst.classes[0], inst.partName, inst.getOffsetInHierarchy(p))
                 for inst in p[Instrument]],
-            [('Piano', None, 0.0), ('Instrument', 'Melody', 4.0)]
+            [('Viola', None, 0.0), ('Violin', None, 4.0)]
         )
 
     def testDeduplicateByOffset(self):
