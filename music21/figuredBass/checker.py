@@ -3,7 +3,7 @@
 # Purpose:      checks figured basses for following voice-leading rules
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2012-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -170,7 +170,7 @@ def createOffsetMapping(
     currentMapping: dict[OffsetEndTime, list[note.GeneralNote]] = collections.defaultdict(list)
     for music21GeneralNote in music21Part.flatten().notesAndRests:
         initOffset = music21GeneralNote.offset
-        endTime = initOffset + music21GeneralNote.quarterLength
+        endTime = opFrac(initOffset + music21GeneralNote.quarterLength)
         currentMapping[(initOffset, endTime)].append(music21GeneralNote)
     return currentMapping
 
@@ -743,6 +743,23 @@ _DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments,
 
 
 class Test(unittest.TestCase):
+    def testOffsetMappingAfterTriplet(self):
+        '''
+        End times after a triplet are exact.
+        '''
+        from fractions import Fraction
+
+        part = stream.Part()
+        for unused_counter in range(3):
+            part.append(note.Note('C3', quarterLength=Fraction(1, 3)))
+        part.append(note.Note('F3'))
+        self.assertEqual(sorted(createOffsetMapping(part)), [
+            (0.0, Fraction(1, 3)),
+            (Fraction(1, 3), Fraction(2, 3)),
+            (Fraction(2, 3), 1.0),
+            (1.0, 2.0),
+        ])
+
     def testParallelFifthsCachePopulatesAndIsShared(self):
         '''
         The speedup table actually caches (it formerly stored False on every call and
