@@ -28,6 +28,7 @@ from music21 import bar
 from music21 import base
 from music21 import chord
 from music21 import clef
+from music21 import duration
 from music21 import dynamics
 from music21 import environment
 from music21 import exceptions21
@@ -2387,10 +2388,10 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
         break
 
     rest0Length = music21Measure.duration.quarterLength - endOffsetZero
-    r0 = note.Rest(quarterLength=rest0Length)
+    r0 = note.Rest(duration=duration.Duration(rest0Length))
     leftMeasure.insert(endOffsetZero, r0)
 
-    r1 = note.Rest(quarterLength=endOffsetZero)
+    r1 = note.Rest(duration=duration.Duration(endOffsetZero))
     rightMeasure.insert(0.0, r1)
 
     ts0_delete = False
@@ -2445,6 +2446,45 @@ class Test(unittest.TestCase):
             score.insert(0, part)
         brailleLines = keyboardPartsToBraille(score).splitlines()
         self.assertEqual(brailleLines[0].strip('⠀'), '⠩⠩⠼⠙⠲')
+
+    def testSplitMeasureBeamsLeftWhenTieFillsIt(self):
+        '''
+        Both halves of a split measure are beamed, including a left half that a
+        tied note extends to the end of the measure.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import tie
+
+        def sixteenths(m, names):
+            for name in names:
+                m.append(note.Note(name + '4', type='16th'))
+
+        def beamFlags(m):
+            return [(n.beamStart, n.beamContinue) for n in m.notes]
+
+        m = stream.Measure()
+        m.append(meter.TimeSignature('2/4'))
+        sixteenths(m, 'CDEF')
+        tiedNote = note.Note('G4')
+        tiedNote.tie = tie.Tie('start')
+        m.append(tiedNote)
+
+        left, right = splitMeasure(m)
+        self.assertEqual([n.name for n in left.notes], ['C', 'D', 'E', 'F', 'G'])
+        self.assertEqual(left.highestTime, 2.0)
+        self.assertEqual(beamFlags(left), [(True, False), (False, True), (False, True),
+                                           (False, True), (False, False)])
+        self.assertEqual(len(right), 0)
+
+        untied = stream.Measure()
+        untied.append(meter.TimeSignature('2/4'))
+        sixteenths(untied, 'CDEFGABC')
+        left, right = splitMeasure(untied)
+        self.assertEqual(beamFlags(left), [(True, False), (False, True), (False, True),
+                                           (False, True)])
+        self.assertEqual(beamFlags(right), [(True, False), (False, True), (False, True),
+                                            (False, True)])
 
 
 if __name__ == '__main__':
