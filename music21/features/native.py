@@ -733,12 +733,12 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
     fe = features.native.ChordBassMotionFeature(s)
     fe.extract().vector
 
-    [0.0, 0.0, 0.0, 0.0416..., 0.0416..., 0.166..., 0.0, 0.54166..., 0.0, 0.0, 0.2083... 0.0]
+    [0.0, 0.0, 0.2083..., 0.0, 0.0, 0.54166..., 0.0, 0.166..., 0.0416..., 0.0416..., 0.0, 0.0]
 
     For comparison, the Beatles Here Comes the Sun has more tone motion
 
-    [0.0, 0.05..., 0.14..., 0.03..., 0.06..., 0.3..., 0.008..., 0.303...,
-     0.0, 0.0, 0.07..., 0.008...]
+    [0.0, 0.008..., 0.07..., 0.0, 0.0, 0.303..., 0.008..., 0.3...,
+     0.06..., 0.03..., 0.14..., 0.05...]
 
     Post 1990s music has a lot more semitone motion.
     '''
@@ -782,7 +782,7 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
                 if lastBass.pitchClass == thisBass.pitchClass:
                     pass
                 else:
-                    halfStepMotion = (lastBass.pitchClass - thisBass.pitchClass) % 12
+                    halfStepMotion = (thisBass.pitchClass - lastBass.pitchClass) % 12
                     totMotion[halfStepMotion] += 1
                     totalHarmonicMotion += 1
                     lastHarm = thisHarm
@@ -972,6 +972,22 @@ class Test(unittest.TestCase):
 
         fe = features.native.IncorrectlySpelledTriadPrevalence(s)
         self.assertEqual(str(fe.extract().vector[0]), '0.5')
+
+    def testChordBassMotionFeature(self):
+        '''
+        C up to D is index 2, D down to B is index 9, and B down to B- is
+        index 11.
+        '''
+        from music21 import features
+        from music21 import stream
+
+        s = stream.Stream()
+        for figure in ['C', 'D', 'B', 'B-']:
+            s.append(harmony.ChordSymbol(figure))
+        fe = features.native.ChordBassMotionFeature(s)
+        third = 1 / 3
+        self.assertEqual(fe.extract().vector,
+                         [0.0, 0.0, third, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, third, 0.0, third])
 
     def testLandiniCadence(self):
         from music21 import converter
