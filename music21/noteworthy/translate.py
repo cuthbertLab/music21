@@ -62,6 +62,7 @@ import re
 import unittest
 
 from music21 import bar
+from music21 import base
 from music21 import chord
 from music21 import clef
 from music21 import common
@@ -111,8 +112,8 @@ class NoteworthyTranslator:
         self.currentClef = 'TREBLE'
         self.currentKey = key.KeySignature(0)
 
-        self.slurStarts: dict[int, note.GeneralNote] = {}
-        self.tiedPositions: set[str] = set()
+        self.openSlurs: list[tuple[note.GeneralNote, stream.Measure, OffsetQL]] = []
+        self.tiedSteps: dict[tuple[str, int], tuple[stream.Measure, OffsetQL]] = {}
         self.positionMeasure: stream.Measure|None = None
         self.measurePosition: OffsetQL = 0.0
 
@@ -270,25 +271,36 @@ class NoteworthyTranslator:
 
     def setTieFromPitchInfo(self, noteOrChord, pitchInfo):
         '''
-        Sets the ties of a note or chord from its Pos info.  A position ending
-        in ``^`` is tied to the next note at that position, whatever group or
-        voice it comes in.
+        Sets the ties of a note or chord, about to go at the current position,
+        from its Pos info.  A position ending in ``^`` is tied to the note on
+        the same staff line or space, under whatever clef, that starts where
+        the tied note ends, whatever group or voice it comes in.
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
+        >>> nwt.currentMeasure = stream.Measure()
         >>> c = chord.Chord('C5 E5')
         >>> nwt.setTieFromPitchInfo(c, '1^,3')
         >>> [n.tie for n in c]
         [<music21.tie.Tie start>, None]
+        >>> nwt.appendSimultaneous([(c, '4th')])
         >>> c = chord.Chord('C5 E5')
         >>> nwt.setTieFromPitchInfo(c, '1,3')
         >>> [n.tie for n in c]
         [<music21.tie.Tie stop>, None]
         '''
+        offset = self.currentPosition()
+        end = opFrac(offset + noteOrChord.quarterLength)
         notes = list(noteOrChord) if isinstance(noteOrChord, chord.Chord) else [noteOrChord]
         for n, posInfo in zip(notes, pitchInfo.split(',')):
             tiedOn = posInfo.endswith('^')
-            position = re.search(r'-?\d+', posInfo).group()
-            tiedFrom = position in self.tiedPositions
+            step = self.getStepAndOctaveFromPosition(int(re.search(r'-?\d+', posInfo).group()))
+            tiedFrom = False
+            if step in self.tiedSteps:
+                tiedMeasure, tiedEnd = self.tiedSteps.pop(step)
+                if tiedMeasure is self.currentMeasure:
+                    tiedFrom = (tiedEnd == offset)
+                else:
+                    tiedFrom = (offset == 0)
             if tiedFrom and tiedOn:
                 n.tie = tie.Tie('continue')
             elif tiedOn:
@@ -296,9 +308,7 @@ class NoteworthyTranslator:
             elif tiedFrom:
                 n.tie = tie.Tie('stop')
             if tiedOn:
-                self.tiedPositions.add(position)
-            else:
-                self.tiedPositions.discard(position)
+                self.tiedSteps[step] = (self.currentMeasure, end)
 
     def getPitchFromPositionInfo(self, posInfo):
         # noinspection PyShadowingNames
@@ -556,8 +566,8 @@ class NoteworthyTranslator:
         Places notes, chords or rests, each with its Dur info, at the current
         position in the measure, and moves the position on by the shortest of
         them.  When more than one starts together, or a voice is still
-        sounding, each goes in a voice that is free at that position.  A slur
-        in the Dur info runs to the next note or rest in the same voice.
+        sounding, each goes in a voice that is free at that position.  Slurs
+        in the Dur info are set with :meth:`setSlurs`.
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
@@ -574,10 +584,7 @@ class NoteworthyTranslator:
         * New in v11.
         '''
         measure = self.currentMeasure
-        if self.positionMeasure is not measure:
-            self.positionMeasure = measure
-            self.measurePosition = measure.highestTime
-        offset = self.measurePosition
+        offset = self.currentPosition()
 
         voices = list(measure.voices)
         if not voices and len(generalNotes) > 1:
@@ -588,13 +595,11 @@ class NoteworthyTranslator:
                 firstVoice.insert(noteOffset, n)
             measure.insert(0, firstVoice)
             voices.append(firstVoice)
-        # the voices free at the offset, those that end there first
         freeVoices = sorted((v for v in voices if v.highestTime <= offset),
                             key=lambda v: -v.highestTime)
-        for gn, durationInfo in generalNotes:
+        for gn, unused_durationInfo in generalNotes:
             if not voices:
                 measure.insert(offset, gn)
-                voiceId = 0
             else:
                 if freeVoices:
                     voice = freeVoices.pop(0)
@@ -603,21 +608,81 @@ class NoteworthyTranslator:
                     measure.insert(0, voice)
                     voices.append(voice)
                 voice.insert(offset, gn)
-                voiceId = voice.id
-            self.setSlur(gn, voiceId, 'Slur' in durationInfo.split(','))
+        self.setSlurs([(gn, 'Slur' in durationInfo.split(','))
+                       for gn, durationInfo in generalNotes])
         self.measurePosition = opFrac(offset + min(gn.quarterLength for gn, unused in generalNotes))
 
-    def setSlur(self, generalNote: note.GeneralNote, voiceId: int, slurred: bool) -> None:
+    def setSlurs(self, generalNotes: list[tuple[note.GeneralNote, bool]]) -> None:
         '''
-        Starts, continues or ends a slur in one voice: a slur runs from the
-        first slurred note in a row to the next note that is not slurred.
+        Starts, continues or ends slurs at notes, chords or rests just placed
+        together at the current position, each with whether it is slurred.  A
+        slurred note is slurred to the next note that starts once it has
+        ended, in any voice, and slurred notes in a row make one slur.
+
+        >>> nwt = noteworthy.translate.NoteworthyTranslator()
+        >>> nwt.currentMeasure = stream.Measure()
+        >>> nwt.appendSimultaneous([(note.Note('C5', type='half'), 'Half'),
+        ...                         (note.Note('A4'), '4th,Slur')])
+        >>> nwt.appendSimultaneous([(note.Note('B4'), '4th,Slur')])
+        >>> nwt.appendSimultaneous([(note.Note('D5'), '4th')])
+        >>> nwt.currentMeasure.getElementsByClass(spanner.Slur).first()
+        <music21.spanner.Slur <music21.note.Note A><music21.note.Note D>>
 
         * New in v11.
         '''
-        if slurred:
-            self.slurStarts.setdefault(voiceId, generalNote)
-        elif voiceId in self.slurStarts:
-            self.currentMeasure.append(spanner.Slur(self.slurStarts.pop(voiceId), generalNote))
+        offset = self.currentPosition()
+        ended = [openSlur for openSlur in self.openSlurs
+                 if openSlur[1] is not self.currentMeasure or openSlur[2] <= offset]
+        for gn, slurred in sorted(generalNotes, key=lambda gnSlurred: not gnSlurred[1]):
+            end = opFrac(offset + gn.quarterLength)
+            if slurred and ended:
+                start = ended.pop(0)[0]
+                self.openSlurs = [openSlur for openSlur in self.openSlurs
+                                  if openSlur[0] is not start]
+                self.openSlurs.append((start, self.currentMeasure, end))
+            elif slurred:
+                self.openSlurs.append((gn, self.currentMeasure, end))
+            for start, unused_measure, unused_end in ended:
+                self.currentMeasure.append(spanner.Slur(start, gn))
+                self.openSlurs = [openSlur for openSlur in self.openSlurs
+                                  if openSlur[0] is not start]
+            ended = []
+
+    def currentPosition(self) -> OffsetQL:
+        '''
+        Returns the offset in the current measure where the next note, chord,
+        rest, clef or other object goes: the end of the measure's contents
+        when first used in a measure, then the position moved on by
+        :meth:`appendSimultaneous`.
+
+        >>> nwt = noteworthy.translate.NoteworthyTranslator()
+        >>> nwt.currentMeasure = stream.Measure()
+        >>> nwt.appendSimultaneous([(note.Note(type='half'), 'Half'), (note.Note(), '4th')])
+        >>> nwt.currentPosition()
+        1.0
+
+        * New in v11.
+        '''
+        if self.positionMeasure is not self.currentMeasure:
+            self.positionMeasure = self.currentMeasure
+            self.measurePosition = self.currentMeasure.highestTime
+        return self.measurePosition
+
+    def insertAtPosition(self, element: base.Music21Object) -> None:
+        '''
+        Inserts a clef, key, dynamic or other object into the current measure
+        at the current position.
+
+        >>> nwt = noteworthy.translate.NoteworthyTranslator()
+        >>> nwt.currentMeasure = stream.Measure()
+        >>> nwt.appendSimultaneous([(note.Note(type='half'), 'Half'), (note.Note(), '4th')])
+        >>> nwt.insertAtPosition(dynamics.Dynamic('p'))
+        >>> nwt.currentMeasure.getElementsByClass(dynamics.Dynamic).first().offset
+        1.0
+
+        * New in v11.
+        '''
+        self.currentMeasure.insert(self.currentPosition(), element)
 
     def translateRest(self, attributes):
         r'''
@@ -687,40 +752,40 @@ class NoteworthyTranslator:
         cl = attributes['Type']
         if cl == 'Treble':
             if octaveShift == 0:
-                self.currentMeasure.append(clef.TrebleClef())
+                self.insertAtPosition(clef.TrebleClef())
                 currentClef = 'TREBLE'
             elif octaveShift == -1:
-                self.currentMeasure.append(clef.Treble8vbClef())
+                self.insertAtPosition(clef.Treble8vbClef())
                 currentClef = 'TREBLE8dw'
             elif octaveShift == 1:
-                self.currentMeasure.append(clef.Treble8vaClef())
+                self.insertAtPosition(clef.Treble8vaClef())
                 currentClef = 'TREBLE8up'
 
         elif cl == 'Bass':
             if octaveShift == 0:
-                self.currentMeasure.append(clef.BassClef())
+                self.insertAtPosition(clef.BassClef())
                 currentClef = 'BASS'
             elif octaveShift == -1:
-                self.currentMeasure.append(clef.Bass8vbClef())
+                self.insertAtPosition(clef.Bass8vbClef())
                 currentClef = 'BASS8dw'
             elif octaveShift == 1:
-                self.currentMeasure.append(clef.Bass8vaClef())
+                self.insertAtPosition(clef.Bass8vaClef())
                 currentClef = 'BASS8up'
 
         elif cl == 'Alto':
             if octaveShift != 0:
                 raise NoteworthyTranslateException('cannot shift octaves on an alto clef')
-            self.currentMeasure.append(clef.AltoClef())
+            self.insertAtPosition(clef.AltoClef())
             currentClef = 'ALTO'
         elif cl == 'Tenor':
             if octaveShift != 0:
                 raise NoteworthyTranslateException('cannot shift octaves on a tenor clef')
-            self.currentMeasure.append(clef.TenorClef())
+            self.insertAtPosition(clef.TenorClef())
             currentClef = 'TENOR'
         elif cl == 'Percussion':
             c = clef.PercussionClef()
             c.line = 2
-            self.currentMeasure.append(c)
+            self.insertAtPosition(c)
             currentClef = 'PERCUSSION'
 
         if currentClef is None:
@@ -752,7 +817,7 @@ class NoteworthyTranslator:
             elif attribute == 'b':
                 currentSharps -= 1
         currentKey = key.KeySignature(currentSharps)
-        self.currentMeasure.append(currentKey)
+        self.insertAtPosition(currentKey)
         self.currentKey = currentKey
 
     def createTimeSignature(self, attributes):
@@ -773,7 +838,7 @@ class NoteworthyTranslator:
             times = '4/4'
 
         m = meter.TimeSignature(times)
-        self.currentMeasure.append(m)
+        self.insertAtPosition(m)
 
     def createPart(self):
         '''
@@ -885,7 +950,7 @@ class NoteworthyTranslator:
             g = repeat.Fine()
         else:
             raise NoteworthyTranslateException(f'Cannot get style from {str(attributes)}')
-        self.currentMeasure.append(g)
+        self.insertAtPosition(g)
 
     def createDynamicVariance(self, attributes):
         r'''
@@ -907,7 +972,7 @@ class NoteworthyTranslator:
             pass
             # raise NoteworthyTranslateException(f'Cannot get style from {attributes}')
         if g is not None:
-            self.currentMeasure.append(g)
+            self.insertAtPosition(g)
 
     def createDynamics(self, attributes):
         r'''
@@ -922,7 +987,7 @@ class NoteworthyTranslator:
         # Dynamic case
         if 'Style' in attributes:
             g = dynamics.Dynamic(attributes['Style'])
-            self.currentMeasure.append(g)
+            self.insertAtPosition(g)
 
     def createLyrics(self, attributes):
         r'''
@@ -960,6 +1025,8 @@ class NoteworthyTranslator:
 
     def createStaff(self, attributes):
         self.createPart()
+        self.openSlurs = []
+        self.tiedSteps = {}
         self.currentKey = key.KeySignature(0)
         self.activeAccidentals = {}
         self.lyrics = []
@@ -981,7 +1048,7 @@ class NoteworthyTranslator:
         expr = expressions.TextExpression(text)
         expr.placement = 'above' if int(attributes.get('Pos')) < 0 else 'below'
         expr.style.relativeY = attributes.get('Pos')
-        self.currentMeasure.append(expr)
+        self.insertAtPosition(expr)
 
     def createSongInfo(self, attributes):
         title = attributes.get('Title')
@@ -1119,7 +1186,36 @@ class Test(unittest.TestCase):
         ]), [('C5', 0.0, 'start'), ('C5', 1.0, 'stop'),
              ('E5', 0.0, 'start'), ('E5', 1.0, 'stop')])
 
-    def testSlursStayInTheirVoice(self):
+    def testTiesFollowTheirPitches(self):
+        def ties(lines):
+            return [(float(n.getOffsetInHierarchy(s)), n.tie.type if n.tie else None)
+                    for s in [self.parseTreble(lines)]
+                    for n in s.recurse().notes]
+
+        self.assertEqual(ties([
+            '|Note|Dur:4th|Pos:-6^',
+            '|Clef|Type:Bass',
+            '|Note|Dur:4th|Pos:6',
+        ]), [(0.0, 'start'), (1.0, 'stop')])
+        self.assertEqual(ties([
+            '|TimeSig|Signature:4/4',
+            '|Note|Dur:Whole|Pos:#1^',
+            '|Bar|',
+            '|Note|Dur:Whole|Pos:1',
+        ]), [(0.0, 'start'), (4.0, 'stop')])
+        self.assertEqual(ties([
+            '|Note|Dur:4th|Pos:1^',
+            '|Note|Dur:4th|Pos:2',
+            '|Note|Dur:4th|Pos:1',
+        ]), [(0.0, 'start'), (1.0, None), (2.0, None)])
+        self.assertEqual(ties([
+            '|Note|Dur:4th|Pos:1^',
+            '|AddStaff|',
+            '|Clef|Type:Treble',
+            '|Note|Dur:4th|Pos:1',
+        ]), [(0.0, 'start'), (0.0, None)])
+
+    def testSlursRunToTheNextNote(self):
         def slurs(lines):
             return [[repr(e) for e in sl.getSpannedElements()]
                     for sl in self.parseTreble(lines).recurse().getElementsByClass(spanner.Slur)]
@@ -1132,6 +1228,47 @@ class Test(unittest.TestCase):
             '|Chord|Dur:4th,Slur|Pos:1|Dur2:4th|Pos2:3',
             '|Chord|Dur:4th|Pos:1|Dur2:4th|Pos2:3',
         ]), [['<music21.chord.Chord C5>', '<music21.chord.Chord C5>']])
+        self.assertEqual(slurs([
+            '|Chord|Dur:Half|Pos:1|Dur2:4th|Pos2:3',
+            '|Note|Dur:4th,Slur|Pos:2',
+            '|Note|Dur:4th|Pos:4',
+        ]), [['<music21.note.Note D>', '<music21.note.Note F>']])
+        self.assertEqual(slurs([
+            '|Chord|Dur:Half|Pos:1|Dur2:4th|Pos2:3',
+            '|Note|Dur:4th,Slur|Pos:2',
+            '|Bar|',
+            '|Note|Dur:4th|Pos:4',
+        ]), [['<music21.note.Note D>', '<music21.note.Note F>']])
+        self.assertEqual(slurs([
+            '|Chord|Dur:4th|Pos:1|Dur2:4th,Slur|Pos2:3',
+            '|Bar|',
+            '|Note|Dur:Whole|Pos:3',
+            '|Bar|',
+            '|Note|Dur:Whole|Pos:3',
+            '|Bar|',
+            '|Chord|Dur:4th|Pos:1|Dur2:4th|Pos2:3',
+        ]), [['<music21.chord.Chord E5>', '<music21.note.Note E>']])
+        self.assertEqual(slurs([
+            '|Note|Dur:4th,Slur|Pos:1',
+            '|AddStaff|',
+            '|Clef|Type:Treble',
+            '|Note|Dur:4th|Pos:1',
+        ]), [])
+
+    def testDirectionsGoAtThePosition(self):
+        for line, className in (
+                ('|Dynamic|Style:p|Pos:-8', dynamics.Dynamic),
+                ('|Clef|Type:Bass', clef.BassClef),
+                ('|Key|Signature:F#', key.KeySignature),
+                ('|Text|Text:"dolce"|Pos:8', expressions.TextExpression)):
+            with self.subTest(line=line):
+                s = self.parseTreble([
+                    '|Chord|Dur:4th|Pos:-1|Dur2:Whole|Pos2:3',
+                    line,
+                    '|Note|Dur:4th|Pos:1',
+                ])
+                self.assertEqual(s.recurse().getElementsByClass(className).first().offset, 1.0)
+                self.assertEqual(s.recurse().getElementsByClass(note.Note).first().offset, 1.0)
 
     def testRestChordFromBinary(self):
         import struct
