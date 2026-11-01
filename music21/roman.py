@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -3256,8 +3256,10 @@ class RomanNumeral(harmony.Harmony):
             if t.TYPE_CHECKING:
                 assert romanNormalMatch is not None
             romanNumeralAlone = romanNormalMatch.group(1)
+            workingFigure = workingFigure[romanNormalMatch.end():]
+            if workingFigure[:1] in ('I', 'V', 'X', 'i', 'v'):
+                raise RomanNumeralException(f'Invalid figure: {self.figure}')
             self.scaleDegree = common.fromRoman(romanNumeralAlone)
-            workingFigure = self._romanNumeralAloneRegex.sub('', workingFigure)
             self.romanNumeralAlone = romanNumeralAlone
 
         return workingFigure, useScale
@@ -4950,6 +4952,12 @@ class Test(unittest.TestCase):
                                                   keyString,
                                                   preferSecondaryDominants=True)
                 self.assertEqual(preferred.figure, preferredFigure)
+
+    def testNumeralsPastSevenAreNotFigures(self):
+        for fig in ('VIII', 'viii7', 'IX', 'bVIII', 'V/VIII', 'Vv'):
+            with self.subTest(figure=fig):
+                with self.assertRaises(RomanNumeralException):
+                    RomanNumeral(fig, 'C')
 
 
 class TestExternal(unittest.TestCase):

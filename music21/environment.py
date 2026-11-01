@@ -449,12 +449,12 @@ class _EnvironmentCore:
         '''
         if not self._checkAccessibility(path):
             return False
-        if common.getPlatform() == 'win':
-            return True
-        pathStat = os.lstat(path)
-        return (stat.S_ISDIR(pathStat.st_mode)
-                and pathStat.st_uid == os.getuid()
-                and not pathStat.st_mode & 0o022)
+        if sys.platform != 'win32':
+            pathStat = os.lstat(path)
+            return (stat.S_ISDIR(pathStat.st_mode)
+                    and pathStat.st_uid == os.getuid()
+                    and not pathStat.st_mode & 0o022)
+        return True
 
     def toSettingsXML(self, ref=None):
         '''
@@ -545,7 +545,7 @@ class _EnvironmentCore:
 
         systemTempDir = pathlib.Path(tempfile.gettempdir())
         candidates = [systemTempDir / 'music21']
-        if common.getPlatform() in ['nix', 'darwin']:
+        if sys.platform != 'win32':
             candidates.append(systemTempDir / f'music21-userid-{os.getuid()}')
 
         for candidate in candidates:
@@ -1650,7 +1650,7 @@ class Test(unittest.TestCase):
             # Wipe out write, exec permissions on the default root dir
             os.chmod(oldTempDir, stat.S_IREAD)
             newTempDir = e.getDefaultRootTempDir()
-            self.assertIn(f'music21-userid-{os.getuid()}', str(newTempDir))
+            self.assertEqual(newTempDir.name, f'music21-userid-{newTempDir.stat().st_uid}')
         finally:
             # Make sure oldTempDir and oldPermission is set in 'try' block
             if oldTempDir is not None and oldPermission is not None:

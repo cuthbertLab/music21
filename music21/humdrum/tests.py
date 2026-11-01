@@ -34,6 +34,7 @@ from music21.humdrum.spineParser import (
     GlobalReference,
     HumdrumDataCollection,
     KernSpine,
+    SpineCollection,
     SpineComment,
     SpineEvent,
     flavors,
@@ -316,13 +317,69 @@ class Test(unittest.TestCase):
 
     def testSplitSpines2(self):
         '''
-        Currently this does not work since a second split on a stream that
-        already resulted from a split does not parse properly.  Shows up also
-        in strangeWTCOpening, below.
+        A spine split a second time after a split.
         '''
         hf1 = HumdrumDataCollection(testFiles.splitLots)
         hf1.parse()
-        unused_masterStream = hf1.stream
+        self.assertEqual(
+            [(s.id, s.parentSpine.id, s.isFirstVoice, s.voiceNumber)
+             for s in hf1.spineCollection.spines if s.parentSpine is not None],
+            [(2, 0, True, 1), (3, 0, False, 2),
+             (4, 1, True, 1), (5, 1, False, 2),
+             (6, 5, True, 2), (7, 5, False, 3)],
+        )
+        def voices(part):
+            return [(list(v.groups), [n.nameWithOctave for n in v.notes])
+                    for v in part.measure(2).voices]
+
+        treble, bass = hf1.stream.parts
+        self.assertEqual(
+            voices(treble),
+            [(['voice1'], ['A#4']), (['voice2'], ['B#4']), (['voice3'], ['F#4'])],
+        )
+        self.assertEqual(
+            voices(bass),
+            [(['voice1'], ['F3']), (['voice2'], ['G3'])],
+        )
+
+    def testNumberVoices(self):
+        '''
+        Voice numbers given to sub-spines: a split, a merge and a second
+        split; a split in two places at once; and a split of a split of a split.
+        '''
+        def split(sc: SpineCollection, parent, lineNumber):
+            children = (sc.addSpine(), sc.addSpine())
+            for child in children:
+                child.parentSpine = parent
+            parent.childSpineInsertPoints[lineNumber] = children
+            return children
+
+        sc = SpineCollection()
+        top = sc.addSpine()
+        first = split(sc, top, 3)
+        second = split(sc, top, 8)
+        self.assertEqual(sc.numberVoices(top, 1), 3)
+        self.assertEqual([s.voiceNumber for s in first + second], [1, 2, 1, 2])
+
+        sc = SpineCollection()
+        left, right = sc.addSpine(), sc.addSpine()
+        leftChildren = split(sc, left, 3)
+        rightChildren = split(sc, right, 3)
+        sc.numberVoices(left, 1)
+        sc.numberVoices(right, 1)
+        self.assertEqual([s.voiceNumber for s in leftChildren + rightChildren], [1, 2, 1, 2])
+
+        sc = SpineCollection()
+        top = sc.addSpine()
+        upper, lower = split(sc, top, 3)
+        lowerUpper, lowerLower = split(sc, lower, 4)
+        lowestUpper, lowestLower = split(sc, lowerLower, 5)
+        self.assertEqual(sc.numberVoices(top, 1), 5)
+        self.assertEqual(
+            [s.voiceNumber for s in (upper, lower, lowerUpper, lowerLower,
+                                     lowestUpper, lowestLower)],
+            [1, 2, 2, 3, 3, 4],
+        )
 
     def testParseStrangeSplit(self):
         hf1 = HumdrumDataCollection(testFiles.strangeWTCOpening)
@@ -464,6 +521,60 @@ class Test(unittest.TestCase):
         self.assertEqual(
             sorted(n.pitch.name for v in m3.voices for n in v.notes),
             ['F', 'G'],
+        )
+
+    def testNestedSplit(self):
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M2/4
+=1
+2c
+=2
+*^
+2d    2e
+*^    *
+2f    2g    2a
+*v    *v    *
+*v    *v
+=3
+2b
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        m2 = hdc.stream.parts[0].measure(2)
+        self.assertEqual(
+            [[(n.pitch.name, n.offset) for n in v.notes] for v in m2.voices],
+            [[('D', 0.0), ('F', 2.0)], [('E', 0.0), ('A', 2.0)], [('G', 2.0)]],
+        )
+
+    def testNestedSplitThreeLevels(self):
+        krn = re.sub(r'\s\s\s\s+', '\t', r'''
+**kern
+*M3/4
+=1
+*^
+4d    4e
+*^    *
+4f    4g    4a
+*^    *    *
+4B    4c    4d    4e
+*v    *v    *    *
+*v    *v    *
+*v    *v
+=2
+2.c
+*-
+''')
+        hdc = HumdrumDataCollection(krn)
+        hdc.parse()
+        m1 = hdc.stream.parts[0].measure(1)
+        self.assertEqual(
+            [[(n.pitch.name, n.offset) for n in v.notes] for v in m1.voices],
+            [[('D', 0.0), ('F', 1.0), ('B', 2.0)],
+             [('E', 0.0), ('A', 1.0), ('E', 2.0)],
+             [('G', 1.0), ('D', 2.0)],
+             [('C', 2.0)]],
         )
 
     def testDynamAttachedAligned(self):

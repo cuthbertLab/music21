@@ -470,7 +470,7 @@ class TrebleClef(GClef):
         self.lowestLine = (7 * 4) + 3  # 4 octaves + 3 notes = e4
 
 
-class Treble8vbClef(TrebleClef):
+class Treble8vbClef(GClef):
     '''
     A vocal tenor treble clef. Also for guitars.
 
@@ -479,15 +479,18 @@ class Treble8vbClef(TrebleClef):
     'G'
     >>> a.octaveChange
     -1
+
+    * Changed in v11: no longer a subclass of :class:`~music21.clef.TrebleClef`.
     '''
 
     def __init__(self, **keywords):
         super().__init__(**keywords)
+        self.line = 2
+        self.lowestLine = (7 * 4) + 3
         self.octaveChange = -1
-        self.lowestLine = (7 * 3) + 3
 
 
-class Treble8vaClef(TrebleClef):
+class Treble8vaClef(GClef):
     '''
     A treble clef an octave up (such as for piccolos).
 
@@ -496,12 +499,15 @@ class Treble8vaClef(TrebleClef):
     'G'
     >>> a.octaveChange
     1
+
+    * Changed in v11: no longer a subclass of :class:`~music21.clef.TrebleClef`.
     '''
 
     def __init__(self, **keywords):
         super().__init__(**keywords)
+        self.line = 2
+        self.lowestLine = (7 * 4) + 3
         self.octaveChange = 1
-        self.lowestLine = (7 * 3) + 3
 
 
 class GSopranoClef(GClef):
@@ -692,8 +698,8 @@ class Bass8vbClef(FClef):
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 4
-        self.octaveChange = -1
         self.lowestLine = (7 * 2) + 5
+        self.octaveChange = -1
 
 
 class Bass8vaClef(FClef):
@@ -708,8 +714,8 @@ class Bass8vaClef(FClef):
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 4
-        self.octaveChange = 1
         self.lowestLine = (7 * 2) + 5
+        self.octaveChange = 1
 
 
 class SubBassClef(FClef):

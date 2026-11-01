@@ -4613,7 +4613,7 @@ class Pitch(prebase.ProtoM21Object):
 
     @diatonicNoteNum.setter
     def diatonicNoteNum(self, newNum: int) -> None:
-        octave = int((newNum - 1) / 7)
+        octave = (newNum - 1) // 7
         noteNameNum = newNum - 1 - (7 * octave)
         pitchList: tuple[StepName, ...] = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
         noteName: StepName = pitchList[noteNameNum]
@@ -5568,6 +5568,20 @@ class Test(unittest.TestCase):
         # plus a double sharp
         self.assertEqual(spellings['triple-flat'], '♭\U0001d12b')
         self.assertEqual(spellings['triple-sharp'], '♯\U0001d12a')
+
+    def testSetDiatonicNoteNumLow(self) -> None:
+        p = Pitch('C4')
+        for dnn, step, octave in (
+            (1, 'C', 0),
+            (0, 'B', -1),
+            (-1, 'A', -1),
+            (-6, 'C', -1),
+            (-7, 'B', -2),
+            (-19, 'D', -3),
+        ):
+            p.diatonicNoteNum = dnn
+            self.assertEqual(p.step, step)
+            self.assertEqual(p.octave, octave)
 
 
 # define presented order in documentation

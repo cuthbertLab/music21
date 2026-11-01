@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2007-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2007-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1288,8 +1288,9 @@ class LilypondConverter:
         if noteOrRest.hasStyleInformation:
             if noteOrRest.style.color and noteOrRest.style.hideObjectOnPrint is False:
                 # LilyPond 2.22 (January 2021) supports hex values
-                noteheadColor = rf'\override NoteHead.color = "{noteOrRest.style.color}"' + '\n'
-                stemColor = rf'\override Stem.color = "{noteOrRest.style.color}"' + '\n'
+                color = lyo.LyObject().quoteString(noteOrRest.style.color).rstrip()
+                noteheadColor = rf'\override NoteHead.color = {color}' + '\n'
+                stemColor = rf'\override Stem.color = {color}' + '\n'
                 simpleElementParts.append(noteheadColor)
                 simpleElementParts.append(stemColor)
 
@@ -1612,7 +1613,10 @@ class LilypondConverter:
         '''
         dictTranslate = OrderedDict([
             ('Treble8vbClef', 'treble_8'),
+            ('Treble8vaClef', 'treble^8'),
             ('TrebleClef', 'treble'),
+            ('Bass8vbClef', 'bass_8'),
+            ('Bass8vaClef', 'bass^8'),
             ('BassClef', 'bass'),
             ('AltoClef', 'alto'),
             ('TenorClef', 'tenor'),
@@ -2653,6 +2657,18 @@ class Test(unittest.TestCase):
             "c' 4  "
         )
 
+    def testColorStaysInsideString(self):
+        n = note.Note()
+        n.style.color = 'red\\" #(system "touch x") "'
+        sm = LilypondConverter().lySimpleMusicFromNoteOrRest(n)
+        escaped = r'"red\\\" #(system \"touch x\") \""'
+        self.assertEqual(
+            sm.stringOutput(),
+            r'\override NoteHead.color = ' + escaped + '\n'
+            + r'\override Stem.color = ' + escaped + '\n'
+            + "c' 4  "
+        )
+
     def testMetronomeMark(self):
         mm = tempo.MetronomeMark(number=87, referent=note.Note(type='quarter'))
         lpEmbeddedScm = LilypondConverter().lyEmbeddedScmFromMetronomeMark(mm)
@@ -2683,6 +2699,16 @@ class Test(unittest.TestCase):
 
         lpLyric = LilypondConverter().lyLyricElementFromM21Lyric(note.Lyric(schemeCall))
         self.assertEqual(str(lpLyric).strip(), escaped)
+
+    def testOctaveClefs(self):
+        lpc = LilypondConverter()
+        for clefClass, lilyName in (
+            (clef.Treble8vbClef, '"treble_8"'),
+            (clef.Treble8vaClef, '"treble^8"'),
+            (clef.Bass8vbClef, '"bass_8"'),
+            (clef.Bass8vaClef, '"bass^8"'),
+        ):
+            self.assertIn(lilyName, str(lpc.lyEmbeddedScmFromClef(clefClass())))
 
     def testRunThroughLilyNoShell(self):
         import tempfile

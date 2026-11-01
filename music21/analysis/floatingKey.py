@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2015-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,6 +15,7 @@ measures emphasizing non-chord tones, etc.
 from __future__ import annotations
 
 import copy
+import unittest
 
 from music21 import key
 from music21 import stream
@@ -44,7 +45,7 @@ class KeyAnalyzer:
     [<music21.key.Key of A major>, <music21.key.Key of A major>, <music21.key.Key of A major>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
-     <music21.key.Key of f# minor>, <music21.key.Key of f# minor>]
+     <music21.key.Key of b minor>, <music21.key.Key of b minor>]
 
     Raw analysis (no smoothing):
 
@@ -57,18 +58,18 @@ class KeyAnalyzer:
     Major smoothing:
 
     >>> ka.windowSize = ka.numMeasures // 2
-    >>> ka.run()  # only the pickup seems to be in A major by this approach
-    [<music21.key.Key of A major>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
+    >>> ka.run()
+    [<music21.key.Key of A major>, <music21.key.Key of A major>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
-     <music21.key.Key of f# minor>, <music21.key.Key of f# minor>]
+     <music21.key.Key of f# minor>, <music21.key.Key of b minor>]
 
     >>> tiny = converter.parse('tinyNotation: c1 e1 g1 c1 d-4 d-4 d-4 d-4')
     >>> ka = analysis.floatingKey.KeyAnalyzer(tiny)
     >>> ka.windowSize = 1
     >>> ka.run()  # This previously only gave four elements: am, CM, CM, CM
     [<music21.key.Key of a minor>, <music21.key.Key of C major>, <music21.key.Key of C major>,
-     <music21.key.Key of C major>, <music21.key.Key of b- minor>]
+     <music21.key.Key of F major>, <music21.key.Key of b- minor>]
 
     No measures will fail.
 
@@ -116,11 +117,11 @@ class KeyAnalyzer:
 
     def getInterpretationByMeasure(self, mIndex):
         '''
-        Returns a dictionary of interpretations for the measure.
+        Returns a new dictionary of interpretations for the measure.
         `mIndex` is 0-indexed.
         '''
         if mIndex in self._interpretationMeasureDict:
-            return self._interpretationMeasureDict[mIndex]  # CACHE
+            return copy.copy(self._interpretationMeasureDict[mIndex])
         if not self.rawKeyByMeasure:
             self.getRawKeyByMeasure()
         mk = self.rawKeyByMeasure[mIndex]
@@ -166,6 +167,23 @@ def divide(coefficient, distance):
     return coefficient / (abs(distance) + 1)
 
 
+class Test(unittest.TestCase):
+
+    def testSmoothingReadsRawInterpretations(self):
+        from music21 import converter
+        s = converter.parse(
+            "tinyNotation: 4/4 c4 e g c' d f a d' g b d' f' c e g c' a c' e' a'")
+        ka = KeyAnalyzer(s)
+        ka.windowSize = 1
+        first = ka.run()
+        for i, k in enumerate(ka.rawKeyByMeasure):
+            raw = {k.tonicPitchNameWithCase: k.correlationCoefficient}
+            for other in k.alternateInterpretations:
+                raw[other.tonicPitchNameWithCase] = other.correlationCoefficient
+            self.assertEqual(ka.getInterpretationByMeasure(i), raw)
+        self.assertEqual(ka.run(), first)
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)
