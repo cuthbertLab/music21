@@ -1352,6 +1352,7 @@ def makeTies(
                     returnObj.insert(mNext.offset, mNext)
                     # need to make sure that the new measure is processed.
                     measureList.append(mNext)
+                    mNextAdd = False
         mCount += 1
 
     for measure in returnObj.getElementsByClass(stream.Measure):
@@ -2370,6 +2371,34 @@ class Test(unittest.TestCase):
         remainder = m2.getElementsByClass(note.Note).first()
         self.assertEqual(remainder.duration.quarterLength, 1.0)
         self.assertEqual(remainder.tie.type, 'stop')
+
+    def testMakeTiesNewMeasureSharedByVoices(self):
+        '''
+        Every voice running past the last barline continues in the one
+        measure made after it.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import stream
+
+        def overrunning(voiceCount):
+            m1 = stream.Measure(number=1)
+            m1.insert(0, meter.TimeSignature('2/4'))
+            for i in range(voiceCount):
+                v = stream.Voice(id=str(i + 1))
+                v.append(note.Note(60 + 4 * i, quarterLength=4.0))
+                m1.insert(0, v)
+            return stream.Part([m1])
+
+        for voiceCount in (1, 2, 3):
+            p = overrunning(voiceCount)
+            p.makeTies(inPlace=True)
+            measures = p.getElementsByClass(stream.Measure)
+            self.assertEqual([m.number for m in measures], [1, 2])
+            self.assertEqual(measures[1].offset, 2.0)
+            remainders = measures[1].recurse().notes
+            self.assertEqual([n.tie.type for n in remainders], ['stop'] * voiceCount)
+            self.assertEqual([n.quarterLength for n in remainders], [2.0] * voiceCount)
 
     def testConsolidateCompletedTupletsNoFalsePositive(self):
         from fractions import Fraction
