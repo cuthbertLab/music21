@@ -44,6 +44,8 @@
 - A method past ~30 lines, or deeply nested, should probably be several methods.
 - `i`, `j`, `junk`, `counter` are exempt from unused-variable warnings; otherwise prefix with `unused_`.
 - Don't restyle code you aren't otherwise changing.
+- Unless something requires great speed, prioritize legibility: no nested or overly complex generator
+      expressions.  Write if statements so the most common cases come first, etc.
 - Text handling must survive non-ASCII input (ß, é, 中国). Comments should mostly remain ASCII; docs may use UTF-8 freely.
 - Never commit anything under copyright without a free (not GNU) license — code, scores, or someone else's encodings.
 

@@ -1003,9 +1003,11 @@ class BrailleSegment(text.BrailleText):
                         currentKeySig = brailleElement
             elif groupingKey.affinity in (Affinity.INACCORD, Affinity.NOTEGROUP):
                 if isinstance(groupingList[0], clef.Clef):
-                    if isinstance(groupingList[0], (clef.TrebleClef, clef.AltoClef)):
+                    if isinstance(groupingList[0], (clef.TrebleClef, clef.Treble8vbClef,
+                                                    clef.Treble8vaClef, clef.AltoClef)):
                         self.descendingChords = True
-                    elif isinstance(groupingList[0], (clef.BassClef, clef.TenorClef)):
+                    elif isinstance(groupingList[0], (clef.BassClef, clef.Bass8vbClef,
+                                                      clef.Bass8vaClef, clef.TenorClef)):
                         self.descendingChords = False
 
                 # make a whole rest no matter the length of the rest if only one note.
@@ -2507,6 +2509,19 @@ class Test(unittest.TestCase):
             score.insert(0, part)
         brailleLines = keyboardPartsToBraille(score).splitlines()
         self.assertEqual(brailleLines[0].strip('⠀'), '⠩⠩⠼⠙⠲')
+
+    def testOctaveClefsSetChordDirection(self):
+        for clefClass, descending in (
+            (clef.Treble8vbClef, True),
+            (clef.Treble8vaClef, True),
+            (clef.Bass8vbClef, False),
+            (clef.Bass8vaClef, False),
+        ):
+            seg = BrailleSegment()
+            seg.descendingChords = not descending
+            seg[SegmentKey(1, 0, Affinity.NOTEGROUP, None)].append(clefClass())
+            seg.addGroupingAttributes()
+            self.assertEqual(seg.descendingChords, descending)
 
 
 if __name__ == '__main__':

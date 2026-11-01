@@ -1179,6 +1179,20 @@ class Test(unittest.TestCase):
         intS1 = s1.melodicIntervals()
         self.assertEqual(len(intS1), 2)
 
+    def testMelodicIntervalsInMeasures(self):
+        m1 = Measure([note.Note('C4', type='half'), note.Note('D4', type='half')])
+        m2 = Measure([note.Note('F4', type='half'), note.Note('G4', type='half')])
+        p = Part()
+        p.append([m1, m2])
+        intervals = p.melodicIntervals()
+        self.assertEqual([i.offset for i in intervals], [2.0, 4.0, 6.0])
+        self.assertEqual([i.quarterLength for i in intervals], [0.0, 0.0, 0.0])
+
+        s = converter.parse('tinynotation: 4/4 c2 r2 f1 g1')
+        withGap = s.melodicIntervals(skipRests=True)
+        self.assertEqual([(i.name, i.offset, i.quarterLength) for i in withGap],
+                         [('P4', 2.0, 2.0), ('M2', 8.0, 0.0)])
+
     def testStripTiesBuiltA(self):
         s1 = Stream()
         n1 = note.Note('D#2')
@@ -7917,6 +7931,14 @@ class Test(unittest.TestCase):
         qj.getElementsByClass(Measure)[1].insert(0, key.KeySignature(5))
         unused_qj2 = qj.invertDiatonic(note.Note('F4'), inPlace=False)
 
+    def testInvertDiatonicBelowOctaveZero(self):
+        s = Stream()
+        s.append(note.Note('E4'))
+        inverted = s.invertDiatonic(note.Note('C2'))
+        invertedPitch = inverted[note.Note].first().pitch
+        self.assertEqual(invertedPitch.step, 'A')
+        self.assertEqual(invertedPitch.octave, -1)
+
     def testMeasuresA(self):
         s = corpus.parse('bwv66.6')
         ex = s.parts[0].measures(3, 6)
@@ -8017,6 +8039,28 @@ class Test(unittest.TestCase):
         self.assertIn(m2a, mm5)
         self.assertIn(m2b, mm5)
         self.assertIn(m3, mm5)
+
+    def testMeasuresKeepsSourceOrder(self):
+        '''
+        Collecting a time signature for an excerpt keeps it before the notes
+        of its own measure, as in Humdrum files, where priority is the line number.
+        '''
+        p = Part()
+        for i in range(1, 4):
+            m = Measure(number=i)
+            m.priority = 10 * i
+            n = note.Note(type='whole')
+            n.priority = 10 * i + 2
+            m.insert(0, n)
+            p.append(m)
+        m1 = p.getElementsByClass(Measure).first()
+        ts = meter.TimeSignature('4/4')
+        ts.priority = 11
+        m1.insert(0, ts)
+        for number in (2, 3):
+            excerpt = p.measures(number, number)
+            self.assertIs(excerpt.first(), ts)
+            self.assertIs(m1.first(), ts)
 
     def testChordifyF(self):
         # testing chordify handling of triplets

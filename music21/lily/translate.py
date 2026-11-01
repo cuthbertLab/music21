@@ -1613,7 +1613,10 @@ class LilypondConverter:
         '''
         dictTranslate = OrderedDict([
             ('Treble8vbClef', 'treble_8'),
+            ('Treble8vaClef', 'treble^8'),
             ('TrebleClef', 'treble'),
+            ('Bass8vbClef', 'bass_8'),
+            ('Bass8vaClef', 'bass^8'),
             ('BassClef', 'bass'),
             ('AltoClef', 'alto'),
             ('TenorClef', 'tenor'),
@@ -2696,6 +2699,16 @@ class Test(unittest.TestCase):
 
         lpLyric = LilypondConverter().lyLyricElementFromM21Lyric(note.Lyric(schemeCall))
         self.assertEqual(str(lpLyric).strip(), escaped)
+
+    def testOctaveClefs(self):
+        lpc = LilypondConverter()
+        for clefClass, lilyName in (
+            (clef.Treble8vbClef, '"treble_8"'),
+            (clef.Treble8vaClef, '"treble^8"'),
+            (clef.Bass8vbClef, '"bass_8"'),
+            (clef.Bass8vaClef, '"bass^8"'),
+        ):
+            self.assertIn(lilyName, str(lpc.lyEmbeddedScmFromClef(clefClass())))
 
     def testRunThroughLilyNoShell(self):
         import tempfile

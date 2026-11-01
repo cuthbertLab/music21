@@ -504,6 +504,11 @@ class Test(unittest.TestCase):
         self.assertEqual(empty.intervalClass, 0)
         self.assertEqual(empty.name, 'P1')
 
+    def testGenericTransposePitchBelowOctaveZero(self):
+        lowered = interval.GenericInterval(-2).transposePitch(pitch.Pitch('C0'))
+        self.assertEqual(lowered.step, 'B')
+        self.assertEqual(lowered.octave, -1)
+
 
 if __name__ == '__main__':
     import music21
