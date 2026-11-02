@@ -32,9 +32,11 @@ Changed in v8: nodeId and nodeName standardized.  TERMINUS and DIRECTION
 are now Enums.
 
 Changed in v11: the `alteredDegrees` arguments are removed, along with
-`AlteredDegree`, `processAlteredNodes` and `getUnalteredPitch`.  Build the
+`AlteredDegree`, `processAlteredNodes` and `getUnalteredPitch`. Build the
 altered pitches into the network's intervals instead, as
-:class:`~music21.scale.AbstractHarmonicMinorScale` does.
+:class:`~music21.scale.AbstractHarmonicMinorScale` does. If an
+application needs to record which degrees are conceived of as altered,
+it can do so with an entry in the Scale's `.editorial` object.
 '''
 from __future__ import annotations
 
