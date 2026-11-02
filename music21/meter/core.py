@@ -2250,19 +2250,26 @@ def _getAtPath(root: MeterSequence, path: tuple[int, ...]) -> MeterNode:
     return node
 
 
-def _replaceAtPath(root: MeterSequence, path: tuple[int, ...], newNode) -> MeterSequence:
+def _replaceAtPaths(
+    node: MeterNode,
+    replacements: dict[tuple[int, ...], MeterNode],
+    ancestors: set[tuple[int, ...]],
+    path: tuple[int, ...] = (),
+) -> MeterNode:
     '''
-    Return a new root MeterSequence with the node at `path` replaced by
-    `newNode`, rebuilding each ancestor functionally.
+    Return `node` with each node at a path in `replacements` replaced, rebuilding
+    only the sequences in `ancestors`, the paths above a replacement.
 
     AI-assisted (Claude).
     '''
-    idx = path[0]
-    if len(path) == 1:
-        return root.setIndex(idx, newNode)
-    child = t.cast('MeterSequence', root[idx])
-    newChild = _replaceAtPath(child, path[1:], newNode)
-    return root.setIndex(idx, newChild)
+    if path in replacements:
+        return replacements[path]
+    if path not in ancestors:
+        return node
+    sequence = t.cast('MeterSequence', node)
+    newPartition = [_replaceAtPaths(child, replacements, ancestors, path + (i,))
+                    for i, child in enumerate(sequence)]
+    return sequence._rebuild(newPartition)
 
 
 def _subdivideNestedByPaths(
@@ -2271,20 +2278,22 @@ def _subdivideNestedByPaths(
     divisions,
 ) -> tuple[MeterSequence, list[tuple[int, ...]]]:
     '''
-    Subdivide (equally) each node reached by a path in `paths`, rebuilding the
-    root functionally, and return the new root plus the list of paths to the
-    newly created child nodes.
+    Subdivide each node at `paths` equally.  No path may lie inside another.
+    Return the new root and the paths to the new child nodes.
 
     AI-assisted (Claude).
     '''
+    replacements: dict[tuple[int, ...], MeterNode] = {}
     newPaths: list[tuple[int, ...]] = []
     for p in paths:
         node = t.cast('MeterSequence', _getAtPath(root, p))
         newNode = node.subdividePartitionsEqual(divisions)
-        root = _replaceAtPath(root, p, newNode)
+        replacements[p] = newNode
         for j in range(len(newNode)):
             newPaths.append(p + (j,))
-    return root, newPaths
+    ancestors = {p[:k] for p in paths for k in range(len(p))}
+    newRoot = t.cast('MeterSequence', _replaceAtPaths(root, replacements, ancestors))
+    return newRoot, newPaths
 
 
 if __name__ == '__main__':
