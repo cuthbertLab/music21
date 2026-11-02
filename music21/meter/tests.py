@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -107,8 +107,8 @@ class Test(unittest.TestCase):
     def testMeterTerminalCache(self):
         # this is an internal test, so it inspects the private cache directly
         from music21.meter.core import _meterTerminalCache
-        # getMeterTerminal populates the cache under its (numerator, denominator,
-        # weight) key, and a repeat request is the very object stored there
+        # the cache key is (numerator, denominator, weight); asking again gives
+        # the same object
         a = getMeterTerminal(1, 4)
         self.assertIs(_meterTerminalCache[(1, 4, 1.0)], a)
         self.assertIs(a, getMeterTerminal(1, 4))
@@ -117,24 +117,24 @@ class Test(unittest.TestCase):
         b = getMeterTerminal(1, 4, weight=0.5)
         self.assertIsNot(a, b)
         self.assertIs(_meterTerminalCache[(1, 4, 0.5)], b)
-        # value equality regardless of how they were built
+        # equal however they were made
         self.assertEqual(MeterTerminal('1/4'), getMeterTerminal(1, 4))
 
     def testMeterTerminalModify(self):
         a = getMeterTerminal(2, 4, weight=0.5)
-        # modify changes only the named slot(s); the rest carry over
+        # modify changes only what is named; the rest carries over
         b = a.modify(weight=0.25)
         self.assertEqual((b.numerator, b.denominator, b.weight), (2, 4, 0.25))
         c = a.modify(numerator=3)
         self.assertEqual((c.numerator, c.denominator, c.weight), (3, 4, 0.5))
-        # the original is unchanged (immutable) and setting a slot raises
+        # the original is unchanged and setting an attribute raises
         self.assertEqual(a.weight, 0.5)
         with self.assertRaises(TypeError):
             a.weight = 0.25
-        # modify is wired through the cache, and __replace__ is an alias
+        # asking again gives the same object; __replace__ is the same as modify
         self.assertIs(a.modify(weight=0.25), b)
         self.assertIs(a.__replace__(numerator=3), c)
-        # an unhandled keyword raises rather than being silently ignored
+        # any other keyword raises
         with self.assertRaises(ValueError):
             a.modify(parenthesis=True)
 
@@ -142,13 +142,12 @@ class Test(unittest.TestCase):
         # this is an internal test, so it inspects the private caches directly
         from music21.meter.core import _meterSequenceCache
         from music21.meter.base import _defaultSequenceCache
-        # getMeterSequence stores the built sequence in the sequence cache, and a
-        # repeat request is the very object stored there
+        # asking again gives the same object, the one in the cache
         ms = getMeterSequence('4/4', 4)
         self.assertIs(getMeterSequence('4/4', 4), ms)
         self.assertTrue(any(cached is ms for cached in _meterSequenceCache.values()))
-        # TimeSignature.load stores its configured (display, beam, beat, accent)
-        # sequences under (value, divisions); a repeat 4/4 reuses exactly those
+        # TimeSignature.load caches (display, beam, beat, accent) sequences by
+        # (value, divisions); a second 4/4 uses the same ones
         a = TimeSignature('4/4')
         display, beam, beat, accent = _defaultSequenceCache[('4/4', None)]
         self.assertIs(a.displaySequence, display)
@@ -166,13 +165,12 @@ class Test(unittest.TestCase):
         b = a.modify(parenthesis=True)
         self.assertTrue(b.parenthesis)
         self.assertFalse(a.parenthesis)  # original unchanged
-        # a mutating attempt on the immutable sequence raises
+        # setting an attribute raises
         with self.assertRaises(TypeError):
             a.parenthesis = True
-        # modify is cache-wired: same result from two independent sequences
+        # two separate sequences modified the same way give the same object
         self.assertIs(b, MeterSequence('4/4', 4).modify(parenthesis=True))
-        # numerator/denominator/weight are not modifiable here (they follow from
-        # the partition); an unhandled keyword raises
+        # numerator, denominator, and weight come from the partition, so they raise
         for kw in ({'numerator': 3}, {'denominator': 8}, {'weight': 1.5}):
             with self.assertRaises(ValueError):
                 a.modify(**kw)
@@ -283,7 +281,7 @@ class Test(unittest.TestCase):
     def testOffsetToDepth(self):
         # get a maximally divided 4/4 to the level of 1/8
         def recSub(node, remaining):
-            # functionally subdivide node by 2 for `remaining` levels
+            # subdivide node by 2, `remaining` levels deep
             if remaining == 0:
                 return node
             sub = node.subdivide(2)

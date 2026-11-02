@@ -2805,9 +2805,8 @@ class Music21Object(prebase.ProtoM21Object):
             try:
                 durationObj.client = self
             except TypeError:
-                # durationObj is an immutable FrozenDuration (e.g. one from a
-                # TimeSignature): it never changes, so it needs no client
-                # back-reference and can be held shared as-is.
+                # a FrozenDuration (e.g. from a TimeSignature) never changes,
+                # so it has nothing to tell a client
                 if not isinstance(durationObj, FrozenDuration):
                     raise
             if durationObjAlreadyExists:
