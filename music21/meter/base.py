@@ -40,12 +40,8 @@ from music21.meter.core import (
 
 environLocal = environment.Environment('meter')
 
-# Cache of the fully-configured MeterSequences a TimeSignature.load() produces for a
-# given (value, divisions).  Each value is a 4-tuple in the fixed order
-# (displaySequence, beamSequence, beatSequence, accentSequence).  The sequences are
-# immutable and shared, and any later change to a TimeSignature is copy-on-write, so
-# repeated TimeSignatures of the same meter can reuse them and skip the (hashing-heavy)
-# rebuild entirely.
+# TimeSignature.load's (value, divisions) ->
+#     (displaySequence, beamSequence, beatSequence, accentSequence)
 _defaultSequenceCache: dict[
     tuple[str, t.Any],
     tuple[MeterSequence, MeterSequence, MeterSequence, MeterSequence],
@@ -608,8 +604,6 @@ class TimeSignature(TimeSignatureBase):
             value = '2/2'
             self.symbol = 'cut'
 
-        # divisions may be list-like -- e.g. ['2/8', '3/8'] (Ariza & Cuthbert 2010) --
-        # so normalize a list to a tuple to make it a usable cache key.
         keyDivisions = tuple(divisions) if isinstance(divisions, list) else divisions
         cacheKey = (value, keyDivisions)
         cached = None
@@ -617,7 +611,7 @@ class TimeSignature(TimeSignatureBase):
         try:
             cached = _defaultSequenceCache.get(cacheKey)
         except TypeError:
-            cacheable = False  # still unhashable (rare): skip the cache
+            cacheable = False
         if cached is not None:
             (self.displaySequence, self.beamSequence,
              self.beatSequence, self.accentSequence) = cached
@@ -812,9 +806,8 @@ class TimeSignature(TimeSignatureBase):
         >>> meter.TimeSignature().barDuration
         <music21.duration.Duration 4.0>
 
-        Note: this currently returns an ordinary (mutable) Duration, but it is
-        expected to return an immutable :class:`~music21.duration.FrozenDuration`
-        in v12 -- do not rely on being able to modify it in place.
+        It may become a :class:`~music21.duration.FrozenDuration` in v12, so
+        do not change it in place.
         '''
         if self._overriddenBarDuration:
             return self._overriddenBarDuration
@@ -823,8 +816,6 @@ class TimeSignature(TimeSignatureBase):
         if beamSequence is not None:
             # could come from self.beamSequence, self.accentSequence,
             #   self.displaySequence, self.accentSequence
-            # unfreeze() so callers get an ordinary, mutable Duration; the meter's
-            # own duration stays a shared, immutable FrozenDuration internally.
             return beamSequence.duration.unfreeze()
 
         # should never happen.
@@ -937,7 +928,7 @@ class TimeSignature(TimeSignatureBase):
     @property
     def beatDuration(self) -> duration.FrozenDuration:
         '''
-        Return a :class:`~music21.duration.Duration` object equal to the beat unit
+        Return a :class:`~music21.duration.FrozenDuration` equal to the beat unit
         of this Time Signature, if and only if this TimeSignature has a uniform beat unit.
 
         Otherwise, raises an exception in v7.1 but will change to returning NaN
@@ -1067,7 +1058,7 @@ class TimeSignature(TimeSignatureBase):
     def beatDivisionDurations(self) -> list[duration.FrozenDuration]:
         '''
         Return the beat division, or the durations that make up one beat,
-        as a list of :class:`~music21.duration.Duration` objects, if and only if
+        as a list of :class:`~music21.duration.FrozenDuration` objects, if and only if
         the TimeSignature has a uniform beat division for all beats.
 
         >>> ts = meter.TimeSignature('3/4')
@@ -1342,8 +1333,7 @@ class TimeSignature(TimeSignatureBase):
         # set weights on accent partitions
         self.accentSequence = self.accentSequence.partition([1] * accentCount)
         for i in range(accentCount):
-            # get values from weightValues dictionary; terminals are
-            # immutable, so replace each with a re-weighted cached one
+            # get values from weightValues dictionary
             mt = self.accentSequence[i]
             self.accentSequence = self.accentSequence.setIndex(
                 i, getMeterTerminal(
@@ -1709,7 +1699,6 @@ class TimeSignature(TimeSignatureBase):
         else:
             weightList = weights
 
-        # sequences are immutable; setLevelWeight returns a new one
         self.accentSequence = self.accentSequence.setLevelWeight(weightList, level)
 
     def averageBeatStrength(self, streamIn, notesOnly=True):
@@ -2128,9 +2117,7 @@ class TimeSignature(TimeSignatureBase):
         >>> b = meter.TimeSignature('3/4', 1)
         >>> b.beatSequence = b.beatSequence.setIndex(0, b.beatSequence[0].subdivide(3))
 
-        Subdivide every component of ``beatSequence[0]`` by 2.  Since the sequences
-        are immutable, build up the new inner sequence in a variable and then set it
-        back into ``beatSequence`` once:
+        Subdivide each part of the first beat by 2:
 
         >>> inner = b.beatSequence[0]
         >>> for i in range(len(inner)):
