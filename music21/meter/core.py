@@ -286,6 +286,7 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
     __slots__ = (
         '_denominator',
+        '_frozenHash',
         '_numerator',
         '_weight',
     )
@@ -459,13 +460,16 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
 # -----------------------------------------------------------------------------
 
-_meterTerminalCache: dict[tuple[int, int, float], MeterTerminal] = {}
+@lru_cache(1024)
+def _cachedMeterTerminal(numerator: int, denominator: int, weight: float) -> MeterTerminal:
+    return MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
 
 
 def getMeterTerminal(numerator: int, denominator: int,
                      weight: float = 1.0) -> MeterTerminal:
     '''
     Return a shared, cached, immutable :class:`MeterTerminal` for these values.
+    The cache keeps the 1024 most recently used.
 
     Because MeterTerminals are immutable, identical `(numerator, denominator,
     weight)` triples can all share one object.  This is how a "changed" terminal
@@ -482,12 +486,7 @@ def getMeterTerminal(numerator: int, denominator: int,
 
     AI-assisted (Claude).
     '''
-    key = (numerator, denominator, weight)
-    cached = _meterTerminalCache.get(key)
-    if cached is None:
-        cached = MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
-        _meterTerminalCache[key] = cached
-    return cached
+    return _cachedMeterTerminal(numerator, denominator, weight)
 
 
 # -----------------------------------------------------------------------------
@@ -537,6 +536,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
     __slots__ = (
         '_denominator',
+        '_frozenHash',
         '_numerator',
         '_partition',
         'parenthesis',
@@ -2058,9 +2058,21 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 # -----------------------------------------------------------------------------
 # module-level building helpers for the immutable MeterSequence
 
-_meterSequenceCache: dict[
-    tuple[int, int, tuple, bool, bool], MeterSequence
-] = {}
+@lru_cache(4096)
+def _cachedSequence(
+    numerator: int,
+    denominator: int,
+    partition: tuple,
+    parenthesis: bool,
+    summedNumerator: bool,
+) -> MeterSequence:
+    ms = MeterSequence.__new__(MeterSequence)
+    object.__setattr__(ms, '_numerator', numerator)
+    object.__setattr__(ms, '_denominator', denominator)
+    object.__setattr__(ms, '_partition', partition)
+    object.__setattr__(ms, 'parenthesis', parenthesis)
+    object.__setattr__(ms, 'summedNumerator', summedNumerator)
+    return ms
 
 
 def makeSequence(
@@ -2074,21 +2086,11 @@ def makeSequence(
     '''
     Return a shared, cached, immutable MeterSequence for these values,
     building it directly (bypassing __init__) when it is not already cached.
+    The cache keeps the 4096 most recently used.
 
     AI-assisted (Claude).
     '''
-    key = (numerator, denominator, partition, parenthesis, summedNumerator)
-    cached = _meterSequenceCache.get(key)
-    if cached is not None:
-        return cached
-    ms = MeterSequence.__new__(MeterSequence)
-    object.__setattr__(ms, '_numerator', numerator)
-    object.__setattr__(ms, '_denominator', denominator)
-    object.__setattr__(ms, '_partition', partition)
-    object.__setattr__(ms, 'parenthesis', parenthesis)
-    object.__setattr__(ms, 'summedNumerator', summedNumerator)
-    _meterSequenceCache[key] = ms
-    return ms
+    return _cachedSequence(numerator, denominator, partition, parenthesis, summedNumerator)
 
 
 def getMeterSequence(

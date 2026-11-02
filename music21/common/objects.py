@@ -225,7 +225,8 @@ class SlottedObjectMixin:
 
     def _getSlotsRecursive(self) -> set[str]:
         '''
-        Find all slots recursively.
+        Find all slots recursively, except `_frozenHash`, where a
+        :class:`FrozenObject` keeps its hash.
 
         A private attribute so as not to change the contents of inheriting
         objects private interfaces:
@@ -253,6 +254,7 @@ class SlottedObjectMixin:
         slots: set[str] = set()
         for cls in self.__class__.mro():
             slots.update(getattr(cls, '__slots__', ()))
+        slots.discard('_frozenHash')
         return slots
 
 
@@ -287,7 +289,16 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 # my own version which Ned Batchelder (as usual) already anticipated:
 # https://stackoverflow.com/questions/4828080/how-to-make-an-immutable-object-in-python
 class FrozenObject(EqualSlottedObjectMixin):
+    '''
+    An object whose slots cannot be set after `__init__`, `__new__`, or
+    `__setstate__`.  It is hashable by the values of its slots.
+
+    A subclass that lists `'_frozenHash'` in its `__slots__` computes its hash
+    once and keeps it there.
+    '''
     __slots__: tuple[str, ...] = ()
+
+    _frozenHash: int
 
     def _check_init(self, key: str|None = None) -> bool:
         if key == '__class__':
@@ -323,10 +334,19 @@ class FrozenObject(EqualSlottedObjectMixin):
         raise TypeError(f'{self.__class__} object is not subscriptable')
 
     def __hash__(self) -> int:
+        try:
+            return self._frozenHash
+        except AttributeError:
+            pass
         out = []
         for s in self._getSlotsRecursive():
             out.append((s, getattr(self, s)))
-        return hash(tuple(out))
+        h = hash(tuple(out))
+        try:
+            object.__setattr__(self, '_frozenHash', h)
+        except AttributeError:
+            pass
+        return h
 
 
 # ------------------------------------------------------------------------------
