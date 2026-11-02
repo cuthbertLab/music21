@@ -902,12 +902,12 @@ class TimeSignature(TimeSignatureBase):
     @beatCount.setter
     def beatCount(self, value: int):
         try:
-            self.beatSequence = self.beatSequence.partition(value)
+            self.beatSequence = self.beatSequence.partitioned(value)
         except MeterException:
             raise TimeSignatureException(f'cannot partition beat with provided value: {value}')
         # create subdivisions using default parameters
         if len(self.beatSequence) > 1:  # if partitioned
-            self.beatSequence = self.beatSequence.subdividePartitionsEqual()
+            self.beatSequence = self.beatSequence.subdividedPartitionsEqual()
 
     @property
     def beatCountName(self) -> str:
@@ -1036,7 +1036,7 @@ class TimeSignature(TimeSignatureBase):
         5/8 + 5/8 with no further subdivisions:
 
         >>> ts = meter.TimeSignature('10/8')
-        >>> ts.beatSequence = ts.beatSequence.partition(2)
+        >>> ts.beatSequence = ts.beatSequence.partitioned(2)
         >>> ts.beatSequence
         <music21.meter.core.MeterSequence {5/8+5/8}>
         >>> for i, mt in enumerate(ts.beatSequence):
@@ -1193,36 +1193,36 @@ class TimeSignature(TimeSignatureBase):
         if len(self.displaySequence) == 1:
             # create toplevel partitions
             if self.numerator == 2:  # duple meters
-                self.beatSequence = self.beatSequence.partition(2)
+                self.beatSequence = self.beatSequence.partitioned(2)
             elif self.numerator == 6 and favorCompound:  # duple meters
-                self.beatSequence = self.beatSequence.partition(2)
+                self.beatSequence = self.beatSequence.partitioned(2)
             elif self.numerator == 3 and favorCompound:  # 3/8, 3/16, but not 3/4
-                self.beatSequence = self.beatSequence.partition(1)
+                self.beatSequence = self.beatSequence.partitioned(1)
             elif self.numerator == 3:  # triple meters
-                self.beatSequence = self.beatSequence.partition([1, 1, 1])
+                self.beatSequence = self.beatSequence.partitioned([1, 1, 1])
             elif self.numerator == 9 and favorCompound:  # triple meters
-                self.beatSequence = self.beatSequence.partition([3, 3, 3])
+                self.beatSequence = self.beatSequence.partitioned([3, 3, 3])
             elif self.numerator == 4:  # quadruple meters
-                self.beatSequence = self.beatSequence.partition(4)
+                self.beatSequence = self.beatSequence.partitioned(4)
             elif self.numerator == 12 and favorCompound:
-                self.beatSequence = self.beatSequence.partition(4)
+                self.beatSequence = self.beatSequence.partitioned(4)
             elif self.numerator >= 15 and self.numerator % 3 == 0 and favorCompound:
                 # quintuple meters and above.
                 num_triples = self.numerator // 3
-                self.beatSequence = self.beatSequence.partition([3] * num_triples)
+                self.beatSequence = self.beatSequence.partitioned([3] * num_triples)
             # skip 6 numerators; covered above
             else:  # case of odd meters: 11, 13
-                self.beatSequence = self.beatSequence.partition(self.numerator)
+                self.beatSequence = self.beatSequence.partitioned(self.numerator)
 
         # if a complex meter has been given
         else:  # partition by display
             # TODO: remove partitionByMeterSequence usage.
-            self.beatSequence = self.beatSequence.partition(self.displaySequence)
+            self.beatSequence = self.beatSequence.partitioned(self.displaySequence)
 
         # create subdivisions, and thus define compound/simple distinction
         if len(self.beatSequence) > 1:  # if partitioned
             try:
-                self.beatSequence = self.beatSequence.subdividePartitionsEqual()
+                self.beatSequence = self.beatSequence.subdividedPartitionsEqual()
             except MeterException:
                 if self.denominator >= 128:
                     pass  # do not raise an exception for unable to subdivide smaller than 128
@@ -1245,7 +1245,7 @@ class TimeSignature(TimeSignatureBase):
 
         # more general, based only on numerator
         elif self.numerator in (2, 3, 4):
-            self.beamSequence = self.beamSequence.partition(self.numerator)
+            self.beamSequence = self.beamSequence.partitioned(self.numerator)
             # if denominator is 4, subdivide each partition
             if self.denominator == 4:
                 for i in range(len(self.beamSequence)):  # subdivide  each beat in 2
@@ -1253,7 +1253,7 @@ class TimeSignature(TimeSignatureBase):
                         i, self.beamSequence[i].subdivide(2))
         elif self.numerator == 5:
             default = [2, 3]
-            self.beamSequence = self.beamSequence.partition(default)
+            self.beamSequence = self.beamSequence.partitioned(default)
             # if denominator is 4, subdivide each partition
             if self.denominator == 4:
                 for i in range(len(self.beamSequence)):  # subdivide  each beat in 2
@@ -1261,10 +1261,10 @@ class TimeSignature(TimeSignatureBase):
                         i, self.beamSequence[i].subdivide(default[i]))
 
         elif self.numerator == 7:
-            self.beamSequence = self.beamSequence.partition(3)  # divide into three groups
+            self.beamSequence = self.beamSequence.partitioned(3)  # divide into three groups
 
         elif self.numerator in [6, 9, 12, 15, 18, 21]:
-            self.beamSequence = self.beamSequence.partition([3] * int(self.numerator / 3))
+            self.beamSequence = self.beamSequence.partitioned([3] * int(self.numerator / 3))
         else:
             pass  # doing nothing will beam all together
         # environLocal.printDebug(f'default beam partitions set to: {self.beamSequence}')
@@ -1307,7 +1307,7 @@ class TimeSignature(TimeSignatureBase):
         ms = MeterSequence(tsStr)
         # key operation here
         # div count needs to be the number of top-level beat divisions
-        ms = ms.subdivideNestedHierarchy(depth, firstPartitionForm=firstPartitionForm)
+        ms = ms.subdividedNestedHierarchy(depth, firstPartitionForm=firstPartitionForm)
 
         # provide a partition for each flattened division
         accentCount = len(ms.flatten())
@@ -1327,7 +1327,7 @@ class TimeSignature(TimeSignatureBase):
             weightValues[x + 1] = weightValueMin * pow(2, x)
 
         # set weights on accent partitions
-        accentSequence = self.accentSequence.partition([1] * accentCount)
+        accentSequence = self.accentSequence.partitioned([1] * accentCount)
         weighted = []
         for i, mt in enumerate(accentSequence):
             # get values from weightValues dictionary
@@ -1644,7 +1644,7 @@ class TimeSignature(TimeSignatureBase):
         division.
 
         >>> a = meter.TimeSignature('3/4', 3)
-        >>> a.accentSequence = a.accentSequence.partition([2, 1])
+        >>> a.accentSequence = a.accentSequence.partitioned([2, 1])
         >>> a.accentSequence
         <music21.meter.core.MeterSequence {2/4+1/4}>
         >>> a.getAccent(0.0)
@@ -1695,7 +1695,7 @@ class TimeSignature(TimeSignatureBase):
         else:
             weightList = weights
 
-        self.accentSequence = self.accentSequence.setLevelWeight(weightList, level)
+        self.accentSequence = self.accentSequence.withLevelWeight(weightList, level)
 
     def averageBeatStrength(self, streamIn, notesOnly=True):
         '''
@@ -1846,7 +1846,7 @@ class TimeSignature(TimeSignatureBase):
         1
         >>> a.getBeat(2.5)
         3
-        >>> a.beatSequence = a.beatSequence.partition(['3/8', '3/8'])
+        >>> a.beatSequence = a.beatSequence.partitioned(['3/8', '3/8'])
         >>> a.getBeat(2.5)
         2
         '''
@@ -2027,7 +2027,7 @@ class TimeSignature(TimeSignatureBase):
 
         Works for specifically partitioned meters too:
 
-        >>> a.beatSequence = a.beatSequence.partition(['3/8', '3/8'])
+        >>> a.beatSequence = a.beatSequence.partitioned(['3/8', '3/8'])
         >>> a.getBeatProgress(2.5)
         (2, 1.0)
         '''
