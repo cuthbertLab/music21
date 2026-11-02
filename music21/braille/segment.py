@@ -2361,11 +2361,11 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
 
     numberOfPartitions = 2
     try:
-        bs = bs.partitionByCount(numberOfPartitions, loadDefault=False)
+        bs = bs.partitionedByCount(numberOfPartitions, loadDefault=False)
         (startOffsetZero, endOffsetZero) = bs.getLevelSpan()[0]
     except meter.MeterException:
         numberOfPartitions += 1
-        bs = bs.partitionByCount(numberOfPartitions, loadDefault=False)
+        bs = bs.partitionedByCount(numberOfPartitions, loadDefault=False)
         startOffsetZero = bs.getLevelSpan()[0][0]
         endOffsetZero = bs.getLevelSpan()[-2][-1]
     endOffsetZero -= offset

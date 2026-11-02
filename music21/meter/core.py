@@ -171,7 +171,7 @@ class MeterCore:
         <music21.meter.core.MeterTerminal 3/8>
 
         But what if you want to divide into 3/8+2/8 or something else?
-        for that, see the :meth:`~music21.meter.MeterSequence.partition` method
+        for that, see the :meth:`~music21.meter.MeterSequence.partitioned` method
         of :class:`~music21.meter.MeterSequence`.
         '''
         # cannot set the weight of this MeterSequence w/o having offsets
@@ -210,12 +210,12 @@ class MeterCore:
         >>> (c[0], c[1])
         (<music21.meter.core.MeterTerminal 2/4>, <music21.meter.core.MeterTerminal 1/4>)
 
-        See :meth:`~music21.meter.MeterSequence.partitionByList` method
+        See :meth:`~music21.meter.MeterSequence.partitionedByList` method
         of :class:`~music21.meter.MeterSequence` for more details.
         '''
         # elevate to meter sequence, then partition
         ms = _buildSequence(self)  # do not need to autoWeight here
-        return ms.partitionByList(numeratorList)  # this will split weight
+        return ms.partitionedByList(numeratorList)  # this will split weight
 
     def subdivide(
         self,
@@ -481,6 +481,26 @@ def getMeterTerminal(numerator: int, denominator: int,
 # -----------------------------------------------------------------------------
 
 
+def _removedInPlaceMethod(oldName: str, newName: str):
+    '''
+    Return a method named `oldName` that raises a MeterException pointing to
+    `newName`, the method that returns a new MeterSequence instead.
+    '''
+    def removed(self, *arguments, **keywords):
+        raise MeterException(
+            f'MeterSequence is immutable, so {oldName}() cannot change it in place. '
+            f'Use the new sequence that {newName}() returns: '
+            f'ms = ms.{newName}(...), or for a TimeSignature, '
+            f'ts.beatSequence = ts.beatSequence.{newName}(...)')
+
+    removed.__name__ = oldName
+    removed.__qualname__ = f'MeterSequence.{oldName}'
+    removed.__doc__ = (f'Raises a MeterException.  Use :meth:`{newName}`, which '
+                       'returns a new MeterSequence.\n\n'
+                       '* Changed in v11: no longer changes the sequence in place.')
+    return removed
+
+
 class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
     '''
     A MeterSequence is a sequence of MeterTerminals or other MeterSequences.
@@ -490,17 +510,27 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
     <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
 
     Like a :class:`~music21.meter.core.MeterTerminal`, it cannot be changed once
-    it is made.  Methods such as :meth:`partition` and :meth:`setIndex` leave it
+    it is made.  Methods such as :meth:`partitioned` and :meth:`setIndex` leave it
     alone and return a new MeterSequence, so be sure to keep the result:
 
-    >>> halves = ms.partition(2)
+    >>> halves = ms.partitioned(2)
     >>> halves
     <music21.meter.core.MeterSequence {1/2+1/2}>
     >>> ms
     <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
 
-    So a deepcopy is just the same object, two MeterSequences with the same
-    contents are equal, and a MeterSequence can be a dictionary key:
+    The methods that changed a sequence in place raise an exception and name
+    the method to use instead:
+
+    >>> ms.partition(2)
+    Traceback (most recent call last):
+    music21.exceptions21.MeterException: MeterSequence is immutable, so partition()
+        cannot change it in place. Use the new sequence that partitioned() returns:
+        ms = ms.partitioned(...), or for a TimeSignature,
+        ts.beatSequence = ts.beatSequence.partitioned(...)
+
+    Since it cannot change, a deepcopy is just the same object, two MeterSequences
+    with the same contents are equal, and a MeterSequence can be a dictionary key:
 
     >>> import copy
     >>> copy.deepcopy(ms) is ms
@@ -509,10 +539,14 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
     True
 
     * Changed in v11: cannot be changed after creation.  `ms.partition(2)` becomes
-      `ms = ms.partition(2)`, `ms[0] = x` becomes `ms = ms.setIndex(0, x)`,
-      `ms.weight = 1.0` becomes `ms = ms.withWeight(1.0)`, and `ms.load('4/4')`
-      becomes `ms = meter.MeterSequence('4/4')`.  Removed `subdivideByOther()`:
-      use `meter.MeterSequence(other)`.
+      `ms = ms.partitioned(2)`, and likewise for `partitionedByCount()`,
+      `partitionedByList()`, `partitionedByOtherMeterSequence()`,
+      `subdividedPartitionsEqual()`, and `subdividedNestedHierarchy()`.
+      `ms.setLevelWeight(x)` becomes `ms = ms.withLevelWeight(x)`,
+      `ms[0] = x` becomes `ms = ms.setIndex(0, x)`, `ms.weight = 1.0` becomes
+      `ms = ms.withWeight(1.0)`, and `ms.load('4/4')` becomes
+      `ms = meter.MeterSequence('4/4')`.  The old forms raise an exception.
+      Removed `subdivideByOther()`: use `meter.MeterSequence(other)`.
 
     AI-assisted (Claude).
     '''
@@ -548,7 +582,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
             built = makeSequence(
                 numerator, denominator, tuple(partitionList),
                 summedNumerator=summedNumerator
-            ).partition(partitionRequest)
+            ).partitioned(partitionRequest)
             numerator = built._numerator
             denominator = built._denominator
             partitionList = list(built._partition)
@@ -601,7 +635,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         False
 
         The numerator, denominator, and weight come from the partition, so they
-        cannot be changed here: use :meth:`partition`, :meth:`setIndex`, or
+        cannot be changed here: use :meth:`partitioned`, :meth:`setIndex`, or
         :meth:`withWeight`.  These, like any other keyword, raise a ValueError:
 
         >>> ms.modify(numerator=3)
@@ -828,7 +862,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
     # -------------------------------------------------------------------------
 
-    def partitionByCount(self, countRequest: int, loadDefault: bool = True) -> MeterSequence:
+    def partitionedByCount(self, countRequest: int, loadDefault: bool = True) -> MeterSequence:
         '''
         Return a new MeterSequence dividing this one into the requested number
         of parts.
@@ -839,12 +873,12 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> a = meter.MeterSequence('4/4')
         >>> a
         <music21.meter.core.MeterSequence {4/4}>
-        >>> a = a.partitionByCount(2)
+        >>> a = a.partitionedByCount(2)
         >>> a
         <music21.meter.core.MeterSequence {1/2+1/2}>
         >>> str(a)
         '{1/2+1/2}'
-        >>> a = a.partitionByCount(4)
+        >>> a = a.partitionedByCount(4)
         >>> a
         <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
         >>> str(a)
@@ -854,13 +888,13 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         meter is irregular:
 
         >>> b = meter.MeterSequence('5/8')
-        >>> b = b.partitionByCount(2)
+        >>> b = b.partitionedByCount(2)
         >>> b
          <music21.meter.core.MeterSequence {2/8+3/8}>
 
         This relies on a pre-defined exemption for partitioning 5 by 3:
 
-        >>> b = b.partitionByCount(3)
+        >>> b = b.partitionedByCount(3)
         >>> str(b)
         '{2/8+2/8+1/8}'
 
@@ -868,17 +902,17 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         there is no known way to do this:
 
         >>> a = meter.MeterSequence('5/8')
-        >>> a = a.partitionByCount(11)
+        >>> a = a.partitionedByCount(11)
         >>> str(a)
         '{2/8+3/8}'
 
         If loadDefault is False then an error is raised:
 
-        >>> a.partitionByCount(11, loadDefault=False)
+        >>> a.partitionedByCount(11, loadDefault=False)
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by 11 (5/8)
 
-        * Changed in v11: returns a new MeterSequence instead of changing this one.
+        * New in v11: replaces `partitionByCount()`, which changed the sequence in place.
         '''
         opts = self.getPartitionOptions()
         optMatch = None
@@ -903,7 +937,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         partition = _applyWeight(partition, self.numerator, self.denominator, targetWeight)
         return self._rebuild(partition)
 
-    def partitionByList(
+    def partitionedByList(
         self,
         numeratorList: Sequence[int] | Sequence[str]
     ) -> MeterSequence:
@@ -912,35 +946,35 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         list of MeterTerminals.
 
         >>> a = meter.MeterSequence('4/4')
-        >>> a = a.partitionByList([1, 1, 1, 1])
+        >>> a = a.partitionedByList([1, 1, 1, 1])
         >>> str(a)
         '{1/4+1/4+1/4+1/4}'
 
         This divides it into two equal parts:
 
-        >>> a = a.partitionByList([1, 1])
+        >>> a = a.partitionedByList([1, 1])
         >>> str(a)
         '{1/2+1/2}'
 
         And now into one big part:
 
-        >>> a = a.partitionByList([1])
+        >>> a = a.partitionedByList([1])
         >>> str(a)
         '{1/1}'
 
         Here we divide 4/4 very unconventionally:
 
-        >>> a = a.partitionByList(['3/4', '1/8', '1/8'])
+        >>> a = a.partitionedByList(['3/4', '1/8', '1/8'])
         >>> a
         <music21.meter.core.MeterSequence {3/4+1/8+1/8}>
 
         But the basics of the MeterSequence must be observed:
 
-        >>> a.partitionByList(['3/4', '1/8', '5/8'])
+        >>> a.partitionedByList(['3/4', '1/8', '5/8'])
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by ['3/4', '1/8', '5/8']
 
-        * Changed in v11: returns a new MeterSequence instead of changing this one.
+        * New in v11: replaces `partitionByList()`, which changed the sequence in place.
         '''
         optMatch: Sequence[MeterNode] | tuple[str, ...] | None = None
 
@@ -986,7 +1020,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         partition = _applyWeight(partition, self.numerator, self.denominator, targetWeight)
         return self._rebuild(partition)
 
-    def partitionByOtherMeterSequence(self, other: MeterSequence) -> MeterSequence:
+    def partitionedByOtherMeterSequence(self, other: MeterSequence) -> MeterSequence:
         '''
         Return a new MeterSequence with the partition found in another
         MeterSequence.
@@ -996,13 +1030,14 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         '{1/4+1/4+1/4+1/4}'
 
         >>> b = meter.MeterSequence('4/4', 2)
-        >>> a = a.partitionByOtherMeterSequence(b)
+        >>> a = a.partitionedByOtherMeterSequence(b)
         >>> len(a)
         2
         >>> str(a)
         '{1/2+1/2}'
 
-        * Changed in v11: returns a new MeterSequence instead of changing this one.
+        * New in v11: replaces `partitionByOtherMeterSequence()`, which changed the
+          sequence in place.
         '''
         if (self.numerator == other.numerator
                 and self.denominator == other.denominator):
@@ -1014,7 +1049,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         else:
             raise MeterException('Cannot set partition for unequal MeterSequences')
 
-    def partition(
+    def partitioned(
         self,
         value: int | Sequence[str] | Sequence[MeterTerminal] | Sequence[int] | MeterSequence,
         loadDefault=False
@@ -1024,7 +1059,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
         A simple way to partition based on argument time. Single integers
         are treated as beat counts; lists are treated as numerator lists;
-        MeterSequence objects are partitioned by calling partitionByOtherMeterSequence().
+        MeterSequence objects are partitioned by calling partitionedByOtherMeterSequence().
 
         >>> a = meter.MeterSequence('5/4+3/8')
         >>> len(a)
@@ -1037,13 +1072,13 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         1
         >>> str(b)
         '{13/8}'
-        >>> b = b.partition(13)
+        >>> b = b.partitioned(13)
         >>> len(b)
         13
         >>> str(b)
         '{1/8+1/8+1/8+...+1/8}'
 
-        >>> a = a.partition(b)
+        >>> a = a.partitioned(b)
         >>> len(a)
         13
         >>> str(a)
@@ -1052,12 +1087,12 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         Demo of loadDefault: if impossible, then do it another way:
 
         >>> c = meter.MeterSequence('3/128')
-        >>> c.partition(2)
+        >>> c.partitioned(2)
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by 2 (3/128)
 
         >>> c = meter.MeterSequence('3/128')
-        >>> c = c.partition(2, loadDefault=True)
+        >>> c = c.partitioned(2, loadDefault=True)
         >>> len(c)
         3
         >>> str(c)
@@ -1065,18 +1100,18 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
         * Changed in v9.3: if given a list it must either be all numbers, all strings,
           or all MeterTerminals, not a mix (which was undocumented and buggy)
-        * Changed in v11: returns a new MeterSequence instead of changing this one.
+        * New in v11: replaces `partition()`, which changed the sequence in place.
         '''
         if common.isListLike(value):
-            return self.partitionByList(value)
+            return self.partitionedByList(value)
         elif isinstance(value, MeterSequence):
-            return self.partitionByOtherMeterSequence(value)
+            return self.partitionedByOtherMeterSequence(value)
         elif isinstance(value, int):
-            return self.partitionByCount(value, loadDefault=loadDefault)
+            return self.partitionedByCount(value, loadDefault=loadDefault)
         else:
             raise MeterException(f'cannot process partition argument {value}')
 
-    def subdividePartitionsEqual(self, divisions: int|None = None) -> MeterSequence:
+    def subdividedPartitionsEqual(self, divisions: int|None = None) -> MeterSequence:
         '''
         Return a new MeterSequence with all partitions subdivided by
         equally-spaced divisions, given a divisions value.
@@ -1100,7 +1135,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         Divide the Sequence into two parts, so now there are two
         MeterTerminals of 1/4 each:
 
-        >>> ms = ms.partition(2)
+        >>> ms = ms.partitioned(2)
         >>> ms
         <music21.meter.core.MeterSequence {1/4+1/4}>
         >>> len(ms)
@@ -1111,9 +1146,9 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         <music21.meter.core.MeterTerminal 1/4>
 
         But what happens if we want to divide each of those into 1/8+1/8 are replace
-        them by MeterSequences?  subdividePartitionsEqual is what is needed.
+        them by MeterSequences?  subdividedPartitionsEqual is what is needed.
 
-        >>> ms = ms.subdividePartitionsEqual(2)
+        >>> ms = ms.subdividedPartitionsEqual(2)
         >>> ms
         <music21.meter.core.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
 
@@ -1129,17 +1164,17 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
         To subdivide something nested, put the result back with :meth:`setIndex`:
 
-        >>> ms = ms.setIndex(0, ms[0].subdividePartitionsEqual(2))
+        >>> ms = ms.setIndex(0, ms[0].subdividedPartitionsEqual(2))
         >>> ms
         <music21.meter.core.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{1/8+1/8}}>
-        >>> ms = ms.setIndex(1, ms[1].subdividePartitionsEqual(2))
+        >>> ms = ms.setIndex(1, ms[1].subdividedPartitionsEqual(2))
         >>> ms
         <music21.meter.core.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
 
         If None is given as a parameter, then it will try to find something logical.
 
         >>> ms = meter.MeterSequence('2/4+3/4')
-        >>> ms = ms.subdividePartitionsEqual(None)
+        >>> ms = ms.subdividedPartitionsEqual(None)
         >>> ms
         <music21.meter.core.MeterSequence {{1/4+1/4}+{1/4+1/4+1/4}}>
 
@@ -1148,11 +1183,11 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> ms = meter.MeterSequence('5/8+3/8')
         >>> len(ms)
         2
-        >>> ms.subdividePartitionsEqual(5)
+        >>> ms.subdividedPartitionsEqual(5)
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by 5 (3/8)
 
-        * Changed in v11: returns a new MeterSequence instead of changing this one.
+        * New in v11: replaces `subdividePartitionsEqual()`, which changed the sequence in place.
         '''
         newPartition: list[MeterNode] = []
         for i in range(len(self)):
@@ -1174,7 +1209,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
         return self._rebuild(newPartition)
 
-    def subdivideNestedHierarchy(self, depth, firstPartitionForm=None,
+    def subdividedNestedHierarchy(self, depth, firstPartitionForm=None,
                                  normalizeDenominators=True) -> MeterSequence:
         '''
         Return a new MeterSequence with a nested structure down to a specified
@@ -1184,11 +1219,11 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         `normalizeDenominators`, if True, will reduce all denominators to the same minimum level.
 
         >>> ms = meter.MeterSequence('4/4')
-        >>> ms.subdivideNestedHierarchy(1)
+        >>> ms.subdividedNestedHierarchy(1)
         <music21.meter.core.MeterSequence {{1/2+1/2}}>
-        >>> ms.subdivideNestedHierarchy(2)
+        >>> ms.subdividedNestedHierarchy(2)
         <music21.meter.core.MeterSequence {{{1/4+1/4}+{1/4+1/4}}}>
-        >>> ms.subdivideNestedHierarchy(3)
+        >>> ms.subdividedNestedHierarchy(3)
         <music21.meter.core.MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
 
         I think you get the picture!
@@ -1197,15 +1232,15 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         so users can skip directly to whatever level of hierarchy they want.
 
         >>> ms2 = meter.MeterSequence('4/4')
-        >>> ms2.subdivideNestedHierarchy(3)
+        >>> ms2.subdividedNestedHierarchy(3)
         <music21.meter.core.MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
 
-        * Changed in v11: returns a new MeterSequence instead of changing this one.
+        * New in v11: replaces `subdivideNestedHierarchy()`, which changed the sequence in place.
 
         AI-assisted (Claude).
         '''
         # as a hierarchical representation, zeroth subdivision must be 1
-        ms = self.partition(1)
+        ms = self.partitioned(1)
         depthCount = 0
 
         # initial divisions are often based on numerator or are provided
@@ -1228,7 +1263,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
                 divFirst = firstPartitionForm
 
             # use partitions equal, divide by number
-            ms = ms.subdividePartitionsEqual(divFirst)
+            ms = ms.subdividedPartitionsEqual(divFirst)
             depthCount += 1
 
         # all other partitions are recursive; start first with list of paths
@@ -1348,7 +1383,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> a = meter.MeterSequence('3/4')
         >>> a.weight
         1.0
-        >>> a = a.partition(3)
+        >>> a = a.partitioned(3)
         >>> a
         <music21.meter.core.MeterSequence {1/4+1/4+1/4}>
         >>> a.weight
@@ -1376,7 +1411,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         Return a new MeterSequence whose weights add up to ``targetWeight``.
         Longer parts get more of it:
 
-        >>> threePlusOne = meter.MeterSequence('4/4').partition(['3/4', '1/4'])
+        >>> threePlusOne = meter.MeterSequence('4/4').partitioned(['3/4', '1/4'])
         >>> threePlusOne.getLevelWeight()
         [0.75, 0.25]
         >>> threePlusOne.withWeight(2.0).getLevelWeight()
@@ -1401,7 +1436,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         to concatenate them.
 
         >>> a = meter.MeterSequence('3/4')
-        >>> a = a.partition(3)
+        >>> a = a.partitioned(3)
         >>> b = a._getFlatList()
         >>> b
         [<music21.meter.core.MeterTerminal 1/4>,
@@ -1520,7 +1555,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> ms = meter.MeterSequence('4/4')
         >>> ms.isUniformPartition()
         True
-        >>> ms = ms.partition(4)
+        >>> ms = ms.partitioned(4)
         >>> ms.isUniformPartition()
         True
         >>> ms = ms.setIndex(0, ms[0].subdivideByCount(2))
@@ -1537,7 +1572,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> ms = meter.MeterSequence('5/8', 5)
         >>> ms.isUniformPartition()
         True
-        >>> ms = ms.partition(2)
+        >>> ms = ms.partitioned(2)
         >>> ms.isUniformPartition()
         False
 
@@ -1749,18 +1784,18 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
             post.append(mt.weight)
         return post
 
-    def setLevelWeight(self, weightList, level=0) -> MeterSequence:
+    def withLevelWeight(self, weightList, level=0) -> MeterSequence:
         '''
         The `weightList` is an array of weights to be applied to a
         single level of the MeterSequence.  Returns a new MeterSequence.
 
         >>> a = meter.MeterSequence('4/4', 4)
-        >>> a = a.setLevelWeight([1.0, 2.0, 3.0, 4.0])
+        >>> a = a.withLevelWeight([1.0, 2.0, 3.0, 4.0])
         >>> a.getLevelWeight()
         [1.0, 2.0, 3.0, 4.0]
 
         >>> b = meter.MeterSequence('4/4', 4)
-        >>> b = b.setLevelWeight([2.0, 3.0])
+        >>> b = b.withLevelWeight([2.0, 3.0])
         >>> b.getLevelWeight(0)
         [2.0, 3.0, 2.0, 3.0]
 
@@ -1779,7 +1814,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         >>> b.getLevelWeight(2)
         [2.0, 1.5, 1.5, 2.0, 0.75, 0.75, 1.5]
 
-        * Changed in v11: returns a new MeterSequence instead of changing this one.
+        * New in v11: replaces `setLevelWeight()`, which changed the sequence in place.
         '''
         new, unused_idx = self._withLevelWeights(weightList, level, 0)
         return new
@@ -1822,13 +1857,13 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         0
         >>> a.offsetToIndex(3.5)
         0
-        >>> a = a.partition(4)
+        >>> a = a.partitioned(4)
         >>> a.offsetToIndex(0.5)
         0
         >>> a.offsetToIndex(3.5)
         3
 
-        >>> a = a.partition([1, 2, 1])
+        >>> a = a.partitioned([1, 2, 1])
         >>> len(a)
         3
         >>> a.offsetToIndex(2.9)
@@ -2065,6 +2100,17 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
         return score
 
+    partition = _removedInPlaceMethod('partition', 'partitioned')
+    partitionByCount = _removedInPlaceMethod('partitionByCount', 'partitionedByCount')
+    partitionByList = _removedInPlaceMethod('partitionByList', 'partitionedByList')
+    partitionByOtherMeterSequence = _removedInPlaceMethod(
+        'partitionByOtherMeterSequence', 'partitionedByOtherMeterSequence')
+    subdividePartitionsEqual = _removedInPlaceMethod(
+        'subdividePartitionsEqual', 'subdividedPartitionsEqual')
+    subdivideNestedHierarchy = _removedInPlaceMethod(
+        'subdivideNestedHierarchy', 'subdividedNestedHierarchy')
+    setLevelWeight = _removedInPlaceMethod('setLevelWeight', 'withLevelWeight')
+
 
 # -----------------------------------------------------------------------------
 # functions that build MeterSequences
@@ -2276,7 +2322,7 @@ def _buildSequence(
     ms = makeSequence(numerator, denominator, tuple(partition),
                        summedNumerator=summedNumerator)
     if partitionRequest is not None:
-        ms = ms.partition(partitionRequest)
+        ms = ms.partitioned(partitionRequest)
     return ms
 
 
@@ -2284,7 +2330,7 @@ def _getAtPath(root: MeterSequence, path: tuple[int, ...]) -> MeterNode:
     '''
     Follow `path`, a tuple of indices, down from `root`: `(1, 0)` means `root[1][0]`.
 
-    >>> ms = meter.MeterSequence('2/4', 2).subdividePartitionsEqual(2)
+    >>> ms = meter.MeterSequence('2/4', 2).subdividedPartitionsEqual(2)
     >>> ms
     <music21.meter.core.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
     >>> meter.core._getAtPath(ms, (1, 0))
@@ -2302,7 +2348,7 @@ def _replaceAtPath(root: MeterSequence, path: tuple[int, ...], newNode) -> Meter
     '''
     Return a new `root` with whatever is at `path` replaced by `newNode`.
 
-    >>> ms = meter.MeterSequence('2/4', 2).subdividePartitionsEqual(2)
+    >>> ms = meter.MeterSequence('2/4', 2).subdividedPartitionsEqual(2)
     >>> sixteenths = ms[1][0].subdivide(2)
     >>> meter.core._replaceAtPath(ms, (1, 0), sixteenths)
     <music21.meter.core.MeterSequence {{1/8+1/8}+{{1/16+1/16}+1/8}}>
@@ -2323,11 +2369,11 @@ def _subdivideNestedByPaths(
     divisions,
 ) -> tuple[MeterSequence, list[tuple[int, ...]]]:
     '''
-    Call :meth:`MeterSequence.subdividePartitionsEqual` on each MeterSequence at
+    Call :meth:`MeterSequence.subdividedPartitionsEqual` on each MeterSequence at
     `paths`.  Returns the new root and the paths to what is now inside them, ready
     to pass back in to go one level deeper.
 
-    >>> root = meter.MeterSequence('4/4').partition(1).subdividePartitionsEqual(2)
+    >>> root = meter.MeterSequence('4/4').partitioned(1).subdividedPartitionsEqual(2)
     >>> root
     <music21.meter.core.MeterSequence {{1/2+1/2}}>
     >>> meter.core._subdivideNestedByPaths(root, [(0,)], 2)
@@ -2338,7 +2384,7 @@ def _subdivideNestedByPaths(
     newPaths: list[tuple[int, ...]] = []
     for p in paths:
         node = t.cast('MeterSequence', _getAtPath(root, p))
-        newNode = node.subdividePartitionsEqual(divisions)
+        newNode = node.subdividedPartitionsEqual(divisions)
         root = _replaceAtPath(root, p, newNode)
         for j in range(len(newNode)):
             newPaths.append(p + (j,))
