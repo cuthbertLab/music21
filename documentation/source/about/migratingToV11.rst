@@ -236,6 +236,9 @@ Removed and deprecated
      - ``c[2].tie``
    * - a Note as a Chord index, ``c[someNote]``
      - ``c[someNote.pitch]``
+   * - ``alteredDegrees`` arguments in ``scale.intervalNetwork``,
+       ``IntervalNetwork.processAlteredNodes`` and ``getUnalteredPitch``
+     - intervals that already hold the altered pitches
 
 .. list-table:: Deprecated in v11 (removed in v12 unless noted)
    :header-rows: 1
