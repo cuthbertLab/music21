@@ -90,7 +90,6 @@ class Test(unittest.TestCase):
     def testMeterSequenceDeepcopy(self):
         a = MeterSequence('4/4', 4)
         b = copy.deepcopy(a)
-        # a MeterSequence is immutable, so deepcopy returns the same object
         self.assertIs(a, b)
         self.assertEqual(a, b)
 
@@ -105,50 +104,36 @@ class Test(unittest.TestCase):
         self.assertNotEqual(e, f)
 
     def testMeterTerminalCache(self):
-        # this is an internal test, so it inspects the private cache directly
         from music21.meter.core import _meterTerminalCache
-        # getMeterTerminal populates the cache under its (numerator, denominator,
-        # weight) key, and a repeat request is the very object stored there
         a = getMeterTerminal(1, 4)
         self.assertIs(_meterTerminalCache[(1, 4, 1.0)], a)
         self.assertIs(a, getMeterTerminal(1, 4))
         self.assertIs(a, getMeterTerminal(numerator=1, denominator=4, weight=1.0))
-        # a different weight is a different terminal, stored under its own key
         b = getMeterTerminal(1, 4, weight=0.5)
         self.assertIsNot(a, b)
         self.assertIs(_meterTerminalCache[(1, 4, 0.5)], b)
-        # value equality regardless of how they were built
         self.assertEqual(MeterTerminal('1/4'), getMeterTerminal(1, 4))
 
     def testMeterTerminalModify(self):
         a = getMeterTerminal(2, 4, weight=0.5)
-        # modify changes only the named slot(s); the rest carry over
         b = a.modify(weight=0.25)
         self.assertEqual((b.numerator, b.denominator, b.weight), (2, 4, 0.25))
         c = a.modify(numerator=3)
         self.assertEqual((c.numerator, c.denominator, c.weight), (3, 4, 0.5))
-        # the original is unchanged (immutable) and setting a slot raises
         self.assertEqual(a.weight, 0.5)
         with self.assertRaises(TypeError):
             a.weight = 0.25
-        # modify is wired through the cache, and __replace__ is an alias
         self.assertIs(a.modify(weight=0.25), b)
         self.assertIs(a.__replace__(numerator=3), c)
-        # an unhandled keyword raises rather than being silently ignored
         with self.assertRaises(ValueError):
             a.modify(parenthesis=True)
 
     def testMeterSequenceCache(self):
-        # this is an internal test, so it inspects the private caches directly
         from music21.meter.core import _meterSequenceCache
         from music21.meter.base import _defaultSequenceCache
-        # getMeterSequence stores the built sequence in the sequence cache, and a
-        # repeat request is the very object stored there
         ms = getMeterSequence('4/4', 4)
         self.assertIs(getMeterSequence('4/4', 4), ms)
         self.assertTrue(any(cached is ms for cached in _meterSequenceCache.values()))
-        # TimeSignature.load stores its configured (display, beam, beat, accent)
-        # sequences under (value, divisions); a repeat 4/4 reuses exactly those
         a = TimeSignature('4/4')
         display, beam, beat, accent = _defaultSequenceCache[('4/4', None)]
         self.assertIs(a.displaySequence, display)
@@ -165,14 +150,11 @@ class Test(unittest.TestCase):
         self.assertFalse(a.parenthesis)
         b = a.modify(parenthesis=True)
         self.assertTrue(b.parenthesis)
-        self.assertFalse(a.parenthesis)  # original unchanged
-        # a mutating attempt on the immutable sequence raises
+        self.assertFalse(a.parenthesis)
         with self.assertRaises(TypeError):
             a.parenthesis = True
-        # modify is cache-wired: same result from two independent sequences
         self.assertIs(b, MeterSequence('4/4', 4).modify(parenthesis=True))
-        # numerator/denominator/weight are not modifiable here (they follow from
-        # the partition); an unhandled keyword raises
+        # these follow from the partition
         for kw in ({'numerator': 3}, {'denominator': 8}, {'weight': 1.5}):
             with self.assertRaises(ValueError):
                 a.modify(**kw)
@@ -262,7 +244,6 @@ class Test(unittest.TestCase):
     def testOffsetToDepth(self):
         # get a maximally divided 4/4 to the level of 1/8
         def recSub(node, remaining):
-            # functionally subdivide node by 2 for `remaining` levels
             if remaining == 0:
                 return node
             sub = node.subdivide(2)

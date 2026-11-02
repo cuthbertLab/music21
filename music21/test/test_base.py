@@ -82,11 +82,8 @@ class Test(unittest.TestCase):
 
     def testAssignFrozenDurationStaysFrozen(self):
         '''
-        A FrozenDuration (e.g. a MeterSequence's duration) may be assigned as an
-        element's .duration; it is held shared -- not thawed -- and its client is
-        left unset, since a frozen duration never changes.  It stays frozen: trying
-        to change the element's length raises, and it is up to the caller to
-        unfreeze first if they want a mutable duration.
+        A FrozenDuration assigned to an element's .duration stays frozen and
+        shared, and gets no client.
         '''
         frozen = meter.MeterSequence('4/4').duration
         self.assertIsInstance(frozen, duration.FrozenDuration)
@@ -96,11 +93,9 @@ class Test(unittest.TestCase):
         self.assertIs(n.duration, frozen)
         self.assertIsNone(frozen.client)
 
-        # the duration stays frozen: n.quarterLength = x (i.e.
-        # n.duration.quarterLength = x) raises rather than silently copying.
         with self.assertRaises(TypeError):
             n.quarterLength = 3.0
-        self.assertEqual(frozen.quarterLength, 4.0)  # untouched
+        self.assertEqual(frozen.quarterLength, 4.0)
 
     def testOffsets(self):
         a = ElementWrapper(note.Note('A#'))
