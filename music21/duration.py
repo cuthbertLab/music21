@@ -1722,21 +1722,19 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> tupDur1 == tupDur2
         True
 
-        Grace durations are conceptually distinct, so they never equal an ordinary
-        Duration:
+        A grace duration never equals an ordinary Duration:
 
         >>> graceDur1 = tupDur1.getGraceDuration()
         >>> graceDur1 == tupDur1
         False
 
-        But two grace durations of the same value are equal:
+        Two grace durations of the same value are equal:
 
         >>> graceDur2 = tupDur2.getGraceDuration()
         >>> graceDur1 == graceDur2
         True
 
-        A :class:`FrozenDuration` differs from a Duration only in being immutable,
-        so it compares equal to an otherwise-identical Duration:
+        A :class:`FrozenDuration` equals a Duration of the same value:
 
         >>> duration.Duration(2.0) == duration.FrozenDuration(quarterLength=2.0)
         True
@@ -1774,13 +1772,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         * Changed in v11: if both durations have `expressionIsInferred` True,
           only `quarterLength` must match.
-        * Changed in v11: equality is by musical value, not exact class, so a
-          FrozenDuration equals the Duration it represents.
+        * Changed in v11: a FrozenDuration equals a Duration of the same value.
         '''
         if not isinstance(other, Duration):
             return False
-        # A grace duration is conceptually a different thing from an ordinary
-        # duration, even at the same length; a FrozenDuration is not.
         if self.isGrace != other.isGrace:
             return False
 
@@ -3149,14 +3144,13 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
 
     def __copy__(self):
         '''
-        Immutable objects return themselves
+        A FrozenDuration is immutable, so copy returns it.
         '''
         return self
 
     def unfreeze(self) -> Duration:
         '''
-        Return an independent, mutable :class:`Duration` with the same value --
-        faithfully preserving components, tuplets, etc.
+        Return a new :class:`Duration` with the same value, components and tuplets.
 
         >>> fd = duration.FrozenDuration(type='half', dots=1)
         >>> d = fd.unfreeze()
@@ -3165,7 +3159,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
         >>> type(d) is duration.Duration
         True
 
-        The copy is mutable and fully independent of the original:
+        It can be changed without changing the original:
 
         >>> d.dots = 0
         >>> d.quarterLength
@@ -3173,7 +3167,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
         >>> fd.dots
         1
 
-        Tuplets and unlinked status survive the round trip:
+        Tuplets are copied:
 
         >>> fd2 = duration.FrozenDuration(2/3)
         >>> d2 = fd2.unfreeze()
@@ -3186,11 +3180,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
 
         AI-assisted (Claude).
         '''
-        # Copy the frozen state straight onto a bare mutable Duration.  __new__
-        # skips __init__ (which would just set defaults __setstate__ overwrites);
-        # __setstate__ then restores every slot.  Components/quarterLength/link
-        # status are immutable and shared; only tuplets are mutable, so deep-copy
-        # those (when any) -- meter durations have none, so it is skipped entirely.
+        # only the tuplets can be changed in place, so only they are copied
         new = Duration.__new__(Duration)
         new.__setstate__(self.__getstate__())
         if self._tuplets:
@@ -3200,8 +3190,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
 
     def augmentOrDiminish(self, amountToScale: OffsetQLIn, retainComponents=False) -> Duration:
         '''
-        Like :meth:`Duration.augmentOrDiminish`, but always returns a new, mutable
-        Duration.
+        Like :meth:`Duration.augmentOrDiminish`, but returns a Duration.
 
         >>> fd = duration.FrozenDuration(quarterLength=1.0)
         >>> d = fd.augmentOrDiminish(0.5)
@@ -3215,8 +3204,8 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
 
     def splitDotGroups(self, *, inPlace=False) -> Duration:
         '''
-        Like :meth:`Duration.splitDotGroups`, but `inPlace` must be False since a
-        FrozenDuration cannot be mutated.
+        Like :meth:`Duration.splitDotGroups`, but returns a Duration;
+        `inPlace` must be False.
 
         >>> fd = duration.FrozenDuration(quarterLength=1.0)
         >>> fd.splitDotGroups()
@@ -3228,7 +3217,6 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
         '''
         if inPlace:
             raise TypeError(f'This {type(self).__name__} instance is immutable.')
-        # unfreeze() already made the copy, so split it in place -- no second copy.
         thawed = self.unfreeze()
         thawed.splitDotGroups(inPlace=True)
         return thawed
