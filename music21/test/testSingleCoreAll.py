@@ -25,15 +25,9 @@ from music21 import common
 from music21 import environment
 
 from music21.test import commonTest
-from music21.test import coverageM21
 from music21.test import testRunner
 
 environLocal = environment.Environment('test.testSingleCoreAll')
-
-
-# this is designed to be None for all but one system and a Coverage() object
-# for one system.
-cov = coverageM21.getCoverage()
 
 
 def main(testGroup: Sequence[str] = ('test',),
@@ -118,8 +112,6 @@ def main(testGroup: Sequence[str] = ('test',),
         runner = unittest.TextTestRunner(verbosity=verbosity)
         finalTestResults = runner.run(s1)
 
-    coverageM21.stopCoverage(cov)
-
     if (finalTestResults.errors
             or finalTestResults.failures
             or finalTestResults.unexpectedSuccesses):
@@ -136,18 +128,17 @@ def ciMain():
     # and TestExternal (without doctests) with show=False
     # exits with the aggregated returnCode
     returnCodeTest = main(testGroup=('test',), verbosity=1)
-    # restart coverage if running main() twice
-    coverageM21.startCoverage(cov)
     returnCodeExternal = main(testGroup=('external',), verbosity=1, show=False)
     sys.exit(returnCodeTest + returnCodeExternal)
 
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    # if optional command line arguments are given, assume they are
-    # test group arguments
-    if len(sys.argv) >= 2:
-        unused_returnCode = main(sys.argv[1:])
+    # 'ci' runs what GitHub Actions runs; other arguments are test group names.
+    if len(sys.argv) < 2:
+        main()
+    elif sys.argv[1] == 'ci':
+        ciMain()
     else:
-        unused_returnCode = main()
+        main(sys.argv[1:])
 

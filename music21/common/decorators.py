@@ -125,7 +125,6 @@ def deprecated(
     Restore stderr at the end.
 
     >>> sys.stderr = saveStdErr
-
     '''
     if hasattr(method, '__qualname__'):
         funcName = method.__qualname__

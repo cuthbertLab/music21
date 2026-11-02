@@ -159,6 +159,8 @@ class SingletonCounter:
 
 # ------------------------------------------------------------------------------
 
+_slotsByClass: dict[type, frozenset[str]] = {}
+
 
 class SlottedObjectMixin:
     r'''
@@ -223,9 +225,9 @@ class SlottedObjectMixin:
         for slot, value in state.items():
             setattr(self, slot, value)
 
-    def _getSlotsRecursive(self) -> set[str]:
+    def _getSlotsRecursive(self) -> frozenset[str]:
         '''
-        Find all slots recursively.
+        Find all slots recursively.  Cached per class.
 
         A private attribute so as not to change the contents of inheriting
         objects private interfaces:
@@ -250,10 +252,16 @@ class SlottedObjectMixin:
         ['_editorial', '_style', 'direction', 'funkiness', 'groovability',
             'id', 'independentAngle', 'number', 'type']
         '''
+        try:
+            return _slotsByClass[type(self)]
+        except KeyError:
+            pass
         slots: set[str] = set()
         for cls in self.__class__.mro():
             slots.update(getattr(cls, '__slots__', ()))
-        return slots
+        frozenSlots = frozenset(slots)
+        _slotsByClass[type(self)] = frozenSlots
+        return frozenSlots
 
 
 class EqualSlottedObjectMixin(SlottedObjectMixin):

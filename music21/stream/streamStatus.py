@@ -138,7 +138,6 @@ class StreamStatus(SlottedObjectMixin):
         >>> nTuplet.duration.tuplets[0].type = 'start'
         >>> s.streamStatus.haveTupletBracketsBeenMade()
         True
-
         '''
         foundTuplet = False
         for n in self.client.recurse(classFilter='GeneralNote', restoreActiveSites=False):

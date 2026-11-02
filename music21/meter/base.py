@@ -203,14 +203,15 @@ def bestTimeSignature(meas: stream.Stream) -> 'music21.meter.TimeSignature':
                 break
         # numerator is the count of min parts in the sum
         multiplier = 1
+        numeratorFloat = 0.0
         while i > 0:
-            numerator = multiplier * sumDurQL / minDurQL
-            if numerator == int(numerator):
+            numeratorFloat = multiplier * sumDurQL / minDurQL
+            if numeratorFloat == int(numeratorFloat):
                 break
             multiplier *= 2
             i -= 1
 
-        numerator = int(numerator)
+        numerator = int(numeratorFloat)
         floatDenominator *= multiplier
         denominator = int(floatDenominator)
         # simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
@@ -504,7 +505,6 @@ class TimeSignature(TimeSignatureBase):
     >>> another44 = meter.TimeSignature()  # '4/4' by default
     >>> one44 == another44
     True
-
     '''
     _styleClass = style.TextStyle
     classSortOrder = 4
@@ -1303,7 +1303,6 @@ class TimeSignature(TimeSignatureBase):
         >>> ts2._setDefaultAccentWeights(3)  # lower depth
         >>> [mt.weight for mt in ts2.accentSequence]
         [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]
-
         '''
         # NOTE: this is a performance critical method
         firstPartitionForm: MeterSequence|int|None
@@ -1669,7 +1668,7 @@ class TimeSignature(TimeSignatureBase):
         >>> a.getAccent(2.0)
         True
         '''
-        pos = 0
+        pos: OffsetQL = 0.0
         qLenPos = opFrac(qLenPos)
         for i in range(len(self.accentSequence)):
             if pos == qLenPos:

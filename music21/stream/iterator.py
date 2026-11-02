@@ -204,10 +204,10 @@ class StreamIterator[M21ObjType: base.Music21Object](prebase.ProtoM21Object, Seq
                 continue
 
             self.elementIndex += 1
-            if self.matchesFilters(e) is False:
+            if not self.matchesFilters(e):
                 continue
 
-            if self.restoreActiveSites is True:
+            if self.restoreActiveSites:
                 self.srcStream.coreSelfActiveSite(e)
 
             self.updateActiveInformation()
@@ -219,7 +219,7 @@ class StreamIterator[M21ObjType: base.Music21Object](prebase.ProtoM21Object, Seq
 
     def __getattr__(self, attr):
         '''
-        DEPRECATED in v8 -- will be removed in v9.
+        DEPRECATED in v8 -- will be removed in soon.
 
         In case an attribute is defined on Stream but not on a StreamIterator,
         create a Stream and then return that attribute.  This is NOT performance
@@ -466,7 +466,6 @@ class StreamIterator[M21ObjType: base.Music21Object](prebase.ProtoM21Object, Seq
         0
         >>> bool(iterator.getElementsByClass(chord.Chord))
         False
-
         '''
         if self._len is not None:
             return bool(self._len)
@@ -1827,10 +1826,10 @@ class RecursiveIterator[M21ObjType: base.Music21Object](
 
                 childRecursiveIterator.iteratorStartOffsetInHierarchy = newStartOffset
                 self.childRecursiveIterator = childRecursiveIterator
-            if self.matchesFilters(e) is False:
+            if not self.matchesFilters(e):
                 continue
 
-            if self.restoreActiveSites is True:
+            if self.restoreActiveSites:
                 self.srcStream.coreSelfActiveSite(e)
 
             self.updateActiveInformation()
@@ -2132,8 +2131,6 @@ class Test(unittest.TestCase):
 
     def testAddingFiltersMidRecursiveIteration(self):
         from music21 import stream
-        # noinspection PyUnresolvedReferences
-        from music21.stream.iterator import RecursiveIterator as ImportedRecursiveIterator
         m = stream.Measure()
         r = note.Rest()
         n = note.Note()
@@ -2149,7 +2146,7 @@ class Test(unittest.TestCase):
         self.assertIs(p0, p)
 
         child = sIter.childRecursiveIterator
-        self.assertIsInstance(child, ImportedRecursiveIterator)
+        self.assertIsInstance(child, RecursiveIterator)
 
 
 

@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2017-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,6 +19,7 @@ This module will move to a medren package hopefully by v7.
 from __future__ import annotations
 
 import enum
+import unittest
 
 from music21 import bar
 from music21 import base
@@ -192,7 +193,6 @@ def toPart(volpianoText, *, breaksToLayout=False):
     p = stream.Part()
     m = stream.Measure()
 
-    currentMeasure = m
     currentNeumeSpanner = None
     noteThatWouldGoInSpanner = None
     lastClef = clef.TrebleClef()
@@ -217,14 +217,14 @@ def toPart(volpianoText, *, breaksToLayout=False):
                 else:
                     breakToken = breakClass()  # pylint: disable=not-callable
 
-            currentMeasure.append(breakToken)
+            m.append(breakToken)
 
         continuousNumberOfBreakTokens = 0
 
         if token == '-':
             noteThatWouldGoInSpanner = None
             if currentNeumeSpanner:
-                currentMeasure.append(currentNeumeSpanner)
+                m.append(currentNeumeSpanner)
                 currentNeumeSpanner = None
             continue
 
@@ -295,7 +295,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
     if continuousNumberOfBreakTokens > 0:
         breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
         breakToken = breakClass()
-        currentMeasure.append(breakToken)
+        m.append(breakToken)
 
     if m:
         p.append(m)
@@ -368,9 +368,9 @@ def fromStream(s, *, layoutToBreaks=False):
         elClasses = el.classes
         if 'Clef' in elClasses:
             lastClef = el
-            if 'TrebleClef' in elClasses:
+            if isinstance(el, (clef.TrebleClef, clef.Treble8vbClef, clef.Treble8vaClef)):
                 ap('1---')
-            elif 'BassClef' in elClasses:
+            elif isinstance(el, (clef.BassClef, clef.Bass8vbClef, clef.Bass8vaClef)):
                 ap('2---')
             else:
                 error(el, ErrorLevel.WARN)
@@ -392,8 +392,8 @@ def fromStream(s, *, layoutToBreaks=False):
                 continue
 
             if n.notehead == 'x' or (n.hasEditorialInformation
-                                      and 'liquescence' in n.editorial
-                                      and n.editorial.liquescence):
+                                     and 'liquescence' in n.editorial
+                                     and n.editorial.liquescence):
                 tokenName = liquescentPitches[indexInPitchString]
             else:
                 tokenName = normalPitches[indexInPitchString]
@@ -456,8 +456,29 @@ def fromStream(s, *, layoutToBreaks=False):
     return ''.join(volpianoTokens)
 
 
+class Test(unittest.TestCase):
+    def testBreaksAndNeumesAfterBarline(self):
+        part = toPart('1---e-3-ef-g-7-e-4-gh--j-77')
+        self.assertEqual(
+            [[type(el).__name__ for el in m.getElementsByClass([Neume, LineBreak, PageBreak])]
+             for m in part.getElementsByClass(stream.Measure)],
+            [[], ['Neume', 'LineBreak'], ['Neume', 'PageBreak']])
+        self.assertEqual(fromStream(part), '1---e----3ef-g7---e----4gh-j77---')
+
+    def testOctaveClefsWritePlainClef(self):
+        for clefClass, volpianoClef in (
+            (clef.Treble8vbClef, '1---'),
+            (clef.Treble8vaClef, '1---'),
+            (clef.Bass8vbClef, '2---'),
+            (clef.Bass8vaClef, '2---'),
+        ):
+            self.assertTrue(fromStream(stream.Stream([clefClass()])).startswith(volpianoClef))
+        self.assertEqual(fromStream(stream.Stream([clef.Bass8vbClef(), note.Note('G1')])),
+                         fromStream(stream.Stream([clef.BassClef(), note.Note('G2')])))
+
+
 if __name__ == '__main__':
     import music21
     # allow things like "fromStream" to be called in doctests as "fromStream"
     # and not just "volpiano.fromStream"
-    music21.mainTest('importPlusRelative')
+    music21.mainTest(Test, 'importPlusRelative')

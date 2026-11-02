@@ -121,7 +121,6 @@ class Axis(prebase.ProtoM21Object):
         >>> axStream = graph.axis.DynamicsAxis(s, axisName='y')
         >>> axStream
         <music21.graph.axis.DynamicsAxis: y axis for Part>
-
         '''
         c = self.client
         if c is not None:
@@ -315,9 +314,9 @@ class PitchAxis(Axis):
     labelDefault = 'Pitch'
     quantities: tuple[str, ...] = ('pitchGeneric', )
 
-    def __init__(self, client=None, axisName='x'):
+    def __init__(self, client=None, axisName='x') -> None:
         super().__init__(client, axisName)
-        self.showOctaves = 'few'
+        self.showOctaves: bool|t.Literal['few'] = 'few'
         self.showEnharmonic = True
         self.blankLabelUnused = True
         self.hideUnused = True
@@ -425,7 +424,7 @@ class PitchAxis(Axis):
                     sub.append(accidentalLabelToUnicode(name))
                 label = '/'.join(sub)
 
-            if self.showOctaves is False:
+            if not self.showOctaves:
                 label = re.sub(r'\d', '', label)
             elif self.showOctaves == 'few':
                 matchOctave = re.search(r'\d', label)
@@ -450,8 +449,8 @@ class PitchClassAxis(PitchAxis):
     labelDefault = 'Pitch Class'
     quantities: tuple[str, ...] = ('pitchClass', 'pitchclass', 'pc')
 
-    def __init__(self, client=None, axisName='x'):
-        self.showOctaves = False
+    def __init__(self, client=None, axisName='x') -> None:
+        self.showOctaves: bool|t.Literal['few'] = False
         super().__init__(client, axisName)
         self.minValue = 0
         self.maxValue = 11
@@ -1034,7 +1033,6 @@ class OffsetAxis(PositionAxis):
         >>> om3 = ax.getOffsetMap()
         >>> om3
         {}
-
         '''
         s = self.stream
         if s is None:
@@ -1127,9 +1125,9 @@ class QuarterLengthAxis(PositionAxis):
                                    'duration',
                                    )
 
-    def __init__(self, client=None, axisName='x'):
+    def __init__(self, client=None, axisName='x') -> None:
         super().__init__(client, axisName)
-        self.useLogScale = True
+        self.useLogScale: bool|int = True
         self.useDurationNames = False
 
     def extractOneElement(self, n, formatDict):
@@ -1322,7 +1320,6 @@ class DynamicsAxis(Axis):
         >>> ax.maxValue = 6
         >>> ax.ticks()
         [(3, '$ppp$'), (4, '$pp$'), (5, '$p$'), (6, '$mp$')]
-
         '''
         ticks = []
         if self.minValue is None:

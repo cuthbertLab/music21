@@ -93,7 +93,7 @@ strangeWTCOpening = re.sub(r'\s\s\s\s+', '\t',
                            )
 
 ojibway = re.sub(r'\s\s\s\s+', '\t',
-                  r'''
+                 r'''
 !! Ojibway Indian Song
 !! Transcribed by Frances Densmore
 !! No. 84 "The Sioux Follow Me"

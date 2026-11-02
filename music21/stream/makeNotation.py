@@ -7,7 +7,7 @@
 #               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2008-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -530,6 +530,11 @@ def makeMeasures(
     post.derivation.origin = s
     post.derivation.method = 'makeMeasures'
 
+    longestBar = max(
+        (ts.barDuration.quarterLength
+            for ts in meterStream.getElementsByClass(meter.TimeSignature)),
+        default=0.0,
+    )
     o = 0.0  # initial position of first measure is assumed to be zero
     measureCount = 0
     lastTimeSignature = None
@@ -581,6 +586,9 @@ def makeMeasures(
         if thisTimeSignature.barDuration.quarterLength == 0:
             raise stream.StreamException(
                 f'time signature {thisTimeSignature!r} has no duration')
+        if measureCount + (oMax - o) / longestBar > defaults.maxMeasures:
+            raise stream.StreamException(
+                f'cannot make more than {defaults.maxMeasures} measures')
         post.coreInsert(o, m)  # insert measure
         # increment by meter length
         o += thisTimeSignature.barDuration.quarterLength
@@ -1242,6 +1250,11 @@ def makeTies(
         )
         meterStream.insert(0, ts)
 
+    longestBar = max(
+        (ts.barDuration.quarterLength
+            for ts in meterStream.getElementsByClass(meter.TimeSignature)),
+        default=0.0,
+    )
     mCount = 0
     measureList = list(returnObj.getElementsByClass(stream.Measure))
 
@@ -1309,6 +1322,9 @@ def makeTies(
                     #     f'({e}) has offset {eOffset} within a measure '
                     #     f'that ends at offset {mEnd}'
                     # )
+                if mCount + overshot / longestBar > defaults.maxMeasures:
+                    raise stream.StreamException(
+                        f'cannot make more than {defaults.maxMeasures} measures')
 
                 qLenWithinMeasure = mEnd - eOffset
                 e, eRemain = e.splitAtQuarterLength(
@@ -1320,20 +1336,21 @@ def makeTies(
                 # manage bridging voices
                 if mNextHasVoices:
                     if mHasVoices:  # try to match voice id
-                        if not isinstance(vId, int):
-                            dst = mNext.voices[vId]
-                        else:
-                            dst = mNext.getElementById(vId)
+                        dst = mNext.voices.getElementById(vId)
                     # src does not have voice, but dst does
                     else:  # place in top-most voice
                         dst = mNext.voices[0]
                 else:
                     # mNext has no voices but this one does
                     if mHasVoices:
-                        # internalize all components in a voice
-                        moveNotesToVoices(mNext)
-                        # place in first voice
-                        dst = mNext.voices[0]
+                        # internalize all components in a voice, once
+                        if not mNext.hasVoices():
+                            moveNotesToVoices(mNext)
+                        # place in a voice of the same id, made if missing
+                        dst = mNext.voices.getElementById(vId)
+                        if dst is None:
+                            dst = stream.Voice(id=vId)
+                            mNext.insert(0, dst)
                     else:  # no voices in either
                         dst = None
 
@@ -1355,6 +1372,7 @@ def makeTies(
                     returnObj.insert(mNext.offset, mNext)
                     # need to make sure that the new measure is processed.
                     measureList.append(mNext)
+                    mNextAdd = False
         mCount += 1
 
     for measure in returnObj.getElementsByClass(stream.Measure):
@@ -1701,9 +1719,11 @@ def makeAccidentalsInMeasureStream(
                 # just get the chromatic pitches from previous measure
                 # G-naturals in C major following G-flats in F major need cautionary
                 # G-naturals in C major following G-flats in Db major don't
-                pitchPastMeasure = [p for p in
-                    measuresOnly[i - 1].pitches + ornamentalPitches(measuresOnly[i - 1])
-                    if p.name not in ksLastDiatonic]
+                previousMeasure = measuresOnly[i - 1]
+                pitchPastMeasure = [
+                    p for p in previousMeasure.pitches + ornamentalPitches(previousMeasure)
+                    if p.name not in ksLastDiatonic
+                ]
             # Get tiePitchSet from previous measure
             try:
                 previousNoteOrChord = measuresOnly[i - 1][note.NotRest][-1]
@@ -2319,7 +2339,7 @@ class Test(unittest.TestCase):
         with self.assertRaises(stream.StreamException) as cm:
             p.makeMeasures(meterStream=duration.Duration())
         self.assertEqual(str(cm.exception),
-            'meterStream is neither a Stream nor a TimeSignature!')
+                         'meterStream is neither a Stream nor a TimeSignature!')
 
     def testMakeTiesChangingTimeSignatures(self):
         '''
@@ -2344,6 +2364,95 @@ class Test(unittest.TestCase):
         self.assertEqual(pp[stream.Measure][1].notes.first().duration.quarterLength, 24.0)
         self.assertEqual(len(pp[stream.Measure][2].notes), 1)
         self.assertEqual(pp[stream.Measure][2].notes.first().duration.quarterLength, 24.0)
+
+    def testMakeTiesVoiceIdMissingFromNextMeasure(self):
+        '''
+        A note crossing the barline in a voice whose (string) id is not
+        in the next measure goes to the measure itself, as it already
+        does for an int id, instead of raising KeyError.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import stream
+        p = stream.Part()
+        m1 = stream.Measure(number=1)
+        m1.insert(0, meter.TimeSignature('4/4'))
+        soprano = stream.Voice(id='soprano')
+        soprano.insert(3, note.Note('C4', quarterLength=2.0))
+        m1.insert(0, soprano)
+        m2 = stream.Measure(number=2)
+        m2.insert(0, stream.Voice(id='alto'))
+        p.insert(0, m1)
+        p.insert(4, m2)
+
+        p.makeTies(inPlace=True)
+        self.assertEqual(soprano.notes.first().duration.quarterLength, 1.0)
+        self.assertEqual(soprano.notes.first().tie.type, 'start')
+        remainder = m2.getElementsByClass(note.Note).first()
+        self.assertEqual(remainder.duration.quarterLength, 1.0)
+        self.assertEqual(remainder.tie.type, 'stop')
+
+    def testMakeTiesNewMeasureSharedByVoices(self):
+        '''
+        Every voice running past the last barline continues in the one
+        measure made after it.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import stream
+
+        def overrunning(voiceCount):
+            m1 = stream.Measure(number=1)
+            m1.insert(0, meter.TimeSignature('2/4'))
+            for i in range(voiceCount):
+                v = stream.Voice(id=str(i + 1))
+                v.append(note.Note(60 + 4 * i, quarterLength=4.0))
+                m1.insert(0, v)
+            return stream.Part([m1])
+
+        for voiceCount in (1, 2, 3):
+            p = overrunning(voiceCount)
+            p.makeTies(inPlace=True)
+            measures = p.getElementsByClass(stream.Measure)
+            self.assertEqual([m.number for m in measures], [1, 2])
+            self.assertEqual(measures[1].offset, 2.0)
+            remainders = measures[1].recurse().notes
+            self.assertEqual([n.tie.type for n in remainders], ['stop'] * voiceCount)
+            self.assertEqual([n.quarterLength for n in remainders], [2.0] * voiceCount)
+
+    def testMakeTiesKeepsVoicesInNextMeasure(self):
+        '''
+        Voices running into a measure that has none continue there in
+        voices of the same ids; notes the measure already holds keep a
+        voice of their own.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import stream
+
+        def tiedInto(nextMeasureNotes):
+            m1 = stream.Measure(number=1)
+            m1.insert(0, meter.TimeSignature('2/4'))
+            for voiceId, pitchName in (('1', 'C5'), ('2', 'C4')):
+                v = stream.Voice(id=voiceId)
+                v.append(note.Note(pitchName, quarterLength=4.0))
+                m1.insert(0, v)
+            m2 = stream.Measure(number=2)
+            for n in nextMeasureNotes:
+                m2.append(n)
+            p = stream.Part()
+            p.insert(0, m1)
+            p.insert(2, m2)
+            p.makeTies(inPlace=True)
+            return {v.id: [n.nameWithOctave for n in v.notes] for v in m2.voices}
+
+        self.assertEqual(tiedInto([]), {'1': ['C5'], '2': ['C4']})
+
+        kept = tiedInto([note.Note('G4', quarterLength=2.0)])
+        self.assertEqual(kept['1'], ['C5'])
+        self.assertEqual(kept['2'], ['C4'])
+        self.assertEqual(len(kept), 3)
+        self.assertIn(['G4'], kept.values())
 
     def testConsolidateCompletedTupletsNoFalsePositive(self):
         from fractions import Fraction
@@ -2429,6 +2538,29 @@ class Test(unittest.TestCase):
         self.assertIsNone(op.scores.first()[note.Note][1].tie)
         op.makeTies(inPlace=True)
         self.assertEqual(op.scores[1][note.Note][2].tie, tie.Tie('stop'))
+
+    def testMakeMeasuresTooManyMeasures(self):
+        from music21 import stream
+        p = stream.Part()
+        p.append(note.Note(quarterLength=4 * 2000))
+        self.assertEqual(len(p.makeMeasures().getElementsByClass(stream.Measure)), 2000)
+
+        p = stream.Part()
+        p.append(note.Note(quarterLength=2 ** 28))
+        with self.assertRaisesRegex(stream.StreamException, 'more than 100000 measures'):
+            p.makeMeasures()
+
+        p = stream.Part()
+        p.append(note.Note())
+        with self.assertRaisesRegex(stream.StreamException, 'more than 100000 measures'):
+            p.makeMeasures(refStreamOrTimeRange=[0.0, 2 ** 28])
+
+    def testMakeTiesTooManyMeasures(self):
+        from music21 import stream
+        m = stream.Measure([meter.TimeSignature('4/4'), note.Note(quarterLength=2 ** 28)])
+        p = stream.Part([m])
+        with self.assertRaisesRegex(stream.StreamException, 'more than 100000 measures'):
+            p.makeTies()
 
 
 # -----------------------------------------------------------------------------

@@ -51,13 +51,9 @@ in this form -- there's a test that ensures that code coverage increases with ea
 we'll help you learn the ropes.  This doc explains some of the main features (and potential Gotchas!)
 of our automatic documentation system.
 
-Install Jupyter with::
+`uv sync` in the music21 directory installs Jupyter. Run it from the music21 directory with::
 
-    pip3 install jupyter
-
-And then run it by changing directory to the one you want to edit and run::
-
-    jupyter notebook
+    uv run jupyter notebook
 
 When editing examples with code be sure, at least the first time, to run each code excerpt individually
 and pay attention to changes in output and unexpected errors.
@@ -79,9 +75,7 @@ by Sphinx.   Place all documentation for public modules, module-level
 functions, classes, and class-level attributes, properties, and methods
 as close to the relevant code as possible.
 
-If you're going to edit docs you'll need the latest version of Sphinx.  Go to the command line and type::
-
-    pip3 install sphinx
+If you're going to edit docs you'll need Sphinx, which `uv sync` installs.
 
 Sphinx uses special characters to identify formatting styles in documentation.
 Helpful tips on Sphinx formatting may be found here:  `Sphinx Cheat Sheet <https://matplotlib.org/sampledoc/cheatsheet.html>`_

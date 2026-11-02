@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -213,7 +213,6 @@ class FeatureExtractor:
          'Fifths_Pitch_Histogram_3', 'Fifths_Pitch_Histogram_4', 'Fifths_Pitch_Histogram_5',
          'Fifths_Pitch_Histogram_6', 'Fifths_Pitch_Histogram_7', 'Fifths_Pitch_Histogram_8',
          'Fifths_Pitch_Histogram_9', 'Fifths_Pitch_Histogram_10', 'Fifths_Pitch_Histogram_11']
-
         '''
         post: list[str] = []
         if self.dimensions == 1:
@@ -1224,7 +1223,6 @@ def extractorsById(idOrList: str|Iterable[str],
     >>> y = [x.id for x in features.extractorsById('all')]
     >>> y[0:3], y[-3:-1]
     (['M1', 'M2', 'M3'], ['CS12', 'MC1'])
-
     '''
     from music21.features import jSymbolic
     from music21.features import native
@@ -1236,7 +1234,7 @@ def extractorsById(idOrList: str|Iterable[str],
     for lib in libraries:
         if lib.lower() in ['jsymbolic', 'all']:
             featureExtractors += jSymbolic.featureExtractors
-        elif lib.lower() in ['native', 'all']:
+        if lib.lower() in ['native', 'all']:
             featureExtractors += native.featureExtractors
 
     ids: Iterable[str] = [idOrList] if isinstance(idOrList, str) else idOrList
@@ -1268,7 +1266,6 @@ def extractorById(idOrList: str|Iterable[str],
     >>> fe = features.extractorById('p20')(s)  # call class
     >>> fe.extract().vector
     [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
     '''
     ebi = extractorsById(idOrList=idOrList, library=library)
     if ebi:
@@ -1358,11 +1355,11 @@ class Test(unittest.TestCase):
                           '3-8': 2, '3-2': 2})
 
         self.assertEqual(di['chordify.flat.getElementsByClass(Chord).typesHistogram'],
-                           {'isMinorTriad': 6, 'isAugmentedTriad': 0,
-                            'isTriad': 34, 'isSeventh': 0, 'isDiminishedTriad': 4,
-                            'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 26,
-                            'isHalfDiminishedSeventh': 0, 'isMajorTriad': 24,
-                            'isDominantSeventh': 0, 'isIncompleteMinorTriad': 16})
+                         {'isMinorTriad': 6, 'isAugmentedTriad': 0,
+                          'isTriad': 34, 'isSeventh': 0, 'isDiminishedTriad': 4,
+                          'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 26,
+                          'isHalfDiminishedSeventh': 0, 'isMajorTriad': 24,
+                          'isDominantSeventh': 0, 'isIncompleteMinorTriad': 16})
 
         self.assertEqual(di['flat.notes.quarterLengthHistogram'],
                          {0.5: 116, 1.0: 39, 1.5: 27, 2.0: 31, 3.0: 2, 4.0: 3,
@@ -1492,6 +1489,17 @@ class Test(unittest.TestCase):
 
         for fp in (fp1, fp2, fp3):
             os.remove(fp)
+
+    def testExtractorsByIdLibraryAll(self):
+        from music21.features import jSymbolic
+        from music21.features import native
+
+        allExtractors = extractorsById('all', library='all')
+        self.assertEqual(allExtractors, extractorsById('all'))
+        self.assertIn(native.ChordBassMotionFeature, allExtractors)
+        self.assertIn(jSymbolic.PitchClassDistributionFeature, allExtractors)
+        self.assertEqual(extractorsById('cs12', library='all'),
+                         [native.ChordBassMotionFeature])
 
     def testFeatureFail(self):
         from music21 import features
@@ -1653,8 +1661,8 @@ class Test(unittest.TestCase):
         # features common to both collections
         featureExtractors = features.extractorsById(
             ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4',
-                             'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13',
-                             'p14', 'p15', 'p16', 'p19', 'p20', 'p21'], 'jSymbolic')
+             'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13',
+             'p14', 'p15', 'p16', 'p19', 'p20', 'p21'], 'jSymbolic')
 
         # first bundle
         ds = features.DataSet(classLabel='Region')

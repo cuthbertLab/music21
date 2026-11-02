@@ -102,7 +102,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     * Changed in v11: all four notes are now required arguments and can no
       longer be set later; they are always present as :class:`~music21.note.Note`
-      objects. `analyticKey` renamed to `key`. `vIntervals` and ``hIntervals` are now tuples.
+      objects. `analyticKey` renamed to `key`. `vIntervals` and `hIntervals` are now tuples.
     '''
 
     _DOC_ATTR: dict[str, str] = {
@@ -577,15 +577,15 @@ class VoiceLeadingQuartet(base.Music21Object):
             if isinstance(requiredInterval, str):
                 requiredInterval = interval.Interval(requiredInterval)
                 intervalsAreValid = (vInt0.semiSimpleName
-                                        == requiredInterval.semiSimpleName
+                                     == requiredInterval.semiSimpleName
                                      and vInt1.semiSimpleName
-                                        == requiredInterval.semiSimpleName)
+                                     == requiredInterval.semiSimpleName)
 
             elif isinstance(requiredInterval, (interval.Interval, interval.DiatonicInterval)):
                 intervalsAreValid = (vInt0.semiSimpleName
-                                        == requiredInterval.semiSimpleName
+                                     == requiredInterval.semiSimpleName
                                      and vInt1.semiSimpleName
-                                        == requiredInterval.semiSimpleName)
+                                     == requiredInterval.semiSimpleName)
 
             return intervalsAreValid
 
@@ -1161,7 +1161,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             if keyScale and n2degree != 3:
                 return False
             return (self.outwardContraryMotion()
-                        and secondHarmony == 6)
+                    and secondHarmony == 6)
 
         elif firstHarmony == 'd5':
             if keyScale and n1degree != 7:
@@ -1169,7 +1169,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             if keyScale and n2degree != 1:
                 return False
             return (self.inwardContraryMotion()
-                        and secondHarmony == 3)
+                    and secondHarmony == 3)
 
         elif firstHarmony == 'm7':
             if keyScale and n1degree != 5:
@@ -1291,9 +1291,9 @@ class VoiceLeadingQuartet(base.Music21Object):
         openingIntervals = ('P1', 'P5')
         openingFunctions = ('I', 'V')
         return ((v0.simpleName in openingIntervals
-                    or v1.simpleName in openingIntervals)
-                  and (r1[0].upper() in openingFunctions if r1 is not False else False
-                       or r2[0].upper() in openingFunctions if r2 is not False else False))
+                 or v1.simpleName in openingIntervals)
+                and (r1[0].upper() in openingFunctions if r1 is not False else False
+                     or r2[0].upper() in openingFunctions if r2 is not False else False))
 
     @common.decorators.deprecated(
         'June 2026', 'v12', 'Use `not vlq.modalOpening()` instead.'
@@ -1367,10 +1367,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         tonicName = self.key.tonic.name
         hIntervalNames = {self.hIntervals[0].name, self.hIntervals[1].name}
         return (hIntervalNames == {'m2', 'M2'}
-                 and self.contraryMotion()
-                 and self.vIntervals[1].name in ('P1', 'P8')
-                 and self.v1n2.name == tonicName
-                 and self.v2n2.name == tonicName)
+                and self.contraryMotion()
+                and self.vIntervals[1].name in ('P1', 'P8')
+                and self.v1n2.name == tonicName
+                and self.v2n2.name == tonicName)
 
     @common.decorators.deprecated(
         'June 2026', 'v12', 'Use `not vlq.clausulaVera()` instead.'
@@ -1684,7 +1684,6 @@ class Verticality(base.Music21Object):
          <music21.note.Note B>, <music21.note.Note F#>]
         >>> vs1.getObjectsByClass('Note', [1, 2])
         [<music21.note.Note C>, <music21.note.Note B>, <music21.note.Note F#>]
-
         '''
         if not common.isIterable(classFilterList):
             classFilterList = [classFilterList]
@@ -1801,42 +1800,44 @@ class Verticality(base.Music21Object):
         else:
             return sorted(self.objects, key=lambda m21Obj: m21Obj.offset)[-1].offset
 
-    def _setLyric(self, value):
-        newList = sorted(self.objects, key=lambda x: x.offset, reverse=True)
-        newList[0].lyric = value
-
-    def _getLyric(self):
-        newList = sorted(self.objects, key=lambda x: x.offset, reverse=True)
-        return newList[0].lyric
-
-    lyric = property(_getLyric, _setLyric, doc='''
+    @property
+    def lyric(self):
+        '''
         Sets each object on the Verticality to have the passed in lyric.
 
         >>> h = voiceLeading.Verticality({1: note.Note('C'), 2: harmony.ChordSymbol('C')})
         >>> h.lyric = 'Verticality 1'
         >>> h.getStream().flatten().getElementsByClass(note.Note).first().lyric
         'Verticality 1'
-        ''')
+        '''
+        newList = sorted(self.objects, key=lambda x: x.offset, reverse=True)
+        return newList[0].lyric
+
+    @lyric.setter
+    def lyric(self, value):
+        newList = sorted(self.objects, key=lambda x: x.offset, reverse=True)
+        newList[0].lyric = value
 
     def _reprInternal(self):
         return f'contentDict={self.contentDict}'
 
-    def _setColor(self, color):
-        self.style.color = color
-        for obj in self.objects:
-            obj.style.color = color
-
-    def _getColor(self):
-        return self.style.color
-
-    color = property(_getColor, _setColor, doc='''
+    @property
+    def color(self):
+        '''
         Sets the color of each element in the Verticality.
 
         >>> vs1 = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('D')})
         >>> vs1.color = 'blue'
         >>> [(x, x.style.color) for x in vs1.objects]
         [(<music21.note.Note C>, 'blue'), (<music21.harmony.ChordSymbol D>, 'blue')]
-    ''')
+        '''
+        return self.style.color
+
+    @color.setter
+    def color(self, color):
+        self.style.color = color
+        for obj in self.objects:
+            obj.style.color = color
 
 
 class VerticalityNTuplet(base.Music21Object):
@@ -1881,8 +1882,8 @@ class VerticalityTriplet(VerticalityNTuplet):
         Calculates the three note linear segments if only three Verticalities provided.
         '''
         for partNum in range(min(len(self.verticalities[0].getObjectsByClass(note.Note)),
-                                    len(self.verticalities[1].getObjectsByClass(note.Note)),
-                                    len(self.verticalities[2].getObjectsByClass(note.Note)))
+                                 len(self.verticalities[1].getObjectsByClass(note.Note)),
+                                 len(self.verticalities[2].getObjectsByClass(note.Note)))
                              ):
             self.tnlsDict[partNum] = ThreeNoteLinearSegment(
                 [
@@ -1914,7 +1915,6 @@ class VerticalityTriplet(VerticalityNTuplet):
         True
         >>> vt.hasPassingTone(1)
         False
-
         '''
         if partNumToIdentify in self.tnlsDict:
             ret = self.tnlsDict[partNumToIdentify].couldBePassingTone()
@@ -2010,18 +2010,9 @@ class NNoteLinearSegment(base.Music21Object):
         return self._noteList[:]
 
 
-    def _getMelodicIntervals(self):
-        tempListOne = self.noteList[:-1]
-        tempListTwo = self.noteList[1:]
-        melodicIntervalList = []
-        for n1, n2 in zip(tempListOne, tempListTwo, strict=True):
-            if n1 and n2:
-                melodicIntervalList.append(interval.Interval(n1, n2))
-            else:
-                melodicIntervalList.append(None)
-        return melodicIntervalList
-
-    melodicIntervals = property(_getMelodicIntervals, doc='''
+    @property
+    def melodicIntervals(self):
+        '''
         Calculates the melodic intervals and returns them as a list,
         with the interval at 0 being the interval between the first and second note.
 
@@ -2031,7 +2022,16 @@ class NNoteLinearSegment(base.Music21Object):
         [<music21.interval.Interval M2>,
          <music21.interval.Interval M-7>,
          <music21.interval.Interval M2>]
-        ''')
+        '''
+        tempListOne = self.noteList[:-1]
+        tempListTwo = self.noteList[1:]
+        melodicIntervalList = []
+        for n1, n2 in zip(tempListOne, tempListTwo, strict=True):
+            if n1 and n2:
+                melodicIntervalList.append(interval.Interval(n1, n2))
+            else:
+                melodicIntervalList.append(None)
+        return melodicIntervalList
 
 
 class ThreeNoteLinearSegmentException(exceptions21.Music21Exception):
@@ -2078,9 +2078,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     >>> ex2 = voiceLeading.ThreeNoteLinearSegment('a', 'b', 'c')
     >>> ex2.n1
     <music21.note.Note A>
-    >>> defaults.pitchOctave
+    >>> ex2.n1.octave
     4
-
     '''
     _DOC_ORDER = ['couldBePassingTone',
                   'couldBeDiatonicPassingTone',
@@ -2095,22 +2094,37 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         else:
             super().__init__([noteListOrN1, n2, n3], **keywords)
 
-    def _getN1(self):
+    @property
+    def n1(self):
+        '''
+        Get or set the first note (left-most) in the segment.
+        '''
         return self.noteList[0]
 
-    def _setN1(self, value):
+    @n1.setter
+    def n1(self, value):
         self.noteList[0] = self._correctNoteInput(value)
 
-    def _getN2(self):
+    @property
+    def n2(self):
+        '''
+        Get or set the middle note in the segment.
+        '''
         return self.noteList[1]
 
-    def _setN2(self, value):
+    @n2.setter
+    def n2(self, value):
         self.noteList[1] = self._correctNoteInput(value)
 
-    def _getN3(self):
+    @property
+    def n3(self):
+        '''
+        Get or set the last note (right-most) in the segment.
+        '''
         return self.noteList[2]
 
-    def _setN3(self, value):
+    @n3.setter
+    def n3(self, value):
         self.noteList[2] = self._correctNoteInput(value)
 
     def _correctNoteInput(self, value):
@@ -2130,53 +2144,44 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
                 ) from e
 
 
-    n1 = property(_getN1, _setN1, doc='''
-        Get or set the first note (left-most) in the segment.
-        ''')
-    n2 = property(_getN2, _setN2, doc='''
-        Get or set the middle note in the segment.
-        ''')
-    n3 = property(_getN3, _setN3, doc='''
-        Get or set the last note (right-most) in the segment.
-        ''')
-
-    def _getILeftToRight(self):
-        if self.n1 and self.n3:
-            return interval.Interval(self.n1, self.n3)
-        else:
-            return None
-
-    def _getILeft(self):
-        return self.melodicIntervals[0]
-
-    def _getIRight(self):
-        return self.melodicIntervals[1]
-
-    iLeftToRight = property(_getILeftToRight, doc='''
+    @property
+    def iLeftToRight(self):
+        '''
         Get the interval between the left-most note and the right-most note
         (read-only property).
 
         >>> tnls = voiceLeading.ThreeNoteLinearSegment('C', 'E', 'G')
         >>> tnls.iLeftToRight
         <music21.interval.Interval P5>
-        ''')
+        '''
+        if self.n1 and self.n3:
+            return interval.Interval(self.n1, self.n3)
+        else:
+            return None
 
-    iLeft = property(_getILeft, doc='''
+    @property
+    def iLeft(self):
+        '''
         Get the interval between the left-most note and the middle note
         (read-only property).
 
         >>> tnls = voiceLeading.ThreeNoteLinearSegment('A', 'B', 'G')
         >>> tnls.iLeft
         <music21.interval.Interval M2>
-        ''')
-    iRight = property(_getIRight, doc='''
+        '''
+        return self.melodicIntervals[0]
+
+    @property
+    def iRight(self):
+        '''
         Get the interval between the middle note and the right-most note
         (read-only property).
 
         >>> tnls = voiceLeading.ThreeNoteLinearSegment('A', 'B', 'G')
         >>> tnls.iRight
         <music21.interval.Interval M-3>
-        ''')
+        '''
+        return self.melodicIntervals[1]
 
     def _reprInternal(self):
         return f'n1={self.n1} n2={self.n2} n3={self.n3}'
@@ -2211,7 +2216,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         >>> voiceLeading.ThreeNoteLinearSegment('B##3', 'C4', 'D--4').couldBePassingTone()
         False
 
-        If no octave is given then ._defaultOctave is used.  This is generally octave 4.
+        If no octave is given then octave 4 is used:
 
         >>> voiceLeading.ThreeNoteLinearSegment('C', 'D', 'E').couldBePassingTone()
         True
@@ -2219,6 +2224,14 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         True
         >>> voiceLeading.ThreeNoteLinearSegment('C5', 'D', 'E').couldBePassingTone()
         False
+
+        But I wouldn't skip the octave, because otherwise this will always seem baffling:
+
+        >>> voiceLeading.ThreeNoteLinearSegment('G', 'A', 'B').couldBePassingTone()
+        True
+        >>> voiceLeading.ThreeNoteLinearSegment('A', 'B', 'C').couldBePassingTone()
+        False
+
 
         Method returns True if either a chromatic passing tone or a diatonic passing
         tone is identified. Spelling of the pitch does matter!
@@ -2334,10 +2347,10 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         '''
 
         return (self._isComplete()
-            and self.n1.nameWithOctave == self.n3.nameWithOctave
-            and self.iLeft.chromatic.undirected == 2
-            and self.iRight.chromatic.undirected == 2
-            and self.iLeft.direction * self.iRight.direction == -1)
+                and self.n1.nameWithOctave == self.n3.nameWithOctave
+                and self.iLeft.chromatic.undirected == 2
+                and self.iRight.chromatic.undirected == 2
+                and self.iLeft.direction * self.iRight.direction == -1)
 
 
     def couldBeChromaticNeighborTone(self) -> bool:
@@ -2355,10 +2368,10 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         False
         '''
         return (self._isComplete()
-            and (self.n1.nameWithOctave == self.n3.nameWithOctave
-                 and self.iLeft.isChromaticStep
-                 and self.iRight.isChromaticStep
-                 and (self.iLeft.direction * self.iRight.direction == -1)))
+                and (self.n1.nameWithOctave == self.n3.nameWithOctave
+                     and self.iLeft.isChromaticStep
+                     and self.iRight.isChromaticStep
+                     and (self.iLeft.direction * self.iRight.direction == -1)))
 
 
 # Below: beginnings of an implementation for any object segments,

@@ -21,7 +21,7 @@ import typing as t
 from music21 import common
 from music21.common.numberTools import opFrac
 from music21.common.objects import FrozenObject
-from music21.common.types import OffsetQLIn
+from music21.common.types import OffsetQL, OffsetQLIn
 from music21.duration import FrozenDuration
 from music21 import environment
 from music21.exceptions21 import MeterException
@@ -1842,7 +1842,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
                 f'where total duration is {self.duration.quarterLength}'
             )
 
-        qPos = 0
+        qPos: OffsetQL = 0.0
         match = -1  # no match -- will not happen.
         for i in range(len(self)):
             start = qPos
@@ -1944,7 +1944,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
         >>> a.offsetToSpan(4.33333336, permitMeterModulus=True)
         (1.0, 2.0)
-
         '''
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
@@ -1984,7 +1983,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         Fraction(1, 3)
         >>> a.offsetToWeight(1.5)
         Fraction(1, 3)
-
         '''
         # Not sure what this does!
         qLenPos = opFrac(qLenPos)

@@ -134,7 +134,6 @@ def plotStream(
 
     .. image:: images/HorizontalBarPitchSpaceOffset.*
         :width: 600
-
     '''
     plotMake = findPlot.getPlotsToMake(graphFormat, xValue, yValue, zValue)
     # environLocal.printDebug(['plotClassName found', plotMake])
