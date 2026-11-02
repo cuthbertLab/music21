@@ -181,6 +181,22 @@ class Test(unittest.TestCase):
         from music21.exceptions21 import MeterException
         ts = TimeSignature('6/8')
         before = ts.beatSequence
+        removed = [
+            ('partition', (6,), 'partitioned'),
+            ('partitionByCount', (6,), 'partitionedByCount'),
+            ('partitionByList', ([1, 1, 1, 1, 1, 1],), 'partitionedByList'),
+            ('partitionByOtherMeterSequence', (MeterSequence('6/8', 6),),
+             'partitionedByOtherMeterSequence'),
+            ('subdividePartitionsEqual', (3,), 'subdividedPartitionsEqual'),
+            ('subdivideNestedHierarchy', (3,), 'subdividedNestedHierarchy'),
+            ('setLevelWeight', ([1, 2],), 'withLevelWeight'),
+        ]
+        for oldName, arguments, newName in removed:
+            with self.assertRaisesRegex(MeterException, newName + '[(][)]', msg=oldName):
+                getattr(ts.beatSequence, oldName)(*arguments)
+            getattr(ts.beatSequence, newName)(*arguments)
+        self.assertIs(ts.beatSequence, before)
+
         with self.assertRaisesRegex(MeterException, r"MeterSequence\('4/4'\)"):
             MeterSequence().load('4/4')
         with self.assertRaisesRegex(TypeError, r'setIndex\(0, value\)'):
@@ -413,28 +429,28 @@ class Test(unittest.TestCase):
                                  beatDur[i])
 
     def testSubdividePartitionsEqual(self):
-        ms = MeterSequence('2/4').subdividePartitionsEqual(None)
+        ms = MeterSequence('2/4').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/4+1/4}}')
 
-        ms = MeterSequence('3/4').subdividePartitionsEqual(None)
+        ms = MeterSequence('3/4').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/4+1/4+1/4}}')
 
-        ms = MeterSequence('6/8').subdividePartitionsEqual(None)
+        ms = MeterSequence('6/8').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{3/8+3/8}}')
 
-        ms = MeterSequence('6/16').subdividePartitionsEqual(None)
+        ms = MeterSequence('6/16').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{3/16+3/16}}')
 
-        ms = MeterSequence('3/8+3/8').subdividePartitionsEqual(None)
+        ms = MeterSequence('3/8+3/8').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/8+1/8+1/8}+{1/8+1/8+1/8}}')
 
-        ms = MeterSequence('2/8+3/8').subdividePartitionsEqual(None)
+        ms = MeterSequence('2/8+3/8').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/8+1/8}+{1/8+1/8+1/8}}')
 
-        ms = MeterSequence('5/8').subdividePartitionsEqual(None)
+        ms = MeterSequence('5/8').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/8+1/8+1/8+1/8+1/8}}')
 
-        ms = MeterSequence('3/8+3/4').subdividePartitionsEqual(None)  # can partition by another
+        ms = MeterSequence('3/8+3/4').subdividedPartitionsEqual(None)  # can partition by another
         self.assertEqual(str(ms), '{{1/8+1/8+1/8}+{1/4+1/4+1/4}}')
 
     def testSetDefaultAccentWeights(self):
@@ -532,7 +548,7 @@ class Test(unittest.TestCase):
         from music21 import meter
         # create a meter with 6 beats but beams in 2 groups
         ts = meter.TimeSignature('6/8')
-        ts.beatSequence = ts.beatSequence.partition(6)
+        ts.beatSequence = ts.beatSequence.partitioned(6)
         self.assertEqual(str(ts.beatSequence), '{1/8+1/8+1/8+1/8+1/8+1/8}')
         self.assertEqual(str(ts.beamSequence), '{3/8+3/8}')
 
