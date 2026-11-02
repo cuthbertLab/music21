@@ -154,7 +154,6 @@ def booleanToYesNo(value):
 
     >>> musicxml.xmlObjects.booleanToYesNo(5)
     'yes'
-
     '''
     if value:  # purposely not "is True"
         return 'yes'
@@ -173,7 +172,6 @@ def fractionToPercent(value):
 
     >>> musicxml.xmlObjects.fractionToPercent(0.251)
     '25'
-
     '''
     return str(int(value * 100))
 
@@ -205,7 +203,6 @@ def isValidXSDID(text):
 
     >>> musicxml.xmlObjects.isValidXSDID(12345)
     False
-
     '''
     if not isinstance(text, str):
         return False

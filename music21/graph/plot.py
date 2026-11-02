@@ -671,7 +671,6 @@ class HistogramPitchClass(Histogram):
 
     .. image:: images/HistogramPitchClass.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **Histogram.axesClasses,
@@ -699,7 +698,6 @@ class HistogramQuarterLength(Histogram):
 
     .. image:: images/HistogramQuarterLength.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **Histogram.axesClasses,
@@ -779,7 +777,6 @@ class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
 
     .. image:: images/ScatterWeightedPitchClassQuarterLength.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **ScatterWeighted.axesClasses,
@@ -814,7 +811,6 @@ class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
 
     .. image:: images/ScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **ScatterWeighted.axesClasses,
@@ -1009,7 +1005,6 @@ class WindowedKey(WindowedAnalysis):
     >>> p.processorClass = analysis.discrete.TemperleyKostkaPayne
     >>> p.doneAction = None #_DOCS_HIDE
     >>> p.run()
-
     '''
     processorClassDefault = discrete.KrumhanslSchmuckler
 
@@ -1027,7 +1022,6 @@ class WindowedAmbitus(WindowedAnalysis):
         :width: 600
 
     .. image:: images/legend-WindowedAmbitus.*
-
     '''
     processorClassDefault = discrete.Ambitus
 
@@ -1174,7 +1168,6 @@ class HorizontalBarPitchClassOffset(HorizontalBar):
 
     .. image:: images/HorizontalBarPitchClassOffset.*
         :width: 600
-
     '''
     axesClasses: dict[str, type[axis.Axis]] = {
         **HorizontalBar.axesClasses,
@@ -1305,7 +1298,6 @@ class Dolan(HorizontalBarWeighted):
 
     .. image:: images/Dolan.*
         :width: 600
-
     '''
 
     def __init__(self, streamObj=None, **keywords):
@@ -1604,7 +1596,7 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
 
         a = corpus.parse('bach/bwv57.8')
         b = HorizontalBarPitchClassOffset(a.parts[0].measures(3, 6),
-                                              title='Bach (soprano voice, mm 3-6)')
+                                          title='Bach (soprano voice, mm 3-6)')
         b.run()
 
     def testScatterWeightedPitchSpaceQuarterLength(self):
@@ -1799,17 +1791,18 @@ class Test(unittest.TestCase):
                         minWindow=1, windowStep=windowStep,
                         doneAction=doneAction, dpi=300)
         b.run()
-        self.assertEqual(b.graphLegend.data,
+        self.assertEqual(
+            b.graphLegend.data,
             [
                 ['Major',
-                    [('C#', '#f0727a'), ('D', '#ffd752'), ('E', '#eeff9a'),
-                     ('F#', '#b9f0ff'), ('A', '#bb9aff'), ('B', '#ffb5ff')
-                     ]
+                 [('C#', '#f0727a'), ('D', '#ffd752'), ('E', '#eeff9a'),
+                  ('F#', '#b9f0ff'), ('A', '#bb9aff'), ('B', '#ffb5ff')
+                  ]
                  ],
                 ['Minor',
-                    [('c#', '#8c0e16'), ('', '#ffffff'), ('', '#ffffff'),
-                     ('f#', '#558caa'), ('', '#ffffff'), ('b', '#9b519b')
-                     ]
+                 [('c#', '#8c0e16'), ('', '#ffffff'), ('', '#ffffff'),
+                  ('f#', '#558caa'), ('', '#ffffff'), ('b', '#9b519b')
+                  ]
                  ]
             ]
         )

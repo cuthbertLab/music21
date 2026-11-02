@@ -272,11 +272,8 @@ def _countUnpacked(i: int, filename: str) -> bool:
 
 
 class Test(unittest.TestCase):
-    # pylint: disable=redefined-outer-name
     def x_figure_out_segfault_testMultiprocess(self) -> None:
         files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
-        # for importing into testSingleCoreAll we need the full path to the modules
-        from music21.common.parallel import _countN, _countUnpacked
         output = runParallel(files, _countN)
         self.assertEqual(output, [165, 50, 131])
         runParallel(files,

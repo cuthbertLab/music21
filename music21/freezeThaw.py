@@ -210,7 +210,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         self.subStreamFreezers = {}  # this will keep track of sub freezers for spanners
 
-        if streamObj is not None and fastButUnsafe is False:
+        if streamObj is not None and not fastButUnsafe:
             # deepcopy necessary because we mangle sites in the objects
             # before serialization
             self.stream = copy.deepcopy(streamObj)
@@ -230,7 +230,6 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> sf = freezeThaw.StreamFreezer(s)
         >>> pprint(sf.packStream())
         {'m21Version': (...), 'stream': <music21.stream.Stream 0x1289212>}
-
         '''
         # do all things necessary to set up the stream
         if streamObj is None:
@@ -267,7 +266,7 @@ class StreamFreezer(StreamFreezeThawBase):
         # might not work when recurse yields
         allEls = list(streamObj.recurse(restoreActiveSites=False))
 
-        if self.topLevel is True:
+        if self.topLevel:
             self.findActiveStreamIdsInHierarchy(streamObj)
 
         for el in allEls:
@@ -297,7 +296,7 @@ class StreamFreezer(StreamFreezeThawBase):
         # removing seems to create problems for jsonPickle with Spanners
         self.setupStoredElementOffsetTuples(streamObj)
 
-        if self.topLevel is True:
+        if self.topLevel:
             self.recursiveClearSites(streamObj)
 
     def removeStreamStatusClient(self, streamObj):
@@ -442,7 +441,6 @@ class StreamFreezer(StreamFreezeThawBase):
          (<music21.bar.Barline type=regular>, 'end')]
         >>> s2._storedElementOffsetTuples[2][0] is v1
         True
-
         '''
         if hasattr(streamObj, '_storedElementOffsetTuples'):
             # in the case of a spanner storing a Stream, like a StaffGroup
@@ -578,11 +576,11 @@ class StreamFreezer(StreamFreezeThawBase):
                                                   includeSelf=True)
         streamIds = [id(s) for s in streamsFoundGenerator]
 
-        if getSpanners is True:
+        if getSpanners:
             spannerBundle = streamObj.spannerBundle
             streamIds += spannerBundle.getSpannerStorageIds()
 
-        if getVariants is True:
+        if getVariants:
             for el in streamObj.recurse(includeSelf=True).getElementsByClass(variant.Variant):
                 streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
@@ -853,7 +851,7 @@ class StreamThawer(StreamFreezeThawBase):
             streamObj.coreElementsChanged()
 
         for subElement in streamObj:
-            if subElement.isStream is True:
+            if subElement.isStream:
                 # note that the elements may have already been restored
                 # if the spanner stores a part or something in the Stream
                 # for instance in a StaffGroup object
@@ -1047,7 +1045,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].measure(7).notes), 6)
 
     def x_testSimplePickle(self):
-        from music21 import freezeThaw
         from music21 import corpus
 
         c = corpus.parse('bwv66.6').parts[0].measure(0).notes
@@ -1061,7 +1058,7 @@ class Test(unittest.TestCase):
 
         n1 = c[0]
         n2 = c[1]
-        sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
+        sf = StreamFreezer(c, fastButUnsafe=True)
         sf.setupSerializationScaffold()
         for dummy in n1.sites.siteDict:
             pass
@@ -1088,17 +1085,16 @@ class Test(unittest.TestCase):
         # s.show('t')
 
     def x_testFreezeThawPickle(self):
-        from music21 import freezeThaw
         from music21 import corpus
 
         c = corpus.parse('luca/gloria')
         # c.show('t')
 
-        sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
+        sf = StreamFreezer(c, fastButUnsafe=True)
         d = sf.writeStr()
         # print(d)
 
-        st = freezeThaw.StreamThawer()
+        st = StreamThawer()
         st.openStr(d)
         s = st.stream
 
@@ -1107,7 +1103,6 @@ class Test(unittest.TestCase):
             pass
 
     def testFreezeThawSimpleVariant(self):
-        from music21 import freezeThaw
         from music21 import stream
         from music21 import note
 
@@ -1126,15 +1121,14 @@ class Test(unittest.TestCase):
 
         s.insert(0, v)
 
-        sf = freezeThaw.StreamFreezer(s)
+        sf = StreamFreezer(s)
         d = sf.writeStr()
 
-        st = freezeThaw.StreamThawer()
+        st = StreamThawer()
         st.openStr(d)
         s = st.stream
 
     def testFreezeThawVariant(self):
-        from music21 import freezeThaw
         from music21 import corpus
         from music21 import stream
         from music21 import note
@@ -1156,14 +1150,14 @@ class Test(unittest.TestCase):
         # test Variant is in stream
         unused_v1 = c.parts.first().getElementsByClass(variant.Variant).first()
 
-        sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
+        sf = StreamFreezer(c, fastButUnsafe=True)
         # sf.v = v
         d = sf.writeStr()
         # print(d)
 
         # print('thawing.')
 
-        st = freezeThaw.StreamThawer()
+        st = StreamThawer()
         st.openStr(d)
         s = st.stream
         # s.show('lily.pdf')
@@ -1176,7 +1170,6 @@ class Test(unittest.TestCase):
     def testSerializationScaffoldA(self):
         from music21 import note
         from music21 import stream
-        from music21 import freezeThaw
 
         n1 = note.Note()
 
@@ -1186,7 +1179,7 @@ class Test(unittest.TestCase):
         s1.append(n1)
         s2.append(n1)
 
-        sf = freezeThaw.StreamFreezer(s2, fastButUnsafe=False)
+        sf = StreamFreezer(s2, fastButUnsafe=False)
         sf.setupSerializationScaffold()
 
         # test safety
@@ -1213,9 +1206,9 @@ class Test(unittest.TestCase):
         from music21 import note
 
         a = str(common.getSourceFilePath()
-                         / 'midi'
-                         / 'testPrimitive'
-                         / 'test03.mid')
+                / 'midi'
+                / 'testPrimitive'
+                / 'test03.mid')
 
         # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
         c = converter.parse(a)

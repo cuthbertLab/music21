@@ -944,7 +944,6 @@ def partPairs(
      (<music21.pitch.Pitch G4>, <music21.pitch.Pitch F4>),
      (<music21.pitch.Pitch E4>, <music21.pitch.Pitch D4>),
      (<music21.pitch.Pitch C4>, <music21.pitch.Pitch D4>)]
-
     '''
     return list(zip(possibA, possibB, strict=True))
 

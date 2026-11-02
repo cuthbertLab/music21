@@ -1974,7 +1974,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
         >>> a.offsetToSpan(4.33333336, permitMeterModulus=True)
         (1.0, 2.0)
-
         '''
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
@@ -2014,7 +2013,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         Fraction(1, 3)
         >>> a.offsetToWeight(1.5)
         Fraction(1, 3)
-
         '''
         # Not sure what this does!
         qLenPos = opFrac(qLenPos)

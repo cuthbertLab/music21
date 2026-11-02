@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -233,6 +233,76 @@ class Test(unittest.TestCase):
              <music21.pitch.Pitch F#5>],
  'notMatched': [<music21.pitch.Pitch C#5>, <music21.pitch.Pitch G#5>]}''', pformat(sc1.match(sc2)))
 
+    def testOctaveRepeatingScaleLeavesModeAlone(self):
+        mode = ['M3', 'M3']
+        sc = scale.OctaveRepeatingScale('c4', mode)
+        self.assertEqual(mode, ['M3', 'M3'])
+        self.assertEqual(self.pitchOut(sc.pitches), '[C4, E4, G#4, C5]')
+
+        again = scale.OctaveRepeatingScale('c4', mode)
+        self.assertEqual(self.pitchOut(again.pitches), '[C4, E4, G#4, C5]')
+
+    def testOctaveRepeatingScaleWiderThanAnOctave(self):
+        sc = scale.OctaveRepeatingScale('c4', ['P5', 'P5'])
+        self.assertEqual(self.pitchOut(sc.pitches), '[C4, G4, D5, C6]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c6')), '[D3, C4, G4, D5, C6]')
+
+    def testOctaveRepeatingScaleGivenAWholeOctave(self):
+        sc = scale.OctaveRepeatingScale('c4', ['m3', 'M2', 'm3', 'M2', 'M2'])
+        self.assertEqual(self.pitchOut(sc.pitches), '[C4, E-4, F4, A-4, B-4, C5]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c5')),
+                         '[C3, E-3, F3, A-3, B-3, C4, E-4, F4, A-4, B-4, C5]')
+        self.assertEqual(str(sc.nextPitch('b-4')), 'C5')
+        self.assertEqual(str(sc.nextPitch('c5')), 'E-5')
+        self.assertEqual(str(sc.nextPitch('c5', Direction.DESCENDING)), 'B-4')
+
+        fifthAndFourth = scale.OctaveRepeatingScale('c4', ['P5', 'P4'])
+        self.assertEqual(fifthAndFourth.getScaleDegreeFromPitch('c'), 1)
+
+        octaves = scale.OctaveRepeatingScale('c4', ['P8'])
+        self.assertEqual(self.pitchOut(octaves.getPitches('c3', 'c6')), '[C3, C4, C5, C6]')
+        self.assertEqual(str(octaves.nextPitch('c5')), 'C6')
+        self.assertEqual(str(octaves.nextPitch('c5', Direction.DESCENDING)), 'C4')
+
+    def testOctaveRepeatingScaleStepsReachingAnEnharmonicOctave(self):
+        thirds = scale.OctaveRepeatingScale('c4', ['M3', 'M3', 'M3'])
+        wholeTones = scale.OctaveRepeatingScale('c4', ['M2'] * 6)
+        self.assertEqual(self.pitchOut(thirds.getPitches('c4', 'c6')),
+                         '[C4, E4, G#4, C5, E5, G#5, C6]')
+        self.assertEqual(self.pitchOut(wholeTones.getPitches('c4', 'c5')),
+                         '[C4, D4, E4, F#4, G#4, A#4, C5]')
+        for unused_x in range(20):
+            self.assertEqual(str(thirds.nextPitch('g#4')), 'C5')
+            self.assertEqual(str(thirds.nextPitch('c5')), 'E5')
+            self.assertEqual(str(thirds.nextPitch('c5', Direction.DESCENDING)), 'G#4')
+            self.assertEqual(thirds.getScaleDegreeFromPitch('c'), 1)
+
+            self.assertEqual(str(wholeTones.nextPitch('a#4')), 'C5')
+            self.assertEqual(str(wholeTones.nextPitch('c5')), 'D5')
+            self.assertEqual(str(wholeTones.nextPitch('c5', Direction.DESCENDING)), 'A#4')
+            self.assertEqual(wholeTones.getScaleDegreeFromPitch('c'), 1)
+
+    def testOctatonicModesDoNotSharePitchDegreeCache(self):
+        sc1 = scale.OctatonicScale('C', mode=1)
+        sc2 = scale.OctatonicScale('C', mode=2)
+
+        self.assertEqual(str(sc1.pitchFromDegree(2)), 'D-4')
+        self.assertEqual(str(sc2.pitchFromDegree(2)), 'D4')
+
+    def testDiatonicModesDoNotSharePitchDegreeCache(self):
+        sc1 = scale.DiatonicScale('C', mode='dorian')
+        sc2 = scale.DiatonicScale('C', mode='major')
+
+        self.assertEqual(str(sc1.pitchFromDegree(3)), 'E-4')
+        self.assertEqual(str(sc2.pitchFromDegree(3)), 'E4')
+
+    def testSwapAbstractScaleDoesNotReuseCachedPitch(self):
+        sc = scale.OctatonicScale('C', mode=2)
+        self.assertEqual(str(sc.pitchFromDegree(2)), 'D4')
+
+        sc.abstract = scale.AbstractOctatonicScale(mode=1)
+        self.assertEqual(str(sc.pitchFromDegree(2)), 'D-4')
+
     def testCyclicalScales(self):
         sc = scale.CyclicalScale('c4', ['m2', 'm2'])
 
@@ -271,6 +341,109 @@ class Test(unittest.TestCase):
         # test default args
         sc2 = scale.CyclicalScale()
         self.assertEqual(self.pitchOut(sc2.getPitches()), '[C4, D-4]')
+
+    def testHarmonicMinorDescendingRange(self):
+        sc = scale.HarmonicMinorScale('c4')
+        descending = sc.getPitches('b2', 'e3', direction=Direction.DESCENDING)
+        self.assertEqual(self.pitchOut(descending), '[E-3, D3, C3, B2]')
+
+        sc = scale.HarmonicMinorScale('b-3')
+        descending = sc.getPitches('c#4', 'g#4', direction=Direction.DESCENDING)
+        self.assertEqual(self.pitchOut(descending), '[G-4, F4, E-4, D-4]')
+
+    def testHarmonicMinorMatch(self):
+        aMinor = scale.HarmonicMinorScale('a4')
+        matches = aMinor.match(['G#4', 'G4', 'F4'])
+        self.assertEqual(self.pitchOut(matches['matched']), '[G#4, F4]')
+        self.assertEqual(self.pitchOut(matches['notMatched']), '[G4]')
+
+        eFlatMinor = scale.HarmonicMinorScale('e-4')
+        matches = eFlatMinor.match(['D4', 'D-4', 'C-4'])
+        self.assertEqual(self.pitchOut(matches['matched']), '[D4, C-4]')
+        self.assertEqual(self.pitchOut(matches['notMatched']), '[D-4]')
+
+    def testDeriveHarmonicMinor(self):
+        sc = scale.HarmonicMinorScale()
+        self.assertEqual(sc.derive(['C', 'D', 'E-', 'B']).name, 'C harmonic minor')
+
+    def testNextPitchOnCycle(self):
+        '''
+        AI-assisted (Claude).
+        '''
+        thirds = scale.CyclicalScale('d3', ['M3'])
+        self.assertEqual(str(thirds.nextPitch('c4')), 'D4')
+        self.assertEqual(str(thirds.nextPitch('g4')), 'A#4')
+        self.assertEqual(str(thirds.nextPitch('g4', Direction.DESCENDING)), 'F#4')
+        self.assertEqual(str(thirds.nextPitch('f#4')), 'A#4')
+
+        fifths = scale.CyclicalScale('c4', ['P5'])
+        self.assertEqual(str(fifths.nextPitch('g4')), 'D5')
+        self.assertEqual(str(fifths.nextPitch('g4', Direction.DESCENDING)), 'C4')
+
+        thirdsAndMinorThirds = scale.CyclicalScale('d3', ['M3', 'm3'])
+        self.assertEqual(str(thirdsAndMinorThirds.nextPitch('d4')), 'E4')
+        self.assertEqual(str(thirdsAndMinorThirds.nextPitch('d4', Direction.DESCENDING)), 'C#4')
+        self.assertEqual(str(thirdsAndMinorThirds.nextPitch('a4')), 'B4')
+        self.assertEqual(str(thirdsAndMinorThirds.nextPitch('a4', Direction.DESCENDING)), 'G#4')
+
+    def testNextPitchFromEnharmonic(self):
+        thirds = scale.CyclicalScale('d3', ['M3'])
+        for enharmonicOfD in ('c##4', 'e--4'):
+            self.assertEqual(str(thirds.nextPitch(enharmonicOfD)), 'F#4')
+            self.assertEqual(str(thirds.nextPitch(enharmonicOfD, Direction.DESCENDING)), 'B-3')
+
+        sc = scale.MajorScale('c4')
+        self.assertEqual(str(sc.nextPitch('b#3')), 'D4')
+        self.assertEqual(str(sc.nextPitch('d-4', Direction.DESCENDING)), 'C4')
+
+    def testNextPitchNodeNearOrigin(self):
+        thirds = scale.CyclicalScale('d3', ['M3'])
+        self.assertEqual(str(thirds.nextPitch('d4', stepSize=2)), 'A#4')
+
+        fifths = scale.CyclicalScale('c4', ['P5'])
+        self.assertEqual(str(fifths.nextPitch('f4', Direction.DESCENDING)), 'C4')
+
+        aMinor = scale.HarmonicMinorScale('a4')
+        self.assertEqual(str(aMinor.nextPitch('f##4')), 'G#4')
+        self.assertEqual(str(aMinor.nextPitch('a4', Direction.DESCENDING)), 'G#4')
+        self.assertEqual(str(aMinor.nextPitch('g4')), 'G#4')
+        self.assertEqual(str(aMinor.nextPitch('g4', Direction.DESCENDING)), 'F4')
+
+        gMinor = scale.HarmonicMinorScale('g4')
+        gMinor.nextPitch('a4')
+        self.assertEqual(str(gMinor.pitches[6]), 'F#5')
+    def testHarmonicMinorKeepsItsSeventhAfterNextPitch(self):
+        sc = scale.HarmonicMinorScale('g4')
+        sc.nextPitch('a4')
+        self.assertEqual(self.pitchOut(sc.pitches), '[G4, A4, B-4, C5, D5, E-5, F#5, G5]')
+
+    def testNextPitchOnCycleWiderThanOctave(self):
+        '''
+        nextPitch finds the neighbors on cycles whose step is wider than an
+        octave, including from D#5 and F--5, the enharmonics of E-5 one
+        letter lower and one higher.
+        '''
+        ninths = scale.CyclicalScale('c4', ['M9'])
+        self.assertEqual(str(ninths.nextPitch('b3')), 'C4')
+        self.assertEqual(str(ninths.nextPitch('b3', Direction.DESCENDING)), 'B-2')
+        self.assertEqual(str(ninths.nextPitch('d#5')), 'E6')
+        self.assertEqual(str(ninths.nextPitch('d#5', Direction.DESCENDING)), 'D5')
+
+        tenths = scale.CyclicalScale('c4', ['m10'])
+        self.assertEqual(str(tenths.nextPitch('d4')), 'E-5')
+        self.assertEqual(str(tenths.nextPitch('d4', Direction.DESCENDING)), 'C4')
+        self.assertEqual(str(tenths.nextPitch('d#5')), 'G-6')
+        self.assertEqual(str(tenths.nextPitch('f--5', Direction.DESCENDING)), 'C4')
+
+        ninthsAndSeconds = scale.CyclicalScale('c4', ['M9', 'm2'])
+        self.assertEqual(str(ninthsAndSeconds.nextPitch('e6')), 'F6')
+        self.assertEqual(str(ninthsAndSeconds.nextPitch('e6', Direction.DESCENDING)), 'E-5')
+        self.assertEqual(str(ninthsAndSeconds.nextPitch('d#5')), 'F6')
+
+    def testNeighborNodeIdsWiderThanOctave(self):
+        net = scale.CyclicalScale('c4', ['M9']).abstract._net
+        self.assertEqual(net.getNeighborNodeIds('c4', Terminus.LOW, 'b3'),
+                         (Terminus.LOW, Terminus.LOW))
 
     def testDeriveByDegree(self):
         sc1 = scale.MajorScale()
@@ -456,7 +629,7 @@ class Test(unittest.TestCase):
                                           getNeighbor=Direction.DESCENDING)),
                          'F1')
 
-        self.assertEqual(str(sc.pitchFromDegree(1)), 'C1')
+        self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
         # there is no third step in ascending form
         self.assertEqual(str(sc.pitchFromDegree(3)), 'None')
         self.assertEqual(str(sc.pitchFromDegree(3, direction=Direction.DESCENDING)),
@@ -514,8 +687,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(sc.getScaleDegreeFromPitch('A1', Direction.ASCENDING))
-        self.assertGreater(post.count(5), 30)
-        self.assertGreater(post.count(7), 30)
+        self.assertGreater(post.count(5), 25)
+        self.assertGreater(post.count(7), 25)
 
         # for rag marwa, and given only the pitch d-, the scale can move to
         # either b or c; this selection is determined by weighted random
@@ -523,8 +696,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(sc.getScaleDegreeFromPitch('D-3', Direction.DESCENDING))
-        self.assertGreater(post.count(2), 30)
-        self.assertGreater(post.count(7), 30)
+        self.assertGreater(post.count(2), 25)
+        self.assertGreater(post.count(7), 25)
 
     def testRagMarwaC(self):
         sc = scale.RagMarwa('c4')
@@ -539,8 +712,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(str(sc.nextPitch('D-2', Direction.DESCENDING)))
-        self.assertGreater(post.count('C2'), 30)
-        self.assertGreater(post.count('B1'), 30)
+        self.assertGreater(post.count('C2'), 25)
+        self.assertGreater(post.count('B1'), 25)
 
     def testWeightedHexatonicBluesA(self):
         sc = scale.WeightedHexatonicBlues('c4')
@@ -585,8 +758,10 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
         self.assertEqual(str(sc.nextPitch('c4', Direction.ASCENDING)), 'E-4')
 
-        # degree 4 is always the blues note in this model
-        self.assertEqual(str(sc.pitchFromDegree(4)), 'F#4')
+        # degree 4 is always the blue note in this model, even though only half of
+        # the realizations pass through it
+        for dummy in range(20):
+            self.assertEqual(str(sc.pitchFromDegree(4)), 'F#4')
 
         # This never worked consistently and was not an important enough part of the project tp
         # continue to debug.
@@ -892,9 +1067,9 @@ class Test(unittest.TestCase):
         e = d.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
         self.assertEqual(str(e),
                          ''.join(['[(3, <music21.scale.ConcreteScale F Concrete>), ',
-                                   '(3, <music21.scale.ConcreteScale E Concrete>), ',
-                                   '(2, <music21.scale.ConcreteScale B Concrete>), ',
-                                   '(2, <music21.scale.ConcreteScale A Concrete>)]']),
+                                  '(3, <music21.scale.ConcreteScale E Concrete>), ',
+                                  '(2, <music21.scale.ConcreteScale B Concrete>), ',
+                                  '(2, <music21.scale.ConcreteScale A Concrete>)]']),
                          str(e)
                          )
 

@@ -73,7 +73,6 @@ def findSubConverterForFormat(fmt: str) -> type[SubConverter]|None:
 
     >>> common.findSubConverterForFormat('t')
     <class 'music21.converter.subConverters.ConverterText'>
-
     '''
     fmt = fmt.lower().strip()
     from music21 import converter

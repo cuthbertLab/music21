@@ -16,9 +16,7 @@ from __future__ import annotations
 import copy
 import doctest
 import importlib
-import importlib.util
 import os
-import sys
 import typing
 import types
 import unittest.runner
@@ -61,28 +59,6 @@ def testCopyAll(testInstance: unittest.TestCase, globals_: typing.Dict[str, typi
             testInstance.fail(f'Could not deepcopy obj {part}: {e}')
 
 
-def load_source(name: str, path: str) -> types.ModuleType:
-    '''
-    Replacement for deprecated imp.load_source()
-
-    Thanks to:
-    https://github.com/epfl-scitas/spack for pointing out the
-    important missing "spec.loader.exec_module(module)" line.
-    '''
-    spec = importlib.util.spec_from_file_location(name, path)
-    if spec is None or spec.loader is None:
-        raise FileNotFoundError(f'No such file or directory: {path!r}')
-    if name in sys.modules:
-        module = sys.modules[name]
-    else:
-        module = importlib.util.module_from_spec(spec)
-        if module is None:
-            raise FileNotFoundError(f'No such file or directory: {path!r}')
-        sys.modules[name] = module
-    spec.loader.exec_module(module)
-
-    return module
-
 # noinspection PyPackageRequirements
 def testImports():
     '''
@@ -92,12 +68,12 @@ def testImports():
     try:
         import scipy  # type: ignore  # noqa: F401
     except ImportError as e:
-        raise ImportError('pip install scipy : needed for running test suites') from e
+        raise ImportError('scipy is needed for test suites; run uv sync') from e
 
     try:
         from Levenshtein import StringMatcher  # type: ignore  # noqa: F401
     except ImportError as e:
-        raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
+        raise ImportError('python-Levenshtein is needed for test suites; run uv sync') from e
 
     from music21.lily.translate import LilypondConverter, LilyTranslateException
     try:
@@ -417,11 +393,11 @@ class ModuleGather:
         if skip:
             return None
 
-        name = self._getNamePeriod(fp, addM21=False)
+        name = self._getNamePeriod(fp, addM21=True)
 
         try:
             with warnings.catch_warnings():
-                mod = load_source(name, fp)
+                mod = importlib.import_module(name)
         except Exception as excp:  # pylint: disable=broad-exception-caught
             environLocal.warn(['failed import:', name, '\t', fp, '\n',
                                '\tEXCEPTION:', str(excp).strip()])

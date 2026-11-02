@@ -619,15 +619,15 @@ class Test(unittest.TestCase):
         amps = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
         for accent in [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1,
                        0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5, 1, 0.5, 0.5, 0.5,
-                        1, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5,
-                        None, None, None, None,
-                        None, None, None, None,
-                        None, None, None, None,
-                        None, None, None, None,
-                        0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1, 0.5, 0.5, 0.5, 0.5,
-                        0.5, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                       1, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5,
+                       None, None, None, None,
+                       None, None, None, None,
+                       None, None, None, None,
+                       None, None, None, None,
+                       0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1, 0.5, 0.5, 0.5, 0.5,
+                       0.5, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                       0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                       0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
                        ]:
             cNew = copy.deepcopy(c)
             if accent is not None:
@@ -713,8 +713,33 @@ class Test(unittest.TestCase):
     def testInvertingSimple(self):
         a = chord.Chord(['g4', 'b4', 'd5', 'f5'])
         self.assertEqual(a.inversion(), 0)
-        a.inversion(1)
+        a.setInversion(1, inPlace=True)
         self.assertEqual(repr(a), '<music21.chord.Chord B4 D5 F5 G5>')
+
+    def testSetInversionCopies(self):
+        a = chord.Chord('C4 E4 G4')
+        b = a.setInversion(2)
+        self.assertEqual(repr(a), '<music21.chord.Chord C4 E4 G4>')
+        self.assertEqual(repr(b), '<music21.chord.Chord G4 C5 E5>')
+        self.assertIs(b.derivation.origin, a)
+        with self.assertRaises(chord.ChordException):
+            chord.Chord().setInversion(1)
+        with self.assertRaises(chord.ChordException):
+            a.setInversion('six-four')
+
+        a.setInversion(1, transpose=False, inPlace=True)
+        cleared = a.setInversion(None)
+        self.assertEqual(cleared.inversion(), 0)
+        self.assertEqual(a.inversion(), 1)
+
+    def testInversionSetterLegacy(self):
+        # setting through inversion() works in place until its v13 removal
+        a = chord.Chord('C4 E4 G4')
+        self.assertIsNone(a.inversion(1))
+        self.assertEqual(repr(a), '<music21.chord.Chord E4 G4 C5>')
+        a.inversion(2, transposeOnSet=False)
+        self.assertEqual(a.inversion(), 2)
+        self.assertEqual(chord.Chord().inversion(1), -1)
 
     def testDeepcopyChord(self):
         ch = Chord('C4 E4 G4')
@@ -738,6 +763,34 @@ class Test(unittest.TestCase):
         with self.assertRaisesRegex(TypeError, msg):
             # noinspection PyTypeChecker
             Chord([note.Unpitched()])  # type: ignore
+
+    def testRemoveRedundantPitchesTellsNegativeOctavesFromFlats(self):
+        '''
+        nameWithOctave spells both B-flat in octave 1 and B-natural in
+        octave -1 as 'B-1', so comparing pitches by that string made the
+        second look like a repeat of the first.
+        '''
+        flat = pitch.Pitch('B-')
+        flat.octave = 1
+        natural = pitch.Pitch('B')
+        natural.octave = -1
+        self.assertEqual(flat.nameWithOctave, natural.nameWithOctave)
+
+        ch = Chord([flat, natural])
+        self.assertEqual(ch.removeRedundantPitches(inPlace=True), [])
+        self.assertEqual([(p.name, p.octave) for p in ch.pitches],
+                         [('B-', 1), ('B', -1)])
+
+        # a real repeat still goes, whatever octave it is in
+        repeated = Chord([flat, natural, pitch.Pitch('B-1')])
+        removed = repeated.removeRedundantPitches(inPlace=True)
+        self.assertEqual([p.nameWithOctave for p in removed], ['B-1'])
+        self.assertEqual(len(repeated.pitches), 2)
+
+        # and a pitch with no octave is not the one in the default octave
+        octaveless = Chord([pitch.Pitch('C'), pitch.Pitch('C4')])
+        self.assertEqual(octaveless.removeRedundantPitches(inPlace=True), [])
+        self.assertEqual(len(octaveless.pitches), 2)
 
     def testCacheClearedOnAdd(self):
         ch = chord.Chord('C4 E4 G4')

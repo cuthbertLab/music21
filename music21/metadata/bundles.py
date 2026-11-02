@@ -347,7 +347,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True
         >>> bachBundle == 'foo'
         False
-
         '''
         if hasattr(other, '_metadataEntries'):
             if self._metadataEntries == other._metadataEntries:
@@ -1096,7 +1095,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         Traceback (most recent call last):
         music21.exceptions21.MetadataException: Unnamed MetadataBundles have
             no default file path to read from.
-
         '''
         timer = common.Timer()
         timer.start()

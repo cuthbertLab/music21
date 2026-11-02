@@ -5,7 +5,7 @@
 #               Bo-cheng Jhan
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-26 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ----------------------------------------------------------------------------------
 '''
@@ -25,6 +25,7 @@ New International Manual of Braille Music Notation (by Bettye Krolick), which we
 from __future__ import annotations
 
 import itertools
+import unittest
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
@@ -526,7 +527,7 @@ binary_dots = {
     _B[356]: ('00', '01', '11'),
     _B[1356]: ('10', '01', '11'),
     _B[2356]: ('00', '11', '11'),
-    _B[12356]: ('01', '11', '11'),
+    _B[12356]: ('10', '11', '11'),
     _B[456]: ('01', '01', '01'),
     _B[1456]: ('11', '01', '01'),
     _B[2456]: ('01', '11', '01'),
@@ -540,7 +541,24 @@ binary_dots = {
 # make public
 brailleDotDict = _B
 
+
+class Test(unittest.TestCase):
+    def testBinaryDotsMatchDotNumbers(self):
+        '''
+        Each row of a binary_dots entry is (left dot, right dot) for dots
+        (1, 4), (2, 5), and (3, 6).
+        '''
+        self.assertEqual(len(binary_dots), 64)
+        for dotNumber, brailleChar in _B.items():
+            dotDigits = str(dotNumber)
+            expected = tuple(
+                ('1' if left in dotDigits else '0') + ('1' if right in dotDigits else '0')
+                for left, right in (('1', '4'), ('2', '5'), ('3', '6'))
+            )
+            self.assertEqual(binary_dots[brailleChar], expected, dotNumber)
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)
 

@@ -92,7 +92,7 @@ def melodicIntervalVariability(streamForAnalysis, **skipKeywords):
     totalElements = len(intervalStream)
     if totalElements < 2:  # this is correct.
         raise ValueError('need at least three notes to have '
-                             + 'a std-deviation of intervals (and thus a MIV)')
+                         + 'a std-deviation of intervals (and thus a MIV)')
     # summation = 0
     semitoneList = [myInt.chromatic.undirected for myInt in intervalStream]
     return 100 * (stdev(semitoneList) / mean(semitoneList))

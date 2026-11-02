@@ -139,7 +139,7 @@ ClefNames = [
     'Treble',
     'Bass',
     'Alto',
-    'Tenor'
+    'Tenor',
     'Percussion']
 
 # octave shift indicators
