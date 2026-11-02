@@ -303,11 +303,13 @@ class FrozenObject(EqualSlottedObjectMixin):
         if not getattr(self, 'frozen', True):
             return True
 
-        for st in inspect.stack():
-            if (st.frame.f_code.co_name in ('__init__', '__new__', '__setstate__')
-                    and 'self' in st.frame.f_locals
-                    and st.frame.f_locals['self'].__class__ == self.__class__):
+        frame = inspect.currentframe()
+        while frame is not None:
+            if (frame.f_code.co_name in ('__init__', '__new__', '__setstate__')
+                    and 'self' in frame.f_locals
+                    and frame.f_locals['self'].__class__ == self.__class__):
                 return True
+            frame = frame.f_back
         raise TypeError(f'This {self.__class__.__name__} instance is immutable.')
 
     def __setattr__(self, key: str, value: t.Any) -> None:
