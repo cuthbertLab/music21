@@ -1728,6 +1728,15 @@ class Test(unittest.TestCase):
             [('Viola', 'Viola', 0.0), ('Violin', None, 2.0)]
         )
 
+    def testImportNoteTooLongForMeasures(self):
+        data = (b'MThd\x00\x00\x00\x06\x00\x00\x00\x01\x00\x01'
+                + b'MTrk\x00\x00\x00\x0f'
+                + b'\x00\x90\x3c\x40'
+                + b'\xff\xff\xff\x7f\x80\x3c\x00'
+                + b'\x00\xff\x2f\x00')
+        with self.assertRaisesRegex(stream.StreamException, 'more than 100000 measures'):
+            converter.parse(data, format='midi')
+
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

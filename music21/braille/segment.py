@@ -2510,6 +2510,45 @@ class Test(unittest.TestCase):
         brailleLines = keyboardPartsToBraille(score).splitlines()
         self.assertEqual(brailleLines[0].strip('⠀'), '⠩⠩⠼⠙⠲')
 
+    def testSplitMeasureBeamsLeftWhenTieFillsIt(self):
+        '''
+        Both halves of a split measure are beamed, including a left half that a
+        tied note extends to the end of the measure.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import tie
+
+        def sixteenths(m, names):
+            for name in names:
+                m.append(note.Note(name + '4', type='16th'))
+
+        def beamFlags(m):
+            return [(n.beamStart, n.beamContinue) for n in m.notes]
+
+        m = stream.Measure()
+        m.append(meter.TimeSignature('2/4'))
+        sixteenths(m, 'CDEF')
+        tiedNote = note.Note('G4')
+        tiedNote.tie = tie.Tie('start')
+        m.append(tiedNote)
+
+        left, right = splitMeasure(m)
+        self.assertEqual([n.name for n in left.notes], ['C', 'D', 'E', 'F', 'G'])
+        self.assertEqual(left.highestTime, 2.0)
+        self.assertEqual(beamFlags(left), [(True, False), (False, True), (False, True),
+                                           (False, True), (False, False)])
+        self.assertEqual(len(right), 0)
+
+        untied = stream.Measure()
+        untied.append(meter.TimeSignature('2/4'))
+        sixteenths(untied, 'CDEFGABC')
+        left, right = splitMeasure(untied)
+        self.assertEqual(beamFlags(left), [(True, False), (False, True), (False, True),
+                                           (False, True)])
+        self.assertEqual(beamFlags(right), [(True, False), (False, True), (False, True),
+                                            (False, True)])
+
     def testOctaveClefsSetChordDirection(self):
         for clefClass, descending in (
             (clef.Treble8vbClef, True),
