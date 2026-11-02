@@ -177,6 +177,27 @@ class Test(unittest.TestCase):
             with self.assertRaises(ValueError):
                 a.modify(**kw)
 
+    def testInPlaceFormsRaise(self):
+        from music21.exceptions21 import MeterException
+        ts = TimeSignature('6/8')
+        before = ts.beatSequence
+        with self.assertRaisesRegex(MeterException, r"MeterSequence\('4/4'\)"):
+            MeterSequence().load('4/4')
+        with self.assertRaisesRegex(TypeError, r'setIndex\(0, value\)'):
+            ts.beatSequence[0] = ts.beatSequence[0].subdivide(3)
+
+        mt = MeterTerminal('3/4')
+        for attribute, value in (('numerator', 2), ('denominator', 8), ('weight', 0.5),
+                                 ('duration', duration.Duration(2.0))):
+            with self.assertRaises(TypeError, msg=attribute):
+                setattr(mt, attribute, value)
+        for attribute, value in (('weight', 0.5), ('parenthesis', True),
+                                 ('summedNumerator', True)):
+            with self.assertRaises(TypeError, msg=attribute):
+                setattr(ts.beatSequence, attribute, value)
+        self.assertIs(ts.beatSequence, before)
+        self.assertEqual(str(mt), '3/4')
+
     def testGetBeams(self):
         ts = TimeSignature('6/8')
         durList = [16, 16, 16, 16, 8, 16, 16, 16, 16, 8]
