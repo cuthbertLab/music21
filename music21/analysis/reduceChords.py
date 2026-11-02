@@ -809,6 +809,27 @@ class Test(unittest.TestCase):
         self.assertEqual(reducedPitches(reduction),
                          [(pitch.Pitch('C3'), pitch.Pitch('E4'), pitch.Pitch('G4'))])
 
+    def testRunFillsMeasureGaps(self):
+        from music21 import converter
+        from music21 import instrument
+
+        parts = []
+        for i, tinyNotation in enumerate(['tinyNotation: 4/4 c1 e1',
+                                          'tinyNotation: 4/4 C2 r2 GG1']):
+            p = converter.parse(tinyNotation)
+            inst = instrument.Instrument()
+            inst.partId = f'P{i}'
+            p.insert(0, inst)
+            parts.append(p)
+        reduction = ChordReducer().run(stream.Score(parts))
+        measures = list(reduction.parts.first().getElementsByClass(stream.Measure))
+        self.assertEqual(
+            [[(c.offset, c.quarterLength, [p.nameWithOctave for p in c.pitches])
+              for c in m.getElementsByClass(chord.Chord)]
+             for m in measures],
+            [[(0.0, 4.0, ['C3', 'C4'])], [(0.0, 4.0, ['G2', 'E4'])]],
+        )
+
 
 class TestExternal(unittest.TestCase):
     show = True
