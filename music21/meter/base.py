@@ -35,7 +35,7 @@ from music21 import style
 
 from music21.meter.tools import slashToTuple, proportionToFraction
 from music21.meter.core import (
-    MeterSequence, getMeterSequence, getMeterTerminal, makeSequence,
+    MeterSequence, getMeterSequence, getMeterTerminal,
 )
 
 environLocal = environment.Environment('meter')
@@ -1167,11 +1167,7 @@ class TimeSignature(TimeSignatureBase):
     @summedNumerator.setter
     def summedNumerator(self, value: bool):
         if self.displaySequence is not None:
-            # displaySequence is immutable; swap in a copy with the new flag
-            ds = self.displaySequence
-            self.displaySequence = makeSequence(
-                ds.numerator, ds.denominator, ds._partition,
-                parenthesis=ds.parenthesis, summedNumerator=value)
+            self.displaySequence = self.displaySequence.modify(summedNumerator=value)
 
     # --------------------------------------------------------------------------
     # private methods -- most to be put into the various sequences.
