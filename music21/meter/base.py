@@ -1337,14 +1337,13 @@ class TimeSignature(TimeSignatureBase):
             weightValues[x + 1] = weightValueMin * pow(2, x)
 
         # set weights on accent partitions
-        self.accentSequence = self.accentSequence.partition([1] * accentCount)
-        for i in range(accentCount):
-            # get values from weightValues dictionary; terminals are
-            # immutable, so replace each with a re-weighted cached one
-            mt = self.accentSequence[i]
-            self.accentSequence = self.accentSequence.setIndex(
-                i, getMeterTerminal(
-                    mt.numerator, mt.denominator, weight=weightValues[weightInts[i]]))
+        accentSequence = self.accentSequence.partition([1] * accentCount)
+        weighted = []
+        for i, mt in enumerate(accentSequence):
+            # get values from weightValues dictionary
+            weighted.append(getMeterTerminal(
+                mt.numerator, mt.denominator, weight=weightValues[weightInts[i]]))
+        self.accentSequence = accentSequence.modify(partition=weighted)
 
     # --------------------------------------------------------------------------
     # access data for other processing
