@@ -525,10 +525,10 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
     * Changed in v11: MeterSequence is immutable, hashable, deep-copies to
       itself, and its formerly in-place operations return a new sequence.
-      Removed `load()` (set values when creating the sequence),
-      `subdivideByOther()` (it only wrapped its argument in a new sequence),
-      the `weight` setter (use `withWeight()`), and item assignment
-      `ms[i] = x` (use `setIndex()`).
+      `load()` raises a MeterException (set values when creating the
+      sequence) and item assignment `ms[i] = x` raises a TypeError (use
+      `setIndex()`).  Removed `subdivideByOther()` (it only wrapped its
+      argument in a new sequence) and the `weight` setter (use `withWeight()`).
 
     AI-assisted (Claude).
     '''
@@ -690,6 +690,36 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         4
         '''
         return len(self._partition)
+
+    def __setitem__(self, key: int, value: MeterNode) -> t.NoReturn:
+        '''
+        Raises a TypeError: a MeterSequence is immutable.  Use :meth:`setIndex`.
+
+        >>> a = meter.MeterSequence('4/4', 4)
+        >>> a[0] = a[0].subdivide(2)
+        Traceback (most recent call last):
+        TypeError: MeterSequence is immutable: use ms = ms.setIndex(0, value)
+
+        * Changed in v11: raises a TypeError.
+        '''
+        raise TypeError(f'MeterSequence is immutable: use ms = ms.setIndex({key}, value)')
+
+    def load(self, *arguments, **keywords) -> t.NoReturn:
+        '''
+        Raises a MeterException: a MeterSequence is immutable.  Pass the value
+        to the constructor or to :func:`getMeterSequence` instead.
+
+        >>> ms = meter.MeterSequence()
+        >>> ms.load('4/4')
+        Traceback (most recent call last):
+        music21.exceptions21.MeterException: MeterSequence is immutable, so load()
+            cannot change it: use ms = meter.MeterSequence('4/4')
+
+        * Changed in v11: no longer changes the sequence in place.
+        '''
+        value = repr(arguments[0]) if arguments else '...'
+        raise MeterException('MeterSequence is immutable, so load() cannot change it: '
+                             f'use ms = meter.MeterSequence({value})')
 
     def setIndex(self, index: int, value: MeterNode) -> MeterSequence:
         '''
