@@ -2794,7 +2794,6 @@ class Music21Object(prebase.ProtoM21Object):
             try:
                 self._duration.client = None
             except TypeError:
-                # a FrozenDuration is immutable and has no client to clear
                 if not isinstance(self._duration, FrozenDuration):
                     raise
             durationObjAlreadyExists = True
@@ -2805,9 +2804,7 @@ class Music21Object(prebase.ProtoM21Object):
             try:
                 durationObj.client = self
             except TypeError:
-                # durationObj is an immutable FrozenDuration (e.g. one from a
-                # TimeSignature): it never changes, so it needs no client
-                # back-reference and can be held shared as-is.
+                # a FrozenDuration never changes, so it needs no client
                 if not isinstance(durationObj, FrozenDuration):
                     raise
             if durationObjAlreadyExists:
@@ -3850,8 +3847,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isolatedNote.beatDuration
         <music21.duration.FrozenDuration 0.0>
 
-        If you want to modify the frozen beatDuration, call unfreeze on it and
-        assign it to a new variable:
+        Call `unfreeze()` for a Duration that can be changed:
 
         >>> bd = n0.beatDuration
         >>> bd
