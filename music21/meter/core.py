@@ -271,6 +271,7 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
     __slots__ = (
         '_denominator',
+        '_frozenHash',
         '_numerator',
         '_weight',
     )
@@ -408,13 +409,16 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
 # -----------------------------------------------------------------------------
 
-_meterTerminalCache: dict[tuple[int, int, float], MeterTerminal] = {}
+@lru_cache(1024)
+def _cachedMeterTerminal(numerator: int, denominator: int, weight: float) -> MeterTerminal:
+    return MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
 
 
 def getMeterTerminal(numerator: int, denominator: int,
                      weight: float = 1.0) -> MeterTerminal:
     '''
     Return the cached :class:`MeterTerminal` for these values, making it if needed.
+    The cache keeps the 1024 most recently used.
 
     >>> mt = meter.core.getMeterTerminal(1, 4)
     >>> mt
@@ -426,12 +430,7 @@ def getMeterTerminal(numerator: int, denominator: int,
 
     AI-assisted (Claude).
     '''
-    key = (numerator, denominator, weight)
-    cached = _meterTerminalCache.get(key)
-    if cached is None:
-        cached = MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
-        _meterTerminalCache[key] = cached
-    return cached
+    return _cachedMeterTerminal(numerator, denominator, weight)
 
 
 # -----------------------------------------------------------------------------
@@ -513,6 +512,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
     __slots__ = (
         '_denominator',
+        '_frozenHash',
         '_numerator',
         '_partition',
         'parenthesis',
@@ -2031,9 +2031,21 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 
 # -----------------------------------------------------------------------------
 
-_meterSequenceCache: dict[
-    tuple[int, int, tuple, bool, bool], MeterSequence
-] = {}
+@lru_cache(4096)
+def _cachedSequence(
+    numerator: int,
+    denominator: int,
+    partition: tuple,
+    parenthesis: bool,
+    summedNumerator: bool,
+) -> MeterSequence:
+    ms = MeterSequence.__new__(MeterSequence)
+    object.__setattr__(ms, '_numerator', numerator)
+    object.__setattr__(ms, '_denominator', denominator)
+    object.__setattr__(ms, '_partition', partition)
+    object.__setattr__(ms, 'parenthesis', parenthesis)
+    object.__setattr__(ms, 'summedNumerator', summedNumerator)
+    return ms
 
 
 def makeSequence(
@@ -2047,7 +2059,7 @@ def makeSequence(
     '''
     Return the cached MeterSequence for these values, making it if needed.
     The partition must be a tuple of MeterTerminals and MeterSequences whose
-    sum is numerator/denominator.
+    sum is numerator/denominator.  The cache keeps the 4096 most recently used.
 
     >>> quarter = meter.core.getMeterTerminal(1, 4)
     >>> ms = meter.core.makeSequence(2, 4, (quarter, quarter))
@@ -2058,18 +2070,7 @@ def makeSequence(
 
     AI-assisted (Claude).
     '''
-    key = (numerator, denominator, partition, parenthesis, summedNumerator)
-    cached = _meterSequenceCache.get(key)
-    if cached is not None:
-        return cached
-    ms = MeterSequence.__new__(MeterSequence)
-    object.__setattr__(ms, '_numerator', numerator)
-    object.__setattr__(ms, '_denominator', denominator)
-    object.__setattr__(ms, '_partition', partition)
-    object.__setattr__(ms, 'parenthesis', parenthesis)
-    object.__setattr__(ms, 'summedNumerator', summedNumerator)
-    _meterSequenceCache[key] = ms
-    return ms
+    return _cachedSequence(numerator, denominator, partition, parenthesis, summedNumerator)
 
 
 def getMeterSequence(

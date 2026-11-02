@@ -13,6 +13,7 @@ from __future__ import annotations
 import copy
 import random
 import unittest
+from unittest import mock
 
 from music21 import common
 from music21 import duration
@@ -104,14 +105,12 @@ class Test(unittest.TestCase):
         self.assertNotEqual(e, f)
 
     def testMeterTerminalCache(self):
-        from music21.meter.core import _meterTerminalCache
         a = getMeterTerminal(1, 4)
-        self.assertIs(_meterTerminalCache[(1, 4, 1.0)], a)
         self.assertIs(a, getMeterTerminal(1, 4))
         self.assertIs(a, getMeterTerminal(numerator=1, denominator=4, weight=1.0))
         b = getMeterTerminal(1, 4, weight=0.5)
         self.assertIsNot(a, b)
-        self.assertIs(_meterTerminalCache[(1, 4, 0.5)], b)
+        self.assertIs(b, getMeterTerminal(1, 4, 0.5))
         self.assertEqual(MeterTerminal('1/4'), getMeterTerminal(1, 4))
 
     def testMeterTerminalModify(self):
@@ -129,11 +128,9 @@ class Test(unittest.TestCase):
             a.modify(parenthesis=True)
 
     def testMeterSequenceCache(self):
-        from music21.meter.core import _meterSequenceCache
         from music21.meter.base import _defaultSequenceCache
         ms = getMeterSequence('4/4', 4)
         self.assertIs(getMeterSequence('4/4', 4), ms)
-        self.assertTrue(any(cached is ms for cached in _meterSequenceCache.values()))
         a = TimeSignature('4/4')
         display, beam, beat, accent = _defaultSequenceCache[('4/4', None)]
         self.assertIs(a.displaySequence, display)
@@ -144,6 +141,36 @@ class Test(unittest.TestCase):
         for seqName in ('beamSequence', 'beatSequence',
                         'accentSequence', 'displaySequence'):
             self.assertIs(getattr(a, seqName), getattr(b, seqName), seqName)
+
+    def testCachesAreBounded(self):
+        from music21.meter import base as meterBase
+        cache = meterBase._defaultSequenceCache
+        first = TimeSignature('4/4')
+        with mock.patch.object(meterBase, '_DEFAULT_SEQUENCE_CACHE_SIZE', 4):
+            for numerator in range(1, 9):
+                TimeSignature(f'{numerator}/64')
+                TimeSignature('4/4')
+            self.assertLessEqual(len(cache), 4)
+            self.assertIn(('4/4', None), cache)
+            self.assertNotIn(('1/64', None), cache)
+            self.assertIs(TimeSignature('4/4').beatSequence, first.beatSequence)
+            evicted = TimeSignature('1/64')
+            self.assertEqual(evicted.beatSequence, MeterSequence('1/64'))
+
+    def testHashIsCached(self):
+        import pickle
+        ms = TimeSignature('6/8').accentSequence
+        h = hash(ms)
+        self.assertEqual(ms._frozenHash, h)
+        self.assertEqual(hash(ms), h)
+        self.assertNotIn('_frozenHash', ms._getSlotsRecursive())
+        self.assertEqual(ms, MeterSequence(list(ms)))
+        loaded = pickle.loads(pickle.dumps(ms))
+        self.assertEqual(loaded, ms)
+        self.assertEqual(hash(loaded), h)
+        fd = duration.FrozenDuration(1.5)
+        self.assertEqual(hash(fd), fd._frozenHash)
+        self.assertEqual(hash(fd), hash(duration.FrozenDuration(1.5)))
 
     def testMeterSequenceModify(self):
         a = MeterSequence('4/4', 4)
