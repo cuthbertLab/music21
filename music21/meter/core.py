@@ -118,9 +118,6 @@ class MeterCore:
         '''
         return self._durationFromNumeratorDenominator(self.numerator, self.denominator)
 
-    def _reprInternal(self):
-        return str(self)
-
     def ratioEqual(self, other) -> bool:
         '''
         Compare the numerator and denominator of another object.
