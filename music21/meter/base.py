@@ -608,8 +608,6 @@ class TimeSignature(TimeSignatureBase):
             value = '2/2'
             self.symbol = 'cut'
 
-        # divisions may be list-like -- e.g. ['2/8', '3/8'] (Ariza & Cuthbert 2010) --
-        # so normalize a list to a tuple to make it a usable cache key.
         keyDivisions = tuple(divisions) if isinstance(divisions, list) else divisions
         cacheKey = (value, keyDivisions)
         cached = None
@@ -937,7 +935,7 @@ class TimeSignature(TimeSignatureBase):
     @property
     def beatDuration(self) -> duration.FrozenDuration:
         '''
-        Return a :class:`~music21.duration.Duration` object equal to the beat unit
+        Return a :class:`~music21.duration.FrozenDuration` equal to the beat unit
         of this Time Signature, if and only if this TimeSignature has a uniform beat unit.
 
         Otherwise, raises an exception in v7.1 but will change to returning NaN
@@ -1067,7 +1065,7 @@ class TimeSignature(TimeSignatureBase):
     def beatDivisionDurations(self) -> list[duration.FrozenDuration]:
         '''
         Return the beat division, or the durations that make up one beat,
-        as a list of :class:`~music21.duration.Duration` objects, if and only if
+        as a list of :class:`~music21.duration.FrozenDuration` objects, if and only if
         the TimeSignature has a uniform beat division for all beats.
 
         >>> ts = meter.TimeSignature('3/4')

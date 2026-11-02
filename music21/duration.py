@@ -3115,8 +3115,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
 
     def unfreeze(self) -> Duration:
         '''
-        Return an independent, mutable :class:`Duration` with the same value --
-        faithfully preserving components, tuplets, etc.
+        Return a new :class:`Duration` with the same value, components and tuplets.
 
         >>> fd = duration.FrozenDuration(type='half', dots=1)
         >>> d = fd.unfreeze()
@@ -3146,11 +3145,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
 
         AI-assisted (Claude).
         '''
-        # Copy the frozen state straight onto a bare mutable Duration.  __new__
-        # skips __init__ (which would just set defaults __setstate__ overwrites);
-        # __setstate__ then restores every slot.  Components/quarterLength/link
-        # status are immutable and shared; only tuplets are mutable, so deep-copy
-        # those (when any) -- meter durations have none, so it is skipped entirely.
+        # only the tuplets can be changed in place, so only they are copied
         new = Duration.__new__(Duration)
         new.__setstate__(self.__getstate__())
         if self._tuplets:
