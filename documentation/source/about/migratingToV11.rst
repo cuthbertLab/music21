@@ -12,7 +12,7 @@ improvements by area, then one table of everything removed or deprecated.
 Python 3.12 or newer
 --------------------
 
-Python 3.11 support is gone; 3.12, 3.13, and 3.14 are tested.  The payoff is
+Python 3.11 support is gone; 3.12 through 3.15 are tested.  The payoff is
 real generics: ``Stream`` and its iterators use the PEP 695 bracket form, so a
 type checker can follow ``stream.Stream[note.Note]()`` all the way to
 ``for n in s: n.pitch``.
@@ -80,6 +80,10 @@ methods that need a pitch's *own* octave, such as
 implicit one; set ``.octave`` first.  ``implicitOctave`` stays as a synonym
 so nothing breaks today, but it is deprecated and starts warning in v12.
 
+``defaults.pitchOctave`` and ``defaults.pitchStep`` are gone: an octave-less
+pitch always sounds in octave 4.  ``defaults.StepName`` is now
+``common.types.StepName``.
+
 
 KeySignature.sharps is always an int
 ------------------------------------
@@ -93,6 +97,11 @@ flag plus a list of pitches.  ``sharps=None`` still works but warns:
 >>> unusual.alteredPitches = ['E-', 'G#4']
 >>> unusual
 <music21.key.KeySignature of pitches: [E-, G#4]>
+
+A non-traditional signature, including one read from MusicXML, has
+``sharps == 0``, so test ``if ks.isNonTraditional:``, not ``if ks.sharps is None:``.
+Assigning ``ks.sharps = None`` does not warn but breaks the signature, and
+``key.sharpsToPitch(None)`` raises; use ``0``.
 
 
 Chord indexing gets simpler
@@ -110,6 +119,9 @@ deprecated.  Index, then use the Note:
 >>> c[1].tie
 <music21.tie.Tie start>
 
+An out-of-range ``c[5]`` raises ``IndexError``, not ``KeyError``, and
+``c['1']`` is read as a pitch name; write ``c[1]``.
+
 
 VoiceLeadingQuartet needs its four notes
 ----------------------------------------
@@ -119,7 +131,9 @@ four notes up front, the first Music21Object ever to insist on arguments.  In
 return they are always Notes, never ``None``.  ``analyticKey`` is now
 ``key``, ``vIntervals`` and ``hIntervals`` are tuples, and two dogmatic names
 got truer ones: ``opensIncorrectly()`` is ``not modalOpening()`` and
-``closesIncorrectly()`` is ``not clausulaVera()``.
+``closesIncorrectly()`` is ``not clausulaVera()``.  The close test is also
+stricter: a half step and a whole step in contrary motion onto the tonic, at a
+unison or single octave.  Closes by leap, or onto wider intervals, no longer pass.
 
 
 Meter parts cannot be changed
@@ -204,10 +218,40 @@ Roman numerals
   the raised sixth and seventh degrees in minor: ``#VI``, not ``VI#63``.
   ``correctRNAlterationForMinor`` gained a ``chordHasMajorThird`` keyword for
   the same reason.
-* Figures containing ``x``, ``y`` or ``z`` raise.  ``RomanNumeral('IIIx')``
-  used to be a III13 chord by accident.
 * ``FigureTuple`` and ``PitchFigureTuple`` are typed NamedTuples, and
   ``FigureTuple.fromPitchAndReference()`` replaces ``figureTupleSolo``.
+  ``PitchFigureTuple`` was ``ChordFigureTuple``, and the first field of both
+  is ``degFromRefPitch``, not ``aboveBass``.
+
+
+Chord symbols
+-------------
+
+Figures that music21 writes, from MusicXML or ``chordSymbolFigureFromChord``,
+put the bass last (``C add 2/B-``, was ``C/B- add 2``) and name added notes by
+degree (``Cmadd9``, was ``CmaddD``), so they parse back.  Compare pitches, not
+figure strings.
+
+
+Instruments and clefs
+---------------------
+
+* ``instrument.HiHatCymbal``, ``RideCymbals`` and ``SplashCymbals`` are now
+  ``HiHat``, ``RideCymbal`` and ``SplashCymbal``, and their part names change to
+  match.  ``instrument.fromString('hi-hat cymbal')`` still works.
+* Only instruments in the General MIDI percussion map have ``percMapPitch``:
+  ``instrument.Timpani().percMapPitch`` raises ``AttributeError`` instead of
+  returning None.  Use ``getattr(inst, 'percMapPitch', None)`` or
+  ``isinstance(inst, instrument.MidiPercussionMapMixin)``.
+* ``CongaDrum`` modifiers ``'mute high'`` and ``'open high'`` are silently
+  ignored; write ``cd.modifier = 'high'`` and set ``cd.muted``.  A modifier
+  set as ``'1'`` or ``'2'`` reads back as ``'midi-1'`` or ``'midi-2'``.  The
+  repr of a percussion instrument ends with its modifier:
+  ``<music21.instrument.BassDrum 'Bass Drum' acoustic>``.
+* ``Treble8vbClef`` and ``Treble8vaClef`` are no longer kinds of
+  ``TrebleClef``, so ``isinstance()`` and ``getElementsByClass(clef.TrebleClef)``
+  miss them.  Name all three, or use ``clef.GClef`` for any G clef.
+* ``TabClef.getStemDirectionForPitches()`` takes ``pitches=``, not ``pitchList=``.
 
 
 Durations and sorting
@@ -252,8 +296,16 @@ File formats
   names, ``\markuplist``), and every ``stringOutput()`` returns a ``str``.
 * **MIDI**: ``midiEventsToInstrument`` is removed; use
   ``midiEventToInstrument``.
-* **Vexflow**: the ``music21.vexflow`` module is gone.  It had not worked in
-  a decade; music21j is the way to draw in a browser.
+* **Scala**: ``Scale.write('scala', fp=...)`` returns a ``pathlib.Path``.
+* **Vexflow**: the ``music21.vexflow`` module and the ``'vexflow'`` format for
+  ``show()`` and ``write()`` are gone.  It had not worked in a decade; music21j
+  is the way to draw in a browser.
+* **Size limits**: making more than 100,000 measures (in ``makeMeasures``,
+  ``makeTies``, MIDI import, MusicXML export, RomanText) or uncompressing more
+  than 256 MB from one member of a .mxl, .capx, .nwc or zipped MuseData file
+  raises.  For very large real files raise ``defaults.maxMeasures`` or
+  ``common.fileTools.MAX_UNCOMPRESSED_BYTES`` (on ``fileTools``, not on
+  ``common``).
 * **configure**: choosing MuseScore as the MusicXML reader also sets
   ``musescoreDirectPNGPath``.
 
@@ -264,9 +316,13 @@ figuredBass, features, tree
 * figuredBass: ``hiddenFifth`` and ``hiddenOctave`` are now ``hiddenFifths``
   and ``hiddenOctaves``, matching ``parallelFifths``.  ``FiguredBassScale``'s
   first argument is ``scaleTonic``, not ``scaleValue``.  Rests inside a
-  possibility are typed sentinels rather than the string ``'RT'``.
-* features: ``Feature.vector`` starts as ``[]`` rather than ``None``, and
-  ``FeatureExtractor.dimensions`` defaults to 1.
+  possibility are typed sentinels rather than the string ``'RT'``: test
+  ``p.ps == possibility.POSSIBILITY_REST_PS``.  An extender with no number is
+  ``notation.EXTENDER_SENTINEL`` (``-1``), not ``'_'``.
+* features: ``Feature.vector`` starts as ``[]`` rather than ``None``.  On both
+  ``Feature`` and ``FeatureExtractor``, ``name`` and ``description`` default
+  to ``''``, ``isSequential`` and ``discrete`` to True, and ``dimensions`` to 1;
+  test ``if not fe.name:``, not ``is None``.
 * tree: ``ElementTimespan`` and ``PitchedTimespan`` take their arguments in
   the same order as ``Timespan``; ``offset``, ``endTime`` and ``element`` are
   required.
@@ -280,6 +336,26 @@ For developers
 * ``common.enums.ContainsEnum`` is not needed: Python 3.12's ``StrEnum``
   suffices, or ``HexEnum`` for hex values such as MIDI.  The alias leaves in
   v12.  ``common.defaultlist`` is deprecated.
+* ``common.enums.StrEnum`` is Python's ``enum.StrEnum``, so member values must
+  be strings.  ``StrEnumMeta`` and ``ContainsMeta`` are gone; ``x in SomeEnum``
+  works without them.
+* Type aliases such as ``common.types.OffsetQL`` are now ``type`` statements.
+* Parser internals, for code that calls or subclasses them:
+
+  * ABC: ``ABCChord.parse()`` takes the key signature first, like
+    ``ABCNote.parse()``, so call it with keywords; ``translate.parseTokens()``
+    needs a ``lyricTargets`` list.
+  * LilyPond: tuplets are ``\tuplet`` actual/normal, so
+    ``setContextForTimeFraction(3, 2)`` (was ``2, 3``) and
+    ``LyPrefixCompositeMusic(type='tuplet', fraction='3/2')``; ``type='times'``
+    raises.  Keywords ``pitch=`` are ``pitchObj=`` and ``chord=`` is ``chordIn=``.
+  * MuseData ``base40``: unused table slots hold ``''``, not None;
+    ``quickEnharmonicString()`` and its siblings take a pitch name, not a base40
+    number; ``BaseN`` is gone.
+  * MusicXML: ``SoundTagMixin`` is gone; ``xmlSoundParser.setSound(mp, mxSound,
+    mxDir=..., totalOffset=...)`` and ``setSoundTempo(mp, ...)`` are module
+    functions.
+  * Noteworthy: ``NWCObject`` has no ``staffParent``.
 * ``EqualSlottedObjectMixin`` returns ``NotImplemented`` rather than False when
   compared with a different type, so the other object's ``__eq__`` gets a turn.
 * The test runners import modules the normal way, so a module's tests no
@@ -307,8 +383,18 @@ Removed and deprecated
      - Python 3.12 or newer
    * - ``MeterTerminal.subdivideByOther(other)``, also on MeterSequence
      - ``meter.MeterSequence(other)``
-   * - ``music21.vexflow``
+   * - ``music21.vexflow``, ``s.show('vexflow')``
      - music21j
+   * - ``defaults.pitchOctave``, ``defaults.pitchStep``
+     - octave 4 is fixed; give octaves explicitly
+   * - ``instrument.HiHatCymbal``, ``RideCymbals``, ``SplashCymbals``
+     - ``HiHat``, ``RideCymbal``, ``SplashCymbal``
+   * - ``roman.ChordFigureTuple``, ``FigureTuple.aboveBass``
+     - ``PitchFigureTuple``, ``degFromRefPitch``
+   * - ``common.enums.StrEnumMeta``, ``ContainsMeta``
+     - not needed
+   * - ``pitch.accidentalModifiersSorted``
+     - ``pitch.accidentalNameToModifier``
    * - ``midi.translate.midiEventsToInstrument``
      - ``midiEventToInstrument``
    * - ``Stream.hasElement(el)``
@@ -317,7 +403,8 @@ Removed and deprecated
      - ``addIdentificationToMetadata``
    * - a string for ``musicxml.xmlToM21.MeasureParser.getStaffNumber``
      - an ``int``
-   * - ``VoiceLeadingQuartet.unison`` / ``.fifth`` / ``.octave``
+   * - ``VoiceLeadingQuartet.unison`` / ``.fifth`` / ``.octave``,
+       ``voiceLeading.intervalCache``
      - ``interval.Interval('P1')`` and friends
    * - ``c['2.tie']`` attribute paths into a Chord
      - ``c[2].tie``
@@ -339,15 +426,22 @@ Removed and deprecated
        ``getNotehead``, ``setNotehead``, ``getNoteheadFill``,
        ``setNoteheadFill``, ``getStemDirection``, ``setStemDirection``
      - ``c[i].tie``, ``c[i].style.color``, ``c[i].notehead``,
-       ``c[i].noteheadFill``, ``c[i].stemDirection``
+       ``c[i].noteheadFill``, ``c[i].stemDirection``.  ``getColor`` fell back
+       to ``c.style.color``; ``setColor(v)`` with no target colored the chord
+       and every note; the other setters with no target changed ``c[0]``.
+   * - ``c.inversion(n)``  (warns from v12, removed in v13)
+     - ``c.setInversion(n, inPlace=True)``; ``transposeOnSet=`` is ``transpose=``
    * - ``roman.figureTupleSolo``
      - ``FigureTuple.fromPitchAndReference()``
    * - ``VoiceLeadingQuartet.opensIncorrectly()`` / ``closesIncorrectly()``
      - ``not modalOpening()`` / ``not clausulaVera()``
    * - ``KeySignature(sharps=None)``
      - ``ks.isNonTraditional = True``
-   * - ``variant.addVariant(replacementDuration=...)``
-     - ``replacementQuarterLength=...``
+   * - ``variant.addVariant(replacementDuration=...)``,
+       ``v.replacementDuration = 2.0``
+     - ``replacementQuarterLength``
+   * - ``HexEnum.hasValue(x)``, e.g. on MIDI enums (no warning yet)
+     - ``x in SomeEnum``
    * - ``common.defaultlist``
      - a ``list`` or a ``dict``
    * - ``common.enums.ContainsEnum``
