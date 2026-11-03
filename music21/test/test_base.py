@@ -49,7 +49,7 @@ class Test(unittest.TestCase):
         from packaging.version import Version
         parsed = Version(base.__version__)
         self.assertEqual(str(parsed), base.__version__)
-        self.assertEqual(parsed.release, tuple(int(v) for v in base.__version_info__[:3]))
+        self.assertEqual(parsed.release, base.__version_info__[:3])
 
     def testVersionNamesNotInStarImport(self):
         import music21  # pylint: disable=redefined-outer-name

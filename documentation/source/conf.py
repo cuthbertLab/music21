@@ -83,7 +83,7 @@ copyright = f'2006-{date.today().year} Michael Scott Asato Cuthbert'
 try:
     import music21
     # The short X.Y version.
-    version = '.'.join(music21.__version_info__[:2])
+    version = f'{music21.__version_info__[0]}.{music21.__version_info__[1]}'
     # The full version, including alpha/beta/rc tags.
     release = music21.__version__
 except ImportError:
