@@ -201,6 +201,20 @@ class Test(unittest.TestCase):
             with self.assertRaises(ValueError):
                 a.modify(**kw)
 
+    def testBarDurationCannotBeChanged(self):
+        # changing the copy that barDuration used to return was silently lost
+        ts = TimeSignature('3/4')
+        self.assertIsInstance(ts.barDuration, duration.FrozenDuration)
+        with self.assertRaises(TypeError):
+            ts.barDuration.quarterLength = 7.0
+        self.assertEqual(ts.barDuration.quarterLength, 3.0)
+        self.assertEqual(ts.barDuration, duration.Duration(3.0))
+
+        # an assigned duration is returned as given
+        override = duration.Duration(7.0)
+        ts.barDuration = override
+        self.assertIs(ts.barDuration, override)
+
     def testInPlaceFormsRaise(self):
         ts = TimeSignature('6/8')
         before = ts.beatSequence

@@ -529,7 +529,12 @@ class Music21Object(prebase.ProtoM21Object):
         # private duration storage; managed by property
         self._duration: Duration|None = duration
         if duration is not None:
-            duration.client = self
+            try:
+                duration.client = self
+            except TypeError:
+                # a FrozenDuration has no client; if this changes, update the duration setter too
+                if not isinstance(duration, FrozenDuration):
+                    raise
         self._priority = 0  # default is zero
 
         # store cached values here:
@@ -2807,6 +2812,7 @@ class Music21Object(prebase.ProtoM21Object):
             except TypeError:
                 # a FrozenDuration (e.g. from a TimeSignature) never changes,
                 # so it has nothing to tell a client
+                # if this changes, update __init__ too
                 if not isinstance(durationObj, FrozenDuration):
                     raise
             if durationObjAlreadyExists:
