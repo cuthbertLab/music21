@@ -229,13 +229,13 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s.append(n)
         >>> sf = freezeThaw.StreamFreezer(s)
         >>> pprint(sf.packStream())
-        {'m21Version': (...), 'stream': <music21.stream.Stream 0x1289212>}
+        {'m21Version': '...', 'stream': <music21.stream.Stream 0x1289212>}
         '''
         # do all things necessary to set up the stream
         if streamObj is None:
             streamObj = self.stream
         self.setupSerializationScaffold(streamObj)
-        storage = {'stream': streamObj, 'm21Version': base.VERSION}
+        storage = {'stream': streamObj, 'm21Version': base.__version__}
         return storage
 
     def setupSerializationScaffold(self, streamObj=None):
@@ -871,7 +871,7 @@ class StreamThawer(StreamFreezeThawBase):
         Convert from storage dictionary to Stream.
         '''
         version = storage['m21Version']
-        if version != base.VERSION:  # pragma: no cover
+        if version != base.__version__:  # pragma: no cover
             environLocal.warn('this pickled file is out of date and may not function properly.')
         streamObj = storage['stream']
 

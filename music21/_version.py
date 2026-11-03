@@ -63,7 +63,7 @@ def get_version_tuple(vv):
             beta += ch
     if beta:
         v.append(beta)
-    return tuple(v)
+    return tuple(int(part) if part.isdigit() else part for part in v)
 
 
 __version_info__ = get_version_tuple(__version__)
