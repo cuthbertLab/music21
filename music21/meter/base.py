@@ -819,7 +819,7 @@ class TimeSignature(TimeSignatureBase):
         ...               duration=ts.barDuration.unfreeze(),
         ... )
         >>> n.duration
-        <music21.duration.Duration 3.5>
+        <music21.duration.Duration 2.0>
         >>> n.duration.dots = 2
         >>> n.duration
         <music21.duration.Duration 3.5>
