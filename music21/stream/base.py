@@ -13398,10 +13398,10 @@ class Measure(Stream):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.barDuration
-        <music21.duration.Duration 3.0>
+        <music21.duration.FrozenDuration 3.0>
         >>> m.repeatAppend(note.Note(type='quarter'), 5)
         >>> m.barDuration
-        <music21.duration.Duration 3.0>
+        <music21.duration.FrozenDuration 3.0>
         >>> m.duration
         <music21.duration.Duration 5.0>
 

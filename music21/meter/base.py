@@ -780,12 +780,12 @@ class TimeSignature(TimeSignatureBase):
     @property
     def barDuration(self) -> duration.Duration:
         '''
-        Return a :class:`~music21.duration.Duration` object equal to the
+        Return a :class:`~music21.duration.FrozenDuration` object equal to the
         total length of this TimeSignature.
 
         >>> ts = meter.TimeSignature('5/16')
         >>> ts.barDuration
-        <music21.duration.Duration 1.25>
+        <music21.duration.FrozenDuration 1.25>
 
         >>> ts2 = meter.TimeSignature('3/8')
         >>> d = ts2.barDuration
@@ -807,10 +807,10 @@ class TimeSignature(TimeSignatureBase):
         An uninitialized TimeSignature returns 4.0 for 4/4
 
         >>> meter.TimeSignature().barDuration
-        <music21.duration.Duration 4.0>
+        <music21.duration.FrozenDuration 4.0>
 
-        Avoid changing the Duration you get here: in v12 it is expected to become a
-        :class:`~music21.duration.FrozenDuration`, which cannot be changed.
+        * Changed in v11: returns a :class:`~music21.duration.FrozenDuration`
+          unless one has been assigned.
         '''
         if self._overriddenBarDuration:
             return self._overriddenBarDuration
@@ -819,8 +819,7 @@ class TimeSignature(TimeSignatureBase):
         if beamSequence is not None:
             # could come from self.beamSequence, self.accentSequence,
             #   self.displaySequence, self.accentSequence
-            # unfreeze() to allow mutability till v12
-            return beamSequence.duration.unfreeze()
+            return beamSequence.duration
 
         # should never happen.
         return duration.Duration(0)  # pragma: no cover
