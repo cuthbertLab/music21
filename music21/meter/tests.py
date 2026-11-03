@@ -87,6 +87,16 @@ class Test(unittest.TestCase):
         a = a.setIndex(3, a[3].subdivide(4))
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}')
 
+    def testGetItemNegativeIndex(self):
+        # ms[-len(ms)] raised IndexError, so ms[-1] on a single part did too
+        ms = MeterSequence('3/8+2/8+1/8')
+        self.assertEqual(str(ms[-1]), '1/8')
+        self.assertEqual(str(ms[-3]), '3/8')
+        self.assertEqual(str(MeterSequence('4/4')[-1]), '4/4')
+        for outOfRange in (3, -4):
+            with self.assertRaisesRegex(IndexError, str(outOfRange), msg=outOfRange):
+                unused_part = ms[outOfRange]
+
     def testMeterSequenceDeepcopy(self):
         a = MeterSequence('4/4', 4)
         b = copy.deepcopy(a)
