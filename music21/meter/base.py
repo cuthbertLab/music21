@@ -530,6 +530,8 @@ class TimeSignature(TimeSignatureBase):
 
     def __init__(self, value: str = '4/4', divisions=None, **keywords):
         super().__init__(**keywords)
+        if value is None:  # it happens...
+            value = '4/4'
 
         self._overriddenBarDuration: duration.Duration|None = None
         self.symbol: str = ''

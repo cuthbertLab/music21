@@ -215,6 +215,19 @@ class Test(unittest.TestCase):
         ts.barDuration = override
         self.assertIs(ts.barDuration, override)
 
+    def testEmptySequenceDuration(self):
+        self.assertEqual(MeterSequence().duration.quarterLength, 0.0)
+
+    def testModifyDenominatorMustBePowerOfTwo(self):
+        a = MeterTerminal('3/4')
+        self.assertEqual(a.modify(denominator=256).denominator, 256)
+        for badDenominator in (0, 7, 12):
+            with self.assertRaises(MeterException):
+                a.modify(denominator=badDenominator)
+
+    def testNoneIsFourFour(self):
+        self.assertEqual(TimeSignature(None).ratioString, '4/4')
+
     def testInPlaceFormsRaise(self):
         ts = TimeSignature('6/8')
         before = ts.beatSequence

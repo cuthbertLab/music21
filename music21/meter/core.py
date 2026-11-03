@@ -72,7 +72,10 @@ class MeterNode:
         <music21.duration.FrozenDuration 1.5>
         '''
         # NOTE: this is a performance critical method.
-        return FrozenDuration(quarterLength=(4.0 * numerator) / denominator)
+        try:
+            return FrozenDuration(quarterLength=(4.0 * numerator) / denominator)
+        except ZeroDivisionError:  # empty MeterSequence
+            return FrozenDuration(quarterLength=0.0)
 
     @property
     def duration(self) -> FrozenDuration:
@@ -362,9 +365,12 @@ class MeterTerminal(prebase.ProtoM21Object, MeterNode, FrozenObject):
             raise ValueError(
                 f'MeterTerminal.modify() does not accept {sorted(extra)}; allowed '
                 'keywords are numerator, denominator, weight.')
+        denominator = keywords.get('denominator', self._denominator)
+        if denominator <= 0 or denominator & (denominator - 1):
+            raise MeterException(f'bad denominator value: {denominator}')
         return getMeterTerminal(
             numerator=keywords.get('numerator', self._numerator),
-            denominator=keywords.get('denominator', self._denominator),
+            denominator=denominator,
             weight=keywords.get('weight', self._weight),
         )
 
