@@ -819,8 +819,7 @@ class TimeSignature(TimeSignatureBase):
         if beamSequence is not None:
             # could come from self.beamSequence, self.accentSequence,
             #   self.displaySequence, self.accentSequence
-            # unfreeze() to allow mutability till v12
-            return beamSequence.duration.unfreeze()
+            return beamSequence.duration
 
         # should never happen.
         return duration.Duration(0)  # pragma: no cover
@@ -932,11 +931,8 @@ class TimeSignature(TimeSignatureBase):
     @property
     def beatDuration(self) -> duration.FrozenDuration:
         '''
-        Return a :class:`~music21.duration.Duration` object equal to the beat unit
+        Return a :class:`~music21.duration.FrozenDuration` object equal to the beat unit
         of this Time Signature, if and only if this TimeSignature has a uniform beat unit.
-
-        Otherwise, raises an exception in v7.1 but will change to returning NaN
-        soon fasterwards.
 
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatDuration
@@ -956,23 +952,24 @@ class TimeSignature(TimeSignatureBase):
         >>> ts.beatDuration
         <music21.duration.FrozenDuration 0.5>
 
-        Cannot do this because of asymmetry
+        For a non-uniform beat unit, this returns the duration of the first unit.
+        If you expect non-uniform beat units, be sure to iterate over the beatSequence
+        terminals instead.
 
-        >>> ts = meter.TimeSignature('2/4+3/16')
+        >>> ts = meter.TimeSignature('3/16+1/4')
         >>> ts.beatDuration
-        Traceback (most recent call last):
-        music21.exceptions21.TimeSignatureException: non-uniform beat unit: [2.0, 0.75]
+        <music21.duration.FrozenDuration 0.75>
+        >>> [meterSequence.duration for meterSequence in ts.beatSequence]
+        [<music21.duration.FrozenDuration 0.75>,
+         <music21.duration.FrozenDuration 1.0>]
 
-        * Changed in v7: return NaN rather than raising Exception in property.
-        * Changed in v11: returns a :class:`~music21.duration.FrozenDuration`.
+        * Changed in v11:
+
+          - returns a :class:`~music21.duration.FrozenDuration`.
+          - returns a duration for non-uniform beat units rather than
+            raising an exception in a property.
         '''
-        post = []
-        for ms in self.beatSequence:
-            post.append(ms.duration.quarterLength)
-        if len(set(post)) == 1:
-            return self.beatSequence[0].duration  # all are the same
-        else:
-            raise TimeSignatureException(f'non-uniform beat unit: {post}')
+        return self.beatSequence[0].duration
 
     @property
     def beatDivisionCount(self) -> int:
