@@ -1547,6 +1547,29 @@ class Test(unittest.TestCase):
         self.assertIsNone(right.leftBarline)
         self.assertEqual(right.rightBarline.type, 'final')
 
+    def testSplitMeasureKeepsItsSettings(self):
+        '''
+        The second half of a split measure gets the clef, key and meter in
+        force where it is split, its own measure's included.
+        '''
+        p = Part()
+        m1 = Measure(number=1)
+        m1.append([clef.BassClef(), key.KeySignature(2), meter.TimeSignature('3/4')])
+        m1.append(note.Note(quarterLength=3))
+        m2 = Measure(number=2)
+        m2.append(note.Note(quarterLength=3))
+        p.append([m1, m2])
+
+        unused_left, right = m1.splitAtQuarterLength(1.0)
+        self.assertIsInstance(right.clef, clef.BassClef)
+        self.assertEqual(right.keySignature.sharps, 2)
+        self.assertEqual(right.timeSignature.ratioString, '3/4')
+
+        unused_left, right = m2.splitAtQuarterLength(1.0)
+        self.assertIsInstance(right.clef, clef.BassClef)
+        self.assertEqual(right.keySignature.sharps, 2)
+        self.assertEqual(right.timeSignature.ratioString, '3/4')
+
     def testSliceByGreatestDivisorGraceAndEmpty(self):
         '''
         A grace note takes no time to divide, and a measure with no notes
