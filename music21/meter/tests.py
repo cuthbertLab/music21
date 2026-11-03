@@ -16,6 +16,7 @@ import unittest
 
 from music21 import common
 from music21 import duration
+from music21.exceptions21 import MeterException
 from music21 import note
 from music21 import stream
 from music21.meter.base import TimeSignature
@@ -96,6 +97,21 @@ class Test(unittest.TestCase):
         for outOfRange in (3, -4):
             with self.assertRaisesRegex(IndexError, str(outOfRange), msg=outOfRange):
                 unused_part = ms[outOfRange]
+
+    def testPartitionOptionsAddUpToMeter(self):
+        # 18/4 offered 4/4+4/4+4/4+4/4 (only 16/4); 14/8 offered 3/8 four times (only 12/8)
+        for meterString in ('18/4', '14/8'):
+            ms = MeterSequence(meterString)
+            for option in ms.getPartitionOptions():
+                self.assertEqual(MeterSequence(list(option)).duration.quarterLength,
+                                 ms.duration.quarterLength,
+                                 f'{meterString}: {option}')
+
+        # no way left to make four parts of 18/4, so raise or use the default
+        with self.assertRaises(MeterException):
+            MeterSequence('18/4').partitionedByCount(4, loadDefault=False)
+        self.assertEqual(str(MeterSequence('18/4').partitionedByCount(4)),
+                         '{' + '+'.join(['3/4'] * 6) + '}')
 
     def testMeterSequenceDeepcopy(self):
         a = MeterSequence('4/4', 4)
@@ -186,7 +202,6 @@ class Test(unittest.TestCase):
                 a.modify(**kw)
 
     def testInPlaceFormsRaise(self):
-        from music21.exceptions21 import MeterException
         ts = TimeSignature('6/8')
         before = ts.beatSequence
         removed = [
