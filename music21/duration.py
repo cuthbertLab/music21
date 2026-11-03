@@ -1722,8 +1722,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> tupDur1 == tupDur2
         True
 
-        Grace durations are conceptually distinct, so they never equal an ordinary
-        Duration:
+        A grace duration never equals an ordinary Duration:
 
         >>> graceDur1 = tupDur1.getGraceDuration()
         >>> graceDur1 == tupDur1
@@ -1735,10 +1734,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> graceDur1 == graceDur2
         True
 
-        A :class:`FrozenDuration` differs from a Duration only in being immutable,
-        so it compares equal to an otherwise-identical Duration:
+        A :class:`FrozenDuration` equals a Duration of the same value:
 
-        >>> duration.Duration(2.0) == duration.FrozenDuration(quarterLength=2.0)
+        >>> duration.FrozenDuration('half') == duration.Duration('half')
         True
 
         Link status must be the same:
@@ -1780,8 +1778,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         if not isinstance(other, Duration):
             return False
-        # A grace duration is conceptually a different thing from an ordinary
-        # duration, even at the same length; a FrozenDuration is not.
+        # grace durations only equal other grace durations
         if self.isGrace != other.isGrace:
             return False
 
@@ -3156,8 +3153,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
 
     def unfreeze(self) -> Duration:
         '''
-        Return an independent, mutable :class:`Duration` with the same value --
-        faithfully preserving components, tuplets, etc.
+        Return a :class:`Duration` with the same value that can be changed.
 
         >>> fd = duration.FrozenDuration(type='half', dots=1)
         >>> d = fd.unfreeze()
@@ -3166,7 +3162,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
         >>> type(d) is duration.Duration
         True
 
-        The copy is mutable and fully independent of the original:
+        Changing it leaves the original alone:
 
         >>> d.dots = 0
         >>> d.quarterLength
@@ -3174,7 +3170,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
         >>> fd.dots
         1
 
-        Tuplets and unlinked status survive the round trip:
+        Tuplets come along too, as copies:
 
         >>> fd2 = duration.FrozenDuration(2/3)
         >>> d2 = fd2.unfreeze()
@@ -3187,11 +3183,8 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
 
         AI-assisted (Claude).
         '''
-        # Copy the frozen state straight onto a bare mutable Duration.  __new__
-        # skips __init__ (which would just set defaults __setstate__ overwrites);
-        # __setstate__ then restores every slot.  Components/quarterLength/link
-        # status are immutable and shared; only tuplets are mutable, so deep-copy
-        # those (when any) -- meter durations have none, so it is skipped entirely.
+        # Skips __init__, since __setstate__ overwrites everything it sets.  Tuplets
+        # are the only part that can change, so they alone need copying.
         new = Duration.__new__(Duration)
         new.__setstate__(self.__getstate__())
         if self._tuplets:
@@ -3201,8 +3194,8 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
 
     def augmentOrDiminish(self, amountToScale: OffsetQLIn, retainComponents=False) -> Duration:
         '''
-        Like :meth:`Duration.augmentOrDiminish`, but always returns a new, mutable
-        Duration.
+        Like :meth:`Duration.augmentOrDiminish`, but always returns an ordinary
+        Duration, which can be changed.
 
         >>> fd = duration.FrozenDuration(quarterLength=1.0)
         >>> d = fd.augmentOrDiminish(0.5)
@@ -3217,7 +3210,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
     def splitDotGroups(self, *, inPlace=False) -> Duration:
         '''
         Like :meth:`Duration.splitDotGroups`, but `inPlace` must be False since a
-        FrozenDuration cannot be mutated.
+        FrozenDuration cannot be changed.
 
         >>> fd = duration.FrozenDuration(quarterLength=1.0)
         >>> fd.splitDotGroups()
@@ -3810,8 +3803,7 @@ class Test(unittest.TestCase):
         self.assertFalse(d != fd)
         self.assertFalse(fd != d)
 
-        # Equal even from different construction paths (differing internal flags
-        # that a slot-by-slot comparison would trip on).
+        # Equal however they were made, though their internal flags differ.
         self.assertEqual(Duration(type='half'), fd)
         self.assertEqual(fd, Duration(type='half'))
 
@@ -3820,7 +3812,7 @@ class Test(unittest.TestCase):
         self.assertNotEqual(fd, Duration(1.0))
         self.assertNotEqual(Duration(1.0), fd)
 
-        # A grace duration is conceptually distinct, in either order.
+        # A grace duration never equals an ordinary one, in either order.
         grace = d.getGraceDuration()
         self.assertNotEqual(grace, d)
         self.assertNotEqual(d, grace)
