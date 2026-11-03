@@ -40,6 +40,24 @@ class MockObject(Music21Object):
 
 class Test(unittest.TestCase):
 
+    def testVersionReadableByPackaging(self):
+        '''
+        Installers and PyPI read versions with the `packaging` library, which
+        raises InvalidVersion on anything outside its rules.  A version it would
+        respell (11.0.0-beta16) is wrong too: tools would show a different string.
+        '''
+        from packaging.version import Version
+        parsed = Version(base.__version__)
+        self.assertEqual(str(parsed), base.__version__)
+        self.assertEqual(parsed.release, tuple(int(v) for v in base.__version_info__[:3]))
+
+    def testVersionNamesNotInStarImport(self):
+        import music21  # pylint: disable=redefined-outer-name
+        for name in ('__version__', '__version_info__', 'VERSION', 'VERSION_STR'):
+            self.assertNotIn(name, music21.__all__)
+            self.assertNotIn(name, base.__all__)
+            self.assertEqual(getattr(music21, name), getattr(base, name))
+
     def testM21ObjRepr(self):
         a = base.Music21Object()
         address = hex(id(a))

@@ -207,6 +207,10 @@ For developers
   longer need ``from music21.key import KeySignature`` to compare types.
 * AI agents get their own instructions, skills and shared memory in
   ``AGENTS.md`` and ``.agents/``.
+* ``from music21 import *`` no longer brings in ``__version__``, ``VERSION``, or
+  ``VERSION_STR``.  Use ``music21.__version__`` (a string) and the new
+  ``music21.__version_info__`` (a tuple), or the same names on ``music21.base``.
+  ``music21.VERSION_STR`` and ``music21.VERSION`` still work.
 
 
 Removed and deprecated
