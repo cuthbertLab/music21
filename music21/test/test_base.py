@@ -80,6 +80,15 @@ class Test(unittest.TestCase):
         self.assertFalse('flute' in n.groups)
         self.assertTrue('flute' in b.groups)
 
+    def testFrozenDurationInConstructor(self):
+        # Note(duration=ts.barDuration) raised while setting the duration's client
+        ts = meter.TimeSignature('2/4')
+        n = note.Note(duration=ts.barDuration)
+        self.assertIs(n.duration, ts.barDuration)
+        with self.assertRaises(TypeError):
+            n.duration.dots = 2
+        self.assertEqual(ts.barDuration.quarterLength, 2.0)
+
     def testAssignFrozenDurationStaysFrozen(self):
         '''
         A note can be given a FrozenDuration, such as a MeterSequence's.  It stays

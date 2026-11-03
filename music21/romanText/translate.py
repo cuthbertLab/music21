@@ -625,7 +625,7 @@ class PartTranslator:
             newRn = copy.deepcopy(self.previousRn)
             newRn.lyric = ''
             # set to entire bar duration and tie
-            newRn.duration = copy.deepcopy(self.tsAtTimeOfLastChord.barDuration)
+            newRn.quarterLength = self.tsAtTimeOfLastChord.barDuration.quarterLength
             if self.previousRn.tie is None:
                 self.previousRn.tie = tie.Tie('start')
             else:
