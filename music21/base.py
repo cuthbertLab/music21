@@ -25,7 +25,7 @@ available after importing `music21`.
 >>> music21.Music21Object
 <class 'music21.base.Music21Object'>
 
->>> music21.VERSION_STR
+>>> music21.__version__
 '11.0.0b15'
 
 Alternatively, after doing a complete import, these classes are available
@@ -92,9 +92,6 @@ __all__ = [
     'Groups',
     'Music21Object',
     'ElementWrapper',
-
-    'VERSION',
-    'VERSION_STR',
 ]
 
 # N.B. for PyDev "all" import working, we need to list this

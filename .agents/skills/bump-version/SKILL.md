@@ -21,7 +21,7 @@ string.
 1. `music21/_version.py` — the `__version__` string.
 2. `music21/base.py` — the single version doctest:
    ```
-   >>> music21.VERSION_STR
+   >>> music21.__version__
    '11.0.0b2'
    ```
    This test exists specifically to force you to remember the bump. If you change
@@ -31,7 +31,7 @@ Verify both with:
 ```bash
 uv run pytest --doctest-modules music21/base.py music21/_version.py
 ```
-(or `uv run python -c "import music21; print(music21.VERSION_STR)"`).
+(or `uv run python -c "import music21; print(music21.__version__)"`).
 
 ## When to bump
 
@@ -87,6 +87,6 @@ number. (Humans remove the AI-assisted note on review; leave the version marker.
 ## Checklist
 
 1. Edit `__version__` in `music21/_version.py`.
-2. Edit the `VERSION_STR` doctest in `music21/base.py` to match.
+2. Edit the `__version__` doctest in `music21/base.py` to match.
 3. Add/update `Changed in` / `New in` markers on any changed public API.
 4. `uv run pytest --doctest-modules music21/base.py music21/_version.py`.
