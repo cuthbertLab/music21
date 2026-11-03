@@ -131,8 +131,7 @@ what their methods return.
 
 If you only make TimeSignatures and ask them about beats, nothing changes but
 the speed.  The second ``TimeSignature('4/4')`` is about 100 times faster than
-before, and a deepcopy about 9 times.  The first TimeSignature of each meter
-takes a few milliseconds longer.
+before, and a deepcopy about 9 times.
 
 If you customize beams, beats, or accents, assign the result back:
 
