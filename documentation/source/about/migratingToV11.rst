@@ -21,7 +21,7 @@ type checker can follow ``stream.Stream[note.Note]()`` all the way to
 Octaves are always integers
 ---------------------------
 
-**In one line:** ``octave`` is always an ``int``, and ``octaveIsImplicit`` says whether you gave one.
+**Summary:** ``octave`` is always an ``int``, and ``octaveIsImplicit`` says whether you gave one.
 
 Before v11, ``pitch.Pitch('F#').octave`` was ``None``: a lovely idea (an
 F-sharp in *any* octave) that crashed the moment someone wrote
@@ -122,6 +122,81 @@ got truer ones: ``opensIncorrectly()`` is ``not modalOpening()`` and
 ``closesIncorrectly()`` is ``not clausulaVera()``.
 
 
+Meter parts cannot be changed
+-----------------------------
+
+**Summary:** :class:`~music21.meter.core.MeterTerminal` and
+:class:`~music21.meter.core.MeterSequence` cannot be changed once made, so keep
+what their methods return.
+
+If you only make TimeSignatures and ask them about beats, nothing changes but
+the speed.  The second ``TimeSignature('4/4')`` is about 100 times faster than
+before, and a deepcopy about 9 times.
+
+If you customize beams, beats, or accents, assign the result back:
+
+>>> ts = meter.TimeSignature('6/8')
+>>> ts.beatSequence = ts.beatSequence.partitioned(6)
+>>> ts.beatCount
+6
+
+.. list-table::
+   :header-rows: 1
+   :widths: 50 50
+
+   * - Before v11
+     - v11
+   * - ``ms.partition(2)``
+     - ``ms = ms.partitioned(2)``
+   * - ``ms.partitionByCount(2)``, ``ms.partitionByList([1, 1])``,
+       ``ms.partitionByOtherMeterSequence(other)``
+     - ``ms = ms.partitionedByCount(2)``, ``ms = ms.partitionedByList([1, 1])``,
+       ``ms = ms.partitionedByOtherMeterSequence(other)``
+   * - ``ms.subdividePartitionsEqual(2)``, ``ms.subdivideNestedHierarchy(3)``
+     - ``ms = ms.subdividedPartitionsEqual(2)``,
+       ``ms = ms.subdividedNestedHierarchy(3)``
+   * - ``ms.setLevelWeight([1.0, 0.5])``
+     - ``ms = ms.withLevelWeight([1.0, 0.5])``
+   * - ``ms[0] = ms[0].subdivide(2)``
+     - ``ms = ms.setIndex(0, ms[0].subdivide(2))``
+   * - ``ms.weight = 1.0``
+     - ``ms = ms.withWeight(1.0)``
+   * - ``ms = MeterSequence(); ms.load('4/4')``
+     - ``ms = MeterSequence('4/4')``
+   * - ``ms.parenthesis = True``
+     - ``ms = ms.modify(parenthesis=True)``, also for ``summedNumerator``
+   * - ``mt.numerator = 2``
+     - ``mt = mt.modify(numerator=2)``, also for ``denominator`` and ``weight``
+
+Every form on the left now raises an exception, and most name the replacement,
+so nothing silently stops working.  A deepcopy of either class is the same
+object, two with the same contents are equal, and a MeterSequence is no longer a
+kind of MeterTerminal, so ``isinstance(ms, meter.MeterTerminal)`` is False.
+
+``meter.core.getMeterTerminal()`` and ``meter.core.getMeterSequence()`` reuse an
+earlier object with the same values when there is one.
+
+The durations that come from a meter are now shared
+:class:`~music21.duration.FrozenDuration` objects: ``.duration`` on a
+MeterTerminal or MeterSequence, ``barDuration``, ``beatDuration``,
+``beatDivisionDurations``, and ``getBeatDuration()``.  Changing one raises an exception, and so does changing
+the length of a note that was given one.  Call ``unfreeze()`` for a copy that can
+be changed:
+
+>>> beat = meter.TimeSignature('6/8').beatDuration
+>>> beat
+<music21.duration.FrozenDuration 1.5>
+>>> changeable = beat.unfreeze()
+>>> changeable.dots = 0
+>>> changeable.quarterLength
+1.0
+
+To change the length of a bar, assign a new Duration, which ``barDuration`` then
+returns as given: ``ts.barDuration = duration.Duration(7.0)``, not
+``ts.barDuration.quarterLength = 7.0``.  ``copy.deepcopy()`` of a FrozenDuration is
+the same FrozenDuration, so use ``unfreeze()`` for a copy that can be changed.
+
+
 Roman numerals
 --------------
 
@@ -140,6 +215,8 @@ Durations and sorting
 
 * Two Durations with ``expressionIsInferred`` True are equal when their
   quarterLengths match; type, dots and tuplets are free to be re-expressed.
+* ``FrozenDuration('half')`` equals ``Duration('half')``, and
+  ``FrozenDuration.unfreeze()`` returns a Duration that can be changed.
 * ``sorting.SortTuple`` is a modern NamedTuple.  ``priority`` and
   ``classSortOrder`` may be floats, and ``modify()`` with a bad field name
   raises ``ValueError``.
@@ -203,6 +280,8 @@ For developers
 * ``common.enums.ContainsEnum`` is not needed: Python 3.12's ``StrEnum``
   suffices, or ``HexEnum`` for hex values such as MIDI.  The alias leaves in
   v12.  ``common.defaultlist`` is deprecated.
+* ``EqualSlottedObjectMixin`` returns ``NotImplemented`` rather than False when
+  compared with a different type, so the other object's ``__eq__`` gets a turn.
 * The test runners import modules the normal way, so a module's tests no
   longer need ``from music21.key import KeySignature`` to compare types.
 * AI agents get their own instructions, skills and shared memory in
@@ -226,6 +305,8 @@ Removed and deprecated
      - Use instead
    * - Python 3.11
      - Python 3.12 or newer
+   * - ``MeterTerminal.subdivideByOther(other)``, also on MeterSequence
+     - ``meter.MeterSequence(other)``
    * - ``music21.vexflow``
      - music21j
    * - ``midi.translate.midiEventsToInstrument``

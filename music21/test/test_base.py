@@ -20,6 +20,7 @@ from music21 import clef
 from music21.common.enums import ElementSearch, OffsetSpecial
 from music21 import converter
 from music21 import corpus
+from music21 import duration
 from music21 import dynamics
 from music21 import editorial
 from music21 import exceptions21
@@ -96,6 +97,33 @@ class Test(unittest.TestCase):
         n.groups[0] = 'bassoon'
         self.assertFalse('flute' in n.groups)
         self.assertTrue('flute' in b.groups)
+
+    def testFrozenDurationInConstructor(self):
+        # Note(duration=ts.barDuration) raised while setting the duration's client
+        ts = meter.TimeSignature('2/4')
+        n = note.Note(duration=ts.barDuration)
+        self.assertIs(n.duration, ts.barDuration)
+        with self.assertRaises(TypeError):
+            n.duration.dots = 2
+        self.assertEqual(ts.barDuration.quarterLength, 2.0)
+
+    def testAssignFrozenDurationStaysFrozen(self):
+        '''
+        A note can be given a FrozenDuration, such as a MeterSequence's.  It stays
+        frozen: changing the note's length raises unless it is unfrozen first.
+        '''
+        frozen = meter.MeterSequence('4/4').duration
+        self.assertIsInstance(frozen, duration.FrozenDuration)
+
+        n = note.Note()
+        n.duration = frozen
+        self.assertIs(n.duration, frozen)
+        self.assertIsNone(frozen.client)
+
+        # n.quarterLength = x sets n.duration.quarterLength, which raises
+        with self.assertRaises(TypeError):
+            n.quarterLength = 3.0
+        self.assertEqual(frozen.quarterLength, 4.0)  # untouched
 
     def testOffsets(self):
         a = ElementWrapper(note.Note('A#'))

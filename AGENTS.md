@@ -66,6 +66,8 @@
 - When making major changes, check the User's Guide to to make sure that docs still work there too.
 - Run `uv run ruff check music21` before making PRs or pushes to open PRs.
 - Run `uv run mypy music21` before making PRs or pushes to open PRs.
+- It is very unlikely that there were any preexisting failures. If you changed something and
+  now it appears master has also a preexisting failure, you should clear the music21 temp cache.
 - **Regression cases go in the module's `Test(unittest.TestCase)` class — never in a
   docstring.** Docstrings should not include one-liners showing that some
   bad input now raises. A doctest sits in the most-read documentation the project has,
