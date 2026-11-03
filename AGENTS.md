@@ -102,6 +102,11 @@
 # Versions
 
 - Mark changes in public interface with `* Changed in v[X]: One-line explanation.` Or new features with "New" instead of "Changed".
+- A change that can break working code from the previous major version (removed or renamed
+  names, changed signatures, defaults, return types or class hierarchy, new deprecations) also
+  goes in `documentation/source/about/migratingToV[MAJOR].rst`, in the same PR: tersely, old
+  code and the new code that does the same job. Agents upgrade users' apps from this file.
+  Bug fixes, including new errors on input that was always wrong, stay out.
 - Changes to parsing formats (esp. musicxml) need to update the patch version of the version file.
 - That is the only reason an agent should bump version: to prevent incompatible pickles in
   caches. A plain bug fix or a new feature elsewhere does not bump — the commit
