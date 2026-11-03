@@ -1663,7 +1663,7 @@ class TimeSignature(TimeSignatureBase):
         >>> a.getAccent(2.0)
         True
         '''
-        pos = 0
+        pos: OffsetQL = 0.0
         qLenPos = opFrac(qLenPos)
         for i in range(len(self.accentSequence)):
             if pos == qLenPos:
