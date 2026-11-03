@@ -1771,10 +1771,11 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         False
 
         * Changed in v11:
-        - if both durations have `expressionIsInferred` True,
-          only `quarterLength` must match.
-        - equality does not depend on classes being identical, so
-          FrozenDuration('half') equals Duration('half') etc.
+
+          - if both durations have `expressionIsInferred` True,
+            only `quarterLength` must match.
+          - equality does not depend on classes being identical, so
+            FrozenDuration('half') equals Duration('half') etc.
         '''
         if not isinstance(other, Duration):
             return False
