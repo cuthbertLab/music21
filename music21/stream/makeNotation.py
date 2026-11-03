@@ -530,6 +530,11 @@ def makeMeasures(
     post.derivation.origin = s
     post.derivation.method = 'makeMeasures'
 
+    longestBar = max(
+        (ts.barDuration.quarterLength
+            for ts in meterStream.getElementsByClass(meter.TimeSignature)),
+        default=0.0,
+    )
     o = 0.0  # initial position of first measure is assumed to be zero
     measureCount = 0
     lastTimeSignature = None
@@ -581,6 +586,9 @@ def makeMeasures(
         if thisTimeSignature.barDuration.quarterLength == 0:
             raise stream.StreamException(
                 f'time signature {thisTimeSignature!r} has no duration')
+        if measureCount + (oMax - o) / longestBar > defaults.maxMeasures:
+            raise stream.StreamException(
+                f'cannot make more than {defaults.maxMeasures} measures')
         post.coreInsert(o, m)  # insert measure
         # increment by meter length
         o += thisTimeSignature.barDuration.quarterLength
@@ -1242,6 +1250,11 @@ def makeTies(
         )
         meterStream.insert(0, ts)
 
+    longestBar = max(
+        (ts.barDuration.quarterLength
+            for ts in meterStream.getElementsByClass(meter.TimeSignature)),
+        default=0.0,
+    )
     mCount = 0
     measureList = list(returnObj.getElementsByClass(stream.Measure))
 
@@ -1309,6 +1322,9 @@ def makeTies(
                     #     f'({e}) has offset {eOffset} within a measure '
                     #     f'that ends at offset {mEnd}'
                     # )
+                if mCount + overshot / longestBar > defaults.maxMeasures:
+                    raise stream.StreamException(
+                        f'cannot make more than {defaults.maxMeasures} measures')
 
                 qLenWithinMeasure = mEnd - eOffset
                 e, eRemain = e.splitAtQuarterLength(
@@ -2522,6 +2538,29 @@ class Test(unittest.TestCase):
         self.assertIsNone(op.scores.first()[note.Note][1].tie)
         op.makeTies(inPlace=True)
         self.assertEqual(op.scores[1][note.Note][2].tie, tie.Tie('stop'))
+
+    def testMakeMeasuresTooManyMeasures(self):
+        from music21 import stream
+        p = stream.Part()
+        p.append(note.Note(quarterLength=4 * 2000))
+        self.assertEqual(len(p.makeMeasures().getElementsByClass(stream.Measure)), 2000)
+
+        p = stream.Part()
+        p.append(note.Note(quarterLength=2 ** 28))
+        with self.assertRaisesRegex(stream.StreamException, 'more than 100000 measures'):
+            p.makeMeasures()
+
+        p = stream.Part()
+        p.append(note.Note())
+        with self.assertRaisesRegex(stream.StreamException, 'more than 100000 measures'):
+            p.makeMeasures(refStreamOrTimeRange=[0.0, 2 ** 28])
+
+    def testMakeTiesTooManyMeasures(self):
+        from music21 import stream
+        m = stream.Measure([meter.TimeSignature('4/4'), note.Note(quarterLength=2 ** 28)])
+        p = stream.Part([m])
+        with self.assertRaisesRegex(stream.StreamException, 'more than 100000 measures'):
+            p.makeTies()
 
 
 # -----------------------------------------------------------------------------

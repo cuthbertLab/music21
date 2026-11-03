@@ -616,20 +616,12 @@ class GeneralNote(base.Music21Object):
                  ):
         if duration is None:
             # ensure music21base does not automatically create a zero duration before we can.
-            if not keywords or ('type' not in keywords and 'quarterLength' not in keywords):
+            if keywords.get('type') is None and keywords.get('quarterLength') is None:
                 tempDuration = Duration(1.0)
             else:
                 tempDuration = Duration(**keywords)
-                if 'quarterLength' in keywords:
-                    del keywords['quarterLength']
-                if 'type' in keywords:
-                    del keywords['type']
-                # only apply default if components are empty
-                # looking at currentComponents so as not to trigger
-                # _updateComponents
-                if (tempDuration.quarterLength == 0
-                        and not tempDuration.currentComponents()):
-                    tempDuration.quarterLength = 1.0
+            keywords.pop('quarterLength', None)
+            keywords.pop('type', None)
         else:
             tempDuration = duration
         # this sets the stored duration defined in Music21Object

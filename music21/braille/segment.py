@@ -1209,6 +1209,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                         storedRight = thisKey
                     storedLeft = None
                 else:
+                    if storedRight is not None:
+                        yield (storedRight, None)
                     storedRight = thisKey
             elif thisKey.hand == 'left':
                 if storedRight is not None:
@@ -1222,6 +1224,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                         storedLeft = thisKey
                     storedRight = None
                 else:
+                    if storedLeft is not None:
+                        yield (None, storedLeft)
                     storedLeft = thisKey
 
         if storedRight:
@@ -2447,6 +2451,103 @@ class Test(unittest.TestCase):
             score.insert(0, part)
         brailleLines = keyboardPartsToBraille(score).splitlines()
         self.assertEqual(brailleLines[0].strip('⠀'), '⠩⠩⠼⠙⠲')
+
+    def testYieldCombinedGroupingKeysSameHandInARow(self):
+        '''
+        Keys of one hand that come in a row are each yielded, paired with None.
+
+        AI-assisted (Claude).
+        '''
+        sig = Affinity.SIGNATURE
+        ttext = Affinity.TTEXT
+        notes = Affinity.NOTEGROUP
+        for handKeys, expected in (
+            ([(sig, 'right'), (notes, 'right'), (notes, 'left')],
+             [((sig, 'right'), None),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'left'), (notes, 'right'), (notes, 'left')],
+             [(None, (sig, 'left')),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'left'), (ttext, 'left'), (notes, 'right'), (notes, 'left')],
+             [(None, (sig, 'left')),
+              (None, (ttext, 'left')),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'right'), (ttext, 'right'), (notes, 'right'), (notes, 'left')],
+             [((sig, 'right'), None),
+              ((ttext, 'right'), None),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'right'), (sig, 'left'), (notes, 'right'), (notes, 'left')],
+             [((sig, 'right'), (sig, 'left')),
+              ((notes, 'right'), (notes, 'left'))]),
+        ):
+            bgs = BrailleGrandSegment()
+            for affinity, hand in handKeys:
+                bgs[SegmentKey(1, 0, affinity, hand)] = BrailleElementGrouping()
+            pairs = []
+            for rightKey, leftKey in bgs.yieldCombinedGroupingKeys():
+                right = None if rightKey is None else (rightKey.affinity, rightKey.hand)
+                left = None if leftKey is None else (leftKey.affinity, leftKey.hand)
+                pairs.append((right, left))
+            self.assertEqual(pairs, expected)
+
+    def testGrandSegmentHeadingFromRightHand(self):
+        '''
+        A key and time signature in only the right hand of a keyboard part
+        go into the heading.
+        '''
+        from music21.braille.translate import keyboardPartsToBraille
+
+        score = stream.Score()
+        for pitchName in ('C5', 'C3'):
+            part = stream.PartStaff()
+            m = stream.Measure(number=1)
+            if pitchName == 'C5':
+                m.append(key.KeySignature(2))
+                m.append(meter.TimeSignature('4/4'))
+            m.append(note.Note(pitchName, quarterLength=4.0))
+            part.append(m)
+            score.insert(0, part)
+        brailleLines = keyboardPartsToBraille(score).splitlines()
+        self.assertEqual(brailleLines[0].strip('⠀'), '⠩⠩⠼⠙⠲')
+
+    def testSplitMeasureBeamsLeftWhenTieFillsIt(self):
+        '''
+        Both halves of a split measure are beamed, including a left half that a
+        tied note extends to the end of the measure.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import tie
+
+        def sixteenths(m, names):
+            for name in names:
+                m.append(note.Note(name + '4', type='16th'))
+
+        def beamFlags(m):
+            return [(n.beamStart, n.beamContinue) for n in m.notes]
+
+        m = stream.Measure()
+        m.append(meter.TimeSignature('2/4'))
+        sixteenths(m, 'CDEF')
+        tiedNote = note.Note('G4')
+        tiedNote.tie = tie.Tie('start')
+        m.append(tiedNote)
+
+        left, right = splitMeasure(m)
+        self.assertEqual([n.name for n in left.notes], ['C', 'D', 'E', 'F', 'G'])
+        self.assertEqual(left.highestTime, 2.0)
+        self.assertEqual(beamFlags(left), [(True, False), (False, True), (False, True),
+                                           (False, True), (False, False)])
+        self.assertEqual(len(right), 0)
+
+        untied = stream.Measure()
+        untied.append(meter.TimeSignature('2/4'))
+        sixteenths(untied, 'CDEFGABC')
+        left, right = splitMeasure(untied)
+        self.assertEqual(beamFlags(left), [(True, False), (False, True), (False, True),
+                                           (False, True)])
+        self.assertEqual(beamFlags(right), [(True, False), (False, True), (False, True),
+                                            (False, True)])
 
     def testOctaveClefsSetChordDirection(self):
         for clefClass, descending in (

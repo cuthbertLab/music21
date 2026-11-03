@@ -9742,17 +9742,18 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         uniqueQuarterLengths = set()
         for e in returnObj.notesAndRests:
-            if e.quarterLength not in uniqueQuarterLengths:
+            if e.quarterLength and e.quarterLength not in uniqueQuarterLengths:
                 uniqueQuarterLengths.add(e.quarterLength)
 
         # environLocal.printDebug(['unique quarter lengths', uniqueQuarterLengths])
 
-        # will raise an exception if no gcd can be found
-        divisor = common.approximateGCD(uniqueQuarterLengths)
+        if uniqueQuarterLengths:
+            # will raise an exception if no gcd can be found
+            divisor = common.approximateGCD(uniqueQuarterLengths)
 
-        # process in place b/c a copy, if necessary, has already been made
-        returnObj.sliceByQuarterLengths(quarterLengthList=[divisor],
-                                        target=None, addTies=addTies, inPlace=True)
+            # process in place b/c a copy, if necessary, has already been made
+            returnObj.sliceByQuarterLengths(quarterLengthList=[divisor],
+                                            target=None, addTies=addTies, inPlace=True)
 
         if not inPlace:
             return returnObj
@@ -14164,9 +14165,11 @@ class Score(Stream):
                 # collect all unique quarter lengths
                 for e in m_or_p.notesAndRests:
                     # environLocal.printDebug(['examining e', i, e, e.quarterLength])
-                    if e.quarterLength not in uniqueQuarterLengths:
+                    if e.quarterLength and e.quarterLength not in uniqueQuarterLengths:
                         uniqueQuarterLengths.append(e.quarterLength)
 
+            if not uniqueQuarterLengths:
+                continue
             # after ql for all parts, find divisor
             divisor = common.approximateGCD(uniqueQuarterLengths)
             # environLocal.printDebug(['Score.sliceByGreatestDivisor:

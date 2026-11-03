@@ -101,6 +101,8 @@ jupyterImageDpi = 200  # retina quality (can go higher soon?)
 multiMeasureRestUseSymbols = True
 multiMeasureRestMaxSymbols = 11
 
+maxMeasures = 100_000
+
 # id numbers above this number will be considered memory locations
 # and rewritten on thaw, etc.
 minIdNumberToConsiderMemoryLocation = 100_000_001
