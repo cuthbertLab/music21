@@ -21,7 +21,7 @@ type checker can follow ``stream.Stream[note.Note]()`` all the way to
 Octaves are always integers
 ---------------------------
 
-**In one line:** ``octave`` is always an ``int``, and ``octaveIsImplicit`` says whether you gave one.
+**Summary:** ``octave`` is always an ``int``, and ``octaveIsImplicit`` says whether you gave one.
 
 Before v11, ``pitch.Pitch('F#').octave`` was ``None``: a lovely idea (an
 F-sharp in *any* octave) that crashed the moment someone wrote
@@ -125,7 +125,7 @@ got truer ones: ``opensIncorrectly()`` is ``not modalOpening()`` and
 Meter parts cannot be changed
 -----------------------------
 
-**In one line:** :class:`~music21.meter.core.MeterTerminal` and
+**Summary:** :class:`~music21.meter.core.MeterTerminal` and
 :class:`~music21.meter.core.MeterSequence` cannot be changed once made, so keep
 what their methods return.
 
