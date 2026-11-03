@@ -222,6 +222,14 @@ class Test(unittest.TestCase):
         self.assertIs(ts.beatSequence, before)
         self.assertEqual(str(mt), '3/4')
 
+    def testDefaultBeamsLargeCompoundMeter(self):
+        # 24/8 had 8 beats under one unbroken beam; only numerators through 21 grouped in threes
+        ts = TimeSignature('24/8')
+        self.assertEqual(str(ts.beamSequence), '{' + '+'.join(['3/8'] * 8) + '}')
+        self.assertEqual(len(ts.beamSequence), ts.beatCount)
+        # not a multiple of 3: beam all together
+        self.assertEqual(str(TimeSignature('20/8').beamSequence), '{20/8}')
+
     def testGetBeams(self):
         ts = TimeSignature('6/8')
         durList = [16, 16, 16, 16, 8, 16, 16, 16, 16, 8]

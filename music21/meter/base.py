@@ -1271,7 +1271,7 @@ class TimeSignature(TimeSignatureBase):
         elif self.numerator == 7:
             self.beamSequence = self.beamSequence.partitioned(3)  # divide into three groups
 
-        elif self.numerator in [6, 9, 12, 15, 18, 21]:
+        elif self.numerator >= 6 and self.numerator % 3 == 0:
             self.beamSequence = self.beamSequence.partitioned([3] * int(self.numerator / 3))
         else:
             pass  # doing nothing will beam all together
