@@ -70,8 +70,6 @@ class MeterNode:
 
         >>> meter.core.MeterTerminal._durationFromNumeratorDenominator(3, 8)
         <music21.duration.FrozenDuration 1.5>
-
-        AI-assisted (Claude).
         '''
         # NOTE: this is a performance critical method.
         return FrozenDuration(quarterLength=(4.0 * numerator) / denominator)
@@ -273,8 +271,6 @@ class MeterTerminal(prebase.ProtoM21Object, MeterNode, FrozenObject):
       becomes `mt = mt.modify(numerator=2)`, likewise for `denominator` and
       `weight`.  `duration` cannot be set.  A deepcopy is the same object, and
       `==` compares values.
-
-    AI-assisted (Claude).
     '''
     # CLASS VARIABLES #
 
@@ -360,8 +356,6 @@ class MeterTerminal(prebase.ProtoM21Object, MeterNode, FrozenObject):
 
         On Python 3.13 and later, ``copy.replace(twoFour, numerator=3)`` does the
         same thing. (Import the `copy` module first.)
-
-        AI-assisted (Claude).
         '''
         extra = set(keywords) - {'numerator', 'denominator', 'weight'}
         if extra:
@@ -464,8 +458,6 @@ def getMeterTerminal(numerator: int, denominator: int,
 
     >>> meter.core.getMeterTerminal(1, 4, weight=0.5) is quarter
     False
-
-    AI-assisted (Claude).
     '''
     key = (numerator, denominator, weight)
     cached = _meterTerminalCache.get(key)
@@ -544,8 +536,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
       `ms = ms.withWeight(1.0)`, and `ms.load('4/4')` becomes
       `ms = meter.MeterSequence('4/4')`.  The old forms raise an exception.
       Removed `subdivideByOther()`: use `meter.MeterSequence(other)`.
-
-    AI-assisted (Claude).
     '''
 
     # CLASS VARIABLES #
@@ -644,8 +634,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
 
         On Python 3.13 and later, ``copy.replace(ms, parenthesis=True)`` does the
         same thing.
-
-        AI-assisted (Claude).
         '''
         extra = set(keywords) - {'partition', 'parenthesis', 'summedNumerator'}
         if extra:
@@ -767,8 +755,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
         music21.exceptions21.MeterException: cannot insert {1/16+1/16} into space of 1/4
 
         * New in v11: use instead of ``ms[index] = value``.
-
-        AI-assisted (Claude).
         '''
         # comparison of numerator and denominator
         if not isinstance(value, MeterNode):
@@ -815,8 +801,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
         '''
         Return a MeterSequence like this one but with a different partition.  The
         numerator and denominator stay the same, so the partition must add up to them.
-
-        AI-assisted (Claude).
         '''
         return makeSequence(
             self._numerator, self._denominator, tuple(partition),
@@ -1234,8 +1218,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
         <music21.meter.core.MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
 
         * New in v11: replaces `subdivideNestedHierarchy()`, which changed the sequence in place.
-
-        AI-assisted (Claude).
         '''
         # as a hierarchical representation, zeroth subdivision must be 1
         ms = self.partitioned(1)
@@ -1416,8 +1398,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
         [1.5, 0.5]
 
         * New in v11: use instead of ``ms.weight = x``.
-
-        AI-assisted (Claude).
         '''
         partition = _applyWeight(
             self._partition, self._numerator, self._denominator, targetWeight
@@ -1822,8 +1802,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
         Set the weights at `level` from `weightList`, repeating it as needed, going
         through the same places in the same order as :meth:`getLevelList`.  Returns
         the new MeterSequence and how far through `weightList` it got.
-
-        AI-assisted (Claude).
         '''
         idx = startIndex
         newPartition = list(self._partition)
@@ -2135,8 +2113,6 @@ def makeSequence(
     >>> fourBeats = meter.core.makeSequence(4, 4, (quarter, quarter, quarter, quarter))
     >>> fourBeats
     <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
-
-    AI-assisted (Claude).
     '''
     key = (numerator, denominator, partition, parenthesis, summedNumerator)
     cached = _meterSequenceCache.get(key)
@@ -2170,8 +2146,6 @@ def getMeterSequence(
 
     >>> meter.TimeSignature('4/4').beatSequence is meter.TimeSignature('4/4').beatSequence
     True
-
-    AI-assisted (Claude).
     '''
     built = MeterSequence(value, partitionRequest)
     return makeSequence(
@@ -2186,8 +2160,6 @@ def _coerceTerminal(value: MeterNode | str) -> MeterNode:
 
     >>> meter.core._coerceTerminal('3/8')
     <music21.meter.core.MeterTerminal 3/8>
-
-    AI-assisted (Claude).
     '''
     # NOTE: this is a performance critical helper
     if isinstance(value, MeterNode):  # MeterTerminal or MeterSequence
@@ -2206,8 +2178,6 @@ def _ratioFromPartition(partition) -> tuple[int, int]:
     >>> oneEighth = meter.MeterTerminal('1/8')
     >>> meter.core._ratioFromPartition([threeEighths, oneEighth])
     (4, 8)
-
-    AI-assisted (Claude).
     '''
     return tools.fractionSum(tuple((mt.numerator, mt.denominator) for mt in partition))
 
@@ -2221,8 +2191,6 @@ def _applyWeight(partition, numerator: int, denominator: int, targetWeight: floa
     >>> weighted = meter.core._applyWeight(parts, 4, 4, 1.0)
     >>> [part.weight for part in weighted]
     [0.75, 0.25]
-
-    AI-assisted (Claude).
     '''
     totalRatio = numerator / denominator
     out: list[MeterNode] = []
@@ -2252,8 +2220,6 @@ def _loadData(
 
     If `autoWeight` is True and `targetWeight` is given, the weights of the parts
     are set to add up to `targetWeight`.
-
-    AI-assisted (Claude).
     '''
     # NOTE: this is a performance critical helper
     if not autoWeight:
@@ -2312,8 +2278,6 @@ def _buildSequence(
     <music21.meter.core.MeterSequence {1/2+1/2}>
     >>> halves.getLevelWeight()
     [1.0, 1.0]
-
-    AI-assisted (Claude).
     '''
     numerator, denominator, partition, summedNumerator = _loadData(
         value, autoWeight=autoWeight, targetWeight=targetWeight)
@@ -2333,8 +2297,6 @@ def _getAtPath(root: MeterSequence, path: tuple[int, ...]) -> MeterNode:
     <music21.meter.core.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
     >>> meter.core._getAtPath(ms, (1, 0))
     <music21.meter.core.MeterTerminal 1/8>
-
-    AI-assisted (Claude).
     '''
     node: MeterNode = root
     for i in path:
@@ -2350,8 +2312,6 @@ def _replaceAtPath(root: MeterSequence, path: tuple[int, ...], newNode) -> Meter
     >>> sixteenths = ms[1][0].subdivide(2)
     >>> meter.core._replaceAtPath(ms, (1, 0), sixteenths)
     <music21.meter.core.MeterSequence {{1/8+1/8}+{{1/16+1/16}+1/8}}>
-
-    AI-assisted (Claude).
     '''
     idx = path[0]
     if len(path) == 1:
@@ -2376,8 +2336,6 @@ def _subdivideNestedByPaths(
     <music21.meter.core.MeterSequence {{1/2+1/2}}>
     >>> meter.core._subdivideNestedByPaths(root, [(0,)], 2)
     (<music21.meter.core.MeterSequence {{{1/4+1/4}+{1/4+1/4}}}>, [(0, 0), (0, 1)])
-
-    AI-assisted (Claude).
     '''
     newPaths: list[tuple[int, ...]] = []
     for p in paths:
