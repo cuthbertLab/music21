@@ -30,19 +30,16 @@ from music21 import prebase
 
 environLocal = environment.Environment('meter.core')
 
-# the two kinds of things that can appear inside a MeterSequence's partition
-type MeterNode = MeterTerminal | MeterSequence
-
 
 # -----------------------------------------------------------------------------
-class MeterCore:
+class MeterNode:
     '''
     Contains the attributes and methods that
     :class:`~music21.meter.core.MeterTerminal` and
     :class:`~music21.meter.core.MeterSequence` have in common: `duration`,
     `ratioEqual`, and the `subdivide` methods.
 
-    MeterCore is not to be used on its own.
+    MeterNode is not to be used on its own.
     '''
     __slots__ = ()
 
@@ -240,7 +237,7 @@ class MeterCore:
 
 # -----------------------------------------------------------------------------
 
-class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
+class MeterTerminal(prebase.ProtoM21Object, MeterNode, FrozenObject):
     '''
     A MeterTerminal is a nestable primitive of rhythmic division.
 
@@ -501,7 +498,7 @@ def _removedInPlaceMethod(oldName: str, newName: str):
     return removed
 
 
-class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
+class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
     '''
     A MeterSequence is a sequence of MeterTerminals or other MeterSequences.
 
@@ -773,7 +770,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         AI-assisted (Claude).
         '''
         # comparison of numerator and denominator
-        if not isinstance(value, MeterCore):
+        if not isinstance(value, MeterNode):
             raise MeterException('values in MeterSequences must be MeterTerminals or '
                                  f'MeterSequences, not {value}')
         if not value.ratioEqual(self[index]):
@@ -982,7 +979,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
         if isinstance(numeratorList[0], str):
             testPartition = [_coerceTerminal(t.cast(str, mtStr)) for mtStr in numeratorList]
             testNum, testDen = _ratioFromPartition(testPartition)
-            testDur = MeterCore._durationFromNumeratorDenominator(
+            testDur = MeterNode._durationFromNumeratorDenominator(
                 testNum, testDen).quarterLength
             # if durations are equal, this can be used as a partition
             if self.duration.quarterLength == testDur:
@@ -2181,7 +2178,7 @@ def getMeterSequence(
         parenthesis=built.parenthesis, summedNumerator=built.summedNumerator)
 
 
-def _coerceTerminal(value: MeterTerminal | MeterSequence | str) -> MeterNode:
+def _coerceTerminal(value: MeterNode | str) -> MeterNode:
     '''
     Turn a string into its MeterTerminal.  A MeterTerminal or MeterSequence comes
     back as it is.
@@ -2192,7 +2189,7 @@ def _coerceTerminal(value: MeterTerminal | MeterSequence | str) -> MeterNode:
     AI-assisted (Claude).
     '''
     # NOTE: this is a performance critical helper
-    if isinstance(value, MeterCore):  # MeterTerminal or MeterSequence
+    if isinstance(value, MeterNode):  # MeterTerminal or MeterSequence
         return value
     # assume it is a string
     values = tools.slashToTuple(value)
@@ -2275,7 +2272,7 @@ def _loadData(
         if targetWeight is not None:
             partition = _applyWeight(partition, numerator, denominator, targetWeight)
 
-    elif isinstance(value, MeterCore):  # a MeterTerminal or MeterSequence
+    elif isinstance(value, MeterNode):  # a MeterTerminal or MeterSequence
         if targetWeight is not None:
             if isinstance(value, MeterSequence):
                 value = value.withWeight(targetWeight)
