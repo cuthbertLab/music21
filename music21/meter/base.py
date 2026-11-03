@@ -27,7 +27,6 @@ from music21 import beam
 from music21 import common
 from music21.common.enums import MeterDivision
 from music21.common.numberTools import opFrac
-from music21 import defaults
 from music21 import duration
 from music21 import environment
 from music21.exceptions21 import MeterException, TimeSignatureException
@@ -532,9 +531,6 @@ class TimeSignature(TimeSignatureBase):
     def __init__(self, value: str = '4/4', divisions=None, **keywords):
         super().__init__(**keywords)
 
-        if value is None:
-            value = f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
-
         self._overriddenBarDuration: duration.Duration|None = None
         self.symbol: str = ''
         self.displaySequence: MeterSequence = _SENTINEL_METER_SEQUENCE
@@ -835,14 +831,9 @@ class TimeSignature(TimeSignatureBase):
         if self._overriddenBarDuration:
             return self._overriddenBarDuration
 
-        beamSequence = self.beamSequence
-        if beamSequence is not None:
-            # could come from self.beamSequence, self.accentSequence,
-            #   self.displaySequence, self.accentSequence
-            return beamSequence.duration
-
-        # should never happen.
-        return duration.Duration(0)  # pragma: no cover
+        # could come from self.beamSequence, self.accentSequence,
+        #   self.displaySequence, self.accentSequence -- they should all be the same length
+        return self.beamSequence.duration
 
     @barDuration.setter
     def barDuration(self, value: duration.Duration):
@@ -1079,7 +1070,7 @@ class TimeSignature(TimeSignatureBase):
     def beatDivisionDurations(self) -> list[duration.FrozenDuration]:
         '''
         Return the beat division, or the durations that make up one beat,
-        as a list of :class:`~music21.duration.Duration` objects, if and only if
+        as a list of :class:`~music21.duration.FrozenDuration` objects, if and only if
         the TimeSignature has a uniform beat division for all beats.
 
         >>> ts = meter.TimeSignature('3/4')
@@ -1181,18 +1172,15 @@ class TimeSignature(TimeSignatureBase):
 
     @property
     def summedNumerator(self) -> bool:
-        if self.displaySequence is None:
-            return False
         return self.displaySequence.summedNumerator
 
     @summedNumerator.setter
     def summedNumerator(self, value: bool):
-        if self.displaySequence is not None:
-            # displaySequence is immutable; swap in a copy with the new flag
-            ds = self.displaySequence
-            self.displaySequence = makeSequence(
-                ds.numerator, ds.denominator, ds._partition,
-                parenthesis=ds.parenthesis, summedNumerator=value)
+        # displaySequence is immutable; swap in a copy with the new flag
+        ds = self.displaySequence
+        self.displaySequence = makeSequence(
+            ds.numerator, ds.denominator, ds._partition,
+            parenthesis=ds.parenthesis, summedNumerator=value)
 
     # --------------------------------------------------------------------------
     # private methods -- most to be put into the various sequences.
