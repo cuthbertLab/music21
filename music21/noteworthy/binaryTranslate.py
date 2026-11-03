@@ -194,6 +194,7 @@ import struct
 from typing import TypedDict
 import unittest
 
+from music21 import common
 from music21 import environment
 from music21 import exceptions21
 
@@ -442,7 +443,12 @@ class NWCConverter:
         '''
         if self.fileContents[0:6] == b'[NWZ]\x00':
             import zlib
-            fcNew = zlib.decompress(self.fileContents[6:])
+            limit = common.fileTools.MAX_UNCOMPRESSED_BYTES
+            decompressor = zlib.decompressobj()
+            fcNew = decompressor.decompress(self.fileContents[6:], limit + 1)
+            if len(fcNew) > limit or decompressor.unconsumed_tail:
+                raise NoteworthyBinaryTranslateException(
+                    f'compressed .nwc data uncompresses to more than {limit} bytes')
             self.fileContents = fcNew
 
         self.parsePosition = 0
@@ -1341,6 +1347,24 @@ class Test(unittest.TestCase):
             clefObject = NWCObject(parserParent=nwcc)
             clefObject.parse()
             self.assertEqual(clefObject.dumpMethod(clefObject), f'|Clef|Type:{clefName}|')
+
+    def testCompressedSizeLimit(self):
+        '''
+        A compressed .nwc file that uncompresses to more than
+        common.fileTools.MAX_UNCOMPRESSED_BYTES raises
+        NoteworthyBinaryTranslateException.
+        '''
+        from unittest import mock
+
+        fp = common.getSourceFilePath() / 'noteworthy' / 'cuthbert_test1.nwc'
+        nwcData = fp.read_bytes()
+        with mock.patch.object(common.fileTools, 'MAX_UNCOMPRESSED_BYTES', 1000):
+            with self.assertRaisesRegex(NoteworthyBinaryTranslateException,
+                                        'more than 1000 bytes'):
+                NWCConverter().parseString(nwcData)
+        nwcc = NWCConverter()
+        nwcc.parseString(nwcData)
+        self.assertEqual(len(nwcc.staves), 4)
 
 
 if __name__ == '__main__':

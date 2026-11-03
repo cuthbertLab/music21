@@ -1547,6 +1547,58 @@ class Test(unittest.TestCase):
         self.assertIsNone(right.leftBarline)
         self.assertEqual(right.rightBarline.type, 'final')
 
+    def testSplitMeasureKeepsItsSettings(self):
+        '''
+        The second half of a split measure gets the clef, key and meter in
+        force where it is split, its own measure's included.
+        '''
+        p = Part()
+        m1 = Measure(number=1)
+        m1.append([clef.BassClef(), key.KeySignature(2), meter.TimeSignature('3/4')])
+        m1.append(note.Note(quarterLength=3))
+        m2 = Measure(number=2)
+        m2.append(note.Note(quarterLength=3))
+        p.append([m1, m2])
+
+        unused_left, right = m1.splitAtQuarterLength(1.0)
+        self.assertIsInstance(right.clef, clef.BassClef)
+        self.assertEqual(right.keySignature.sharps, 2)
+        self.assertEqual(right.timeSignature.ratioString, '3/4')
+
+        unused_left, right = m2.splitAtQuarterLength(1.0)
+        self.assertIsInstance(right.clef, clef.BassClef)
+        self.assertEqual(right.keySignature.sharps, 2)
+        self.assertEqual(right.timeSignature.ratioString, '3/4')
+
+    def testSliceByGreatestDivisorGraceAndEmpty(self):
+        '''
+        A grace note takes no time to divide, and a measure with no notes
+        of its own has nothing to slice.
+        '''
+        m = Measure()
+        m.append(note.Note('C4').getGrace())
+        m.append(note.Note('D4', quarterLength=1.5))
+        m.append(note.Note('E4', quarterLength=0.5))
+        m.sliceByGreatestDivisor(inPlace=True)
+        self.assertEqual([n.quarterLength for n in m.notes], [0.0, 0.5, 0.5, 0.5, 0.5])
+
+        empty = Measure()
+        empty.sliceByGreatestDivisor(inPlace=True)
+        self.assertEqual(len(empty), 0)
+
+        voiced = Measure()
+        voiced.insert(0, Voice([note.Note(quarterLength=2)]))
+        voiced.sliceByGreatestDivisor(inPlace=True)
+        self.assertEqual(len(voiced.voices[0].notes), 1)
+
+        sc = Score()
+        for unused in range(2):
+            p = Part()
+            p.append([Measure([note.Note(type='whole')]), Measure()])
+            sc.insert(0, p)
+        sc.sliceByGreatestDivisor(inPlace=True)
+        self.assertEqual(len(sc.parts[0].getElementsByClass(Measure)[0].notes), 1)
+
     def testStripTiesScore(self):
         '''
         Test stripTies using the Score method

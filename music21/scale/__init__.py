@@ -269,10 +269,6 @@ class AbstractScale(Scale):
     object. Thus, they are rarely created or manipulated directly by
     most users.
 
-    The AbstractScale additionally stores an `_alteredDegrees` dictionary.
-    Subclasses can define altered nodes in AbstractScale that are passed
-    to the :class:`~music21.intervalNetwork.IntervalNetwork`.
-
     Equality
     --------
     Two abstract scales are the same if they have the same class and the
@@ -308,10 +304,6 @@ class AbstractScale(Scale):
 
         # passed to interval network
         self.deterministic = True
-        # store parameter for interval network-based node modifications
-        # entries are in the form:
-        # step: {'direction':Direction.BI, 'interval':Interval}
-        self._alteredDegrees: intervalNetwork.AlteredDegrees = {}
 
     def buildNetwork(self, mode: t.Any = None) -> None:
         '''
@@ -485,9 +477,6 @@ class AbstractScale(Scale):
     #     '''
     #     pass
 
-    # expose interface from network. these methods must be called (and not
-    # ._net directly because they can pass the alteredDegrees dictionary
-
     def getRealization(self,
                        pitchObj: _PitchOrStr,
                        stepOfPitch: _NodeId,
@@ -507,7 +496,6 @@ class AbstractScale(Scale):
                                       stepOfPitch,
                                       minPitch=minPitch,
                                       maxPitch=maxPitch,
-                                      alteredDegrees=self._alteredDegrees,
                                       direction=direction,
                                       reverse=reverse)
         # here, we copy the list of pitches so as not to allow editing of
@@ -531,7 +519,6 @@ class AbstractScale(Scale):
         post = self._net.realizeIntervals(stepOfPitch,
                                           minPitch=minPitch,
                                           maxPitch=maxPitch,
-                                          alteredDegrees=self._alteredDegrees,
                                           direction=direction,
                                           reverse=reverse)
         # here, we copy the list of pitches so as not to allow editing of
@@ -557,7 +544,6 @@ class AbstractScale(Scale):
             direction=direction,
             minPitch=minPitch,
             maxPitch=maxPitch,
-            alteredDegrees=self._alteredDegrees,
             equateTermini=equateTermini
         )
         return post
@@ -590,8 +576,7 @@ class AbstractScale(Scale):
             nodeDegreeTargets=nodeDegreeTargets,  # target looking for
             direction=direction,
             minPitch=minPitch,
-            maxPitch=maxPitch,
-            alteredDegrees=self._alteredDegrees)
+            maxPitch=maxPitch)
         return copy.deepcopy(post)
 
     def getRelativeNodeDegree(self,
@@ -602,8 +587,7 @@ class AbstractScale(Scale):
                               direction: Direction = Direction.ASCENDING) -> int|None:
         '''
         Expose functionality from
-        :class:`~music21.intervalNetwork.IntervalNetwork`, passing on the
-        stored alteredDegrees dictionary.
+        :class:`~music21.intervalNetwork.IntervalNetwork`.
         '''
         net = t.cast('intervalNetwork.IntervalNetwork', self._net)
         post = net.getRelativeNodeDegree(
@@ -612,7 +596,6 @@ class AbstractScale(Scale):
             pitchTarget=pitchTarget,
             comparisonAttribute=comparisonAttribute,
             direction=direction,
-            alteredDegrees=self._alteredDegrees
         )
         return post
 
@@ -624,8 +607,7 @@ class AbstractScale(Scale):
                   stepSize: int = 1,
                   getNeighbor: Direction|bool = True) -> pitch.Pitch|None:
         '''
-        Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`,
-        passing on the stored alteredDegrees dictionary.
+        Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`.
         '''
         net = t.cast('intervalNetwork.IntervalNetwork', self._net)
         post = net.nextPitch(pitchReference=pitchReference,
@@ -633,7 +615,6 @@ class AbstractScale(Scale):
                              pitchOrigin=pitchOrigin,
                              direction=direction,
                              stepSize=stepSize,
-                             alteredDegrees=self._alteredDegrees,
                              getNeighbor=getNeighbor
                              )
         return post
@@ -655,7 +636,6 @@ class AbstractScale(Scale):
             direction=direction,
             minPitch=minPitch,
             maxPitch=maxPitch,
-            alteredDegrees=self._alteredDegrees
         )
         return post
 
@@ -2325,8 +2305,7 @@ class ConcreteScale(Scale):
                     comparisonAttribute: str = 'pitchClass',
                     minPitch: _PitchOrStr|None = None,
                     maxPitch: _PitchOrStr|None = None,
-                    direction: Direction = Direction.ASCENDING,
-                    alteredDegrees=None) -> list[pitch.Pitch]:
+                    direction: Direction = Direction.ASCENDING) -> list[pitch.Pitch]:
         '''
         Given another object of the forms that `extractPitches` takes
         (e.g., a :class:`~music21.stream.Stream`,
@@ -2338,6 +2317,8 @@ class ConcreteScale(Scale):
         >>> sc1 = scale.MajorScale('g4')
         >>> [str(p) for p in sc1.findMissing(['d'])]
         ['G4', 'A4', 'B4', 'C5', 'E5', 'F#5', 'G5']
+
+        * Changed in v11: the `alteredDegrees` argument is removed.
         '''
         # strip out unique pitches in a list
         otherPitches = self.extractPitchList(other,
@@ -2352,7 +2333,6 @@ class ConcreteScale(Scale):
             minPitch=minPitch,
             maxPitch=maxPitch,
             direction=direction,
-            alteredDegrees=alteredDegrees,
         )
         return post
 
@@ -2455,8 +2435,7 @@ class ConcreteScale(Scale):
         net = t.cast('intervalNetwork.IntervalNetwork', abstract._net)
         pairs = net.find(pitchTarget=otherPitches,
                          resultsReturned=resultsReturned,
-                         comparisonAttribute=comparisonAttribute,
-                         alteredDegrees=abstract._alteredDegrees)
+                         comparisonAttribute=comparisonAttribute)
         post: list[tuple[int, ConcreteScale]] = []
         for weight, p in pairs:
             sc = self.__class__(tonic=p)
@@ -2490,8 +2469,7 @@ class ConcreteScale(Scale):
         abstract = t.cast(AbstractScale, self._abstract)
         net = t.cast('intervalNetwork.IntervalNetwork', abstract._net)
         pairs = net.find(pitchTarget=otherPitches,
-                         comparisonAttribute=comparisonAttribute,
-                         alteredDegrees=abstract._alteredDegrees)
+                         comparisonAttribute=comparisonAttribute)
 
         newScale = self.__class__(tonic=pairs[0][1])
         if newScale.abstract is None:
@@ -2542,8 +2520,7 @@ class ConcreteScale(Scale):
         net = t.cast('intervalNetwork.IntervalNetwork', abstract._net)
         pairs = net.find(pitchTarget=otherPitches,
                          resultsReturned=None,
-                         comparisonAttribute=comparisonAttribute,
-                         alteredDegrees=abstract._alteredDegrees)
+                         comparisonAttribute=comparisonAttribute)
         post: list[ConcreteScale] = []
         numPitches = len(otherPitches)
 
