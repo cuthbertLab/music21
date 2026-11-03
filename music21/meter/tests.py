@@ -16,6 +16,7 @@ import unittest
 
 from music21 import common
 from music21 import duration
+from music21.exceptions21 import MeterException
 from music21 import note
 from music21 import stream
 from music21.meter.base import TimeSignature
@@ -86,6 +87,31 @@ class Test(unittest.TestCase):
 
         a = a.setIndex(3, a[3].subdivide(4))
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}')
+
+    def testGetItemNegativeIndex(self):
+        # ms[-len(ms)] raised IndexError, so ms[-1] on a single part did too
+        ms = MeterSequence('3/8+2/8+1/8')
+        self.assertEqual(str(ms[-1]), '1/8')
+        self.assertEqual(str(ms[-3]), '3/8')
+        self.assertEqual(str(MeterSequence('4/4')[-1]), '4/4')
+        for outOfRange in (3, -4):
+            with self.assertRaisesRegex(IndexError, str(outOfRange), msg=outOfRange):
+                unused_part = ms[outOfRange]
+
+    def testPartitionOptionsAddUpToMeter(self):
+        # 18/4 offered 4/4+4/4+4/4+4/4 (only 16/4); 14/8 offered 3/8 four times (only 12/8)
+        for meterString in ('18/4', '14/8'):
+            ms = MeterSequence(meterString)
+            for option in ms.getPartitionOptions():
+                self.assertEqual(MeterSequence(list(option)).duration.quarterLength,
+                                 ms.duration.quarterLength,
+                                 f'{meterString}: {option}')
+
+        # no way left to make four parts of 18/4, so raise or use the default
+        with self.assertRaises(MeterException):
+            MeterSequence('18/4').partitionedByCount(4, loadDefault=False)
+        self.assertEqual(str(MeterSequence('18/4').partitionedByCount(4)),
+                         '{' + '+'.join(['3/4'] * 6) + '}')
 
     def testMeterSequenceDeepcopy(self):
         a = MeterSequence('4/4', 4)
@@ -176,7 +202,6 @@ class Test(unittest.TestCase):
                 a.modify(**kw)
 
     def testInPlaceFormsRaise(self):
-        from music21.exceptions21 import MeterException
         ts = TimeSignature('6/8')
         before = ts.beatSequence
         removed = [
@@ -211,6 +236,14 @@ class Test(unittest.TestCase):
                 setattr(ts.beatSequence, attribute, value)
         self.assertIs(ts.beatSequence, before)
         self.assertEqual(str(mt), '3/4')
+
+    def testDefaultBeamsLargeCompoundMeter(self):
+        # 24/8 had 8 beats under one unbroken beam; only numerators through 21 grouped in threes
+        ts = TimeSignature('24/8')
+        self.assertEqual(str(ts.beamSequence), '{' + '+'.join(['3/8'] * 8) + '}')
+        self.assertEqual(len(ts.beamSequence), ts.beatCount)
+        # not a multiple of 3: beam all together
+        self.assertEqual(str(TimeSignature('20/8').beamSequence), '{20/8}')
 
     def testGetBeams(self):
         ts = TimeSignature('6/8')

@@ -671,9 +671,10 @@ class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
         >>> a[3].numerator
         1
         '''
-        if abs(key) >= len(self):
-            raise IndexError
-        return self._partition[key]
+        try:
+            return self._partition[key]
+        except IndexError as ie:
+            raise IndexError(f'MeterSequence does not have entry {key}.') from ie
 
     def __iter__(self):
         '''
