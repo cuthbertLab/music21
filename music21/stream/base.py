@@ -3248,8 +3248,6 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         * Changed in v7: all but quarterLength are keyword only
         '''
-        keySignatures: list[key.KeySignature] = []
-
         quarterLength = opFrac(quarterLength)
         if retainOrigin:
             sLeft = self
@@ -3265,17 +3263,25 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                 returnDefault=False,
             )
             if timeSignatures:
-                sRight.keySignature = copy.deepcopy(timeSignatures[0])
-            if searchContext:
-                ksContext = sLeft.getContextByClass(key.KeySignature)
-                if ksContext is not None:
-                    keySignatures = [ksContext]
-            else:
-                keySignatures = list(sLeft.getElementsByClass(key.KeySignature))
+                sRight.timeSignature = copy.deepcopy(timeSignatures[0])
 
-            if keySignatures:
-                sRight.keySignature = copy.deepcopy(keySignatures[0])
-            endClef = sLeft.getContextByClass(clef.Clef)
+            def inForceAtSplit(klass):
+                '''
+                The last one of sLeft's own before the split, else the
+                one in force before sLeft when searchContext is True.
+                '''
+                own = [e for e in sLeft.getElementsByClass(klass)
+                       if sLeft.elementOffset(e) < quarterLength]
+                if own:
+                    return own[-1]
+                if searchContext:
+                    return sLeft.getContextByClass(klass)
+                return None
+
+            keySignature = inForceAtSplit(key.KeySignature)
+            if keySignature is not None:
+                sRight.keySignature = copy.deepcopy(keySignature)
+            endClef = inForceAtSplit(clef.Clef)
             if endClef is not None:
                 sRight.clef = copy.deepcopy(endClef)
 
@@ -9736,17 +9742,18 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
 
         uniqueQuarterLengths = set()
         for e in returnObj.notesAndRests:
-            if e.quarterLength not in uniqueQuarterLengths:
+            if e.quarterLength and e.quarterLength not in uniqueQuarterLengths:
                 uniqueQuarterLengths.add(e.quarterLength)
 
         # environLocal.printDebug(['unique quarter lengths', uniqueQuarterLengths])
 
-        # will raise an exception if no gcd can be found
-        divisor = common.approximateGCD(uniqueQuarterLengths)
+        if uniqueQuarterLengths:
+            # will raise an exception if no gcd can be found
+            divisor = common.approximateGCD(uniqueQuarterLengths)
 
-        # process in place b/c a copy, if necessary, has already been made
-        returnObj.sliceByQuarterLengths(quarterLengthList=[divisor],
-                                        target=None, addTies=addTies, inPlace=True)
+            # process in place b/c a copy, if necessary, has already been made
+            returnObj.sliceByQuarterLengths(quarterLengthList=[divisor],
+                                            target=None, addTies=addTies, inPlace=True)
 
         if not inPlace:
             return returnObj
@@ -14158,9 +14165,11 @@ class Score(Stream):
                 # collect all unique quarter lengths
                 for e in m_or_p.notesAndRests:
                     # environLocal.printDebug(['examining e', i, e, e.quarterLength])
-                    if e.quarterLength not in uniqueQuarterLengths:
+                    if e.quarterLength and e.quarterLength not in uniqueQuarterLengths:
                         uniqueQuarterLengths.append(e.quarterLength)
 
+            if not uniqueQuarterLengths:
+                continue
             # after ql for all parts, find divisor
             divisor = common.approximateGCD(uniqueQuarterLengths)
             # environLocal.printDebug(['Score.sliceByGreatestDivisor:

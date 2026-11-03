@@ -290,11 +290,10 @@ class ChordReducer:
             cLastEnd = newOffset + cElCopy.quarterLength
             m.coreInsert(newOffset, cElCopy, ignoreSort=True)
 
-        tsContext = mI.parts.first().getContextByClass(meter.TimeSignature)
-        if tsContext is not None:
-            if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
-                cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
-
+        sourceMeasure = mI.parts.first().getElementsByClass(stream.Measure).first()
+        measureLength = sourceMeasure.duration.quarterLength
+        if cLast is not None and round(measureLength - cLastEnd, 6) != 0.0:
+            cLast.quarterLength += measureLength - cLastEnd
 
         m.coreElementsChanged()
 
@@ -314,7 +313,7 @@ class ChordReducer:
                         self._lastPitchedObject.tie = tie.Tie('start')
         self._lastPitchedObject = m[-1]
 
-        sourceMeasureTs = mI.parts.first().getElementsByClass(stream.Measure).first().timeSignature
+        sourceMeasureTs = sourceMeasure.timeSignature
         if sourceMeasureTs != self._lastTs:
             m.timeSignature = copy.deepcopy(sourceMeasureTs)
             self._lastTs = sourceMeasureTs
@@ -340,6 +339,15 @@ class Test(unittest.TestCase):
         self.assertEqual(cr.computeMeasureChordWeights(m.notes), {(3, 11): 4.0})
         reduced = cr.reduceMeasureToNChords(m, 2, weightAlgorithm=cr.qlbsmpConsonance)
         self.assertEqual([c.quarterLength for c in reduced.notes], [4.0])
+
+    def testMeasureLengthsKept(self):
+        from music21 import converter
+        score = stream.Score([converter.parse('tinyNotation: 4/4 c2 r2 r1 e1'),
+                              converter.parse('tinyNotation: 4/4 C2 r2 r1 E1')])
+        reduction = ChordReducer().multiPartReduction(score, maxChords=3)
+        measures = reduction.getElementsByClass(stream.Measure)
+        self.assertEqual([m.offset for m in measures], [0.0, 4.0, 8.0])
+        self.assertEqual([m.duration.quarterLength for m in measures], [4.0, 4.0, 4.0])
 
 class TestExternal(unittest.TestCase):
     show = True

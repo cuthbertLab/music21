@@ -131,7 +131,7 @@ def getUserData():
     post = {}
     try:
         import music21  # pylint: disable=redefined-outer-name
-        post['music21.version'] = music21.VERSION_STR
+        post['music21.version'] = music21.__version__
     except ImportError:
         post['music21.version'] = 'None'
 
