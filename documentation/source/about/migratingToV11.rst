@@ -211,6 +211,8 @@ For developers
   ``VERSION_STR``.  Use ``music21.__version__`` (a string) and the new
   ``music21.__version_info__`` (a tuple), or the same names on ``music21.base``.
   ``music21.VERSION_STR`` and ``music21.VERSION`` still work.
+* The numbers in ``music21.VERSION`` and ``__version_info__`` are ints again, as
+  they were before v8: ``(11, 0, 0, 'b16')``, not ``('11', '0', '0', 'b16')``.
 
 
 Removed and deprecated
