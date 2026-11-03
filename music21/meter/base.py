@@ -789,6 +789,8 @@ class TimeSignature(TimeSignatureBase):
 
         >>> ts2 = meter.TimeSignature('3/8')
         >>> d = ts2.barDuration
+        >>> d
+        <music21.duration.FrozenDuration 1.5>
         >>> d.type
         'quarter'
         >>> d.dots
@@ -797,7 +799,7 @@ class TimeSignature(TimeSignatureBase):
         1.5
 
         This can be overridden to create different representations
-        or to contradict the meter.
+        or to contradict the meter (which do not have to be FrozenDurations)
 
         >>> d2 = duration.Duration(1.75)
         >>> ts2.barDuration = d2
@@ -808,6 +810,24 @@ class TimeSignature(TimeSignatureBase):
 
         >>> meter.TimeSignature().barDuration
         <music21.duration.FrozenDuration 4.0>
+
+        To set a note's duration to fill a whole measure, but allow it to be
+        manipulated later, `unfreeze` the duration:
+
+        >>> ts = meter.TimeSignature('2/4')
+        >>> n = note.Note('G#',
+        ...               duration=ts.barDuration.unfreeze(),
+        ... )
+        >>> n.duration
+        <music21.duration.Duration 3.5>
+        >>> n.duration.dots = 2
+        >>> n.duration
+        <music21.duration.Duration 3.5>
+
+        The time signature's barDuration is unchanged.
+
+        >>> ts.barDuration
+        <music21.duration.FrozenDuration 2.0>
 
         * Changed in v11: returns a :class:`~music21.duration.FrozenDuration`
           unless one has been assigned.
