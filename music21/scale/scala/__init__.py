@@ -288,10 +288,12 @@ class ScalaData:
                     self.description = line
             elif count == 2:
                 if line != '':
-                    self.pitchCount = int(line)
+                    # only the first token is data; the format ignores any
+                    # trailing characters, so a comment can follow the value
+                    self.pitchCount = int(line.split()[0])
             else:  # remaining counts are pitches
                 if line != '':
-                    sp = ScalaPitch(line)
+                    sp = ScalaPitch(line.split()[0])
                     sp.parse()
                     self.pitchValues.append(sp)
 
@@ -648,31 +650,35 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(ss.description,
                          'Franck Jedrzejewski continued fractions approx. of 12-tet')
 
-        self.assertEqual([f'{x:.9f}' for x in ss.getCentsAboveTonic()], ['100.099209825',
-                                                                         '199.979843291',
-                                                                         '299.973903610',
-                                                                         '400.108480470',
-                                                                         '498.044999135',
-                                                                         '600.088323762',
-                                                                         '699.997698171',
-                                                                         '800.909593096',
-                                                                         '900.026096390',
-                                                                        '1000.020156709',
-                                                                        '1088.268714730',
-                                                                        '1200.000000000'])
+        self.assertEqual(
+            [f'{x:.9f}' for x in ss.getCentsAboveTonic()],
+            ['100.099209825',
+             '199.979843291',
+             '299.973903610',
+             '400.108480470',
+             '498.044999135',
+             '600.088323762',
+             '699.997698171',
+             '800.909593096',
+             '900.026096390',
+             '1000.020156709',
+             '1088.268714730',
+             '1200.000000000'])
 
-        self.assertEqual([f'{x:.9f}' for x in ss.getAdjacentCents()], ['100.099209825',
-                                                                        '99.880633466',
-                                                                        '99.994060319',
-                                                                       '100.134576860',
-                                                                        '97.936518664',
-                                                                       '102.043324627',
-                                                                        '99.909374409',
-                                                                       '100.911894925',
-                                                                        '99.116503294',
-                                                                        '99.994060319',
-                                                                        '88.248558022',
-                                                                       '111.731285270'])
+        self.assertEqual(
+            [f'{x:.9f}' for x in ss.getAdjacentCents()],
+            ['100.099209825',
+             '99.880633466',
+             '99.994060319',
+             '100.134576860',
+             '97.936518664',
+             '102.043324627',
+             '99.909374409',
+             '100.911894925',
+             '99.116503294',
+             '99.994060319',
+             '88.248558022',
+             '111.731285270'])
 
         self.assertEqual([str(x) for x in ss.getIntervalSequence()],
                          ['<music21.interval.Interval m2 (+0c)>',
@@ -739,6 +745,57 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
                           '<music21.interval.Interval P1 (+50c)>',
                           '<music21.interval.Interval m2 (+50c)>',
                           '<music21.interval.Interval m3>'])
+
+    def testCommentAfterAPitchValue(self) -> None:
+        # noinspection SpellCheckingInspection
+        msg = r'''! commented.scl
+!
+A scale whose values carry trailing comments
+ 3
+!
+ 10/9  ! A\  ;  8 |mi|la|re|
+ 454.75 (427)
+ 2/1 ! octave
+'''
+        ss = ScalaData(msg)
+        ss.parse()
+        self.assertEqual(ss.pitchCount, 3)
+        self.assertEqual(len(ss.pitchValues), 3)
+        self.assertEqual([f'{x.cents:.5f}' for x in ss.pitchValues],
+                         ['182.40371', '454.75000', '1200.00000'])
+
+        # two bundled files the old parser read without raising, and got
+        # wrong: the comment's digits were appended to the value
+        newton = parse('newton_15_out_of_53')
+        assert newton is not None
+        self.assertEqual(newton.pitchValues[0].src, '10/9')
+        self.assertEqual(f'{newton.pitchValues[0].cents:.5f}', '182.40371')
+
+        loops = parse('sparschuh-jsbloops440')
+        assert loops is not None
+        self.assertEqual(loops.pitchValues[8].src, '1760/1055')
+        self.assertEqual(f'{loops.pitchValues[8].cents:.5f}', '885.99892')
+
+    def testEveryBundledScalaFileParses(self) -> None:
+        # a guard on the archive itself: a file added or edited upstream that
+        # this parser cannot read should fail here rather than at the point
+        # some scale is asked for. The description line is not checked, as the
+        # format allows it to be empty.
+        paths = getPaths()
+        self.assertGreater(len(paths), 3000)
+        for fp in paths:
+            sf = ScalaFile()
+            sf.open(fp)
+            try:
+                ss = sf.read()
+            finally:
+                sf.close()
+            self.assertIsNotNone(ss.pitchCount, fp)
+            self.assertEqual(len(ss.pitchValues), ss.pitchCount, fp)
+            for sp in ss.pitchValues:
+                self.assertIsNotNone(sp.cents, f'{fp}: {sp.src!r}')
+                self.assertTrue(math.isfinite(t.cast(float, sp.cents)),
+                                f'{fp}: {sp.src!r}')
 
 
 # ------------------------------------------------------------------------------

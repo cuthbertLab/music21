@@ -159,6 +159,8 @@ class SingletonCounter:
 
 # ------------------------------------------------------------------------------
 
+_slotsByClass: dict[type, frozenset[str]] = {}
+
 
 class SlottedObjectMixin:
     r'''
@@ -223,10 +225,10 @@ class SlottedObjectMixin:
         for slot, value in state.items():
             setattr(self, slot, value)
 
-    def _getSlotsRecursive(self) -> set[str]:
+    def _getSlotsRecursive(self) -> frozenset[str]:
         '''
         Find all slots recursively, except `_frozenHash`, where a
-        :class:`FrozenObject` keeps its hash.
+        :class:`FrozenObject` keeps its hash.  Cached per class.
 
         A private attribute so as not to change the contents of inheriting
         objects private interfaces:
@@ -251,11 +253,17 @@ class SlottedObjectMixin:
         ['_editorial', '_style', 'direction', 'funkiness', 'groovability',
             'id', 'independentAngle', 'number', 'type']
         '''
+        try:
+            return _slotsByClass[type(self)]
+        except KeyError:
+            pass
         slots: set[str] = set()
         for cls in self.__class__.mro():
             slots.update(getattr(cls, '__slots__', ()))
         slots.discard('_frozenHash')
-        return slots
+        frozenSlots = frozenset(slots)
+        _slotsByClass[type(self)] = frozenSlots
+        return frozenSlots
 
 
 class EqualSlottedObjectMixin(SlottedObjectMixin):
@@ -270,7 +278,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
     def __eq__(self, other: object) -> bool:
         if type(self) is not type(other):
-            # Defer to the other operand rather than declaring inequality
+            # let the other object's __eq__ decide
             return NotImplemented
         for thisSlot in self._getSlotsRecursive():
             if thisSlot == 'id':
@@ -316,11 +324,13 @@ class FrozenObject(EqualSlottedObjectMixin):
         if not getattr(self, 'frozen', True):
             return True
 
-        for st in inspect.stack():
-            if (st.frame.f_code.co_name in ('__init__', '__new__', '__setstate__')
-                    and 'self' in st.frame.f_locals
-                    and st.frame.f_locals['self'].__class__ == self.__class__):
+        frame = inspect.currentframe()
+        while frame is not None:
+            if (frame.f_code.co_name in ('__init__', '__new__', '__setstate__')
+                    and 'self' in frame.f_locals
+                    and frame.f_locals['self'].__class__ == self.__class__):
                 return True
+            frame = frame.f_back
         raise TypeError(f'This {self.__class__.__name__} instance is immutable.')
 
     def __setattr__(self, key: str, value: t.Any) -> None:

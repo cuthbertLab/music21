@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -215,7 +215,7 @@ class ArchiveManager:
                     # Noteflight bug for untitled files puts filename as just '.xml'
                     continue
 
-                post = f.read(subFp)
+                post = common.readZipMember(f, subFp, ArchiveManagerException)
                 if isinstance(post, bytes):
                     foundEncoding = re.match(br"encoding=[\'\"](\S*?)[\'\"]", post[:1000])
                     if foundEncoding:
@@ -245,14 +245,13 @@ class ArchiveManager:
                 # but that was removed in Python 3.6 and while it is supposed
                 # to be fixed with io.TextIOWrapper, there are no docs that
                 # show how to do so.  -- hopefully fixed -- no problems for years, maybe okay.
+                memberData = common.readZipMember(f, subFp, ArchiveManagerException)
                 try:
-                    with f.open(subFp, 'r') as zipOpen:
-                        lines = list(io.TextIOWrapper(zipOpen, newline=None))
+                    lines = list(io.TextIOWrapper(io.BytesIO(memberData), newline=None))
                 except UnicodeDecodeError:
                     # python3 UTF-8 failed to read haydn/opus103/movement1.zip
-                    with f.open(subFp, 'r') as zipOpen:
-                        lines = list(io.TextIOWrapper(zipOpen, newline=None,
-                                                      encoding='ISO-8859-1'))
+                    lines = list(io.TextIOWrapper(io.BytesIO(memberData), newline=None,
+                                                  encoding='ISO-8859-1'))
                 # environLocal.printDebug(['subFp', subFp, len(lines)])
                 post.append(''.join(lines))
 
@@ -1384,6 +1383,10 @@ def parse(value: bundles.MetadataEntry|bytes|str|pathlib.Path|list|tuple,
     # a midi string, must come before os.path.exists test
     elif not isinstance(value, bytes) and valueStr.startswith('MThd'):
         return parseData(value, number=number, format=format, **keywords)
+    elif (isinstance(value, str)
+          and Converter().formatFromHeader(value.lstrip())[0] is not None):
+        # 'tinyNotation: ...' is data even if it contains a path
+        return parseData(value, number=number, format=format, **keywords)
     elif (not isinstance(value, bytes)
           and _osCanLoad(valueStr)):
         return parseFile(valueStr, number=number, format=format,
@@ -1639,6 +1642,28 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
+
+    def testArchiveMemberSizeLimit(self):
+        '''
+        An archive member that uncompresses to more than
+        common.fileTools.MAX_UNCOMPRESSED_BYTES raises ArchiveManagerException.
+        '''
+        from unittest import mock
+
+        fp = environLocal.getTempFile('.mxl')
+        try:
+            with zipfile.ZipFile(fp, 'w', zipfile.ZIP_DEFLATED) as zf:
+                zf.writestr('score.xml', '<score-partwise/>' + ' ' * 2000)
+                zf.writestr('part01', 'x' * 2000)
+            am = ArchiveManager(fp)
+            with mock.patch.object(common.fileTools, 'MAX_UNCOMPRESSED_BYTES', 1000):
+                for dataFormat in ('musicxml', 'musedata'):
+                    with self.assertRaisesRegex(ArchiveManagerException, 'more than 1000 bytes'):
+                        am.getData(dataFormat)
+            self.assertEqual(len(am.getData('musicxml')), 2017)
+            self.assertEqual(am.getData('musedata'), ['x' * 2000])
+        finally:
+            os.remove(fp)
 
     def testConversionMX(self):
         from music21.musicxml import testPrimitive
@@ -2219,6 +2244,29 @@ class Test(unittest.TestCase):
             parse(str(fp))
         with self.assertRaises(FileNotFoundError):
             parse('nonexistent_path_ending_in_correct_extension.musicxml')
+
+    def testDataNotReadAsPath(self):
+        '''
+        Data whose '/..' segments cancel out to a real path must not read that file.
+        '''
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tempDir:
+            fp = pathlib.Path(tempDir, 'other.tntxt')
+            fp.write_text('3/4 f#2.', encoding='utf-8')
+            toRoot = '/..' * 30
+
+            s = parse('tinyNotation: ' + toRoot + str(fp))
+            self.assertNotIn('F#', [n.name for n in s.recurse().notes])
+            with self.assertRaises(FileNotFoundError):
+                parse('c4 ' + toRoot + str(fp), format='tinyNotation')
+
+            s = parse(str(fp), storePickle=False)
+            self.assertEqual(s.recurse().notes.first().name, 'F#')
+            with mock.patch.dict(os.environ, {'HOME': tempDir, 'USERPROFILE': tempDir}):
+                s = parse('~/other.tntxt', storePickle=False)
+            self.assertEqual(s.recurse().notes.first().name, 'F#')
 
     def testParseURL(self):
         '''

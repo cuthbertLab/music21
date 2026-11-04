@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -43,7 +43,6 @@ def _musedataBeamToBeams(beamSymbol):
 
     >>> translate._musedataBeamToBeams(r']/')  # must escape backslash
     <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>
-
     '''
     from music21 import beam
 
@@ -166,8 +165,10 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         s = inputM21
 
     p = stream.Part()
-    p.id = museDataPart.getPartName()
-    p.partName = p.id
+    partName = museDataPart.getPartName()
+    if partName is not None:
+        p.id = partName
+        p.partName = partName
 
     # create and store objects
     mdmObjs = museDataPart.getMeasures()
@@ -367,7 +368,7 @@ class Test(unittest.TestCase):
         from music21 import common
 
         fp1 = (common.getSourceFilePath()
-                           / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
+               / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
         mdw = musedata.MuseDataWork()
         mdw.addFile(fp1)
 
@@ -391,6 +392,35 @@ class Test(unittest.TestCase):
         # self.assertEqual(len(s.parts[0].recurse().notesAndRests), 291)
         # self.assertEqual(len(s.parts[1].recurse().notesAndRests), 293)
 
+    def testStage1PartName(self):
+        '''
+        A stage-1 part has no name and writes to MusicXML.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import musedata
+        from music21.musicxml import m21ToXml
+
+        mdw = musedata.MuseDataWork()
+        mdw.addString('\n'.join([
+            'A Stage-One Work',
+            '   12 3',
+            'source one',
+            'source two',
+            'source three',
+            '1 1',
+            'A 0 4 0 2 4',
+            '0 0 4',
+            'measure 1',
+            'C4    2',
+            'E4    1',
+            'G4    1',
+            '/END',
+        ]))
+        s = museDataWorkToStreamScore(mdw)
+        self.assertIsNone(s.parts[0].partName)
+        gex = m21ToXml.GeneralObjectExporter(s)
+        self.assertIn(b'<part-list>', gex.parse())
 
 
     # def testGetMetaData(self):

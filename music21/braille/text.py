@@ -4,7 +4,7 @@
 # Authors:      Jose Cabal-Ugaz
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011, 2016 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011, 2016, 2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -64,12 +64,11 @@ class BrailleText(prebase.ProtoM21Object):
 
     @showHand.setter
     def showHand(self, newHand):
-        if newHand == 'right':
-            self.rightHandSymbol = True
-        elif newHand == 'left':
-            self.leftHandSymbol = True
-        elif newHand is not None:
+        if newHand not in ('right', 'left', None):
             raise BrailleTextException('Illegal hand sign request.')
+        self._showHand = newHand
+        self.rightHandSymbol = (newHand == 'right')
+        self.leftHandSymbol = (newHand == 'left')
 
     def addHeading(self, heading):
         '''
@@ -147,7 +146,6 @@ class BrailleText(prebase.ProtoM21Object):
         >>> print(str(bt))
         hi
         ⠨⠜⠄⠹⠹⠹
-
         '''
         self.makeNewLine()
         if self.rightHandSymbol or self.leftHandSymbol:
@@ -666,7 +664,48 @@ class BrailleTextException(exceptions21.Music21Exception):
 
 
 class Test(unittest.TestCase):
-    pass
+    def testShowHandReturnsTheHandSet(self):
+        bt = BrailleText(lineLength=40)
+        self.assertIsNone(bt.showHand)
+        bt.showHand = 'right'
+        self.assertEqual(bt.showHand, 'right')
+        self.assertTrue(bt.rightHandSymbol)
+
+        bt = BrailleText(lineLength=40, showHand='left')
+        self.assertEqual(bt.showHand, 'left')
+        self.assertTrue(bt.leftHandSymbol)
+        self.assertFalse(bt.rightHandSymbol)
+
+        with self.assertRaises(BrailleTextException):
+            bt.showHand = 'both'
+        self.assertEqual(bt.showHand, 'left')
+
+    def testShowHandSetsOnlyThatHandsSymbol(self):
+        bt = BrailleText(lineLength=40, showHand='right')
+        bt.showHand = 'left'
+        self.assertTrue(bt.leftHandSymbol)
+        self.assertFalse(bt.rightHandSymbol)
+
+        bt.showHand = 'right'
+        self.assertTrue(bt.rightHandSymbol)
+        self.assertFalse(bt.leftHandSymbol)
+
+        bt.showHand = None
+        self.assertFalse(bt.rightHandSymbol)
+        self.assertFalse(bt.leftHandSymbol)
+
+        bt.showHand = 'left'
+        with self.assertRaises(BrailleTextException):
+            bt.showHand = 'both'
+        self.assertTrue(bt.leftHandSymbol)
+        self.assertFalse(bt.rightHandSymbol)
+
+    def testShowHandChangedPrintsTheNewHandSymbol(self):
+        c = lookup.pitchNameToNotes['C']['quarter']
+        bt = BrailleText(lineLength=10, showHand='right')
+        bt.showHand = 'left'
+        bt.addToNewLine(c + c + c)
+        self.assertEqual(str(bt).strip(), symbols['lh_keyboard'] + symbols['dot'] + c + c + c)
 
 
 if __name__ == '__main__':

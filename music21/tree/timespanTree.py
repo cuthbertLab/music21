@@ -5,7 +5,7 @@
 # Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2013-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -494,6 +494,8 @@ class TimespanTree(trees.OffsetTree):
         <music21.tree.verticality.Verticality 30.0 {A#2 C#4 E4 F#4}>
         <music21.tree.verticality.Verticality 29.5 {A#2 F#3 D4 F#4}>
         '''
+        if self.rootNode is None:
+            return
         if reverse:
             offset = self.highestPosition()
             verticality = self.getVerticalityAt(offset)
@@ -687,12 +689,13 @@ class TimespanTree(trees.OffsetTree):
         Used by reduceChords.  May disappear at any time without a deprecation
         notice.
         '''
-        partwiseTimespanTrees = {}
-        for part in self.allParts():
-            partwiseTimespanTrees[part] = TimespanTree()
+        partwiseTimespans = {part: [] for part in self.allParts()}
         for timespan in self:
-            partwiseTimespanTree = partwiseTimespanTrees[timespan.part]
-            partwiseTimespanTree.insert(timespan)
+            partwiseTimespans[timespan.part].append(timespan)
+        partwiseTimespanTrees = {}
+        for part, timespans in partwiseTimespans.items():
+            partwiseTimespanTrees[part] = TimespanTree()
+            partwiseTimespanTrees[part].insert(timespans)
         return partwiseTimespanTrees
 
     @staticmethod
@@ -737,11 +740,33 @@ class TimespanTree(trees.OffsetTree):
     # PUBLIC PROPERTIES #
 
     def allParts(self):
-        parts = set()
-        for timespan in self:
-            parts.add(timespan.part)
-        parts = sorted(parts, key=lambda x: x.getInstrument().partId)
-        return parts
+        '''
+        Returns a list of the parts that the timespans in this tree belong to.
+
+        If the tree's source has parts (such as a Score), the parts are returned
+        in the order they appear in the source.  Other parts come after them,
+        sorted by the partId of their instrument.
+
+        Parts do not need a partId:
+
+        >>> upper = stream.Part([instrument.Instrument(), note.Note('E4')])
+        >>> lower = stream.Part([instrument.Instrument(), note.Note('C3')])
+        >>> score = stream.Score([upper, lower])
+        >>> scoreTree = score.asTimespans()
+        >>> scoreTree.allParts() == [upper, lower]
+        True
+        '''
+        parts = {timespan.part for timespan in self}
+        source = self.source
+        sourceOrder = {}
+        if source is not None and hasattr(source, 'parts'):
+            sourceOrder = {id(part): i for i, part in enumerate(source.parts)}
+
+        def sortKey(part):
+            partId = part.getInstrument().partId
+            return (sourceOrder.get(id(part), len(sourceOrder)), partId is None, str(partId))
+
+        return sorted(parts, key=sortKey)
 
     def maximumOverlap(self):
         '''
@@ -816,6 +841,22 @@ class Test(unittest.TestCase):
         v = scoreTree.getVerticalityAt(0.0)
         ps = v.pitchSet
         self.assertEqual(len(ps), 1)
+
+    def testIterateVerticalitiesEmptyTree(self):
+        emptyTree = TimespanTree()
+        self.assertEqual(list(emptyTree.iterateVerticalities()), [])
+        self.assertEqual(list(emptyTree.iterateVerticalities(reverse=True)), [])
+        self.assertEqual(list(emptyTree.iterateVerticalitiesNwise()), [])
+
+    def testToPartwiseTimespanTrees(self):
+        from music21 import corpus
+        from music21 import note
+        score = corpus.parse('bwv66.6')
+        scoreTree = score.asTimespans(classList=(note.Note,))
+        partwise = scoreTree.toPartwiseTimespanTrees()
+        self.assertEqual(list(partwise), list(score.parts))
+        for part, subtree in partwise.items():
+            self.assertEqual(list(subtree), [ts for ts in scoreTree if ts.part is part])
 
     def testTimespanTree(self):
         for attempt in range(100):

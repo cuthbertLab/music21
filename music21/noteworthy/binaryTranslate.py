@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2006-2013 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2006-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -186,14 +186,15 @@ This is very beta.  Much better would be to convert the file into .xml or .nwctx
         {36.0} <music21.stream.Measure 8 offset=36.0>
             {0.0} <music21.chord.Chord F3 A3 C4>
             {3.0} <music21.note.Rest quarter>
-
 '''
 from __future__ import annotations
 
 import pathlib
 import struct
 from typing import TypedDict
+import unittest
 
+from music21 import common
 from music21 import environment
 from music21 import exceptions21
 
@@ -442,7 +443,12 @@ class NWCConverter:
         '''
         if self.fileContents[0:6] == b'[NWZ]\x00':
             import zlib
-            fcNew = zlib.decompress(self.fileContents[6:])
+            limit = common.fileTools.MAX_UNCOMPRESSED_BYTES
+            decompressor = zlib.decompressobj()
+            fcNew = decompressor.decompress(self.fileContents[6:], limit + 1)
+            if len(fcNew) > limit or decompressor.unconsumed_tail:
+                raise NoteworthyBinaryTranslateException(
+                    f'compressed .nwc data uncompresses to more than {limit} bytes')
             self.fileContents = fcNew
 
         self.parsePosition = 0
@@ -1340,9 +1346,40 @@ class NWCObject:
                   ]
 
 
+class Test(unittest.TestCase):
+
+    def testClefNames(self):
+        for clefType, clefName in ((3, 'Tenor'), (4, 'Percussion')):
+            nwcc = NWCConverter()
+            nwcc.version = 201
+            # object type 0 (clef), visibility, clef type, no octave shift
+            nwcc.fileContents = struct.pack('<hBhh', 0, 0, clefType, 0)
+            clefObject = NWCObject(parserParent=nwcc)
+            clefObject.parse()
+            self.assertEqual(clefObject.dumpMethod(clefObject), f'|Clef|Type:{clefName}|')
+
+    def testCompressedSizeLimit(self):
+        '''
+        A compressed .nwc file that uncompresses to more than
+        common.fileTools.MAX_UNCOMPRESSED_BYTES raises
+        NoteworthyBinaryTranslateException.
+        '''
+        from unittest import mock
+
+        fp = common.getSourceFilePath() / 'noteworthy' / 'cuthbert_test1.nwc'
+        nwcData = fp.read_bytes()
+        with mock.patch.object(common.fileTools, 'MAX_UNCOMPRESSED_BYTES', 1000):
+            with self.assertRaisesRegex(NoteworthyBinaryTranslateException,
+                                        'more than 1000 bytes'):
+                NWCConverter().parseString(nwcData)
+        nwcc = NWCConverter()
+        nwcc.parseString(nwcData)
+        self.assertEqual(len(nwcc.staves), 4)
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)
     # fp = '/Users/cuthbert/Desktop/395.nwc'
     # fp = 'http://www.cpdl.org/brianrussell/358.nwc'
     # from music21 import converter

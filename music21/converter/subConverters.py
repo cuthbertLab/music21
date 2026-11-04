@@ -61,7 +61,6 @@ class SubConverter:
         codecWrite = True or False (default False) if encodings need to be used to write
         stringEncoding = string (default 'utf-8'). If codecWrite is True, this specifies what
             encoding to use
-
     '''
     readBinary: bool = False
     canBePickled: bool = True
@@ -100,7 +99,7 @@ class SubConverter:
         loading the file and putting the data into parseData then there is no need
         to implement this method.  Just set self.readBinary to True | False.
         '''
-        if self.readBinary is False:
+        if not self.readBinary:
             import locale
             with open(filePath, encoding=locale.getpreferredencoding()) as f:
                 dataStream = f.read()
@@ -113,15 +112,16 @@ class SubConverter:
 
         return self.stream
 
-    def _getStream(self):
+    @property
+    def stream(self):
+        '''
+        Returns or sets the stream in the converter.  Must be defined for subConverter to work.
+        '''
         return self._stream
 
-    def _setStream(self, newStream):
+    @stream.setter
+    def stream(self, newStream):
         self._stream = newStream
-
-    stream = property(_getStream, _setStream, doc='''
-        Returns or sets the stream in the converter.  Must be defined for subConverter to work.
-        ''')
 
     def checkShowAbility(self, **keywords) -> bool:
         '''
@@ -289,7 +289,7 @@ class SubConverter:
         if fp is None:
             fp = self.getTemporaryFile()
 
-        if self.readBinary is False:
+        if not self.readBinary:
             writeFlags = 'w'
         else:
             writeFlags = 'wb'
@@ -330,7 +330,7 @@ class SubConverter:
         and return the object (str or bytes) returned.
         '''
         fp = self.write(obj, fmt=fmt, subformats=subformats, **keywords)
-        if self.readBinary is False:
+        if not self.readBinary:
             readFlags = 'r'
         else:
             readFlags = 'rb'
@@ -1206,8 +1206,12 @@ class ConverterClercqTemperley(SubConverter):
     registerFormats = ('cttxt', 'har', 'clercqTemperley')
     registerInputExtensions = ('cttxt', 'har', 'clercqTemperley')
 
-    def parseData(self, strData: str|pathlib.Path, number=None):
+    def parseData(self, strData: str, number=None):
         from music21.romanText import clercqTemperley
+        # CTSong opens anything else as a file; if this test changes, update CTSong.parse too
+        if not (isinstance(strData, str) and '|' in strData and 'S:' in strData):
+            raise clercqTemperley.CTSongException(
+                'Clercq-Temperley data must contain "|" and "S:"')
         ctSong = clercqTemperley.CTSong(strData)
         self.stream = ctSong.toPart()
 
@@ -1215,7 +1219,9 @@ class ConverterClercqTemperley(SubConverter):
                   filePath: pathlib.Path|str,
                   number=None,
                   **keywords):
-        self.parseData(filePath)
+        from music21.romanText import clercqTemperley
+        ctSong = clercqTemperley.CTSong(filePath)
+        self.stream = ctSong.toPart()
 
 
 class ConverterCapella(SubConverter):
@@ -1545,6 +1551,22 @@ class Test(unittest.TestCase):
         text_stream = StringIO()
         s.write('romanText', text_stream)
         self.assertTrue(text_stream.getvalue().endswith(rntxt))
+
+    def testClercqTemperleyDataNotOpenedAsFile(self):
+        import tempfile
+        from music21 import roman
+        from music21.romanText import clercqTemperley
+
+        with tempfile.TemporaryDirectory() as tempDir:
+            fp = pathlib.Path(tempDir, 'song.cttxt')
+            fp.write_text('S: [C] I | IV | V | I |', encoding='utf-8')
+            with self.assertRaises(clercqTemperley.CTSongException):
+                ConverterClercqTemperley().parseData(str(fp))
+
+            ctConverter = ConverterClercqTemperley()
+            ctConverter.parseFile(fp)
+            figures = [rn.figure for rn in ctConverter.stream[roman.RomanNumeral]]
+            self.assertEqual(figures, ['I', 'IV', 'V', 'I'])
 
 class TestExternal(unittest.TestCase):
     show = True

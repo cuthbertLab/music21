@@ -53,7 +53,7 @@ if sys.version_info < minPythonVersion:
     If you have the wrong version there are several options for getting
     the right one.
 
-    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.14).
+    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.15).
 
          The great features there will more
          than make up for the headache of downloading
@@ -176,7 +176,6 @@ __all__ = [
     'Groups',
     'Music21Object',
     'ElementWrapper',
-    'VERSION',
 ]
 
 # ------------------------------------------------------------------------------
@@ -199,10 +198,10 @@ from music21.base import Groups  # noqa: E402
 from music21.base import Music21Object  # noqa: E402
 from music21.base import ElementWrapper  # noqa: E402
 
-from music21.base import VERSION  # noqa: E402
-from music21.base import VERSION_STR  # noqa: E402
-
-__version__ = VERSION_STR
+# public attributes, but not in __all__: import * must not overwrite a module's __version__
+from music21._version import __version__, __version_info__  # noqa: E402, F401
+from music21.base import VERSION  # noqa: E402, F401
+from music21.base import VERSION_STR  # noqa: E402, F401
 
 from music21.test.testRunner import mainTest  # noqa: E402
 

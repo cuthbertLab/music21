@@ -104,9 +104,9 @@ class StreamCore(Music21Object):
         if not ignoreSort:
             # # if sorted and our insertion is > the highest time, then
             # # are still inserted
-            # if self.isSorted is True and self.highestTime <= offset:
+            # if self.isSorted and self.highestTime <= offset:
             #     storeSorted = True
-            if self.isSorted is True:
+            if self.isSorted:
                 ht = self.highestTime   # type: ignore
                 if ht < offset:
                     storeSorted = True
@@ -403,7 +403,6 @@ class StreamCore(Music21Object):
         music21.exceptions21.StreamException: The object you tried to add to
         the Stream, 3.14159, is not a Music21Object.  Use an ElementWrapper
         object if this is what you intend.
-
         '''
         if element is self:  # cannot add this Stream into itself
             raise StreamException('this Stream cannot be contained within itself')

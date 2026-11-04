@@ -4,7 +4,7 @@
 # Authors:      Jose Cabal-Ugaz
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012, 2016 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2012-26 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -118,7 +118,6 @@ class NoteGroupingTranscriber:
         transcribe a group of notes, possibly excluding certain attributes.
 
         Returns a (unicode) string of brailleElementGrouping transcribed.
-
         '''
         self.reset()
         if brailleElementGrouping is not None:
@@ -258,7 +257,7 @@ class NoteGroupingTranscriber:
                 and self.showClefSigns)
             or (isinstance(prev, expressions.TextExpression)
                 # TE is an abbreviation, no extra dot 3 necessary
-                and prev.content[-1] != '.')):
+                and not prev.content.endswith('.'))):
             for dot in basic.yieldDots(self.trans[-1][0]):
                 self.trans.insert(-1, dot)  # insert one before the end, not append
                 prev.editorial.brailleEnglish.append(f'Dot 3 {dot}')
@@ -280,7 +279,23 @@ def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    pass
+
+    def testTranscribeGroupWithTextExpression(self):
+        '''
+        A note after a TextExpression, including an empty one, is transcribed
+        after the word sign and the expression's text.
+        '''
+        from music21 import note
+        from music21.braille.segment import BrailleElementGrouping
+
+        for content, expected in (('', '⠐⠹⠜⠐⠱'),
+                                  ('dolce', '⠐⠹⠜⠙⠕⠇⠉⠑⠐⠱'),
+                                  ('dim.', '⠐⠹⠜⠙⠊⠍⠄⠐⠱')):
+            grouping = BrailleElementGrouping([note.Note('C4'),
+                                               expressions.TextExpression(content),
+                                               note.Note('D4')])
+            ngt = NoteGroupingTranscriber()
+            self.assertEqual(ngt.transcribeGroup(grouping), expected)
 
 
 if __name__ == '__main__':

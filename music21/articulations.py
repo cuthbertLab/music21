@@ -94,7 +94,7 @@ environLocal = environment.Environment('articulations')
 # ------------------------------------------------------------------------------
 class Articulation(base.Music21Object):
     '''
-    Base class for all Articulation sub-classes.
+    Base class for all Articulation subclasses.
 
     >>> x = articulations.Articulation()
     >>> x.placement = 'below'
@@ -170,26 +170,26 @@ class Articulation(base.Music21Object):
         className = self.__class__.__name__
         return common.camelCaseToHyphen(className, replacement=' ')
 
-    def _getVolumeShift(self):
+    @property
+    def volumeShift(self):
+        '''
+        Get or set the volumeShift of this Articulation. This value, between -1 and 1,
+        that is used to shift the final Volume of the object it is attached to.
+
+        >>> at1 = articulations.StrongAccent()
+        >>> at1.volumeShift > 0.1
+        True
+        '''
         return self._volumeShift
 
-    def _setVolumeShift(self, value):
+    @volumeShift.setter
+    def volumeShift(self, value):
         # value should be between 0 and 1
         if value > 1:
             value = 1
         elif value < -1:
             value = -1
         self._volumeShift = value
-
-    volumeShift = property(_getVolumeShift, _setVolumeShift, doc='''
-        Get or set the volumeShift of this Articulation. This value, between -1 and 1,
-        that is used to shift the final Volume of the object it is attached to.
-
-
-        >>> at1 = articulations.StrongAccent()
-        >>> at1.volumeShift > 0.1
-        True
-        ''')
 
 # ------------------------------------------------------------------------------
 class LengthArticulation(Articulation):
@@ -219,7 +219,6 @@ class TimbreArticulation(Articulation):
 # ------------------------------------------------------------------------------
 class Accent(DynamicArticulation):
     '''
-
     >>> a = articulations.Accent()
     '''
     def __init__(self, **keywords):
@@ -246,7 +245,6 @@ class StrongAccent(Accent):
 
 class Staccato(LengthArticulation):
     '''
-
     >>> a = articulations.Staccato()
     '''
     def __init__(self, **keywords):
@@ -440,8 +438,10 @@ class Fingering(TechnicalIndication):
     Other articulations, e.g., accents, apply to the whole chord and will,
     therefore, only be associated with the first note of a chord when serializing.
     Since chords store all articulations in an ordered list, Fingerings
-    are mapped implicitly to the notes of a chord in order. Superfluous
-    Fingerings will be ignored and may be discarded when serializing.
+    are mapped implicitly to the notes of a chord in order, from the lowest
+    note up: MusicXML import stores them so, and export writes a chord's
+    notes from lowest to highest. Superfluous Fingerings will be ignored
+    and may be discarded when serializing.
     '''
     def __init__(self, fingerNumber=None, **keywords):
         super().__init__(**keywords)

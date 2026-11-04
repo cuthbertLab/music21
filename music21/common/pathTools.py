@@ -180,6 +180,11 @@ def cleanpath(path: str|pathlib.Path, *,
 
     v5 -- returnPathlib -- None (default) does not convert. False, returns a string,
     True, returns a pathlib.Path.
+
+    A '..' is collapsed only if the folders before it exist, as the operating system
+    requires, so text such as 'tinyNotation: /../../x.xml' does not become a real path.
+
+    * Changed in v11: '..' after a missing folder is no longer collapsed.
     '''
     if isinstance(path, pathlib.Path):
         path = str(path)
@@ -188,9 +193,19 @@ def cleanpath(path: str|pathlib.Path, *,
     elif returnPathlib is None:
         returnPathlib = False
     path = os.path.expanduser(path)
-    path = os.path.normpath(path)
-    if not os.path.isabs(path):
-        path = os.path.abspath(path)
+    parts = pathlib.PurePath(path).parts
+    canNormalize = True
+    if '..' in parts:
+        lastDotdotIndex = max(i for i, part in enumerate(parts) if part == '..')
+        throughLastDotdot = parts[:lastDotdotIndex + 1]
+        canNormalize = os.path.isdir(os.path.join(*throughLastDotdot))
+
+    if canNormalize:
+        path = os.path.normpath(path)
+        if not os.path.isabs(path):
+            path = os.path.abspath(path)
+    else:
+        path = os.path.join(os.getcwd(), path)
 
     path = os.path.expandvars(path)
     if not returnPathlib:
@@ -203,6 +218,13 @@ class Test(unittest.TestCase):
     def testGetSourcePath(self) -> None:
         fp = getSourceFilePath()
         self.assertIsInstance(fp, pathlib.Path)
+
+    @unittest.skipIf(os.name == 'nt', "Windows collapses '..' before checking the disk")
+    def testCleanpathParentDirs(self) -> None:
+        fp = getSourceFilePath()
+        missingThenUp = str(fp / 'noSuchFolder' / '..' / 'corpus')
+        self.assertEqual(cleanpath(missingThenUp), missingThenUp)
+        self.assertEqual(cleanpath(str(fp / 'common' / '..' / 'corpus')), str(fp / 'corpus'))
 
 
 if __name__ == '__main__':

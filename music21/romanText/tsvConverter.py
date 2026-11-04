@@ -4,7 +4,7 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2019 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2019-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -522,7 +522,6 @@ class TsvHandler:
     >>> out_stream = handler.toM21Stream()
     >>> out_stream.parts[0].measure(1)[roman.RomanNumeral][0].figure
     'I'
-
     '''
     def __init__(self, tsvFile: str|pathlib.Path, dcml_version: int = 1) -> None:
         if dcml_version == 1:
@@ -568,8 +567,13 @@ class TsvHandler:
         with open(fileName, 'r', encoding='utf-8') as f:
             tsvreader = csv.reader(f, delimiter='\t', quotechar='"')
             # The first row is the header
-            self._get_heading_indices(next(tsvreader))
-            return list(tsvreader)
+            self._get_heading_indices([cell.strip() for cell in next(tsvreader)])
+            rows = []
+            for row in tsvreader:
+                cells = [cell.strip() for cell in row]
+                if any(cells):
+                    rows.append(cells)
+            return rows
 
     def _makeTabChord(self, row: list[str]) -> TabChordBase:
         '''
@@ -660,21 +664,22 @@ class TsvHandler:
         if self.dcml_version == 1:
             # This sort of metadata seems to have been removed altogether from the
             # v2 files
-            s.insert(0, metadata.Metadata())
+            md = metadata.Metadata()
+            s.insert(0, md)
 
             firstEntry = self.chordList[0]  # Any entry will do
             title = []
             if 'op' in firstEntry.extra:
-                s.metadata.opusNumber = firstEntry.extra['op']
-                title.append('Op' + s.metadata.opusNumber)
+                md.opusNumber = firstEntry.extra['op']
+                title.append('Op' + firstEntry.extra['op'])
             if 'no' in firstEntry.extra:
-                s.metadata.number = firstEntry.extra['no']
-                title.append('No' + s.metadata.number)
+                md.number = firstEntry.extra['no']
+                title.append('No' + firstEntry.extra['no'])
             if 'mov' in firstEntry.extra:
-                s.metadata.movementNumber = firstEntry.extra['mov']
-                title.append('Mov' + s.metadata.movementNumber)
+                md.movementNumber = firstEntry.extra['mov']
+                title.append('Mov' + firstEntry.extra['mov'])
             if title:
-                s.metadata.title = '_'.join(title)
+                md.title = '_'.join(title)
 
         startingKeySig = str(self.chordList[0].global_key)
         ks = key.Key(startingKeySig)
@@ -816,9 +821,10 @@ class M21toTSV:
                 thisEntry.timesig = ''
             else:
                 thisEntry.timesig = ts.ratioString
-            thisEntry.extra['op'] = self.m21Stream.metadata.opusNumber or ''
-            thisEntry.extra['no'] = self.m21Stream.metadata.number or ''
-            thisEntry.extra['mov'] = self.m21Stream.metadata.movementNumber or ''
+            md = self.m21Stream.metadata
+            thisEntry.extra['op'] = (md.opusNumber or '') if md is not None else ''
+            thisEntry.extra['no'] = (md.number or '') if md is not None else ''
+            thisEntry.extra['mov'] = (md.movementNumber or '') if md is not None else ''
             thisEntry.length = thisRN.quarterLength
             thisEntry.global_key = global_key
             thisEntry.local_key = thisRN.key.tonicPitchNameWithCase
@@ -1070,13 +1076,6 @@ def localKeyAsRn(local_key: key.Key, global_key: key.Key) -> str:
         'i' if letter.islower() else 'I', keyOrScale=local_key
     )
     r = roman.romanNumeralFromChord(chord.Chord(rn.pitches), keyObj=global_key)
-    # Temporary hack: for some reason this gives VI and VII instead of #VI and #VII *only*
-    #   when local_key is major and global_key is minor.
-    # see issue at https://github.com/cuthbertLab/music21/issues/1349#issue-1327713452
-    if (local_key.mode == 'major' and global_key.mode == 'minor'
-            and r.romanNumeral in ('VI', 'VII')
-            and (r.pitchClasses[0] - global_key.pitches[0].pitchClass) % 12 in (9, 11)):
-        return '#' + r.romanNumeral
     return r.romanNumeral
 
 def isMinor(test_key: str) -> bool:
@@ -1140,7 +1139,6 @@ def getLocalKey(local_key: str, global_key: str, convertDCMLToM21: bool = False)
 
     >>> romanText.tsvConverter.getLocalKey('vii', 'a', convertDCMLToM21=True)
     'g'
-
     '''
     if convertDCMLToM21:
         local_key = characterSwaps(local_key, minor=isMinor(global_key[0]), direction='DCML-m21')
@@ -1375,6 +1373,36 @@ class Test(unittest.TestCase):
         first_ending, second_ending = rb_iter
         _test_ending_contents(first_ending, ['2a'])
         _test_ending_contents(second_ending, ['2b'])
+
+    def testWhitespaceRows(self) -> None:
+        '''
+        AI-assisted (Claude) regression coverage for whitespace in DCML TSV files.
+        '''
+        # https://github.com/cuthbertLab/music21/issues/1541
+        import os
+        path = common.getSourceFilePath() / 'romanText' / 'tsvEg_v2_repeats.tsv'
+        text = path.read_text(encoding='utf-8')
+        clean = TsvHandler(path, dcml_version=2).toM21Stream()
+        expected = [rn.figure for rn in clean[roman.RomanNumeral]]
+        paddedLines = []
+        for line in text.splitlines():
+            paddedCells = [f' {cell} ' for cell in line.split('\t')]
+            paddedLines.append('\t'.join(paddedCells))
+        padded = '\n'.join(paddedLines)
+        variants = {
+            'blank line': text + '\n',
+            'tabs only': text + '\t\t\t\t\t\n',
+            'padded cells': padded + '\n\t\t\t\t\t\t\n',
+        }
+        tempFile = environment.Environment().getTempFile()
+        try:
+            for name, variant in variants.items():
+                with open(tempFile, 'w', encoding='utf-8') as f:
+                    f.write(variant)
+                parsed = TsvHandler(tempFile, dcml_version=2).toM21Stream()
+                self.assertEqual([rn.figure for rn in parsed[roman.RomanNumeral]], expected, name)
+        finally:
+            os.remove(tempFile)
 
 # ------------------------------------------------------------------------------
 

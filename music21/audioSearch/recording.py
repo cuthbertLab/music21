@@ -13,10 +13,10 @@ modules for audio searching that directly record from the microphone.
 
 Requires PyAudio and portaudio to be installed (https://portaudio.com/download.html)
 
-Windows users will get pyaudio and portaudio with `pip install pyaudio`
+Windows users will get pyaudio and portaudio with `uv add pyaudio`
 
 macOS users should have Homebrew installed and run `brew install portaudio`
-before running `pip install pyaudio`
+before running `uv add pyaudio`
 
 There is no official support for Linux/BSD etc. in music21, but package managers like `apt`
 tend to have libraries like `portaudio19` and `python3-pyaudio`.
@@ -38,7 +38,8 @@ default_recordSampleRate = 44100
 default_recordChunkLength = 1024
 
 
-def samplesFromRecording(seconds=10.0, storeFile=True,
+def samplesFromRecording(seconds=10.0,
+                         storeFile: bool|str = True,
                          recordFormat=None,
                          recordChannels=default_recordChannels,
                          recordSampleRate=default_recordSampleRate,
@@ -77,7 +78,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     st.close()
     p_audio.terminate()
 
-    if storeFile is not False:
+    if storeFile:
         if isinstance(storeFile, str):
             waveFilename = storeFile
         else:
