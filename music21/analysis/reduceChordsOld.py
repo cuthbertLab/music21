@@ -16,6 +16,7 @@ import copy
 import unittest
 
 from music21 import chord
+from music21.common.numberTools import opFrac
 from music21.common.types import DocOrder
 from music21 import clef
 from music21 import meter
@@ -287,7 +288,7 @@ class ChordReducer:
                 if round(newOffset - cLastEnd, 6) != 0.0:
                     cLast.quarterLength += newOffset - cLastEnd
             cLast = cElCopy
-            cLastEnd = newOffset + cElCopy.quarterLength
+            cLastEnd = opFrac(newOffset + cElCopy.quarterLength)
             m.coreInsert(newOffset, cElCopy, ignoreSort=True)
 
         sourceMeasure = mI.parts.first().getElementsByClass(stream.Measure).first()
@@ -348,6 +349,15 @@ class Test(unittest.TestCase):
         measures = reduction.getElementsByClass(stream.Measure)
         self.assertEqual([m.offset for m in measures], [0.0, 4.0, 8.0])
         self.assertEqual([m.duration.quarterLength for m in measures], [4.0, 4.0, 4.0])
+
+    def testTripletMeasureLengthsKept(self):
+        from music21 import converter
+        score = stream.Score([converter.parse('tinyNotation: 2/4 trip{c8 d8 e8} r4 trip{c4 d4 e4}'),
+                              converter.parse('tinyNotation: 2/4 trip{C8 D8 E8} r4 C2')])
+        reduction = ChordReducer().multiPartReduction(score, maxChords=3)
+        measures = reduction.getElementsByClass(stream.Measure)
+        self.assertEqual([m.offset for m in measures], [0.0, 2.0])
+        self.assertEqual([m.highestTime for m in measures], [2.0, 2.0])
 
 class TestExternal(unittest.TestCase):
     show = True
