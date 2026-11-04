@@ -1237,6 +1237,19 @@ class Converter:
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
+def writesUnifiedOpusFiles(format: str | None) -> bool:
+    if format is None:
+        return False
+
+    v = Converter()
+    v.setSubConverterFromFormat(format)
+
+    if v.subConverter is None:
+        return False
+    if not hasattr(v.subConverter, 'writesUnifiedOpusFiles'):
+        return False
+    return v.subConverter.writesUnifiedOpusFiles
+
 def parseFile(fp,
               number=None,
               format=None,

@@ -410,6 +410,8 @@ class ConverterLilypond(SubConverter):
     registerOutputSubformatExtensions = {'png': 'png',
                                          'pdf': 'pdf',
                                          'svg': ''}  # sic! (Why?)
+    writesUnifiedOpusFiles = True
+
     codecWrite = True
 
     def write(self,
