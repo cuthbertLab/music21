@@ -1509,6 +1509,24 @@ class Test(unittest.TestCase):
         self.assertEqual(len(lh_last.voices), 0)
         self.assertEqual([r.style.hideObjectOnPrint for r in lh_last[note.Rest]], [False] * 3)
 
+    def testFinaleZeroForward(self):
+        '''
+        A Finale <forward> of no duration makes no hidden rest.
+        '''
+        from music21 import converter
+        from music21.musicxml import m21ToXml
+        from music21.musicxml import testPrimitive
+
+        forward = '<forward>\n        <duration>2</duration>'
+        zeroForward = '<forward><duration>0</duration><voice>1</voice></forward>'
+        self.assertIn(forward, testPrimitive.hiddenRestsFinale)
+        xmlText = testPrimitive.hiddenRestsFinale.replace(forward, zeroForward + forward, 1)
+        s = converter.parse(xmlText, format='musicxml')
+        v1 = s.recurse().voices.first()
+        self.assertEqual([r.quarterLength for r in v1.getElementsByClass(note.Rest)], [1.0])
+        GEX = m21ToXml.GeneralObjectExporter(s)
+        GEX.parse()
+
     def testHiddenRestImpliedVoice(self):
         '''
         MuseScore expects readers to infer the voice context surrounding
