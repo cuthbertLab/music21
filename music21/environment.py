@@ -25,6 +25,7 @@ from __future__ import annotations
 import io
 import os
 import pathlib
+import stat
 import sys
 import tempfile
 import unittest
@@ -33,7 +34,6 @@ import typing as t
 from typing import overload
 
 import xml.etree.ElementTree as ET
-from xml.sax import saxutils
 
 from music21 import exceptions21
 from music21 import common
@@ -173,12 +173,12 @@ class _EnvironmentCore:
         ]:
             self._keysToPaths.append(pathKey)
 
+        self.defaultRootTempDir = None
         # defines all valid keys in ref
         self._loadDefaults(forcePlatform=forcePlatform)
         # read will only overwrite values if set in field
         if forcePlatform is None:  # only read if not forcing platform
             self.read()  # load a stored file if available
-        self.defaultRootTempDir = None
 
     # SPECIAL METHODS #
 
@@ -234,11 +234,6 @@ class _EnvironmentCore:
         return '<Environment>'
 
     def __setitem__(self, key, value):
-        # saxutils.escape  # used for escaping strings going to xml
-        # with unicode encoding
-        # http://www.xml.com/pub/a/2002/11/13/py-xml.html?page=2
-        # saxutils.escape(msg).encode('UTF-8')
-
         # add local corpus path as a key
         # if isinstance(value, bytes):
         #    value = value.decode(errors='replace')
@@ -275,9 +270,8 @@ class _EnvironmentCore:
             raise EnvironmentException(
                 f'{value} is not an acceptable value for preference: {key}')
 
-        # need to escape problematic characters for xml storage
-        if isinstance(value, str):
-            value = saxutils.escape(value)  # .encode('UTF-8')
+        # ElementTree handles XML escaping when serializing in toSettingsXML.
+
         # set value
         if key == 'localCorpusPath':
             # only add if unique
@@ -397,10 +391,10 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath', 'lilypond'),
                 ('musicxmlPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\bin\MuseScore3.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 4\bin\MuseScore4.exe')
                  ),
                 ('musescoreDirectPNGPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\bin\MuseScore3.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 4\bin\MuseScore4.exe')
                  ),
             ]:
                 self[name] = value  # use for key checking
@@ -424,13 +418,13 @@ class _EnvironmentCore:
                 ('lilypondPath',
                  '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
                 ('musicxmlPath',
-                 '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
+                 '/Applications/MuseScore 4.app/Contents/MacOS/mscore'),
                 ('graphicsPath', previewLocation),
                 ('vectorPath', previewLocation),
                 ('pdfPath', previewLocation),
                 ('midiPath', '/Applications/GarageBand.app'),
                 ('musescoreDirectPNGPath',
-                 '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
+                 '/Applications/MuseScore 4.app/Contents/MacOS/mscore'),
             ]:
                 self[name] = value  # use for key checking
 
@@ -445,6 +439,22 @@ class _EnvironmentCore:
             return exists and readable and writable
         else:
             return False
+
+    def _isSafeTempDir(self, path: pathlib.Path) -> bool:
+        '''
+        Return True if `path` is accessible and no other user can change it.
+
+        On Unix it must be a real directory (not a link) that this user owns and
+        that no one else can write to.
+        '''
+        if not self._checkAccessibility(path):
+            return False
+        if sys.platform != 'win32':
+            pathStat = os.lstat(path)
+            return (stat.S_ISDIR(pathStat.st_mode)
+                    and pathStat.st_uid == os.getuid()
+                    and not pathStat.st_mode & 0o022)
+        return True
 
     def toSettingsXML(self, ref=None):
         '''
@@ -519,48 +529,36 @@ class _EnvironmentCore:
         >>> e.getDefaultRootTempDir() == pathlib.Path(tempFile) / 'music21'
         True
 
-        If failed to create the subdirectory (OSError is raised), this function
-        will return (1), for Linux and Mac platforms, a subdirectory under the
-        system temp directory which is named with 'music21-userid-$UID' or (2),
-        for other platforms, a temporary directory which is created by
-        tempfile.mkdtemp(prefix="music21-"), which is named with 'music21-'
-        plus 8 hashed codes, and (3) if failing for both above, it will return
-        the directory from tempfile.gettempdir(). The location of this directory
-        depends on OS.
+        If that subdirectory cannot be used, this function returns (1), for
+        Linux and Mac platforms, a subdirectory under the system temp directory
+        named 'music21-userid-$UID', or (2) a new directory created by
+        tempfile.mkdtemp(prefix="music21-"). On Linux and Mac, a directory is
+        used only if this user owns it and no one else can write to it, since
+        the system temp directory may be shared with other users.
 
         Note the temporary directory may be different in each Python session.
+
+        * Changed in v11: directories other users could change are not used.
         '''
         if self._checkAccessibility(self.defaultRootTempDir):
             return self.defaultRootTempDir
 
-        # this returns the root temp dir; this does not create a new dir
-        self.defaultRootTempDir = pathlib.Path(tempfile.gettempdir()) / 'music21'
+        systemTempDir = pathlib.Path(tempfile.gettempdir())
+        candidates = [systemTempDir / 'music21']
+        if sys.platform != 'win32':
+            candidates.append(systemTempDir / f'music21-userid-{os.getuid()}')
 
-        # if this path already exists, readable and writable, we have nothing more to do
-        if self._checkAccessibility(self.defaultRootTempDir):
-            return self.defaultRootTempDir
-        else:
-            # make this directory as a temp directory
+        for candidate in candidates:
             try:
-                self.defaultRootTempDir.mkdir()
+                candidate.mkdir(mode=0o700)
             except OSError:  # directory already exists or permission denied
-                if common.getPlatform() in ['nix', 'darwin']:
-                    uid = os.getuid()
-                    dir_path = pathlib.Path(tempfile.gettempdir()) / f'music21-userid-{uid}'
-                else:
-                    dir_path = pathlib.Path(tempfile.mkdtemp(prefix='music21-'))
+                pass
+            if self._isSafeTempDir(candidate):
+                self.defaultRootTempDir = candidate
+                return candidate
 
-                if self._checkAccessibility(dir_path):
-                    self.defaultRootTempDir = dir_path
-                else:
-                    try:
-                        dir_path.mkdir()
-                        self.defaultRootTempDir = dir_path
-                    except OSError:  # pragma: no cover
-                        # Give up and use /tmp
-                        self.defaultRootTempDir = pathlib.Path(tempfile.gettempdir())
-
-            return self.defaultRootTempDir
+        self.defaultRootTempDir = pathlib.Path(tempfile.mkdtemp(prefix='music21-'))
+        return self.defaultRootTempDir
 
     def getKeysToPaths(self):
         '''
@@ -620,6 +618,11 @@ class _EnvironmentCore:
     def getSettingsPath(self):
         '''
         Return a pathlib.Path object to the '.music21rc' object
+
+        On Linux and Mac without a writable HOME (as for many web servers), the file
+        is kept in this user's music21 temp directory.
+
+        * Changed in v11: no longer uses the shared /tmp directory.
         '''
         platform = common.getPlatform()
         if 'USERPROFILE' in os.environ:
@@ -642,7 +645,7 @@ class _EnvironmentCore:
             if 'HOME' in os.environ and os.access(os.environ['HOME'], os.W_OK):
                 directory = pathlib.Path(os.environ['HOME'])
             else:
-                directory = pathlib.Path('/tmp/')
+                directory = self.getDefaultRootTempDir()
             return directory / '.music21rc'
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
@@ -881,14 +884,11 @@ class Environment:
 
         Must call write() to make permanent:
 
-        >>> from pathlib import Path
         >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a['graphicsPath'] = '/test&Encode'
-        >>> 'test&amp;Encode' in str(a['graphicsPath'])
-        True
-        >>> isinstance(a['graphicsPath'], Path)
-        True
+        >>> a['graphicsPath']
+        PosixPath('/test&Encode')
 
         >>> a['autoDownload'] = 'asdf'
         Traceback (most recent call last):
@@ -902,6 +902,8 @@ class Environment:
 
         >>> a['showFormat'] = 'musicxml'
         >>> a['localCorpusPath'] = '/path/to/local'
+
+        * Fixed in v11: values containing ``&`` etc. are properly stored and retrieved.
         '''
         envSingleton().__setitem__(key, value)
 
@@ -919,8 +921,8 @@ class Environment:
         This method is only called if the no scratch directory preference has
         been set.
 
-        If not able to create a 'music21' directory, the standard default is
-        returned.
+        If a 'music21' directory cannot be used, another temporary directory
+        only this user can change is returned.
 
         Returns a pathlib.Path.
         '''
@@ -946,7 +948,6 @@ class Environment:
         'musicxmlPath'
         'pdfPath'
         'vectorPath'
-
         '''
         return envSingleton().getKeysToPaths()
 
@@ -1435,8 +1436,6 @@ def get(key):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-    import stat
-
     def stringFromTree(self, settingsTree):
         etIndent(settingsTree.getroot())
         bio = io.BytesIO()
@@ -1472,8 +1471,8 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/GarageBand.app" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
+      value="/Applications/MuseScore 4.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 4.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/System/Applications/Preview.app" />
@@ -1527,8 +1526,8 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/GarageBand.app" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
+      value="/Applications/MuseScore 4.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 4.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/System/Applications/Preview.app" />
@@ -1539,6 +1538,30 @@ class Test(unittest.TestCase):
         true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
             '/System/Applications/Preview', '/Applications/Preview'), match)
         self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
+
+    @unittest.skipIf(common.getPlatform() == 'win', 'test assumes Unix-style paths')
+    def testSpecialCharactersRoundTrip(self):
+        '''
+        A path containing XML special characters such as "&" is stored
+        unescaped, serialized escaped by ElementTree, and comes back
+        unescaped after parsing.
+
+        AI-assisted (Claude).
+        '''
+        core = _EnvironmentCore(forcePlatform='darwin')
+        fp = '/Applications/Q&A <Beta>/MuseScore 4.app'
+
+        # these lines use overridden __setitem__ and __getitem__ internally
+        core['musicxmlPath'] = fp
+        self.assertEqual(str(core['musicxmlPath']), fp)
+
+        settingsTree = core.toSettingsXML()
+        match = self.stringFromTree(settingsTree)
+        self.assertIn('Q&amp;A &lt;Beta&gt;', match)
+
+        ref = {'musicxmlPath': None}
+        core._fromSettings(settingsTree, ref)
+        self.assertEqual(ref['musicxmlPath'], fp)
 
     @unittest.skipIf(common.getPlatform() == 'win', 'test assumes Unix-style paths')
     def testFromSettings(self):
@@ -1583,8 +1606,8 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="w" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
+      value="/Applications/MuseScore 4.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 4.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/System/Applications/Preview.app" />
@@ -1615,8 +1638,6 @@ class Test(unittest.TestCase):
         'os.getuid can be called only on Unix platforms'
     )
     def testGetDefaultRootTempDir(self):
-        import stat
-
         e = Environment()
         oldScratchDir = e['directoryScratch']
         oldTempDir = None
@@ -1629,7 +1650,7 @@ class Test(unittest.TestCase):
             # Wipe out write, exec permissions on the default root dir
             os.chmod(oldTempDir, stat.S_IREAD)
             newTempDir = e.getDefaultRootTempDir()
-            self.assertIn(f'music21-userid-{os.getuid()}', str(newTempDir))
+            self.assertEqual(newTempDir.name, f'music21-userid-{newTempDir.stat().st_uid}')
         finally:
             # Make sure oldTempDir and oldPermission is set in 'try' block
             if oldTempDir is not None and oldPermission is not None:
@@ -1656,6 +1677,51 @@ class Test(unittest.TestCase):
                 empty = len(os.listdir(newTempDir)) == 0
                 if not tmp and empty:
                     os.rmdir(newTempDir)
+
+    @unittest.skipUnless(
+        common.getPlatform() in ['nix', 'darwin'],
+        'Windows gives each user a private temp folder'
+    )
+    def testDefaultRootTempDirNotShared(self):
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as parent:
+            shared = pathlib.Path(parent, 'music21')
+            shared.mkdir()
+            shared.chmod(0o777)  # as if another user made it for everyone
+            with mock.patch.object(tempfile, 'tempdir', parent):
+                chosen = _EnvironmentCore().getDefaultRootTempDir()
+            self.assertNotEqual(chosen, shared)
+            self.assertEqual(chosen.stat().st_mode & 0o077, 0)
+
+    @unittest.skipUnless(
+        common.getPlatform() in ['nix', 'darwin'],
+        'os.getuid can be called only on Unix platforms'
+    )
+    def testDefaultRootTempDirKeepsPermissions(self):
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as parent:
+            existing = pathlib.Path(parent, 'music21')
+            existing.mkdir()
+            existing.chmod(0o755)
+            with mock.patch.object(tempfile, 'tempdir', parent):
+                chosen = _EnvironmentCore().getDefaultRootTempDir()
+            self.assertEqual(chosen, existing)
+            self.assertEqual(stat.S_IMODE(existing.stat().st_mode), 0o755)
+
+    @unittest.skipUnless(
+        common.getPlatform() in ['nix', 'darwin'],
+        'Windows does not use HOME'
+    )
+    def testSettingsPathWithoutHome(self):
+        from unittest import mock
+
+        core = _EnvironmentCore()
+        with mock.patch.dict(os.environ):
+            os.environ.pop('HOME', None)
+            settingsPath = core.getSettingsPath()
+        self.assertEqual(settingsPath.parent, core.getDefaultRootTempDir())
 
 # -----------------------------------------------------------------------------
 

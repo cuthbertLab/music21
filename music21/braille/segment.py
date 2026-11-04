@@ -4,7 +4,7 @@
 # Authors:      Jose Cabal-Ugaz
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012-22 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2012-26 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -697,7 +697,6 @@ class BrailleSegment(text.BrailleText):
         True
         >>> bs1.showLeadingOctaveFromNoteGrouping(beg1)
         True
-
         '''
         currentKey = self.currentGroupingKey
         previousKey = self.previousGroupingKey
@@ -827,8 +826,8 @@ class BrailleSegment(text.BrailleText):
                 # hence -- let us split this noteGrouping into two noteGroupings.
                 try:
                     bngA, bngB = self.splitNoteGroupingAndTranscribe(noteGrouping,
-                                                                 showLeadingOctave,
-                                                                 addSpace)
+                                                                     showLeadingOctave,
+                                                                     addSpace)
                     self.currentLine.append(bngA, addSpace=addSpace)
                     self.addToNewLine(bngB)
                 except BrailleSegmentException:
@@ -1004,9 +1003,11 @@ class BrailleSegment(text.BrailleText):
                         currentKeySig = brailleElement
             elif groupingKey.affinity in (Affinity.INACCORD, Affinity.NOTEGROUP):
                 if isinstance(groupingList[0], clef.Clef):
-                    if isinstance(groupingList[0], (clef.TrebleClef, clef.AltoClef)):
+                    if isinstance(groupingList[0], (clef.TrebleClef, clef.Treble8vbClef,
+                                                    clef.Treble8vaClef, clef.AltoClef)):
                         self.descendingChords = True
-                    elif isinstance(groupingList[0], (clef.BassClef, clef.TenorClef)):
+                    elif isinstance(groupingList[0], (clef.BassClef, clef.Bass8vbClef,
+                                                      clef.Bass8vaClef, clef.TenorClef)):
                         self.descendingChords = False
 
                 # make a whole rest no matter the length of the rest if only one note.
@@ -1073,8 +1074,8 @@ class BrailleSegment(text.BrailleText):
 
         newSegment = self.consolidate()
         noteGroupings = [newSegment[gpKey]
-                             for gpKey in newSegment.keys()
-                                if gpKey.affinity == Affinity.NOTEGROUP]
+                         for gpKey in newSegment.keys()
+                         if gpKey.affinity == Affinity.NOTEGROUP]
         for noteGrouping in noteGroupings:
             allNotes_outer = [n for n in noteGrouping if isinstance(n, note.Note)]
             for noteIndexStart_outer in range(len(allNotes_outer)):
@@ -1208,6 +1209,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                         storedRight = thisKey
                     storedLeft = None
                 else:
+                    if storedRight is not None:
+                        yield (storedRight, None)
                     storedRight = thisKey
             elif thisKey.hand == 'left':
                 if storedRight is not None:
@@ -1221,6 +1224,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                         storedLeft = thisKey
                     storedRight = None
                 else:
+                    if storedLeft is not None:
+                        yield (None, storedLeft)
                     storedLeft = thisKey
 
         if storedRight:
@@ -1316,26 +1321,17 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
 
         while self.allKeyPairs:
             (rightKey, leftKey) = self.allKeyPairs[0]
-            useKey = rightKey
-            try:
-                useElement = self._groupingDict.get(rightKey)
-            except KeyError as ke:
-                if ke.args[0] == 'None':
-                    useElement = self._groupingDict.get(leftKey)
-                    useKey = leftKey
-                else:
-                    raise ke
+            useKey = rightKey if rightKey is not None else leftKey
+            useElement = self._groupingDict.get(useKey)
             if useKey.affinity > Affinity.MMARK:
                 break
             self.allKeyPairs.popleft()
             if useKey.affinity == Affinity.SIGNATURE:
-                try:
-                    keySignature, timeSignature = useElement[0], useElement[1]
-                except IndexError:
-                    if isinstance(useElement, key.KeySignature):
-                        keySignature = useElement[0]
-                    else:
-                        timeSignature = useElement[0]
+                for el in useElement:
+                    if keySignature is None and isinstance(el, key.KeySignature):
+                        keySignature = el
+                    elif timeSignature is None and isinstance(el, meter.TimeSignature):
+                        timeSignature = el
             elif useKey.affinity == Affinity.TTEXT:
                 tempoText = useElement[0]
             elif useKey.affinity == Affinity.MMARK:
@@ -2435,6 +2431,136 @@ class Test(unittest.TestCase):
 
         rawSegList = getRawSegments(tn)
         unused = str(rawSegList[0])
+
+    def testGrandSegmentHeadingFromLeftHand(self):
+        '''
+        A key and time signature in only the left hand of a keyboard part
+        go into the heading.
+        '''
+        from music21.braille.translate import keyboardPartsToBraille
+
+        score = stream.Score()
+        for pitchName in ('C5', 'C3'):
+            part = stream.PartStaff()
+            m = stream.Measure(number=1)
+            if pitchName == 'C3':
+                m.append(key.KeySignature(2))
+                m.append(meter.TimeSignature('4/4'))
+            m.append(note.Note(pitchName, quarterLength=4.0))
+            part.append(m)
+            score.insert(0, part)
+        brailleLines = keyboardPartsToBraille(score).splitlines()
+        self.assertEqual(brailleLines[0].strip('⠀'), '⠩⠩⠼⠙⠲')
+
+    def testYieldCombinedGroupingKeysSameHandInARow(self):
+        '''
+        Keys of one hand that come in a row are each yielded, paired with None.
+
+        AI-assisted (Claude).
+        '''
+        sig = Affinity.SIGNATURE
+        ttext = Affinity.TTEXT
+        notes = Affinity.NOTEGROUP
+        for handKeys, expected in (
+            ([(sig, 'right'), (notes, 'right'), (notes, 'left')],
+             [((sig, 'right'), None),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'left'), (notes, 'right'), (notes, 'left')],
+             [(None, (sig, 'left')),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'left'), (ttext, 'left'), (notes, 'right'), (notes, 'left')],
+             [(None, (sig, 'left')),
+              (None, (ttext, 'left')),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'right'), (ttext, 'right'), (notes, 'right'), (notes, 'left')],
+             [((sig, 'right'), None),
+              ((ttext, 'right'), None),
+              ((notes, 'right'), (notes, 'left'))]),
+            ([(sig, 'right'), (sig, 'left'), (notes, 'right'), (notes, 'left')],
+             [((sig, 'right'), (sig, 'left')),
+              ((notes, 'right'), (notes, 'left'))]),
+        ):
+            bgs = BrailleGrandSegment()
+            for affinity, hand in handKeys:
+                bgs[SegmentKey(1, 0, affinity, hand)] = BrailleElementGrouping()
+            pairs = []
+            for rightKey, leftKey in bgs.yieldCombinedGroupingKeys():
+                right = None if rightKey is None else (rightKey.affinity, rightKey.hand)
+                left = None if leftKey is None else (leftKey.affinity, leftKey.hand)
+                pairs.append((right, left))
+            self.assertEqual(pairs, expected)
+
+    def testGrandSegmentHeadingFromRightHand(self):
+        '''
+        A key and time signature in only the right hand of a keyboard part
+        go into the heading.
+        '''
+        from music21.braille.translate import keyboardPartsToBraille
+
+        score = stream.Score()
+        for pitchName in ('C5', 'C3'):
+            part = stream.PartStaff()
+            m = stream.Measure(number=1)
+            if pitchName == 'C5':
+                m.append(key.KeySignature(2))
+                m.append(meter.TimeSignature('4/4'))
+            m.append(note.Note(pitchName, quarterLength=4.0))
+            part.append(m)
+            score.insert(0, part)
+        brailleLines = keyboardPartsToBraille(score).splitlines()
+        self.assertEqual(brailleLines[0].strip('⠀'), '⠩⠩⠼⠙⠲')
+
+    def testSplitMeasureBeamsLeftWhenTieFillsIt(self):
+        '''
+        Both halves of a split measure are beamed, including a left half that a
+        tied note extends to the end of the measure.
+
+        AI-assisted (Claude).
+        '''
+        from music21 import tie
+
+        def sixteenths(m, names):
+            for name in names:
+                m.append(note.Note(name + '4', type='16th'))
+
+        def beamFlags(m):
+            return [(n.beamStart, n.beamContinue) for n in m.notes]
+
+        m = stream.Measure()
+        m.append(meter.TimeSignature('2/4'))
+        sixteenths(m, 'CDEF')
+        tiedNote = note.Note('G4')
+        tiedNote.tie = tie.Tie('start')
+        m.append(tiedNote)
+
+        left, right = splitMeasure(m)
+        self.assertEqual([n.name for n in left.notes], ['C', 'D', 'E', 'F', 'G'])
+        self.assertEqual(left.highestTime, 2.0)
+        self.assertEqual(beamFlags(left), [(True, False), (False, True), (False, True),
+                                           (False, True), (False, False)])
+        self.assertEqual(len(right), 0)
+
+        untied = stream.Measure()
+        untied.append(meter.TimeSignature('2/4'))
+        sixteenths(untied, 'CDEFGABC')
+        left, right = splitMeasure(untied)
+        self.assertEqual(beamFlags(left), [(True, False), (False, True), (False, True),
+                                           (False, True)])
+        self.assertEqual(beamFlags(right), [(True, False), (False, True), (False, True),
+                                            (False, True)])
+
+    def testOctaveClefsSetChordDirection(self):
+        for clefClass, descending in (
+            (clef.Treble8vbClef, True),
+            (clef.Treble8vaClef, True),
+            (clef.Bass8vbClef, False),
+            (clef.Bass8vaClef, False),
+        ):
+            seg = BrailleSegment()
+            seg.descendingChords = not descending
+            seg[SegmentKey(1, 0, Affinity.NOTEGROUP, None)].append(clefClass())
+            seg.addGroupingAttributes()
+            self.assertEqual(seg.descendingChords, descending)
 
 
 if __name__ == '__main__':

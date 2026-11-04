@@ -21,7 +21,7 @@ string.
 1. `music21/_version.py` — the `__version__` string.
 2. `music21/base.py` — the single version doctest:
    ```
-   >>> music21.VERSION_STR
+   >>> music21.__version__
    '11.0.0b2'
    ```
    This test exists specifically to force you to remember the bump. If you change
@@ -31,31 +31,41 @@ Verify both with:
 ```bash
 uv run pytest --doctest-modules music21/base.py music21/_version.py
 ```
-(or `uv run python -c "import music21; print(music21.VERSION_STR)"`).
+(or `uv run python -c "import music21; print(music21.__version__)"`).
 
 ## When to bump
 
-- **Parsing-format / parser changes (most common reason).** Any change to how a
-  format is read or written — musicxml, abc, MIDI, noteworthy/NWC, humdrum,
-  etc. — should bump the version, even a refactor, because the version is baked
-  into the **pickled-stream cache** (cached parsed files). Bumping invalidates
-  stale pickles so users don't get results from the old parser. This is the rule
-  in AGENTS.md ("Changes to parsing formats … need to update the patch version").
-- **New feature** → bump (see digit rules below); mark it in docstrings with
-  `* New in vX: …`.
-- **Bug fix** → bump the patch; if it changes public behavior, mark
-  `* Changed in vX: …`.
-- **Pure internal refactor with no behavioral/pickle impact** → usually no bump.
+One thing depends on the number changing: the **pickled-stream cache**. The
+version is part of the cache key, so a bump invalidates stale pickles
+everywhere. If nobody is holding a wrong cached parse, don't bump — the commit
+is the record.
+
+- **Parser or parsing-format change → always bump**, even a pure refactor:
+  someone is holding a pickle parsed by the old code. musicxml, abc, MIDI,
+  noteworthy/NWC, humdrum, and the rest.
+- **Anything else → no bump**: a new feature, a fix that makes code do what it
+  already claimed, an internal refactor, a test-only or docs-only change.
+
+"It's a bug fix" is not by itself a reason. A musicxml importer that now reads a
+tag it used to drop bumps, because cached parses are wrong. A scale analysis
+method that changed its return format does not.
+
+A `New in` / `Changed in` marker is **not** a reason to bump. Those markers name
+a major version, at most a minor one — never a patch, never a `bN` beta — and
+moving those digits is a release decision only a human makes. Write the marker
+for the version the change will land in and leave `_version.py` alone.
 
 ## Which part to change
 
 music21 follows semver-ish rules (see the `_version.py` docstring for the full
 rationale):
 
-- **MAJOR (X)** — breaks old features. Rare.
+- **MAJOR (X)** — breaks old features. Rare. A human decides this.
 - **MINOR (Y)** — new features. **Even Y = alpha/beta, odd Y = release.**
   `X.0` (e.g. `11.0`) are development releases that can still change until `X.1`.
-- **PATCH (Z)** — bug fixes and parsing/pickle-invalidating changes.
+  A human decides this too; an agent changes only the patch or the beta suffix.
+- **PATCH (Z)** — parsing/pickle-invalidating changes and other fixes that
+  meet the bar above.
 - **beta suffix (`bN`)** — successive pre-release builds of the same
   `MAJOR.MINOR.PATCH`. To cut another beta without otherwise changing the
   number, increment it: `11.0.0b1` → `11.0.0b2`. (This is what a
@@ -63,8 +73,9 @@ rationale):
 
 ## `Changed in` / `New in` docstring markers
 
-When a bump accompanies a public-interface change, annotate the affected
-method/class docstring:
+Annotate a changed public interface in the affected method/class docstring.
+This is independent of bumping — a marker is documentation, not a version
+change:
 - `* Changed in vX: one-line explanation.`
 - `* New in vX: one-line explanation.`
 
@@ -76,6 +87,6 @@ number. (Humans remove the AI-assisted note on review; leave the version marker.
 ## Checklist
 
 1. Edit `__version__` in `music21/_version.py`.
-2. Edit the `VERSION_STR` doctest in `music21/base.py` to match.
+2. Edit the `__version__` doctest in `music21/base.py` to match.
 3. Add/update `Changed in` / `New in` markers on any changed public API.
 4. `uv run pytest --doctest-modules music21/base.py music21/_version.py`.

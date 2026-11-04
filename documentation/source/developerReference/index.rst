@@ -8,6 +8,7 @@ Developer Reference
     testing
     documenting
     buildingDocumentation
+    releasing
     installJupyter
 
     usingGit

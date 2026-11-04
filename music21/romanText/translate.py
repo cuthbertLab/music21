@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -129,6 +129,7 @@ from music21 import bar
 from music21 import base
 from music21 import common
 from music21.common.types import OffsetQL
+from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import harmony
@@ -548,7 +549,7 @@ class PartTranslator:
         '''
         p = self.p
         skipsPriorMeasures = ((measureLineToken.number[0] > self.lastMeasureNumber + 1)
-                               and (self.previousRn is not None))
+                              and (self.previousRn is not None))
         isSingleMeasureCopy = (len(measureLineToken.number) == 1
                                and measureLineToken.isCopyDefinition)
         isMultipleMeasureCopy = (len(measureLineToken.number) > 1)
@@ -604,6 +605,9 @@ class PartTranslator:
         implied by `measureToken`.
         '''
         p = self.p
+        if len(p) + measureToken.number[0] - self.lastMeasureNumber > defaults.maxMeasures:
+            raise RomanTextTranslateException(
+                f'cannot make more than {defaults.maxMeasures} measures')
         for i in range(self.lastMeasureNumber + 1, measureToken.number[0]):
             mFill = stream.Measure()
             mFill.number = i
@@ -621,7 +625,7 @@ class PartTranslator:
             newRn = copy.deepcopy(self.previousRn)
             newRn.lyric = ''
             # set to entire bar duration and tie
-            newRn.duration = copy.deepcopy(self.tsAtTimeOfLastChord.barDuration)
+            newRn.quarterLength = self.tsAtTimeOfLastChord.barDuration.quarterLength
             if self.previousRn.tie is None:
                 self.previousRn.tie = tie.Tie('start')
             else:
@@ -1575,7 +1579,6 @@ m3 NC b3 G: V
 
     def testUnprocessed(self):
         from music21 import converter
-        from music21.romanText import translate
         src = '''Note: Hello
 m1 G: IV || b3 d: III b4 NC
 varM1 I
@@ -1583,7 +1586,7 @@ Note: Hi
 '''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        unprocessedElements = p[translate.RomanTextUnprocessedMetadata]
+        unprocessedElements = p[RomanTextUnprocessedMetadata]
         self.assertEqual(len(unprocessedElements), 3)
         note1, var1, note2 = unprocessedElements
         self.assertEqual(note1.tag, 'Note')
@@ -1594,19 +1597,18 @@ Note: Hi
         self.assertIn(' I', var1.data)
 
     def testUnprocessedWithAnacrusis(self):
-        from music21.romanText import translate
         src = '''
         Time Signature: 4/4
         m0 b4 f: i
         Note: Internal Note field after anacrusis.
         m1 V
         '''
-        s = translate.romanTextToStreamScore(src)
+        s = romanTextToStreamScore(src)
         p = s.parts[0]
         self.assertEqual(len(p), 3)
         self.assertIsInstance(p[0], stream.Measure)
         self.assertEqual(p[0].paddingLeft, 3.0)
-        self.assertIsInstance(p[1], translate.RomanTextUnprocessedMetadata)
+        self.assertIsInstance(p[1], RomanTextUnprocessedMetadata)
         self.assertEqual(p[1].offset, 0.0)
         self.assertEqual(p[1].data, 'Internal Note field after anacrusis.')
         self.assertIsInstance(p[2], stream.Measure)
@@ -1890,6 +1892,10 @@ m1 C: I'''
         _test_ending_contents(second_ending, ['2b'])
         _test_ending_contents(third_ending, ['2c', '3c'])
         _test_expanded(s, 27.0)
+
+    def testMeasureNumberTooHigh(self):
+        with self.assertRaisesRegex(RomanTextTranslateException, 'more than 100000 measures'):
+            romanTextToStreamScore('Time Signature: 4/4\nm1 C: I\nm99999999 V\n')
 
 
 # ------------------------------------------------------------------------------

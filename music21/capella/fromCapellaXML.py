@@ -18,6 +18,7 @@ Does not handle pickup notes, which are defined simply with an early barline
 '''
 from __future__ import annotations
 
+import os
 import pathlib
 import typing as t
 import unittest
@@ -123,7 +124,8 @@ class CapellaImporter:
         '''
         self.zipFilename = str(filename)
         with zipfile.ZipFile(str(filename), 'r') as zipFileHandle:
-            xmlText = zipFileHandle.read('score.xml')
+            xmlText = common.readZipMember(zipFileHandle, 'score.xml',
+                                           CapellaImportException)
         self.xmlText = xmlText
         return xmlText
 
@@ -539,7 +541,7 @@ class CapellaImporter:
         noteNameWithOctave = headElement.attrib['pitch']
         n = note.Note()
         n.nameWithOctave = noteNameWithOctave
-        n.octave = n.pitch.implicitOctave - 1  # capella octaves are 1 off
+        n.octave = n.pitch.octave - 1  # capella octaves are 1 off
 
         alters = headElement.findall('alter')
         if len(alters) > 1:
@@ -841,7 +843,7 @@ class CapellaImporter:
             denominator = 1
             while numerator > denominator * 2:
                 denominator *= 2
-        if 'prolong' in tupletElement.attrib and tupletElement.attrib['count'] == 'true':
+        if 'prolong' in tupletElement.attrib and tupletElement.attrib['prolong'] == 'true':
             denominator *= 2
 
         if 'tripartite' in tupletElement.attrib:
@@ -851,7 +853,7 @@ class CapellaImporter:
         tup = duration.Tuplet(numerator, denominator)
         return tup
 
-    barlineMap = {'single': 'normal',
+    barlineMap = {'single': 'regular',
                   'double': 'double',
                   'end': 'final',
                   'repEnd': 'end',
@@ -877,7 +879,6 @@ class CapellaImporter:
         >>> repeatTag = ci.domElementFromText('<barline type="repEndBegin"/>')
         >>> ci.barlineListFromBarline(repeatTag)
         [<music21.bar.Repeat direction=end>, <music21.bar.Repeat direction=start>]
-
         '''
         barlineList: list[bar.Barline] = []
         hasRepeatEnd = False
@@ -919,6 +920,46 @@ class Test(unittest.TestCase):
         self.assertGreater(len(partScore.recurse().notes), 20)
         self.assertIn('mass!', text.assembleLyrics(partScore.parts[0], 1))
         self.assertIn('scherz', text.assembleLyrics(partScore.parts[0], 2))
+
+    def testScoreXMLSizeLimit(self):
+        '''
+        A score.xml that uncompresses to more than
+        common.fileTools.MAX_UNCOMPRESSED_BYTES raises CapellaImportException.
+        '''
+        from unittest import mock
+        from music21 import environment
+
+        fp = environment.Environment().getTempFile('.capx')
+        try:
+            with zipfile.ZipFile(fp, 'w', zipfile.ZIP_DEFLATED) as zf:
+                zf.writestr('score.xml', '<score/>' + ' ' * 2000)
+            ci = CapellaImporter()
+            with mock.patch.object(common.fileTools, 'MAX_UNCOMPRESSED_BYTES', 1000):
+                with self.assertRaisesRegex(CapellaImportException, 'more than 1000 bytes'):
+                    ci.readCapellaXMLFile(fp)
+            self.assertEqual(len(ci.readCapellaXMLFile(fp)), 2008)
+        finally:
+            os.remove(fp)
+
+    def testSingleBarline(self):
+        ci = CapellaImporter()
+        barlineTag = ci.domElementFromText('<barline type="single"/>')
+        barlines = ci.barlineListFromBarline(barlineTag)
+        self.assertEqual(len(barlines), 1)
+        self.assertEqual(barlines[0].type, 'regular')
+
+    def testTupletProlong(self):
+        ci = CapellaImporter()
+        tupletTag = ci.domElementFromText('<tuplet count="3" prolong="true"/>')
+        tup = ci.tupletFromTuplet(tupletTag)
+        self.assertEqual((tup.numberNotesActual, tup.numberNotesNormal), (3, 4))
+        tupletTag = ci.domElementFromText('<tuplet count="3" prolong="false"/>')
+        tup = ci.tupletFromTuplet(tupletTag)
+        self.assertEqual((tup.numberNotesActual, tup.numberNotesNormal), (3, 2))
+        for count in (5, 6):
+            tupletTag = ci.domElementFromText(f'<tuplet count="{count}" prolong="true"/>')
+            tup = ci.tupletFromTuplet(tupletTag)
+            self.assertEqual((tup.numberNotesActual, tup.numberNotesNormal), (count, 8))
 
 class TestExternal(unittest.TestCase):
     show = True

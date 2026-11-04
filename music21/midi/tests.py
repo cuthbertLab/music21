@@ -32,6 +32,7 @@ from music21.midi.translate import (
     midiEventToInstrument,
     midiEventsToNote,
     midiFileToStream,
+    midiTrackToStream,
     noteToMidiEvents,
     packetStorageFromSubstreamList,
     prepareStreamForMidi,
@@ -508,7 +509,7 @@ class Test(unittest.TestCase):
                  instrument.Flute,
                  instrument.Vibraphone,  # not 10
                  instrument.BassDrum,  # 10
-                 instrument.HiHatCymbal,  # 10
+                 instrument.HiHat,  # 10
                  ]
         iObjs = []
 
@@ -1548,6 +1549,60 @@ class Test(unittest.TestCase):
         self.assertEqual(len(note_ons), 3)
         self.assertEqual([ev.pitch for ev in note_ons], [67, 60, 60])
 
+    @staticmethod
+    def _unpitched(midiNumber):
+        u = note.Unpitched()
+        u.storedInstrument = instrument.UnpitchedPercussion()
+        u.storedInstrument.percMapPitch = midiNumber
+        return u
+
+    def testUnmappedPercussionRoundTrip(self):
+        '''
+        22 is not in the GM map; 39 (Hand Clap) is, but has no class.
+        '''
+        m = stream.Measure([
+            instrument.UnpitchedPercussion(),
+            self._unpitched(22),
+            self._unpitched(39),
+            percussion.PercussionChord(
+                [self._unpitched(22), self._unpitched(36), self._unpitched(39)]),
+        ])
+        b = converter.toData(m, fmt='midi')
+        s = converter.parseData(b, fmt='midi')
+        single22, single39, ch = s[note.NotRest]
+        self.assertEqual(single22.storedInstrument.percMapPitch, 22)
+        self.assertEqual(single22.storedInstrument.instrumentName, 'Percussion')
+        self.assertEqual(single39.storedInstrument.percMapPitch, 39)
+        self.assertEqual(single39.storedInstrument.instrumentName, 'Hand Clap')
+        self.assertEqual(
+            [u.storedInstrument.percMapPitch for u in ch.notes], [22, 36, 39])
+
+        tracks = streamHierarchyToMidiTracks(s)
+        note_ons = [
+            ev for ev in tracks[1].events if ev.type is ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual([ev.pitch for ev in note_ons], [22, 39, 22, 36, 39])
+
+    def testTambourineImportsHeadless(self):
+        b = converter.toData(
+            stream.Measure([instrument.UnpitchedPercussion(), self._unpitched(54)]),
+            fmt='midi')
+        s = converter.parseData(b, fmt='midi')
+        tamb = s[note.Unpitched].first().storedInstrument
+        self.assertIsInstance(tamb, instrument.Tambourine)
+        self.assertTrue(tamb.headless)
+
+    def testWhistleRoundTrip(self):
+        b = converter.toData(
+            stream.Measure([instrument.UnpitchedPercussion(), self._unpitched(71)]),
+            fmt='midi')
+        s = converter.parseData(b, fmt='midi')
+        wh = s[note.Unpitched].first().storedInstrument
+        self.assertIsInstance(wh, instrument.Whistle)
+        tracks = streamHierarchyToMidiTracks(s)
+        note_ons = [
+            ev for ev in tracks[1].events if ev.type is ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual([ev.pitch for ev in note_ons], [71])
+
     def testMidiImportLyrics(self):
         lyricFactZh = ['明', '山', '涌', '水', '郁', '郁', '葱', '', '葱',
                        '钟', '灵', '毓', '秀', '海', '天', '', '东',
@@ -1637,6 +1692,50 @@ class Test(unittest.TestCase):
         c = ChannelVoiceMessages.NOTE_OFF
         self.assertIn(c, ChannelVoiceMessages)
         self.assertTrue(c in ChannelVoiceMessages)
+
+    def testProgramChangeAfterTrackName(self):
+        '''
+        A program change after the start of a track adds an instrument there
+        and keeps the instrument at the start.
+
+        AI-assisted (Claude).
+        '''
+        mt = MidiTrack(1)
+
+        def addEvent(ticks: int, eventType, data=None, midiPitch=None):
+            mt.events.append(DeltaTime(mt, time=ticks, channel=1))
+            me = MidiEvent(mt, type=eventType, channel=1)
+            if data is not None:
+                me.data = data
+            if midiPitch is not None:
+                me.pitch = midiPitch
+                me.velocity = 90
+            mt.events.append(me)
+
+        addEvent(0, MetaEvents.SEQUENCE_TRACK_NAME, data=b'Viola')
+        addEvent(0, ChannelVoiceMessages.PROGRAM_CHANGE, data=41)
+        addEvent(0, ChannelVoiceMessages.NOTE_ON, midiPitch=60)
+        addEvent(2048, ChannelVoiceMessages.NOTE_OFF, midiPitch=60)
+        addEvent(0, ChannelVoiceMessages.PROGRAM_CHANGE, data=40)
+        addEvent(0, ChannelVoiceMessages.NOTE_ON, midiPitch=62)
+        addEvent(2048, ChannelVoiceMessages.NOTE_OFF, midiPitch=62)
+        addEvent(0, MetaEvents.END_OF_TRACK, data=b'')
+
+        p = midiTrackToStream(mt, ticksPerQuarter=1024)
+        self.assertEqual(
+            [(inst.classes[0], inst.partName, inst.getOffsetInHierarchy(p))
+                for inst in p[instrument.Instrument]],
+            [('Viola', 'Viola', 0.0), ('Violin', None, 2.0)]
+        )
+
+    def testImportNoteTooLongForMeasures(self):
+        data = (b'MThd\x00\x00\x00\x06\x00\x00\x00\x01\x00\x01'
+                + b'MTrk\x00\x00\x00\x0f'
+                + b'\x00\x90\x3c\x40'
+                + b'\xff\xff\xff\x7f\x80\x3c\x00'
+                + b'\x00\xff\x2f\x00')
+        with self.assertRaisesRegex(stream.StreamException, 'more than 100000 measures'):
+            converter.parse(data, format='midi')
 
 
 # ------------------------------------------------------------------------------

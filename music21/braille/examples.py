@@ -87,6 +87,10 @@ Measure 1 Left, Signature Grouping 1:
 B- major
 <music21.meter.TimeSignature 3/8>
 ====
+Measure 1 Right, Metronome Mark Grouping 1:
+<music21.tempo.MetronomeMark Quarter=75 (playback only)>
+<BLANKLINE>
+====
 Measure 1 Right, Note Grouping 1:
 <music21.clef.TrebleClef>
 Word ⠜
@@ -268,6 +272,10 @@ Time Signature 3/8 ⠼⠉⠦
 Measure 1 Left, Signature Grouping 1:
 B- major
 <music21.meter.TimeSignature 3/8>
+====
+Measure 1 Right, Metronome Mark Grouping 1:
+<music21.tempo.MetronomeMark Quarter=75 (playback only)>
+
 ====
 Measure 1 Right, Note Grouping 1:
 <music21.clef.TrebleClef>

@@ -203,7 +203,7 @@ def rabinMiller(n):
 
     # primes up to 100;  2, 3 handled by mod 6
     primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
-               47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+              47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 
     if n <= 100:
         if n in primes:
@@ -253,7 +253,6 @@ def discreteBinaryPad(series: Iterable[int], fixRange=None) -> list[int]:
 
     >>> sieve.discreteBinaryPad([3, 4, 5])
     [1, 1, 1]
-
     '''
     # make sure these are ints
     for x in series:
@@ -293,7 +292,6 @@ def unitNormRange(series, fixRange=None):
 
     >>> sieve.unitNormRange([1, 3, 4])
     [0.0, 0.666..., 1.0]
-
     '''
     if fixRange is not None:
         fixRange.sort()
@@ -367,7 +365,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
     >>> post = sieve.unitNormStep(0.25, 0, 20, normalized=False)
     >>> len(post)
     81
-
     '''
     if a == b:
         return []  # no range, return boundary
@@ -487,7 +484,7 @@ class PrimeSegment:
             segNeg = [-x for x in segNeg]  # make negative
             if len(segNeg) < self.length:
                 segPos = self._fillRabinMiller(0, self.length - len(segNeg),
-                                                         None, 'up')
+                                               None, 'up')
                 self.seg = segNeg + segPos
             else:  # add positive values
                 self.seg = segNeg
@@ -586,14 +583,11 @@ class Residual:
             segmentFormat = self._segmentFormat
 
         subset = []
-        if self._m == 0:
-            return subset  # empty
-
-        n = (n + self._shift) % self._m  # check for n >= m
-
-        for value in z:
-            if n == value % self._m:
-                subset.append(value)
+        if self._m != 0:
+            n = (n + self._shift) % self._m  # check for n >= m
+            for value in z:
+                if n == value % self._m:
+                    subset.append(value)
         if self._neg:  # find opposite
             compSet = copy.deepcopy(z)
             for value in subset:
@@ -869,7 +863,6 @@ class CompressionSegment:
     # --------------------------------------------------------------------------
     def __call__(self):
         '''
-
         >>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8])
         >>> b = a()
         >>> str(b[0])
@@ -1053,7 +1046,7 @@ class Sieve:
             try:
                 self._cmpIntersection()
                 self._expType = 'simple'  # only if successful
-            except TypeError:  # attempted intersection of complemented
+            except (TypeError, ResidualException):  # attempted intersection of complemented
                 try:
                     self._cmpSegment()
                 except IndexError:  # no segments available
@@ -2010,9 +2003,6 @@ class PitchSieve:
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def testDummy(self):
-        self.assertEqual(True, True)
-
     def pitchOut(self, listIn):
         out = '['
         for p in listIn:
@@ -2041,6 +2031,15 @@ class Test(unittest.TestCase):
             # environLocal.printDebug(['testSieveParse', arg])
             testObj = Sieve(arg)
             dummy = testObj(0, list(range(30)))
+
+    def testComplementOfEmptyResidual(self):
+        z = list(range(6))
+        self.assertEqual(Residual(0, 0).segment(0, z), [])
+        self.assertEqual(Residual(0, 0, neg=True).segment(0, z), z)
+        self.assertEqual(Sieve('-0@0', z).segment('exp'), z)
+        self.assertEqual(Sieve('-0@0', z).segment('cmp'), z)
+        self.assertEqual(Residual(0, 0).segment(0, z, 'bin'), [0] * 6)
+        self.assertEqual(Sieve('-0@0|3@1', z).segment('exp'), z)
 
     def testSievePitch(self):
         unused_testObj = PitchSieve('-5 | 4 & 4sub3 & 6', 'b3', 'f#4')
@@ -2097,22 +2096,18 @@ class Test(unittest.TestCase):
                          '{-{13@3|13@5|13@7|13@9}&11@2}|{-{11@4|11@8}&13@9}|{13@0|13@1|13@6}')
 
     def testPitchSieveA(self):
-        from music21 import sieve
-
-        s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6')
+        s1 = PitchSieve('3@0|7@0', 'c2', 'c6')
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, E-2, F#2, G2, A2, C3, D3, E-3, F#3, A3, C4, E-4, '
                          'E4, F#4, A4, B4, C5, E-5, F#5, A5, C6]')
 
-        s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6', eld=2)
+        s1 = PitchSieve('3@0|7@0', 'c2', 'c6', eld=2)
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, D2, F#2, C3, E3, F#3, C4, F#4, C5, F#5, G#5, C6]')
 
     def testPitchSieveB(self):
-        from music21 import sieve
-
         # microtonal elds
-        s1 = sieve.PitchSieve('1@0', 'c2', 'c6', eld=0.5)
+        s1 = PitchSieve('1@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, C~2, C#2, C#~2, D2, D~2, E-2, E`2, E2, E~2, F2, F~2, F#2, '
                          'F#~2, G2, G~2, G#2, G#~2, A2, A~2, B-2, B`2, B2, B~2, C3, C~3, C#3, '
@@ -2122,11 +2117,20 @@ class Test(unittest.TestCase):
                          'B`4, B4, B~4, C5, C~5, C#5, C#~5, D5, D~5, E-5, E`5, E5, E~5, F5, F~5, '
                          'F#5, F#~5, G5, G~5, G#5, G#~5, A5, A~5, B-5, B`5, B5, B~5, C6]')
 
-        s1 = sieve.PitchSieve('3@0', 'c2', 'c6', eld=0.5)
+        s1 = PitchSieve('3@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
                          '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, '
                          'A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, '
                          'G~5, A5, B`5, C6]')
+
+    def testIntersectComplementUnbracketed(self):
+        # an unbracketed intersection with a complemented residual
+        # should evaluate the same as the bracketed form
+        z = list(range(24))
+        for formula in ('3@1&-4@2', '-4@2&3@1'):
+            self.assertEqual(Sieve(formula, z=z)(),
+                             Sieve(f'({formula})', z=z)())
+        self.assertEqual(Sieve('3@1&-4@2', z=z)(), [1, 4, 7, 13, 16, 19])
 
 # sieve that breaks LCM
 # >>> t = sieve.Sieve((3, 99, 123123, 2433, 2050))

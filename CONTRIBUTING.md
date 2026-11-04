@@ -17,6 +17,14 @@ In 2026 we welcome AI-Assisted contributions, but users must take responsibility
 they must match the code-style of the rest of the music21 project. "Slop that works somehow" will
 not be accepted.
 
+When opening an issue or pull request in Github, templates will appear to guide you in making
+the request.  If you are opening in a different way, like through an agent tool, those
+templates may not appear -- be sure your agent is reading them in `.github/` anyhow, since
+they are required to be used. Thanks!
+
+If this is your first PR, an automated check of your account credentials will be run and if
+there are any issues this will be posted publicly as a comment on the PR.
+
 ## Resources ##
 
 [Module Documentation and User's Guide](https://www.music21.org/music21docs/)

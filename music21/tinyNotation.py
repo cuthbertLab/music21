@@ -4,7 +4,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
@@ -340,6 +340,14 @@ class TieState(State):
     '''
     autoExpires = 2
 
+    def affectTokenAfterParse(self, m21Obj):
+        '''
+        Ties only notes and rests; other tokens pass through.
+        '''
+        if not isinstance(m21Obj, note.GeneralNote):
+            return m21Obj
+        return super().affectTokenAfterParse(m21Obj)
+
     def end(self):
         '''
         End the tie state by applying tie ties to the appropriate notes.
@@ -372,8 +380,10 @@ class TupletState(State):
 
     def affectTokenAfterParse(self, n):
         '''
-        Puts a tuplet on the note.
+        Puts a tuplet on a note or rest.
         '''
+        if not isinstance(n, note.GeneralNote):
+            return n
         super().affectTokenAfterParse(n)
         newTup = duration.Tuplet()
         newTup.durationActual = duration.durationTupleFromTypeDots(n.duration.type, 0)
@@ -517,6 +527,8 @@ class NoteOrRestToken(Token):
         self.durationFound = True
         typeNum = int(search.group(1))
         if typeNum == 0:
+            # NOTE: using 0 to mean full-bar + fermata was never fully documented.
+            #    it is considered deprecated.
             if parent.stateDict['currentTimeSignature'] is not None:
                 element.duration = copy.deepcopy(
                     parent.stateDict['currentTimeSignature'].barDuration
@@ -1133,7 +1145,7 @@ class Converter:
         self.modifierSquare = None
         self.modifierUnderscore = LyricModifier
 
-        self.makeNotation = makeNotation
+        self.makeNotation: bool = makeNotation
         self.raiseExceptions = raiseExceptions
         # will be filled by self.setupRegularExpressions()
         self._tokenMapRe: list[tuple[typing.Pattern, type]] = []
@@ -1270,7 +1282,10 @@ class Converter:
             numberOfStatesToEnd = len(self.activeStates)
 
         for i in range(numberOfStatesToEnd):
-            stateToRemove = self.activeStates.pop()
+            stateIndex = len(self.activeStates) - 1
+            while stateIndex > 0 and self.activeStates[stateIndex].autoExpires is not False:
+                stateIndex -= 1
+            stateToRemove = self.activeStates.pop(stateIndex)
             possibleObj = stateToRemove.end()
             if possibleObj is not None:
                 self.stream.coreAppend(possibleObj)
@@ -1408,7 +1423,7 @@ class Converter:
 
         It currently runs `.makeMeasures()` on `.stream` unless `.makeNotation` is `False`.
         '''
-        if self.makeNotation is not False:
+        if self.makeNotation:
             self.stream.makeMeasures(inPlace=True)
 
 
@@ -1556,6 +1571,32 @@ class Test(unittest.TestCase):
             "Token 'e}}' closes more states than are open"
         ):
             c.parse()
+
+    def testCloseBracketAfterTie(self):
+        c = Converter('4/4 trip{c8 d e~} e4 f2')
+        c.parse()
+        notes = list(c.stream.recurse().notes)
+        self.assertEqual([n.tie.type if n.tie else None for n in notes],
+                         [None, None, 'start', 'stop', None])
+        self.assertEqual([n.duration.quarterLength for n in notes],
+                         [fractions.Fraction(1, 3)] * 3 + [1.0, 2.0])
+        self.assertEqual(notes[2].duration.tuplets[0].type, 'stop')
+
+    def testStateDoesNotAffectTimeSignature(self):
+        c = Converter('2/4 trip{c8 d 4/4} e4 f4 g2')
+        c.parse()
+        s = c.stream
+        self.assertEqual(s[meter.TimeSignature].last().ratioString, '4/4')
+        notes = list(s.recurse().notes)
+        self.assertEqual([n.duration.quarterLength for n in notes],
+                         [fractions.Fraction(1, 3)] * 2 + [1.0, 1.0, 2.0])
+        self.assertEqual([n.duration.tuplets[0].type for n in notes[:2]], ['start', 'stop'])
+
+    def testTiePastTimeSignature(self):
+        c = Converter('4/4 c1~ 3/4 c2.')
+        c.parse()
+        notes = list(c.stream.recurse().notes)
+        self.assertEqual([n.tie.type if n.tie else None for n in notes], ['start', 'stop'])
 
 
 class TestExternal(unittest.TestCase):
