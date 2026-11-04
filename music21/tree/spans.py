@@ -6,7 +6,7 @@
 # Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2013-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -350,6 +350,9 @@ class ElementTimespan(Timespan):
     def __eq__(self, other: object) -> bool:
         return self is other
 
+    def __hash__(self) -> int:
+        return object.__hash__(self)
+
     def __repr__(self) -> str:
         typeName = type(self).__name__
         return f'<{typeName} ({self.offset} to {self.endTime}) {self.element!r}>'
@@ -634,7 +637,14 @@ class PitchedTimespan(ElementTimespan):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-    pass
+
+    def testElementTimespanHashesByIdentity(self):
+        from music21 import note
+
+        n = note.Note('C4')
+        ts1 = PitchedTimespan(0.0, 1.0, n)
+        ts2 = PitchedTimespan(0.0, 1.0, n)
+        self.assertEqual(len({ts1, ts2, ts1}), 2)
 
 
 if __name__ == '__main__':

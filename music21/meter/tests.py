@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -17,11 +17,14 @@ import unittest
 
 from music21 import common
 from music21 import duration
+from music21.exceptions21 import MeterException
 from music21 import note
 from music21 import stream
 from music21.exceptions21 import TimeSignatureException
 from music21.meter.base import TimeSignature
-from music21.meter.core import MeterSequence, MeterTerminal
+from music21.meter.core import (
+    MeterSequence, MeterTerminal, getMeterSequence, getMeterTerminal,
+)
 
 class TestExternal(unittest.TestCase):
     show = True
@@ -78,23 +81,46 @@ class TestExternal(unittest.TestCase):
 
 class Test(unittest.TestCase):
     def testMeterSubdivision(self):
-        a = MeterSequence()
-        a.load('4/4', 4)
+        a = MeterSequence('4/4', 4)
         self.assertEqual(str(a), '{1/4+1/4+1/4+1/4}')
 
-        a[0] = a[0].subdivide(2)
+        a = a.setIndex(0, a[0].subdivide(2))
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+1/4}')
 
-        a[3] = a[3].subdivide(4)
+        a = a.setIndex(3, a[3].subdivide(4))
         self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}')
 
+    def testGetItemNegativeIndex(self):
+        # ms[-len(ms)] raised IndexError, so ms[-1] on a single part did too
+        ms = MeterSequence('3/8+2/8+1/8')
+        self.assertEqual(str(ms[-1]), '1/8')
+        self.assertEqual(str(ms[-3]), '3/8')
+        self.assertEqual(str(MeterSequence('4/4')[-1]), '4/4')
+        for outOfRange in (3, -4):
+            with self.assertRaisesRegex(IndexError, str(outOfRange), msg=outOfRange):
+                unused_part = ms[outOfRange]
+
+    def testPartitionOptionsAddUpToMeter(self):
+        # 18/4 offered 4/4+4/4+4/4+4/4 (only 16/4); 14/8 offered 3/8 four times (only 12/8)
+        for meterString in ('18/4', '14/8'):
+            ms = MeterSequence(meterString)
+            for option in ms.getPartitionOptions():
+                self.assertEqual(MeterSequence(list(option)).duration.quarterLength,
+                                 ms.duration.quarterLength,
+                                 f'{meterString}: {option}')
+
+        # no way left to make four parts of 18/4, so raise or use the default
+        with self.assertRaises(MeterException):
+            MeterSequence('18/4').partitionedByCount(4, loadDefault=False)
+        self.assertEqual(str(MeterSequence('18/4').partitionedByCount(4)),
+                         '{' + '+'.join(['3/4'] * 6) + '}')
+
     def testMeterSequenceDeepcopy(self):
-        a = MeterSequence()
-        a.load('4/4', 4)
+        a = MeterSequence('4/4', 4)
         b = copy.deepcopy(a)
-        self.assertIsNot(a, b)
-        # TODO: equity of meter sequences not yet defined.
-        # self.assertEqual(a, b)
+        # a MeterSequence is immutable, so deepcopy returns the same object
+        self.assertIs(a, b)
+        self.assertEqual(a, b)
 
     def testTimeSignatureDeepcopy(self):
         c = TimeSignature('4/4')
@@ -105,6 +131,148 @@ class Test(unittest.TestCase):
         e = TimeSignature('slow 6/8')
         f = TimeSignature('fast 6/8')
         self.assertNotEqual(e, f)
+
+    def testMeterTerminalCache(self):
+        # this is an internal test, so it inspects the private cache directly
+        from music21.meter.core import _meterTerminalCache
+        # the cache key is (numerator, denominator, weight); asking again gives
+        # the same object
+        a = getMeterTerminal(1, 4)
+        self.assertIs(_meterTerminalCache[(1, 4, 1.0)], a)
+        self.assertIs(a, getMeterTerminal(1, 4))
+        self.assertIs(a, getMeterTerminal(numerator=1, denominator=4, weight=1.0))
+        # a different weight is a different terminal, stored under its own key
+        b = getMeterTerminal(1, 4, weight=0.5)
+        self.assertIsNot(a, b)
+        self.assertIs(_meterTerminalCache[(1, 4, 0.5)], b)
+        # equal however they were made
+        self.assertEqual(MeterTerminal('1/4'), getMeterTerminal(1, 4))
+
+    def testMeterTerminalModify(self):
+        a = getMeterTerminal(2, 4, weight=0.5)
+        # modify changes only what is named; the rest carries over
+        b = a.modify(weight=0.25)
+        self.assertEqual((b.numerator, b.denominator, b.weight), (2, 4, 0.25))
+        c = a.modify(numerator=3)
+        self.assertEqual((c.numerator, c.denominator, c.weight), (3, 4, 0.5))
+        # the original is unchanged and setting an attribute raises
+        self.assertEqual(a.weight, 0.5)
+        with self.assertRaises(TypeError):
+            a.weight = 0.25
+        # asking again gives the same object; __replace__ is the same as modify
+        self.assertIs(a.modify(weight=0.25), b)
+        self.assertIs(a.__replace__(numerator=3), c)
+        # any other keyword raises
+        with self.assertRaises(ValueError):
+            a.modify(parenthesis=True)
+
+    def testMeterSequenceCache(self):
+        # this is an internal test, so it inspects the private caches directly
+        from music21.meter.core import _meterSequenceCache
+        from music21.meter.base import _defaultSequenceCache
+        # asking again gives the same object, the one in the cache
+        ms = getMeterSequence('4/4', 4)
+        self.assertIs(getMeterSequence('4/4', 4), ms)
+        self.assertTrue(any(cached is ms for cached in _meterSequenceCache.values()))
+        # TimeSignature.load caches (display, beam, beat, accent) sequences by
+        # (value, divisions); a second 4/4 uses the same ones
+        a = TimeSignature('4/4')
+        display, beam, beat, accent = _defaultSequenceCache[('4/4', None)]
+        self.assertIs(a.displaySequence, display)
+        self.assertIs(a.beamSequence, beam)
+        self.assertIs(a.beatSequence, beat)
+        self.assertIs(a.accentSequence, accent)
+        b = TimeSignature('4/4')
+        for seqName in ('beamSequence', 'beatSequence',
+                        'accentSequence', 'displaySequence'):
+            self.assertIs(getattr(a, seqName), getattr(b, seqName), seqName)
+
+    def testMeterSequenceModify(self):
+        a = MeterSequence('4/4', 4)
+        self.assertFalse(a.parenthesis)
+        b = a.modify(parenthesis=True)
+        self.assertTrue(b.parenthesis)
+        self.assertFalse(a.parenthesis)  # original unchanged
+        # setting an attribute raises
+        with self.assertRaises(TypeError):
+            a.parenthesis = True
+        # two separate sequences modified the same way give the same object
+        self.assertIs(b, MeterSequence('4/4', 4).modify(parenthesis=True))
+        # numerator, denominator, and weight come from the partition, so they raise
+        for kw in ({'numerator': 3}, {'denominator': 8}, {'weight': 1.5}):
+            with self.assertRaises(ValueError):
+                a.modify(**kw)
+
+    def testBarDurationCannotBeChanged(self):
+        # changing the copy that barDuration used to return was silently lost
+        ts = TimeSignature('3/4')
+        self.assertIsInstance(ts.barDuration, duration.FrozenDuration)
+        with self.assertRaises(TypeError):
+            ts.barDuration.quarterLength = 7.0
+        self.assertEqual(ts.barDuration.quarterLength, 3.0)
+        self.assertEqual(ts.barDuration, duration.Duration(3.0))
+
+        # an assigned duration is returned as given
+        override = duration.Duration(7.0)
+        ts.barDuration = override
+        self.assertIs(ts.barDuration, override)
+
+    def testEmptySequenceDuration(self):
+        self.assertEqual(MeterSequence().duration.quarterLength, 0.0)
+
+    def testModifyDenominatorMustBePowerOfTwo(self):
+        a = MeterTerminal('3/4')
+        self.assertEqual(a.modify(denominator=256).denominator, 256)
+        for badDenominator in (0, 7, 12):
+            with self.assertRaises(MeterException):
+                a.modify(denominator=badDenominator)
+
+    def testNoneIsFourFour(self):
+        self.assertEqual(TimeSignature(None).ratioString, '4/4')
+
+    def testInPlaceFormsRaise(self):
+        ts = TimeSignature('6/8')
+        before = ts.beatSequence
+        removed = [
+            ('partition', (6,), 'partitioned'),
+            ('partitionByCount', (6,), 'partitionedByCount'),
+            ('partitionByList', ([1, 1, 1, 1, 1, 1],), 'partitionedByList'),
+            ('partitionByOtherMeterSequence', (MeterSequence('6/8', 6),),
+             'partitionedByOtherMeterSequence'),
+            ('subdividePartitionsEqual', (3,), 'subdividedPartitionsEqual'),
+            ('subdivideNestedHierarchy', (3,), 'subdividedNestedHierarchy'),
+            ('setLevelWeight', ([1, 2],), 'withLevelWeight'),
+        ]
+        for oldName, arguments, newName in removed:
+            with self.assertRaisesRegex(MeterException, newName + '[(][)]', msg=oldName):
+                getattr(ts.beatSequence, oldName)(*arguments)
+            getattr(ts.beatSequence, newName)(*arguments)
+        self.assertIs(ts.beatSequence, before)
+
+        with self.assertRaisesRegex(MeterException, r"MeterSequence\('4/4'\)"):
+            MeterSequence().load('4/4')
+        with self.assertRaisesRegex(TypeError, r'setIndex\(0, value\)'):
+            ts.beatSequence[0] = ts.beatSequence[0].subdivide(3)
+
+        mt = MeterTerminal('3/4')
+        for attribute, value in (('numerator', 2), ('denominator', 8), ('weight', 0.5),
+                                 ('duration', duration.Duration(2.0))):
+            with self.assertRaises(TypeError, msg=attribute):
+                setattr(mt, attribute, value)
+        for attribute, value in (('weight', 0.5), ('parenthesis', True),
+                                 ('summedNumerator', True)):
+            with self.assertRaises(TypeError, msg=attribute):
+                setattr(ts.beatSequence, attribute, value)
+        self.assertIs(ts.beatSequence, before)
+        self.assertEqual(str(mt), '3/4')
+
+    def testDefaultBeamsLargeCompoundMeter(self):
+        # 24/8 had 8 beats under one unbroken beam; only numerators through 21 grouped in threes
+        ts = TimeSignature('24/8')
+        self.assertEqual(str(ts.beamSequence), '{' + '+'.join(['3/8'] * 8) + '}')
+        self.assertEqual(len(ts.beamSequence), ts.beatCount)
+        # not a multiple of 3: beam all together
+        self.assertEqual(str(TimeSignature('20/8').beamSequence), '{20/8}')
 
     def testGetBeams(self):
         ts = TimeSignature('6/8')
@@ -190,13 +358,18 @@ class Test(unittest.TestCase):
 
     def testOffsetToDepth(self):
         # get a maximally divided 4/4 to the level of 1/8
+        def recSub(node, remaining):
+            # subdivide node by 2, `remaining` levels deep
+            if remaining == 0:
+                return node
+            sub = node.subdivide(2)
+            for idx in range(len(sub)):
+                sub = sub.setIndex(idx, recSub(sub[idx], remaining - 1))
+            return sub
+
         a = MeterSequence('4/4')
         for h in range(len(a)):
-            a[h] = a[h].subdivide(2)
-            for i in range(len(a[h])):
-                a[h][i] = a[h][i].subdivide(2)
-                for j in range(len(a[h][i])):
-                    a[h][i][j] = a[h][i][j].subdivide(2)
+            a = a.setIndex(h, recSub(a[h], 3))
 
         # matching with starts result in a Lerdahl-Jackendoff style depth
         match = [4, 1, 2, 1, 3, 1, 2, 1]
@@ -316,36 +489,28 @@ class Test(unittest.TestCase):
                                  beatDur[i])
 
     def testSubdividePartitionsEqual(self):
-        ms = MeterSequence('2/4')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('2/4').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/4+1/4}}')
 
-        ms = MeterSequence('3/4')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('3/4').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/4+1/4+1/4}}')
 
-        ms = MeterSequence('6/8')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('6/8').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{3/8+3/8}}')
 
-        ms = MeterSequence('6/16')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('6/16').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{3/16+3/16}}')
 
-        ms = MeterSequence('3/8+3/8')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('3/8+3/8').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/8+1/8+1/8}+{1/8+1/8+1/8}}')
 
-        ms = MeterSequence('2/8+3/8')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('2/8+3/8').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/8+1/8}+{1/8+1/8+1/8}}')
 
-        ms = MeterSequence('5/8')
-        ms.subdividePartitionsEqual(None)
+        ms = MeterSequence('5/8').subdividedPartitionsEqual(None)
         self.assertEqual(str(ms), '{{1/8+1/8+1/8+1/8+1/8}}')
 
-        ms = MeterSequence('3/8+3/4')
-        ms.subdividePartitionsEqual(None)  # can partition by another
+        ms = MeterSequence('3/8+3/4').subdividedPartitionsEqual(None)  # can partition by another
         self.assertEqual(str(ms), '{{1/8+1/8+1/8}+{1/4+1/4+1/4}}')
 
     def testSetDefaultAccentWeights(self):
@@ -443,7 +608,7 @@ class Test(unittest.TestCase):
         from music21 import meter
         # create a meter with 6 beats but beams in 2 groups
         ts = meter.TimeSignature('6/8')
-        ts.beatSequence.partition(6)
+        ts.beatSequence = ts.beatSequence.partitioned(6)
         self.assertEqual(str(ts.beatSequence), '{1/8+1/8+1/8+1/8+1/8+1/8}')
         self.assertEqual(str(ts.beamSequence), '{3/8+3/8}')
 

@@ -20,6 +20,7 @@ from music21 import clef
 from music21.common.enums import ElementSearch, OffsetSpecial
 from music21 import converter
 from music21 import corpus
+from music21 import duration
 from music21 import dynamics
 from music21 import editorial
 from music21 import exceptions21
@@ -38,6 +39,24 @@ class MockObject(Music21Object):
 
 
 class Test(unittest.TestCase):
+
+    def testVersionReadableByPackaging(self):
+        '''
+        Installers and PyPI read versions with the `packaging` library, which
+        raises InvalidVersion on anything outside its rules.  A version it would
+        respell (11.0.0-beta16) is wrong too: tools would show a different string.
+        '''
+        from packaging.version import Version
+        parsed = Version(base.__version__)
+        self.assertEqual(str(parsed), base.__version__)
+        self.assertEqual(parsed.release, base.__version_info__[:3])
+
+    def testVersionNamesNotInStarImport(self):
+        import music21  # pylint: disable=redefined-outer-name
+        for name in ('__version__', '__version_info__', 'VERSION', 'VERSION_STR'):
+            self.assertNotIn(name, music21.__all__)
+            self.assertNotIn(name, base.__all__)
+            self.assertEqual(getattr(music21, name), getattr(base, name))
 
     def testM21ObjRepr(self):
         a = base.Music21Object()
@@ -78,6 +97,33 @@ class Test(unittest.TestCase):
         n.groups[0] = 'bassoon'
         self.assertFalse('flute' in n.groups)
         self.assertTrue('flute' in b.groups)
+
+    def testFrozenDurationInConstructor(self):
+        # Note(duration=ts.barDuration) raised while setting the duration's client
+        ts = meter.TimeSignature('2/4')
+        n = note.Note(duration=ts.barDuration)
+        self.assertIs(n.duration, ts.barDuration)
+        with self.assertRaises(TypeError):
+            n.duration.dots = 2
+        self.assertEqual(ts.barDuration.quarterLength, 2.0)
+
+    def testAssignFrozenDurationStaysFrozen(self):
+        '''
+        A note can be given a FrozenDuration, such as a MeterSequence's.  It stays
+        frozen: changing the note's length raises unless it is unfrozen first.
+        '''
+        frozen = meter.MeterSequence('4/4').duration
+        self.assertIsInstance(frozen, duration.FrozenDuration)
+
+        n = note.Note()
+        n.duration = frozen
+        self.assertIs(n.duration, frozen)
+        self.assertIsNone(frozen.client)
+
+        # n.quarterLength = x sets n.duration.quarterLength, which raises
+        with self.assertRaises(TypeError):
+            n.quarterLength = 3.0
+        self.assertEqual(frozen.quarterLength, 4.0)  # untouched
 
     def testOffsets(self):
         a = ElementWrapper(note.Note('A#'))

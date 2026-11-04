@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2023 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -129,6 +129,7 @@ from music21 import bar
 from music21 import base
 from music21 import common
 from music21.common.types import OffsetQL
+from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import harmony
@@ -604,6 +605,9 @@ class PartTranslator:
         implied by `measureToken`.
         '''
         p = self.p
+        if len(p) + measureToken.number[0] - self.lastMeasureNumber > defaults.maxMeasures:
+            raise RomanTextTranslateException(
+                f'cannot make more than {defaults.maxMeasures} measures')
         for i in range(self.lastMeasureNumber + 1, measureToken.number[0]):
             mFill = stream.Measure()
             mFill.number = i
@@ -621,7 +625,7 @@ class PartTranslator:
             newRn = copy.deepcopy(self.previousRn)
             newRn.lyric = ''
             # set to entire bar duration and tie
-            newRn.duration = copy.deepcopy(self.tsAtTimeOfLastChord.barDuration)
+            newRn.quarterLength = self.tsAtTimeOfLastChord.barDuration.quarterLength
             if self.previousRn.tie is None:
                 self.previousRn.tie = tie.Tie('start')
             else:
@@ -1888,6 +1892,10 @@ m1 C: I'''
         _test_ending_contents(second_ending, ['2b'])
         _test_ending_contents(third_ending, ['2c', '3c'])
         _test_expanded(s, 27.0)
+
+    def testMeasureNumberTooHigh(self):
+        with self.assertRaisesRegex(RomanTextTranslateException, 'more than 100000 measures'):
+            romanTextToStreamScore('Time Signature: 4/4\nm1 C: I\nm99999999 V\n')
 
 
 # ------------------------------------------------------------------------------

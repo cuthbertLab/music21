@@ -12,7 +12,7 @@ Install separately:
 
 ## Steps
 
-1. Update the `VERSION` in `music21/_version.py` and the single test case in
+1. Update `__version__` in `music21/_version.py` and the single test case in
    `base.py`.
 
 2. Run `corpus.corpora.CoreCorpus().cacheMetadata()`.
@@ -117,7 +117,7 @@ Install separately:
 22. For starting a new major release, create a GitHub branch to preserve the old
     one for patches, etc., especially during beta releases.
 
-23. Immediately increment the number in `_version.py` and run test on VERSION_STR in base.py to
+23. Immediately increment the number in `_version.py` and run test on `__version__` in base.py to
     prepare for the next release.
 
 24. Announce on the blog and to the list.

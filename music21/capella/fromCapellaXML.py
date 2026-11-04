@@ -18,6 +18,7 @@ Does not handle pickup notes, which are defined simply with an early barline
 '''
 from __future__ import annotations
 
+import os
 import pathlib
 import typing as t
 import unittest
@@ -123,7 +124,8 @@ class CapellaImporter:
         '''
         self.zipFilename = str(filename)
         with zipfile.ZipFile(str(filename), 'r') as zipFileHandle:
-            xmlText = zipFileHandle.read('score.xml')
+            xmlText = common.readZipMember(zipFileHandle, 'score.xml',
+                                           CapellaImportException)
         self.xmlText = xmlText
         return xmlText
 
@@ -918,6 +920,26 @@ class Test(unittest.TestCase):
         self.assertGreater(len(partScore.recurse().notes), 20)
         self.assertIn('mass!', text.assembleLyrics(partScore.parts[0], 1))
         self.assertIn('scherz', text.assembleLyrics(partScore.parts[0], 2))
+
+    def testScoreXMLSizeLimit(self):
+        '''
+        A score.xml that uncompresses to more than
+        common.fileTools.MAX_UNCOMPRESSED_BYTES raises CapellaImportException.
+        '''
+        from unittest import mock
+        from music21 import environment
+
+        fp = environment.Environment().getTempFile('.capx')
+        try:
+            with zipfile.ZipFile(fp, 'w', zipfile.ZIP_DEFLATED) as zf:
+                zf.writestr('score.xml', '<score/>' + ' ' * 2000)
+            ci = CapellaImporter()
+            with mock.patch.object(common.fileTools, 'MAX_UNCOMPRESSED_BYTES', 1000):
+                with self.assertRaisesRegex(CapellaImportException, 'more than 1000 bytes'):
+                    ci.readCapellaXMLFile(fp)
+            self.assertEqual(len(ci.readCapellaXMLFile(fp)), 2008)
+        finally:
+            os.remove(fp)
 
     def testSingleBarline(self):
         ci = CapellaImporter()

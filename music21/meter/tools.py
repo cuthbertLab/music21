@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations
@@ -375,6 +375,8 @@ def divisionOptionsAdditiveMultiples(n: int, d: int) -> MeterOptions:
             seq = tuple([f'{nMod}/{d}'] * i)
             if seq not in opts:  # may be cases defined elsewhere
                 opts.append(seq)
+            if nMod % div != 0:  # if no longer even must stop
+                break
             nMod = nMod // div
             i *= div
     return tuple(opts)
@@ -525,8 +527,6 @@ def divisionOptionsAlgo(n, d) -> MeterOptions:
      ('1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2'),
      ('18/4',),
      ('9/4', '9/4'),
-     ('4/4', '4/4', '4/4', '4/4'),
-     ('2/4', '2/4', '2/4', '2/4', '2/4', '2/4', '2/4', '2/4'),
      ('9/2',),
      ('36/8',),
      ('72/16',),

@@ -66,6 +66,8 @@
 - When making major changes, check the User's Guide to to make sure that docs still work there too.
 - Run `uv run ruff check music21` before making PRs or pushes to open PRs.
 - Run `uv run mypy music21` before making PRs or pushes to open PRs.
+- It is very unlikely that there were any preexisting failures. If you changed something and
+  now it appears master has also a preexisting failure, you should clear the music21 temp cache.
 - **Regression cases go in the module's `Test(unittest.TestCase)` class — never in a
   docstring.** Docstrings should not include one-liners showing that some
   bad input now raises. A doctest sits in the most-read documentation the project has,
@@ -100,6 +102,11 @@
 # Versions
 
 - Mark changes in public interface with `* Changed in v[X]: One-line explanation.` Or new features with "New" instead of "Changed".
+- A change that can break working code from the previous major version (removed or renamed
+  names, changed signatures, defaults, return types or class hierarchy, new deprecations) also
+  goes in `documentation/source/about/migratingToV[MAJOR].rst`, in the same PR: tersely, old
+  code and the new code that does the same job. Agents upgrade users' apps from this file.
+  Bug fixes, including new errors on input that was always wrong, stay out.
 - Changes to parsing formats (esp. musicxml) need to update the patch version of the version file.
 - That is the only reason an agent should bump version: to prevent incompatible pickles in
   caches. A plain bug fix or a new feature elsewhere does not bump — the commit

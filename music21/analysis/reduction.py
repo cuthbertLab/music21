@@ -685,6 +685,8 @@ class PartReduction:
 
         If `splitSpans` is True, a span will be split of the target changes over the span.
         Otherwise, Spans will be averaged. This is the `segmentByTarget` parameter.
+        When splitting, each span starts with the weight of the last target at
+        or before its start.
 
         The `targetToWeight` parameter is a function that takes a list or Stream of objects
         (of the class specified by `target`) and returns a single floating-point value.
@@ -738,7 +740,7 @@ class PartReduction:
                     inRegion = flatRef.getElementsByOffset(
                         offsetStart,
                         offsetEnd,
-                        includeEndBoundary=True,
+                        includeEndBoundary=False,
                         mustFinishInSpan=False,
                         mustBeginInSpan=True,
                     )
@@ -748,6 +750,9 @@ class PartReduction:
                     match = match.extendDuration(target, inPlace=False)
                     # match.show('t')
                     dsFirst = copy.deepcopy(ds)
+                    prior = flatRef.getElementAtOrBefore(offsetStart, [target])
+                    if prior is not None:
+                        dsFirst['weight'] = targetToWeight(prior)
                     if not match:
                         # weight is not known
                         finalBundle.append(dsFirst)
@@ -1098,6 +1103,58 @@ class Test(unittest.TestCase):
         sr.score = src
         unused_post = sr.reduce()
         # post.show()
+
+    def testPartReductionDynamicOnBarline(self):
+        '''
+        A dynamic on a barline starts the span after the barline.
+        '''
+        from music21 import analysis
+        from music21 import dynamics
+        p = stream.Part()
+        p.id = 'solo'
+        for unused_i in range(3):
+            p.append(note.Note(quarterLength=4))
+        p.insert(0, dynamics.Dynamic('p'))
+        p.insert(4, dynamics.Dynamic('f'))
+        p.makeMeasures(inPlace=True)
+        s = stream.Score([p])
+
+        pr = analysis.reduction.PartReduction(s)
+        pr.process()
+        self._matchWeightedData(pr.getGraphHorizontalBarWeightedData(),
+                                [('solo', [[0.0, 4.0, 0.5, '#666666'],
+                                           [4.0, 4.0, 1.0, '#666666'],
+                                           [8.0, 4.0, 1.0, '#666666']])])
+
+        pr = analysis.reduction.PartReduction(s, fillByMeasure=False)
+        pr.process()
+        self._matchWeightedData(pr.getGraphHorizontalBarWeightedData(),
+                                [('solo', [[0.0, 4.0, 0.5, '#666666'],
+                                           [4.0, 8.0, 1.0, '#666666']])])
+
+    def testPartReductionDynamicBetweenSpans(self):
+        '''
+        A dynamic in a rest measure, or on the barline before it, starts
+        the next span.
+        '''
+        from music21 import analysis
+        from music21 import dynamics
+        for fOffset in (4, 5):
+            p = stream.Part()
+            p.id = 'solo'
+            p.append(note.Note(quarterLength=4))
+            p.append(note.Rest(quarterLength=4))
+            p.append(note.Note(quarterLength=4))
+            p.insert(0, dynamics.Dynamic('p'))
+            p.insert(fOffset, dynamics.Dynamic('f'))
+            p.makeMeasures(inPlace=True)
+            s = stream.Score([p])
+            target = [('solo', [[0.0, 4.0, 0.5, '#666666'],
+                                [8.0, 4.0, 1.0, '#666666']])]
+            for fillByMeasure in (True, False):
+                pr = analysis.reduction.PartReduction(s, fillByMeasure=fillByMeasure)
+                pr.process()
+                self._matchWeightedData(pr.getGraphHorizontalBarWeightedData(), target)
 
     def testPartReductionA(self):
         from music21 import analysis

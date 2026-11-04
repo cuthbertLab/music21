@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -23,17 +23,64 @@ import pickle
 import os
 import subprocess
 import typing as t
+import zipfile
 
 from music21.exceptions21 import Music21Exception
 
 __all__ = [
+    'MAX_UNCOMPRESSED_BYTES',
     'readFileEncodingSafe',
+    'readZipMember',
     'readPickleGzip',
     'cd',
     'preparePathClassesForUnpickling',
     'restorePathClassesAfterUnpickling',
     'runSubprocessCapturingStderr',
 ]
+
+
+MAX_UNCOMPRESSED_BYTES = 256 * 1024 * 1024
+'''
+The largest number of bytes that music21 will uncompress from one member of a
+compressed file (.mxl, .capx, zipped MuseData, compressed .nwc).
+'''
+
+
+def readZipMember(
+    zipFile: zipfile.ZipFile,
+    name: str,
+    exceptionClass: type[Exception] = Music21Exception,
+) -> bytes:
+    '''
+    Return the uncompressed contents of the member `name` of `zipFile`.
+
+    Raises `exceptionClass` if the member holds more than
+    `MAX_UNCOMPRESSED_BYTES` bytes.
+
+    >>> import io, zipfile
+    >>> buffer = io.BytesIO()
+    >>> with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+    ...     zf.writestr('score.xml', '<score/>')
+    >>> with zipfile.ZipFile(buffer) as zf:
+    ...     common.readZipMember(zf, 'score.xml')
+    b'<score/>'
+
+    AI-assisted (Claude).
+    '''
+    limit = MAX_UNCOMPRESSED_BYTES
+    tooLargeMessage = f'{name!r} uncompresses to more than {limit} bytes'
+    zipInfo = zipFile.getinfo(name)
+    if zipInfo.file_size > limit:
+        raise exceptionClass(tooLargeMessage)
+    chunks: list[bytes] = []
+    totalSize = 0
+    with zipFile.open(zipInfo) as member:
+        while chunk := member.read(1024 * 1024):
+            totalSize += len(chunk)
+            if totalSize > limit:
+                raise exceptionClass(tooLargeMessage)
+            chunks.append(chunk)
+    return b''.join(chunks)
 
 
 @contextlib.contextmanager

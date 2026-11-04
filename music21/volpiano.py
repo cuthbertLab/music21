@@ -90,6 +90,24 @@ naturalTokens = flatTokens.upper()
 accidentalTokens = flatTokens + naturalTokens
 
 
+def _makeBreak(numBreakTokens: int, breaksToLayout: bool) -> base.Music21Object:
+    '''
+    The break object for a run of `numBreakTokens` '7' tokens:
+    a LineBreak, PageBreak or ColumnBreak, or, if `breaksToLayout` is True,
+    a new SystemLayout, a new PageLayout or a ColumnBreak.
+    '''
+    if not breaksToLayout:
+        breakClass = classByNumBreakTokens[numBreakTokens]
+        assert breakClass is not None
+        return breakClass()
+
+    layoutClass = classByNumBreakTokensLayout[numBreakTokens]
+    assert layoutClass is not None
+    if numBreakTokens < 3:
+        return layoutClass(isNew=True)
+    return layoutClass()
+
+
 def toPart(volpianoText, *, breaksToLayout=False):
     # noinspection PyShadowingNames
     '''
@@ -207,16 +225,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
             continuousNumberOfBreakTokens += 1
             continue
         elif continuousNumberOfBreakTokens > 0:
-            if not breaksToLayout:  # default
-                breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-                breakToken = breakClass()  # pylint: disable=not-callable
-            else:
-                breakClass = classByNumBreakTokensLayout[continuousNumberOfBreakTokens]
-                if continuousNumberOfBreakTokens < 3:
-                    breakToken = breakClass(isNew=True)  # pylint: disable=not-callable
-                else:
-                    breakToken = breakClass()  # pylint: disable=not-callable
-
+            breakToken = _makeBreak(continuousNumberOfBreakTokens, breaksToLayout)
             m.append(breakToken)
 
         continuousNumberOfBreakTokens = 0
@@ -293,8 +302,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
 
 
     if continuousNumberOfBreakTokens > 0:
-        breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-        breakToken = breakClass()
+        breakToken = _makeBreak(continuousNumberOfBreakTokens, breaksToLayout)
         m.append(breakToken)
 
     if m:
@@ -475,6 +483,24 @@ class Test(unittest.TestCase):
             self.assertTrue(fromStream(stream.Stream([clefClass()])).startswith(volpianoClef))
         self.assertEqual(fromStream(stream.Stream([clef.Bass8vbClef(), note.Note('G1')])),
                          fromStream(stream.Stream([clef.BassClef(), note.Note('G2')])))
+
+    def testBreaksAtEndToLayout(self):
+        part = toPart('1---e-7', breaksToLayout=True)
+        self.assertEqual(len(part[layout.SystemLayout]), 1)
+        self.assertEqual(len(part[LineBreak]), 0)
+        self.assertTrue(part[layout.SystemLayout].first().isNew)
+
+        part = toPart('1---e-77', breaksToLayout=True)
+        self.assertEqual(len(part[layout.PageLayout]), 1)
+        self.assertTrue(part[layout.PageLayout].first().isNew)
+
+        part = toPart('1---e-77')
+        self.assertEqual(len(part[PageBreak]), 1)
+
+        part = toPart('1---ef-3-gh-7', breaksToLayout=True)
+        measures = part.getElementsByClass(stream.Measure)
+        self.assertEqual(len(measures[0][layout.SystemLayout]), 0)
+        self.assertEqual(len(measures[1][layout.SystemLayout]), 1)
 
 
 if __name__ == '__main__':
