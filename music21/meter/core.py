@@ -461,10 +461,6 @@ class MeterTerminal(prebase.ProtoM21Object, MeterCore, FrozenObject):
 # -----------------------------------------------------------------------------
 
 @lru_cache(1024)
-def _cachedMeterTerminal(numerator: int, denominator: int, weight: float) -> MeterTerminal:
-    return MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
-
-
 def getMeterTerminal(numerator: int, denominator: int,
                      weight: float = 1.0) -> MeterTerminal:
     '''
@@ -486,7 +482,7 @@ def getMeterTerminal(numerator: int, denominator: int,
 
     AI-assisted (Claude).
     '''
-    return _cachedMeterTerminal(numerator, denominator, weight)
+    return MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
 
 
 # -----------------------------------------------------------------------------
@@ -2137,22 +2133,6 @@ class MeterSequence(prebase.ProtoM21Object, MeterCore, FrozenObject):
 # module-level building helpers for the immutable MeterSequence
 
 @lru_cache(4096)
-def _cachedSequence(
-    numerator: int,
-    denominator: int,
-    partition: tuple,
-    parenthesis: bool,
-    summedNumerator: bool,
-) -> MeterSequence:
-    ms = MeterSequence.__new__(MeterSequence)
-    object.__setattr__(ms, '_numerator', numerator)
-    object.__setattr__(ms, '_denominator', denominator)
-    object.__setattr__(ms, '_partition', partition)
-    object.__setattr__(ms, 'parenthesis', parenthesis)
-    object.__setattr__(ms, 'summedNumerator', summedNumerator)
-    return ms
-
-
 def makeSequence(
     numerator: int,
     denominator: int,
@@ -2168,7 +2148,13 @@ def makeSequence(
 
     AI-assisted (Claude).
     '''
-    return _cachedSequence(numerator, denominator, partition, parenthesis, summedNumerator)
+    ms = MeterSequence.__new__(MeterSequence)
+    object.__setattr__(ms, '_numerator', numerator)
+    object.__setattr__(ms, '_denominator', denominator)
+    object.__setattr__(ms, '_partition', partition)
+    object.__setattr__(ms, 'parenthesis', parenthesis)
+    object.__setattr__(ms, 'summedNumerator', summedNumerator)
+    return ms
 
 
 def getMeterSequence(

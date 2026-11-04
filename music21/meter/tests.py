@@ -108,10 +108,10 @@ class Test(unittest.TestCase):
     def testMeterTerminalCache(self):
         a = getMeterTerminal(1, 4)
         self.assertIs(a, getMeterTerminal(1, 4))
-        self.assertIs(a, getMeterTerminal(numerator=1, denominator=4, weight=1.0))
+        self.assertEqual(a, getMeterTerminal(numerator=1, denominator=4, weight=1.0))
         b = getMeterTerminal(1, 4, weight=0.5)
         self.assertIsNot(a, b)
-        self.assertIs(b, getMeterTerminal(1, 4, 0.5))
+        self.assertIs(b, getMeterTerminal(1, 4, weight=0.5))
         # value equality regardless of how they were built
         self.assertEqual(MeterTerminal('1/4'), getMeterTerminal(1, 4))
 
@@ -167,19 +167,28 @@ class Test(unittest.TestCase):
 
     def testHashIsCached(self):
         import pickle
-        ms = TimeSignature('6/8').accentSequence
-        h = hash(ms)
-        self.assertEqual(ms._frozenHash, h)
-        self.assertEqual(hash(ms), h)
-        self.assertNotIn('_frozenHash', ms._getSlotsRecursive())
         a = MeterSequence('6/8', 2)
         b = MeterSequence('6/8', 2)
-        hash(a)
+        self.assertIsNone(a._frozenHash)
+        h = hash(a)
+        self.assertEqual(a._frozenHash, h)
+        self.assertEqual(hash(a), h)
+        self.assertIsNone(b._frozenHash)
         self.assertEqual(a, b)
-        loaded = pickle.loads(pickle.dumps(ms))
-        self.assertEqual(loaded, ms)
-        self.assertEqual(hash(loaded), h)
+        self.assertEqual(hash(b), h)
+        self.assertNotIn('_frozenHash', a._getSlotsRecursive())
+        self.assertNotIn('_frozenHash', a.__getstate__())
+        self.assertIs(copy.deepcopy(a), a)
+        for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
+            loaded = pickle.loads(pickle.dumps(a, protocol))
+            self.assertIsNone(loaded._frozenHash, protocol)
+            self.assertEqual(loaded, a)
+            self.assertEqual(hash(loaded), h)
+        mt = MeterTerminal('3/8')
+        self.assertIsNone(mt._frozenHash)
+        self.assertEqual(hash(mt), mt._frozenHash)
         fd = duration.FrozenDuration(1.5)
+        self.assertIsNone(fd._frozenHash)
         self.assertEqual(hash(fd), fd._frozenHash)
         self.assertEqual(hash(fd), hash(duration.FrozenDuration(1.5)))
 

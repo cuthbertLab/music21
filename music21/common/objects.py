@@ -293,12 +293,22 @@ class FrozenObject(EqualSlottedObjectMixin):
     An object whose slots cannot be set after `__init__`, `__new__`, or
     `__setstate__`.  It is hashable by the values of its slots.
 
-    A subclass that lists `'_frozenHash'` in its `__slots__` computes its hash
-    once and keeps it there.
+    The hash is computed on the first call to `__hash__` and kept in
+    `_frozenHash`, which is None until then.  A subclass with `__slots__`
+    includes `'_frozenHash'` in them.
     '''
     __slots__: tuple[str, ...] = ()
 
-    _frozenHash: int
+    _frozenHash: int|None
+
+    def __new__(cls, *arguments: t.Any, **keywords: t.Any) -> t.Self:
+        new = super().__new__(cls)
+        object.__setattr__(new, '_frozenHash', None)
+        return new
+
+    def __setstate__(self, state: dict[str, t.Any]) -> None:
+        object.__setattr__(self, '_frozenHash', None)
+        super().__setstate__(state)
 
     def _check_init(self, key: str|None = None) -> bool:
         if key == '__class__':
@@ -334,18 +344,13 @@ class FrozenObject(EqualSlottedObjectMixin):
         raise TypeError(f'{self.__class__} object is not subscriptable')
 
     def __hash__(self) -> int:
-        try:
-            return self._frozenHash
-        except AttributeError:
-            pass
-        out = []
-        for s in self._getSlotsRecursive():
-            out.append((s, getattr(self, s)))
-        h = hash(tuple(out))
-        try:
+        h = self._frozenHash
+        if h is None:
+            out = []
+            for s in self._getSlotsRecursive():
+                out.append((s, getattr(self, s)))
+            h = hash(tuple(out))
             object.__setattr__(self, '_frozenHash', h)
-        except AttributeError:
-            pass
         return h
 
 
