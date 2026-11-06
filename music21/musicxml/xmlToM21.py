@@ -2719,7 +2719,8 @@ class MeasureParser(XMLParserBase):
         if durationText := strippedText(mxDuration):
             change = opFrac(float(durationText) / self.divisions)
 
-            if (self.parent
+            if (change
+                    and self.parent
                     and self.parent.parent
                     and self.parent.parent.applyFinaleWorkarounds):
                 # If the ScoreParser senses the Score was written by Finale
