@@ -567,11 +567,11 @@ class GeneralNote(base.Music21Object):
     :class:`~music21.note.Rest`, :class:`~music21.chord.Chord`,
     and related objects.
 
-    Keywords can be passed to
-    a GeneralNote which are then passed to the
-    underlying :class:`~music21.duration.Duration`.
-    These keywords might be listed like
-    type='16th', dots=2 etc. to create a
+    The `duration` keyword sets the :class:`~music21.duration.Duration`.
+    Without it, the `quarterLength` and `type` keywords, along with other
+    Duration keywords such as `dots`, create the Duration; with neither
+    `quarterLength` nor `type`, the GeneralNote lasts one quarter note.
+    For instance, type='16th', dots=2 creates a
     double-dotted sixteenth note.
 
     In almost every circumstance, you should
@@ -582,6 +582,10 @@ class GeneralNote(base.Music21Object):
     >>> gn = note.GeneralNote(type='16th', dots=2)
     >>> gn.quarterLength
     0.4375
+    >>> note.GeneralNote(quarterLength=3.0).duration.type
+    'half'
+    >>> note.GeneralNote().quarterLength
+    1.0
 
     **Equality**
 
@@ -612,20 +616,21 @@ class GeneralNote(base.Music21Object):
                  *,
                  duration: Duration|None = None,
                  lyric: None|str|Lyric = None,
+                 quarterLength: OffsetQLIn|None = None,
+                 type: str|None = None,  # pylint: disable=redefined-builtin
                  **keywords
                  ):
         if duration is None:
             # ensure music21base does not automatically create a zero duration before we can.
-            if keywords.get('type') is None and keywords.get('quarterLength') is None:
+            if type is None and quarterLength is None:
                 tempDuration = Duration(1.0)
             else:
-                tempDuration = Duration(**keywords)
-            keywords.pop('quarterLength', None)
-            keywords.pop('type', None)
+                tempDuration = Duration(type=type, quarterLength=quarterLength, **keywords)
+            quarterLength = None
         else:
             tempDuration = duration
         # this sets the stored duration defined in Music21Object
-        super().__init__(duration=tempDuration, **keywords)
+        super().__init__(duration=tempDuration, quarterLength=quarterLength, **keywords)
 
         self.lyrics: list[Lyric] = []  # a list of lyric objects
         self.expressions: list[expressions.Expression] = []
