@@ -34,7 +34,7 @@ from music21 import style
 
 from music21.meter.tools import slashToTuple, proportionToFraction
 from music21.meter.core import (
-    MeterSequence, getMeterSequence, getMeterTerminal, makeSequence,
+    MeterSequence, getMeterSequence, getMeterTerminal,
 )
 
 environLocal = environment.Environment('meter')
@@ -1178,11 +1178,7 @@ class TimeSignature(TimeSignatureBase):
 
     @summedNumerator.setter
     def summedNumerator(self, value: bool):
-        # displaySequence is immutable; swap in a copy with the new flag
-        ds = self.displaySequence
-        self.displaySequence = makeSequence(
-            ds.numerator, ds.denominator, ds._partition,
-            parenthesis=ds.parenthesis, summedNumerator=value)
+        self.displaySequence = self.displaySequence.modify(summedNumerator=value)
 
     # --------------------------------------------------------------------------
     # private methods -- most to be put into the various sequences.
@@ -1342,14 +1338,13 @@ class TimeSignature(TimeSignatureBase):
             weightValues[x + 1] = weightValueMin * pow(2, x)
 
         # set weights on accent partitions
-        self.accentSequence = self.accentSequence.partitioned([1] * accentCount)
-        for i in range(accentCount):
-            # get values from weightValues dictionary; terminals cannot
-            # change, so replace each with one of the new weight
-            mt = self.accentSequence[i]
-            self.accentSequence = self.accentSequence.setIndex(
-                i, getMeterTerminal(
-                    mt.numerator, mt.denominator, weight=weightValues[weightInts[i]]))
+        accentSequence = self.accentSequence.partitioned([1] * accentCount)
+        weighted = []
+        for i, mt in enumerate(accentSequence):
+            # get values from weightValues dictionary
+            weighted.append(getMeterTerminal(
+                mt.numerator, mt.denominator, weight=weightValues[weightInts[i]]))
+        self.accentSequence = accentSequence.modify(partition=weighted)
 
     # --------------------------------------------------------------------------
     # access data for other processing
