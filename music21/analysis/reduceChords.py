@@ -373,42 +373,36 @@ class ChordReducer:
 
         for unused_part, subtree in partwiseTrees.items():
             timespanList = list(subtree)
+            nextIndex = 0
             for bassTimespan, group_generator in itertools.groupby(timespanList, procedure):
                 group = list(group_generator)
+                nextIndex += len(group)
 
                 if bassTimespan is None:
                     continue
 
                 if bassTimespan.offset < group[0].offset:
-                    beatStrength = bassTimespan.element.beatStrength
                     offset = bassTimespan.offset
                     previousTimespan = scoreTree.findPreviousPitchedTimespanInSameStreamByClass(
                         group[0]
                     )
                     if previousTimespan is not None:
-                        if previousTimespan.endTime > group[0].offset:
-                            msg = (
-                                'Timespan offset errors: previousTimespan.endTime, '
-                                + str(previousTimespan.endTime)
-                                + ' should be before ' + str(group[0].offset)
-                                + ' previousTimespan: ' + repr(previousTimespan)
-                                + ' groups: ' + repr(group)
-                                + ' group[0]: ' + repr(group[0])
-                            )
-                            print(msg)
-                            # raise ChordReducerException(msg)
                         offset = max(offset, previousTimespan.endTime)
-                    scoreTree.removeTimespan(group[0])
-                    subtree.removeTimespan(group[0])
-                    newTimespan = group[0].new(offset=offset)
-                    newTimespan.beatStrength = beatStrength
+                    if offset < group[0].offset:
+                        beatStrength = bassTimespan.element.beatStrength
+                        scoreTree.removeTimespan(group[0])
+                        subtree.removeTimespan(group[0])
+                        newTimespan = group[0].new(offset=offset)
+                        newTimespan.beatStrength = beatStrength
 
-                    scoreTree.insert(newTimespan)
-                    subtree.insert(newTimespan)
-                    group[0] = newTimespan
+                        scoreTree.insert(newTimespan)
+                        subtree.insert(newTimespan)
+                        group[0] = newTimespan
 
-                if group[-1].endTime < bassTimespan.endTime:
-                    endTime = bassTimespan.endTime
+                endTime = bassTimespan.endTime
+                if nextIndex < len(timespanList):
+                    endTime = min(endTime, timespanList[nextIndex].offset)
+                if group[-1].endTime < endTime:
                     scoreTree.removeTimespan(group[-1])
                     subtree.removeTimespan(group[-1])
                     newTimespan = group[-1].new(
@@ -829,6 +823,23 @@ class Test(unittest.TestCase):
              for m in measures],
             [[(0.0, 4.0, ['C3', 'C4'])], [(0.0, 4.0, ['G2', 'E4'])]],
         )
+
+    def testFillBassGapsWithLowestNoteInAnotherPart(self):
+        from music21 import converter
+        from music21 import instrument
+
+        parts = []
+        for i, tinyNotation in enumerate(["3/4 r8 r16 d'16 e'16 r16 r8 r4",
+                                          '3/4 g8 G4 r8 r4',
+                                          '3/4 G8 r8 r4 r16 G16 r8']):
+            p = converter.parse('tinyNotation: ' + tinyNotation)
+            inst = instrument.Instrument()
+            inst.partId = f'P{i}'
+            p.insert(0, inst)
+            parts.append(p)
+        reduction = ChordReducer().run(stream.Score(parts))
+        chords = list(reduction.recurse().getElementsByClass(chord.Chord))
+        self.assertEqual(sum(c.quarterLength for c in chords), 3.0)
 
 
 class TestExternal(unittest.TestCase):
