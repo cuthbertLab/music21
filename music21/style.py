@@ -61,13 +61,12 @@ class Style(ProtoM21Object):
     >>> st.absoluteX = 20.4
     >>> st.absoluteX
     20.4
-
     '''
     _DOC_ATTR: dict[str, str] = {
         'hideObjectOnPrint': '''
             If set to `True`, the Music21Object will not print upon output
             (only used in MusicXML output at this point and
-            in Lilypond output for notes, chords, and rests).
+            in LilyPond output for notes, chords, and rests).
             ''',
         'units': '''
             What distances are measured in.  The default "tenths" is a concept
@@ -138,7 +137,7 @@ class Style(ProtoM21Object):
         >>> tst.enclosure
         <Enclosure.OCTAGON>
 
-        Setting an invalid enclosure raises a TextFormatException
+        Setting an invalid enclosure raises a TextFormatException.
 
         >>> tst.enclosure = 'parabola'
         Traceback (most recent call last):
@@ -176,10 +175,39 @@ class Style(ProtoM21Object):
         else:
             raise TextFormatException(f'Not a supported enclosure: {value!r}')
 
-    def _getAbsoluteY(self):
+    @property
+    def absoluteY(self):
+        '''
+        Get or set the vertical position, where 0
+        is the top line of the staff and units
+        are whatever is defined in `.units`, generally "tenths", meaning
+        1/10th of a staff space.
+
+        Other legal positions are 'above' and 'below' which
+        are synonyms for 10 and -70 respectively (for 5-line
+        staves; other staves are not yet implemented).
+        This behavior may change in music21 v8 or after.
+
+        >>> te = style.Style()
+        >>> te.absoluteY = 10
+        >>> te.absoluteY
+        10
+
+        >>> te.absoluteY = 'below'
+        >>> te.absoluteY
+        -70
+
+        Setting an invalid position raises a TextFormatException.
+
+        >>> te.absoluteY = 'hello'
+        Traceback (most recent call last):
+        music21.style.TextFormatException:
+            Not a supported absoluteY position: 'hello'
+        '''
         return self._absoluteY
 
-    def _setAbsoluteY(self, value):
+    @absoluteY.setter
+    def absoluteY(self, value):
         if value is None:
             self._absoluteY = None
         elif value == 'above':  # TODO: convert to Enum and keep it
@@ -193,36 +221,6 @@ class Style(ProtoM21Object):
                 raise TextFormatException(
                     f'Not a supported absoluteY position: {value!r}'
                 ) from ve
-
-    absoluteY = property(_getAbsoluteY,
-                         _setAbsoluteY,
-                         doc='''
-        Get or set the vertical position, where 0
-        is the top line of the staff and units
-        are whatever is defined in `.units`, generally "tenths", meaning
-        1/10th of a staff space.
-
-        Other legal positions are 'above' and 'below' which
-        are synonyms for 10 and -70 respectively (for 5-line
-        staves; other staves are not yet implemented)
-        This behavior may change in music21 v8 or after.
-
-        >>> te = style.Style()
-        >>> te.absoluteY = 10
-        >>> te.absoluteY
-        10
-
-        >>> te.absoluteY = 'below'
-        >>> te.absoluteY
-        -70
-
-        Setting an invalid position raises a TextFormatException
-
-        >>> te.absoluteY = 'hello'
-        Traceback (most recent call last):
-        music21.style.TextFormatException:
-            Not a supported absoluteY position: 'hello'
-        ''')
 
 
 class NoteStyle(Style):
@@ -307,21 +305,11 @@ class TextStyle(Style):
         self._alignHorizontal = None
         self._alignVertical = None
 
-    def _getAlignVertical(self):
-        return self._alignVertical
-
-    def _setAlignVertical(self, value):
-        # TODO: convert to StrEnum
-        if value in (None, 'top', 'middle', 'bottom', 'baseline'):
-            self._alignVertical = value
-        else:
-            raise TextFormatException(f'Invalid vertical align: {value!r}')
-
-    alignVertical = property(_getAlignVertical,
-                             _setAlignVertical,
-                             doc='''
+    @property
+    def alignVertical(self):
+        '''
         Get or set the vertical align. Valid values are top, middle, bottom, baseline
-        or None
+        or None.
 
         >>> te = style.TextStyle()
         >>> te.alignVertical = 'top'
@@ -334,22 +322,22 @@ class TextStyle(Style):
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Invalid vertical align: 'hello'
-        ''')
+        '''
+        return self._alignVertical
 
-    def _getAlignHorizontal(self):
-        return self._alignHorizontal
-
-    def _setAlignHorizontal(self, value):
-        if value in (None, 'left', 'right', 'center'):
-            self._alignHorizontal = value
+    @alignVertical.setter
+    def alignVertical(self, value):
+        # TODO: convert to StrEnum
+        if value in (None, 'top', 'middle', 'bottom', 'baseline'):
+            self._alignVertical = value
         else:
-            raise TextFormatException(f'Invalid horizontal align: {value!r}')
+            raise TextFormatException(f'Invalid vertical align: {value!r}')
 
-    alignHorizontal = property(_getAlignHorizontal,
-                               _setAlignHorizontal,
-                               doc='''
+    @property
+    def alignHorizontal(self):
+        '''
         Get or set the horizontal alignment.  Valid values are left, right, center,
-        or None
+        or None.
 
         >>> te = style.TextStyle()
         >>> te.alignHorizontal = 'right'
@@ -362,21 +350,29 @@ class TextStyle(Style):
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Invalid horizontal align: 'hello'
-        ''')
+        '''
+        return self._alignHorizontal
+
+    @alignHorizontal.setter
+    def alignHorizontal(self, value):
+        if value in (None, 'left', 'right', 'center'):
+            self._alignHorizontal = value
+        else:
+            raise TextFormatException(f'Invalid horizontal align: {value!r}')
 
 
     @property
     def justify(self) -> str|None:
         '''
         Get or set the justification.  Valid values are left,
-        center, right, full (not supported by MusicXML), and None
+        center, right, full (not supported by MusicXML), and None.
 
         >>> tst = style.TextStyle()
         >>> tst.justify = 'center'
         >>> tst.justify
         'center'
 
-        Invalid values raise a TextFormatException
+        Invalid values raise a TextFormatException.
 
         >>> tst.justify = 'hello'
         Traceback (most recent call last):
@@ -405,7 +401,7 @@ class TextStyle(Style):
         >>> tst.fontStyle
         'bold'
 
-        Invalid values raise a TextFormatException
+        Invalid values raise a TextFormatException.
 
         >>> tst.fontStyle = 'hello'
         Traceback (most recent call last):
@@ -423,10 +419,22 @@ class TextStyle(Style):
                 raise TextFormatException(f'Not a supported fontStyle: {value!r}')
             self._fontStyle = value.lower()
 
-    def _getWeight(self):
+    # TODO: figure out if we want to use fontStyle for all weights.
+
+    @property
+    def fontWeight(self):
+        '''
+        Get or set the weight, as normal, or bold.
+
+        >>> tst = style.TextStyle()
+        >>> tst.fontWeight = 'bold'
+        >>> tst.fontWeight
+        'bold'
+        '''
         return self._fontWeight
 
-    def _setWeight(self, value):
+    @fontWeight.setter
+    def fontWeight(self, value):
         if value is None:
             self._fontWeight = None
         else:
@@ -434,23 +442,20 @@ class TextStyle(Style):
                 raise TextFormatException(f'Not a supported fontWeight: {value}')
             self._fontWeight = value.lower()
 
-    # TODO: figure out if we want to use fontStyle for all weights.
-
-    fontWeight = property(_getWeight,
-                          _setWeight,
-                          doc='''
-        Get or set the weight, as normal, or bold.
+    @property
+    def fontSize(self):
+        '''
+        Get or set the size.  Best, an int or float, but also a css font size.
 
         >>> tst = style.TextStyle()
-        >>> tst.fontWeight = 'bold'
-        >>> tst.fontWeight
-        'bold'
-        ''')
-
-    def _getSize(self):
+        >>> tst.fontSize = 20
+        >>> tst.fontSize
+        20
+        '''
         return self._fontSize
 
-    def _setSize(self, value):
+    @fontSize.setter
+    def fontSize(self, value):
         if value is not None:
             try:
                 value = common.numToIntOrFloat(value)
@@ -459,21 +464,21 @@ class TextStyle(Style):
                 # raise TextFormatException(f'Not a supported size: {value}')
         self._fontSize = value
 
-    fontSize = property(_getSize,
-                        _setSize,
-                        doc='''
-        Get or set the size.  Best, an int or float, but also a css font size
+    @property
+    def letterSpacing(self):
+        '''
+        Get or set the letter spacing.
 
         >>> tst = style.TextStyle()
-        >>> tst.fontSize = 20
-        >>> tst.fontSize
-        20
-        ''')
-
-    def _getLetterSpacing(self):
+        >>> tst.letterSpacing = 20
+        >>> tst.letterSpacing
+        20.0
+        >>> tst.letterSpacing = 'normal'
+        '''
         return self._letterSpacing
 
-    def _setLetterSpacing(self, value):
+    @letterSpacing.setter
+    def letterSpacing(self, value):
         if value != 'normal' and value is not None:
             # convert to number
             try:
@@ -484,18 +489,6 @@ class TextStyle(Style):
                 ) from ve
 
         self._letterSpacing = value
-
-    letterSpacing = property(_getLetterSpacing,
-                             _setLetterSpacing,
-                             doc='''
-         Get or set the letter spacing.
-
-        >>> tst = style.TextStyle()
-        >>> tst.letterSpacing = 20
-        >>> tst.letterSpacing
-        20.0
-        >>> tst.letterSpacing = 'normal'
-        ''')
 
     @property
     def fontFamily(self):
@@ -534,7 +527,7 @@ class TextStyle(Style):
 
 class TextStylePlacement(TextStyle):
     '''
-    TextStyle plus a placement attribute
+    TextStyle plus a placement attribute.
     '''
 
     def __init__(self):
@@ -561,7 +554,7 @@ class BezierStyle(Style):
 
 class LineStyle(Style):
     '''
-    from the MusicXML Definition
+    From the MusicXML Definition.
 
     Defines lineShape ('straight', 'curved' or None)
     lineType ('solid', 'dashed', 'dotted', 'wavy' or None)
@@ -581,7 +574,7 @@ class LineStyle(Style):
 class StreamStyle(Style):
     '''
     Includes several elements in the MusicXML <appearance> tag in <defaults>
-    along with <music-font> and <word-font>
+    along with <music-font> and <word-font>.
     '''
 
     def __init__(self):
@@ -606,7 +599,7 @@ class StreamStyle(Style):
 
 class BeamStyle(Style):
     '''
-    Style for beams
+    Style for beams.
     '''
 
     def __init__(self):

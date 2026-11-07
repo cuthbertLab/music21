@@ -151,6 +151,47 @@ def insertBeforeElements(root, insert, tagList=None):
     root.insert(min(insertIndices), insert)
 
 
+def insertAfterElements(root, insert, tagList=None):
+    # noinspection PyShadowingNames
+    '''
+    Insert element `insert` into element `root` directly after the last
+    instance of any child tag given in `tagList`. Insert at the beginning
+    if `tagList` is `None` or no instance is found.
+
+    >>> from xml.etree.ElementTree import fromstring as EL
+    >>> from music21.musicxml.helpers import insertAfterElements, dump
+    >>> root = EL('<note><grace /><voice>1</voice></note>')
+    >>> insert = EL('<unpitched/>')
+
+    >>> insertAfterElements(root, insert, tagList=['grace'])
+    >>> dump(root)
+    <note>
+        <grace />
+        <unpitched />
+        <voice>1</voice>
+    </note>
+
+    Insert at the beginning when nothing in `tagList` matches:
+
+    >>> insert2 = EL('<foo/>')
+    >>> insertAfterElements(root, insert2, tagList=['bar'])
+    >>> dump(root)
+    <note>
+        <foo />
+        <grace />
+        <unpitched />
+        <voice>1</voice>
+    </note>
+    '''
+    insertIndex = 0
+    if tagList:
+        # Iterate children only, not grandchildren
+        for i, child in enumerate(root.findall('*')):
+            if child.tag in tagList:
+                insertIndex = i + 1
+    root.insert(insertIndex, insert)
+
+
 def measureNumberComesBefore(mNum1: str, mNum2: str) -> bool:
     '''
     Determine whether `measureNumber1` strictly precedes

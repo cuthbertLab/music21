@@ -61,7 +61,7 @@ def labelBeatDepth(streamIn):
 
         # need to make a copy otherwise the .beat/.beatStr values will be messed up (1/4 the normal)
         tsTemp = copy.deepcopy(ts)
-        tsTemp.beatSequence.subdivideNestedHierarchy(depth=3)
+        tsTemp.beatSequence = tsTemp.beatSequence.subdividedNestedHierarchy(depth=3)
 
         for n in m.notesAndRests:
             if hasattr(n, 'tie') and n.tie is not None:
@@ -114,7 +114,6 @@ def thomassenMelodicAccent(streamIn: stream.Stream):
     ('E4', 0.5561)
     ('D4', 0.17)
     ('D4', 0.0)
-
     '''
     # we use .ps instead of Intervals for speed, since
     # we just need perceived contours

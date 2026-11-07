@@ -186,7 +186,6 @@ class Hasher:
         >>> r = note.Rest()
         >>> h._hashMIDIPitchName(r, thisChord=c)
         0
-
         '''
         if thisChord and self.hashChordsAsChords:
             return 1
@@ -417,16 +416,16 @@ class Hasher:
                 if self.hashChordsAsNotes:
                     for n in elt:
                         singleNoteHash = [self.hashingFunctions[hashProperty](n, thisChord=elt)
-                                            for hashProperty in self.tupleList]
+                                          for hashProperty in self.tupleList]
 
                         self.addHashToFinalHash(singleNoteHash, finalHash, n)
                 elif self.hashChordsAsChords:
                     singleNoteHash = [self.hashingFunctions[hashProperty](None, thisChord=elt)
-                                        for hashProperty in self.tupleList]
+                                      for hashProperty in self.tupleList]
                     self.addHashToFinalHash(singleNoteHash, finalHash, elt)
             else:
                 singleNoteHash = [self.hashingFunctions[hashProperty](elt)
-                                    for hashProperty in self.tupleList]
+                                  for hashProperty in self.tupleList]
                 self.addHashToFinalHash(singleNoteHash, finalHash, elt)
         # TODO: don't finalHash back and forth, return it in the smaller functions
         return finalHash
@@ -577,7 +576,7 @@ class NoteHash(tuple):
     >>> b
     2
     >>> nh.__class__
-    <... 'music21.alpha.analysis.hasher.NoteHash'>
+    <class 'music21.alpha.analysis.hasher.NoteHash'>
     '''
     def __new__(cls, tupEls):
         return super(NoteHash, cls).__new__(cls, tuple(tupEls))

@@ -349,7 +349,6 @@ class Spanner(base.Music21Object):
     # --------------------------------------------------------------------------
     def __getitem__(self, key):
         '''
-
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.BassClef()
@@ -399,7 +398,6 @@ class Spanner(base.Music21Object):
 
     def getSpannedElementsByClass(self, classFilterList):
         '''
-
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.AltoClef()
@@ -649,8 +647,7 @@ class Spanner(base.Music21Object):
                     'Spanner.fill() requires a searchStream or getFirst().activeSite'
                 )
 
-        if t.TYPE_CHECKING:
-            assert isinstance(searchStream, stream.Stream)
+        searchStream = t.cast('stream.Stream', searchStream)
 
         endElement: base.Music21Object|None = self.getLast()
         if endElement is startElement:
@@ -700,7 +697,8 @@ class Spanner(base.Music21Object):
         else:
             endOffsetInHierarchy = opFrac(startOffsetInHierarchy + startElement.quarterLength)
 
-        matchIterator = (searchStream
+        matchIterator = (
+            searchStream
             .recurse()
             .getElementsByOffsetInHierarchy(
                 startOffsetInHierarchy,
@@ -756,7 +754,7 @@ class Spanner(base.Music21Object):
 
     def getFirst(self):
         '''
-        Get the object of the first spannedElement (or None if it's an empty spanner)
+        Get the object of the first spannedElement (or None if it's an empty spanner).
 
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
@@ -779,13 +777,13 @@ class Spanner(base.Music21Object):
 
     def isLast(self, spannedElement):
         '''
-        Given a spannedElement, is it last?  Returns True or False
+        Given a spannedElement, is it last?  Returns True or False.
         '''
         return self.getLast() is spannedElement
 
     def getLast(self):
         '''
-        Get the object of the last spannedElement (or None if it's an empty spanner)
+        Get the object of the last spannedElement (or None if it's an empty spanner).
 
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
@@ -915,7 +913,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
     def append(self, other: Spanner):
         '''
-        adds a Spanner to the bundle. Will be done automatically when adding a Spanner
+        Adds a Spanner to the bundle. Will be done automatically when adding a Spanner
         to a Stream.
         '''
         self._storage.append(other)
@@ -962,7 +960,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
     def getSpannerStorageIds(self) -> list[int]:
         '''
-        Return all SpannerStorage ids from all contained Spanners
+        Return all SpannerStorage ids from all contained Spanners.
         '''
         post: list[int] = []
         for x in self._storage:
@@ -1007,7 +1005,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
     def getByCompleteStatus(self, completeStatus: bool) -> SpannerBundle:
         '''
-        Get spanners by matching status of `completeStatus` to the same attribute
+        Get spanners by matching status of `completeStatus` to the same attribute.
 
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
@@ -1727,7 +1725,7 @@ class RepeatBracket(Spanner):
         'numberRange': '''
             Get a contiguous list of repeat numbers that are applicable for this instance.
 
-            Will always have at least one element, but [0] means undefined
+            Will always have at least one element, but [0] means undefined.
 
             >>> rb = spanner.RepeatBracket()
             >>> rb.numberRange
@@ -1761,22 +1759,33 @@ class RepeatBracket(Spanner):
     @property
     def _numberSpanIsAdjacent(self) -> bool:
         '''
-        are there exactly two numbers that should be written as 3, 4 not 3-4.
+        Are there exactly two numbers that should be written as 3, 4 not 3-4.
         '''
         return len(self.numberRange) == 2 and self.numberRange[0] == self.numberRange[1] - 1
 
     @property
     def _numberSpanIsContiguous(self) -> bool:
         '''
-        can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'
+        Can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'.
         '''
         return common.contiguousList(self.numberRange)
 
     # property to enforce numerical numbers
-    def _getNumber(self) -> str:
+    @property
+    def number(self) -> str:
         '''
-        This must return a string, as we may have single numbers or lists.
-        For a raw numerical list, look at `.numberRange`.
+        Get or set the number -- returning a string always, as we may have
+        single numbers or lists.  For a raw numerical list, look at `.numberRange`.
+
+        >>> rb = spanner.RepeatBracket()
+        >>> rb.number
+        ''
+        >>> rb.number = '5-7'
+        >>> rb.number
+        '5-7'
+        >>> rb.numberRange
+        [5, 6, 7]
+        >>> rb.number = 1
         '''
         if len(self.numberRange) == 1:
             if self.numberRange[0] == 0:
@@ -1790,10 +1799,9 @@ class RepeatBracket(Spanner):
             else:  # range of values
                 return f'{self.numberRange[0]}-{self.numberRange[-1]}'
 
-    def _setNumber(self, value: int|str|Iterable[int]):
-        '''
-        Set the bracket number. There may be range of values provided
-        '''
+    @number.setter
+    def number(self, value: int|str|Iterable[int]):
+        # There may be a range of values provided.
         if value == '':
             # undefined.
             self.numberRange = [0]
@@ -1822,20 +1830,6 @@ class RepeatBracket(Spanner):
                 self.numberRange.append(value)
         else:
             raise SpannerException(f'number for RepeatBracket must be a number, not {value!r}')
-
-    number = property(_getNumber, _setNumber, doc='''
-            Get or set the number -- returning a string always.
-
-            >>> rb = spanner.RepeatBracket()
-            >>> rb.number
-            ''
-            >>> rb.number = '5-7'
-            >>> rb.number
-            '5-7'
-            >>> rb.numberRange
-            [5, 6, 7]
-            >>> rb.number = 1
-        ''')
 
     def _reprInternal(self):
         if self.overrideDisplay is not None:
@@ -1930,10 +1924,24 @@ class Ottava(Spanner):
         self.placement = placement  # can above or below, after musicxml
         self.transposing = transposing
 
-    def _getType(self):
+    @property
+    def type(self):
+        '''
+        Get or set Ottava type. This can be set by as complete string
+        (such as 8va or 15mb) or with a pair specifying size and direction.
+
+        >>> os = spanner.Ottava()
+        >>> os.type = '8vb'
+        >>> os.type
+        '8vb'
+        >>> os.type = 15, 'down'
+        >>> os.type
+        '15mb'
+        '''
         return self._type
 
-    def _setType(self, newType):
+    @type.setter
+    def type(self, newType):
         if common.isNum(newType) and newType in (8, 15):
             if newType == 8:
                 self._type = '8va'
@@ -1960,19 +1968,6 @@ class Ottava(Spanner):
                     f'cannot create Ottava of type: {newType}')
             self._type = newType.lower()
 
-    type = property(_getType, _setType, doc='''
-        Get or set Ottava type. This can be set by as complete string
-        (such as 8va or 15mb) or with a pair specifying size and direction.
-
-        >>> os = spanner.Ottava()
-        >>> os.type = '8vb'
-        >>> os.type
-        '8vb'
-        >>> os.type = 15, 'down'
-        >>> os.type
-        '15mb'
-        ''')
-
     def _reprInternal(self):
         transposing = 'transposing'
         if not self.transposing:
@@ -1996,7 +1991,7 @@ class Ottava(Spanner):
 
     def shiftDirection(self, reverse=False):
         '''
-        Returns up or down depending on the type of shift:
+        Returns up or down depending on the type of shift.
         '''
         # an 8va mark means that the notes must be shifted down with the mark
         if self._type.endswith('a'):
@@ -2013,7 +2008,7 @@ class Ottava(Spanner):
 
     def interval(self, reverse=False):
         '''
-        return an interval.Interval() object representing this ottava
+        Return an interval.Interval() object representing this ottava.
 
         >>> ottava = spanner.Ottava(type='15mb')
         >>> i = ottava.interval()
@@ -2156,42 +2151,36 @@ class Line(Spanner):
         if startHeight is not None:
             self.startHeight = startHeight  # use property
 
-    def _getEndTick(self):
+    @property
+    def endTick(self):
+        '''
+        Get or set the endTick property.
+        '''
         return self._endTick
 
-    def _setEndTick(self, value):
+    @endTick.setter
+    def endTick(self, value):
         if value.lower() not in self.validTickTypes:
             raise SpannerException(f'not a valid value: {value}')
         self._endTick = value.lower()
 
-    endTick = property(_getEndTick, _setEndTick, doc='''
-        Get or set the endTick property.
-        ''')
-
-    def _getStartTick(self):
+    @property
+    def startTick(self):
+        '''
+        Get or set the startTick property.
+        '''
         return self._startTick
 
-    def _setStartTick(self, value):
+    @startTick.setter
+    def startTick(self, value):
         if value.lower() not in self.validTickTypes:
             raise SpannerException(f'not a valid value: {value}')
         self._startTick = value.lower()
 
-    startTick = property(_getStartTick, _setStartTick, doc='''
-        Get or set the startTick property.
-        ''')
-
-    def _getTick(self):
-        return self._startTick  # just returning start
-
-    def _setTick(self, value):
-        if value.lower() not in self.validTickTypes:
-            raise SpannerException(f'not a valid value: {value}')
-        self._startTick = value.lower()
-        self._endTick = value.lower()
-
-    tick = property(_getTick, _setTick, doc='''
+    @property
+    def tick(self):
+        '''
         Set the start and end tick to the same value
-
 
         >>> b = spanner.Line()
         >>> b.tick = 'arrow'
@@ -2199,19 +2188,19 @@ class Line(Spanner):
         'arrow'
         >>> b.endTick
         'arrow'
-        ''')
+        '''
+        return self._startTick  # just returning start
 
-    def _getLineType(self):
-        return self._lineType
-
-    def _setLineType(self, value):
-        if value is not None and value.lower() not in self.validLineTypes:
+    @tick.setter
+    def tick(self, value):
+        if value.lower() not in self.validTickTypes:
             raise SpannerException(f'not a valid value: {value}')
-        # not sure if we should permit setting as None
-        if value is not None:
-            self._lineType = value.lower()
+        self._startTick = value.lower()
+        self._endTick = value.lower()
 
-    lineType = property(_getLineType, _setLineType, doc='''
+    @property
+    def lineType(self):
+        '''
         Get or set the lineType property. Valid line types are listed in .validLineTypes.
 
         >>> b = spanner.Line()
@@ -2222,41 +2211,52 @@ class Line(Spanner):
 
         >>> b.validLineTypes
         ('solid', 'dashed', 'dotted', 'wavy')
-        ''')
+        '''
+        return self._lineType
 
-    def _getEndHeight(self):
-        return self._endHeight
-
-    def _setEndHeight(self, value):
-        if not (common.isNum(value) and value >= 0):
+    @lineType.setter
+    def lineType(self, value):
+        if value is not None and value.lower() not in self.validLineTypes:
             raise SpannerException(f'not a valid value: {value}')
-        self._endHeight = value
+        # not sure if we should permit setting as None
+        if value is not None:
+            self._lineType = value.lower()
 
-    endHeight = property(_getEndHeight, _setEndHeight, doc='''
+    @property
+    def endHeight(self):
+        '''
         Get or set the endHeight property.
 
         >>> b = spanner.Line()
         >>> b.endHeight = -20
         Traceback (most recent call last):
         music21.spanner.SpannerException: not a valid value: -20
-        ''')
+        '''
+        return self._endHeight
 
-    def _getStartHeight(self):
-        return self._startHeight
-
-    def _setStartHeight(self, value):
+    @endHeight.setter
+    def endHeight(self, value):
         if not (common.isNum(value) and value >= 0):
             raise SpannerException(f'not a valid value: {value}')
-        self._startHeight = value
+        self._endHeight = value
 
-    startHeight = property(_getStartHeight, _setStartHeight, doc='''
+    @property
+    def startHeight(self):
+        '''
         Get or set the startHeight property.
 
         >>> b = spanner.Line()
         >>> b.startHeight = None
         Traceback (most recent call last):
         music21.spanner.SpannerException: not a valid value: None
-        ''')
+        '''
+        return self._startHeight
+
+    @startHeight.setter
+    def startHeight(self, value):
+        if not (common.isNum(value) and value >= 0):
+            raise SpannerException(f'not a valid value: {value}')
+        self._startHeight = value
 
 
 class Glissando(Spanner):
@@ -2265,7 +2265,7 @@ class Glissando(Spanner):
     Different line types can be specified.
 
     Glissandos can have a label and a lineType.  Label is a string or None.
-    lineType defaults to 'wavy'
+    lineType defaults to 'wavy'.
 
     >>> gl = spanner.Glissando()
     >>> gl.lineType
@@ -2300,17 +2300,18 @@ class Glissando(Spanner):
         if label is not None:
             self.label = label  # use property
 
-    def _getLineType(self):
+    @property
+    def lineType(self):
+        '''
+        Get or set the lineType property. See Line for valid line types.
+        '''
         return self._lineType
 
-    def _setLineType(self, value):
+    @lineType.setter
+    def lineType(self, value):
         if value.lower() not in self.validLineTypes:
             raise SpannerException(f'not a valid value: {value}')
         self._lineType = value.lower()
-
-    lineType = property(_getLineType, _setLineType, doc='''
-        Get or set the lineType property. See Line for valid line types.
-        ''')
 
     @property
     def slideType(self):
@@ -2402,10 +2403,9 @@ class Test(unittest.TestCase):
 
     def testSpannerAnchorRepr(self):
         from music21 import stream
-        from music21 import spanner
 
         # SpannerAnchor with no activeSite
-        sa1 = spanner.SpannerAnchor()
+        sa1 = SpannerAnchor()
         self.assertEqual(repr(sa1), '<music21.spanner.SpannerAnchor unanchored>')
 
         # SpannerAnchor with activeSite, but no duration
@@ -2418,19 +2418,17 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(sa1), '<music21.spanner.SpannerAnchor at 0.5-3.0>')
 
     def testSpannerRepr(self):
-        from music21 import spanner
-        su1 = spanner.Slur()
+        su1 = Slur()
         self.assertEqual(repr(su1), '<music21.spanner.Slur>')
 
     def testSpannerFill(self):
         from music21 import stream
         from music21 import note
-        from music21 import spanner
         theNotes = [note.Note('A'), note.Note('B'), note.Note('C'), note.Note('D')]
         m = stream.Measure(theNotes)
 
         # Spanner with no fillElementTypes
-        sp = spanner.Spanner(theNotes[0], theNotes[3])
+        sp = Spanner(theNotes[0], theNotes[3])
         sp.fill(m)
         # should not have done anything
         noFillElements = [theNotes[0], theNotes[3]]
@@ -2439,7 +2437,7 @@ class Test(unittest.TestCase):
             self.assertIs(el, noFillElements[i])
 
         # Ottava with filledStatus == True
-        ott1 = spanner.Ottava(noFillElements)
+        ott1 = Ottava(noFillElements)
         ott1.filledStatus = True  # pretend it has already been filled
         ott1.fill(m)
         # should not have done anything
@@ -2457,20 +2455,20 @@ class Test(unittest.TestCase):
             self.assertIs(el, theNotes[i])
 
         # Ottava with no elements
-        ott2 = spanner.Ottava()
+        ott2 = Ottava()
         ott2.fill(m)
         self.assertEqual(len(ott2), 0)
 
         # Ottava with only element not in searchStream
         expectedElements = [note.Note('E')]
-        ott3 = spanner.Ottava(expectedElements)
+        ott3 = Ottava(expectedElements)
         ott3.fill(m)
         self.assertEqual(len(ott3), 1)
         self.assertIs(ott3.getFirst(), expectedElements[0])
 
         # Ottava with start element not in searchStream, end element is
         expectedElements = [note.Note('F'), m.notes[0]]
-        ott4 = spanner.Ottava(expectedElements)
+        ott4 = Ottava(expectedElements)
         ott4.fill(m)
         self.assertEqual(len(ott4), 2)
         for i, el in enumerate(ott4.getSpannedElements()):
@@ -2478,40 +2476,38 @@ class Test(unittest.TestCase):
 
         # Ottava with endElement not in searchStream, startElement is
         expectedElements = [m.notes[0], note.Note('G')]
-        ott5 = spanner.Ottava(expectedElements)
+        ott5 = Ottava(expectedElements)
         ott5.fill(m)
         self.assertEqual(len(ott5), 2)
         for i, el in enumerate(ott5.getSpannedElements()):
             self.assertIs(el, expectedElements[i])
 
     def testSpannerBundle(self):
-        from music21 import spanner
         from music21 import stream
 
-        su1 = spanner.Slur()
+        su1 = Slur()
         su1.idLocal = 1
-        su2 = spanner.Slur()
+        su2 = Slur()
         su2.idLocal = 2
-        sb = spanner.SpannerBundle()
+        sb = SpannerBundle()
         sb.append(su1)
         sb.append(su2)
         self.assertEqual(len(sb), 2)
         self.assertEqual(sb[0], su1)
         self.assertEqual(sb[1], su2)
 
-        su3 = spanner.Slur()
-        su4 = spanner.Slur()
+        su3 = Slur()
+        su4 = Slur()
 
         s = stream.Stream()
         s.append(su3)
         s.append(su4)
-        sb2 = spanner.SpannerBundle(list(s))
+        sb2 = SpannerBundle(list(s))
         self.assertEqual(len(sb2), 2)
         self.assertEqual(sb2[0], su3)
         self.assertEqual(sb2[1], su4)
 
     def testDeepcopySpanner(self):
-        from music21 import spanner
         from music21 import note
 
         # how slurs might be defined
@@ -2533,7 +2529,7 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.getSpannerSites(), [su1, su2])
         self.assertEqual(n3.getSpannerSites(), [su1, su2])
 
-        sb1 = spanner.SpannerBundle([su1, su2])
+        sb1 = SpannerBundle([su1, su2])
         sb2 = copy.deepcopy(sb1)
         self.assertEqual(sb1[0].getSpannedElements(), [n1, n3])
         self.assertEqual(sb2[0].getSpannedElements(), [n1, n3])
@@ -2542,7 +2538,6 @@ class Test(unittest.TestCase):
 
     def testReplaceSpannedElement(self):
         from music21 import note
-        from music21 import spanner
 
         n1 = note.Note()
         n2 = note.Note()
@@ -2550,7 +2545,7 @@ class Test(unittest.TestCase):
         n4 = note.Note()
         n5 = note.Note()
 
-        su1 = spanner.Slur()
+        su1 = Slur()
         su1.addSpannedElements([n1, n3])
 
         self.assertEqual(su1.getSpannedElements(), [n1, n3])
@@ -2568,10 +2563,10 @@ class Test(unittest.TestCase):
         self.assertEqual(n2.getSpannerSites(), [])
         self.assertEqual(n1.getSpannerSites(), [su1])
 
-        su2 = spanner.Slur()
+        su2 = Slur()
         su2.addSpannedElements([n3, n4])
 
-        su3 = spanner.Slur()
+        su3 = Slur()
         su3.addSpannedElements([n4, n5])
 
         # n1a = note.Note()
@@ -2580,7 +2575,7 @@ class Test(unittest.TestCase):
         n4a = note.Note()
         # n5a = note.Note()
 
-        sb1 = spanner.SpannerBundle([su1, su2, su3])
+        sb1 = SpannerBundle([su1, su2, su3])
         self.assertEqual(len(sb1), 3)
         self.assertEqual(list(sb1), [su1, su2, su3])
 
@@ -2601,18 +2596,16 @@ class Test(unittest.TestCase):
         self.assertEqual(sb1[2].getSpannedElements(), [n4a, n5])
 
     def testRepeatBracketA(self):
-        from music21 import spanner
         from music21 import stream
 
         m1 = stream.Measure()
-        rb1 = spanner.RepeatBracket(m1)
+        rb1 = RepeatBracket(m1)
         # if added again; it is not really added, it simply is ignored
         rb1.addSpannedElements(m1)
         self.assertEqual(len(rb1), 1)
 
     def testRepeatBracketB(self):
         from music21 import note
-        from music21 import spanner
         from music21 import stream
         from music21 import bar
 
@@ -2628,19 +2621,19 @@ class Test(unittest.TestCase):
         m3.repeatAppend(note.Note('g#4'), 4)
         m3.rightBarline = bar.Repeat(direction='end')
         p.append(m3)
-        p.append(spanner.RepeatBracket(m3, number=1))
+        p.append(RepeatBracket(m3, number=1))
 
         m4 = stream.Measure()
         m4.repeatAppend(note.Note('a4'), 4)
         m4.rightBarline = bar.Repeat(direction='end')
         p.append(m4)
-        p.append(spanner.RepeatBracket(m4, number=2))
+        p.append(RepeatBracket(m4, number=2))
 
         m5 = stream.Measure()
         m5.repeatAppend(note.Note('b4'), 4)
         m5.rightBarline = bar.Repeat(direction='end')
         p.append(m5)
-        p.append(spanner.RepeatBracket(m5, number=3))
+        p.append(RepeatBracket(m5, number=3))
 
         m6 = stream.Measure()
         m6.repeatAppend(note.Note('c#5'), 4)
@@ -2652,7 +2645,6 @@ class Test(unittest.TestCase):
     # noinspection DuplicatedCode
     def testRepeatBracketC(self):
         from music21 import note
-        from music21 import spanner
         from music21 import stream
         from music21 import bar
 
@@ -2669,7 +2661,7 @@ class Test(unittest.TestCase):
         m3.repeatAppend(note.Note('g#4'), 4)
         m3.rightBarline = bar.Repeat(direction='end')
         p.append(m3)
-        rb1 = spanner.RepeatBracket(number=1)
+        rb1 = RepeatBracket(number=1)
         rb1.addSpannedElements(m2, m3)
         self.assertEqual(len(rb1), 2)
         p.insert(0, rb1)
@@ -2678,7 +2670,7 @@ class Test(unittest.TestCase):
         m4.repeatAppend(note.Note('a4'), 4)
         m4.rightBarline = bar.Repeat(direction='end')
         p.append(m4)
-        p.append(spanner.RepeatBracket(m4, number=2))
+        p.append(RepeatBracket(m4, number=2))
 
         m5 = stream.Measure()
         m5.repeatAppend(note.Note('b4'), 4)
@@ -2697,7 +2689,6 @@ class Test(unittest.TestCase):
     # noinspection DuplicatedCode
     def testRepeatBracketD(self):
         from music21 import note
-        from music21 import spanner
         from music21 import stream
         from music21 import bar
 
@@ -2714,7 +2705,7 @@ class Test(unittest.TestCase):
         m3.repeatAppend(note.Note('g#4'), 4)
         m3.rightBarline = bar.Repeat(direction='end')
         p.append(m3)
-        rb1 = spanner.RepeatBracket(number=1)
+        rb1 = RepeatBracket(number=1)
         rb1.addSpannedElements(m2, m3)
         self.assertEqual(len(rb1), 2)
         p.insert(0, rb1)
@@ -2728,7 +2719,7 @@ class Test(unittest.TestCase):
         m5.rightBarline = bar.Repeat(direction='end')
         p.append(m5)
 
-        rb2 = spanner.RepeatBracket(number=2)
+        rb2 = RepeatBracket(number=2)
         rb2.addSpannedElements(m4, m5)
         self.assertEqual(len(rb2), 2)
         p.insert(0, rb2)
@@ -2746,7 +2737,7 @@ class Test(unittest.TestCase):
         m8.rightBarline = bar.Repeat(direction='end')
         p.append(m8)
 
-        rb3 = spanner.RepeatBracket(number=3)
+        rb3 = RepeatBracket(number=3)
         rb3.addSpannedElements(m6, m8)
         self.assertEqual(len(rb3), 2)
         p.insert(0, rb3)
@@ -2768,7 +2759,7 @@ class Test(unittest.TestCase):
         m12.rightBarline = bar.Repeat(direction='end')
         p.append(m12)
 
-        rb4 = spanner.RepeatBracket(number=4)
+        rb4 = RepeatBracket(number=4)
         rb4.addSpannedElements(m9, m10, m11, m12)
         self.assertEqual(len(rb4), 4)
         p.insert(0, rb4)
@@ -2797,7 +2788,6 @@ class Test(unittest.TestCase):
 
     def testRepeatBracketE(self):
         from music21 import note
-        from music21 import spanner
         from music21 import stream
         from music21 import bar
 
@@ -2813,19 +2803,19 @@ class Test(unittest.TestCase):
         m3.repeatAppend(note.Note('g#4'), 1)
         m3.rightBarline = bar.Repeat(direction='end')
         p.append(m3)
-        p.append(spanner.RepeatBracket(m3, number=1))
+        p.append(RepeatBracket(m3, number=1))
 
         m4 = stream.Measure(number=4)
         m4.repeatAppend(note.Note('a4'), 1)
         m4.rightBarline = bar.Repeat(direction='end')
         p.append(m4)
-        p.append(spanner.RepeatBracket(m4, number=2))
+        p.append(RepeatBracket(m4, number=2))
 
         m5 = stream.Measure(number=5)
         m5.repeatAppend(note.Note('b4'), 1)
         m5.rightBarline = bar.Repeat(direction='end')
         p.append(m5)
-        p.append(spanner.RepeatBracket(m5, number=3))
+        p.append(RepeatBracket(m5, number=3))
 
         m6 = stream.Measure(number=6)
         m6.repeatAppend(note.Note('c#5'), 1)
@@ -2866,7 +2856,6 @@ class Test(unittest.TestCase):
         from music21 import stream
         from music21 import note
         from music21 import chord
-        from music21.spanner import Ottava   # need to do it this way for classSet
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
         # s.repeatAppend(note.Note(), 12)
@@ -2918,10 +2907,9 @@ class Test(unittest.TestCase):
         '''
         from music21 import stream
         from music21 import note
-        from music21 import spanner
         s = stream.Stream()
         n = note.Note('c4')
-        sp = spanner.Ottava(n)
+        sp = Ottava(n)
         s.append(n)
         s.append(sp)
         # s.show()
@@ -2970,16 +2958,15 @@ class Test(unittest.TestCase):
     def testLineA(self):
         from music21 import stream
         from music21 import note
-        from music21 import spanner
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[len(s.notes) // 2]
         n3 = s.notes[-1]
-        sp1 = spanner.Line(n1, n2, startTick='up', lineType='dotted')
-        sp2 = spanner.Line(n2, n3, startTick='down', lineType='dashed',
-                                    endHeight=40)
+        sp1 = Line(n1, n2, startTick='up', lineType='dotted')
+        sp2 = Line(n2, n3, startTick='down', lineType='dashed',
+                   endHeight=40)
         s.append(sp1)
         s.append(sp2)
         # s.show('t')
@@ -2990,7 +2977,6 @@ class Test(unittest.TestCase):
     def testLineB(self):
         from music21 import stream
         from music21 import note
-        from music21 import spanner
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -3000,8 +2986,8 @@ class Test(unittest.TestCase):
         n3 = s.notes[0]
         n4 = s.notes[2]
 
-        sp1 = spanner.Line(n1, n2, startTick='up', endTick='down', lineType='solid')
-        sp2 = spanner.Line(n3, n4, startTick='arrow', endTick='none', lineType='solid')
+        sp1 = Line(n1, n2, startTick='up', endTick='down', lineType='solid')
+        sp2 = Line(n3, n4, startTick='arrow', endTick='none', lineType='solid')
 
         s.append(sp1)
         s.append(sp2)
@@ -3017,7 +3003,6 @@ class Test(unittest.TestCase):
     def testGlissandoA(self):
         from music21 import stream
         from music21 import note
-        from music21 import spanner
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 3)
@@ -3028,8 +3013,8 @@ class Test(unittest.TestCase):
         n1 = s.notes[0]
         n2 = s.notes[len(s.notes) // 2]
         n3 = s.notes[-1]
-        sp1 = spanner.Glissando(n1, n2)
-        sp2 = spanner.Glissando(n2, n3)
+        sp1 = Glissando(n1, n2)
+        sp2 = Glissando(n2, n3)
         sp2.lineType = 'dashed'
         s.append(sp1)
         s.append(sp2)
@@ -3043,7 +3028,6 @@ class Test(unittest.TestCase):
     def testGlissandoB(self):
         from music21 import stream
         from music21 import note
-        from music21 import spanner
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -3053,7 +3037,7 @@ class Test(unittest.TestCase):
         # note: this does not support glissandi between non-adjacent notes
         n1 = s.notes[0]
         n2 = s.notes[1]
-        sp1 = spanner.Glissando(n1, n2)
+        sp1 = Glissando(n1, n2)
         sp1.lineType = 'solid'
         sp1.label = 'gliss.'
         s.append(sp1)
@@ -3084,7 +3068,6 @@ class Test(unittest.TestCase):
 
     def testOneElementSpanners(self):
         from music21 import note
-        from music21.spanner import Spanner
 
         n1 = note.Note()
         sp = Spanner()
@@ -3097,7 +3080,6 @@ class Test(unittest.TestCase):
     def testRemoveSpanners(self):
         from music21 import stream
         from music21 import note
-        from music21.spanner import Spanner, Slur
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -3121,7 +3103,6 @@ class Test(unittest.TestCase):
         from music21 import stream
         from music21 import note
         from music21 import converter
-        from music21.spanner import Slur
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -3141,7 +3122,6 @@ class Test(unittest.TestCase):
     def testDeepcopyJustSpannerAndNotes(self):
         from music21 import note
         from music21 import clef
-        from music21.spanner import Spanner
 
         n1 = note.Note('g')
         n2 = note.Note('f#')
@@ -3160,7 +3140,6 @@ class Test(unittest.TestCase):
         from music21 import note
         from music21 import clef
         from music21 import stream
-        from music21.spanner import Spanner
 
         n1 = note.Note('g')
         n2 = note.Note('f#')
@@ -3183,7 +3162,6 @@ class Test(unittest.TestCase):
         from music21 import note
         from music21 import clef
         from music21 import stream
-        from music21.spanner import Spanner
 
         n1 = note.Note('g')
         n2 = note.Note('f#')
@@ -3207,7 +3185,6 @@ class Test(unittest.TestCase):
     def testDeepcopyNotesAndSpannerInStream(self):
         from music21 import note
         from music21 import stream
-        from music21.spanner import Spanner
 
         n1 = note.Note('G4')
         n2 = note.Note('F#4')
@@ -3232,7 +3209,6 @@ class Test(unittest.TestCase):
     def testDeepcopyStreamWithSpanners(self):
         from music21 import note
         from music21 import stream
-        from music21.spanner import Slur
 
         n1 = note.Note()
         su1 = Slur((n1,))
@@ -3256,7 +3232,6 @@ class Test(unittest.TestCase):
 
     def testGetSpannedElementIds(self):
         from music21 import note
-        from music21.spanner import Spanner
 
         n1 = note.Note('g')
         n2 = note.Note('f#')

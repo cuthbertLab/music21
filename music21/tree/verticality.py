@@ -39,7 +39,7 @@ if t.TYPE_CHECKING:
 
 environLocal = environment.Environment('tree.verticality')
 
-PitchedTimespanQuartet = tuple[
+type PitchedTimespanQuartet = tuple[
     tuple[spans.PitchedTimespan, spans.PitchedTimespan],
     tuple[spans.PitchedTimespan, spans.PitchedTimespan],
 ]
@@ -52,7 +52,7 @@ class VerticalityException(exceptions21.TreeException):
 class Verticality(prebase.ProtoM21Object):
     r'''
     A collection of information about elements that are sounding at a given
-    offset or just finished at that offset or are continuing from before, etc..
+    offset or just finished at that offset or are continuing from before, etc.
 
     Create a timespan-stream from a score:
 
@@ -360,7 +360,7 @@ class Verticality(prebase.ProtoM21Object):
         if tree is None:
             return None
         offset = tree.getPositionAfter(self.offset)
-        return offset
+        return t.cast('float | None', offset)
 
     @property
     def nextVerticality(self):
@@ -1051,7 +1051,7 @@ class Verticality(prebase.ProtoM21Object):
             if not hasattr(pairedMotion[0][0], 'pitches'):
                 continue  # not a PitchedTimespan
 
-            if includeNoMotion is False:
+            if not includeNoMotion:
                 if (pairedMotion[0][0].pitches == pairedMotion[0][1].pitches
                         and pairedMotion[1][0].pitches == pairedMotion[1][1].pitches):
                     continue
@@ -1064,13 +1064,13 @@ class Verticality(prebase.ProtoM21Object):
                     if ((verticalityStreamParts[pp[0]] == thisQuartetTopPart
                             or verticalityStreamParts[pp[0]] == thisQuartetBottomPart)
                         and (verticalityStreamParts[pp[1]] == thisQuartetTopPart
-                            or verticalityStreamParts[pp[1]] == thisQuartetBottomPart)):
+                             or verticalityStreamParts[pp[1]] == thisQuartetBottomPart)):
                         isAppropriate = True
                         break
                 if not isAppropriate:
                     continue
 
-            if returnObjects is False:
+            if not returnObjects:
                 filteredList.append(pairedMotion)
             else:
                 n11 = pairedMotion[0][0].element
@@ -1160,15 +1160,15 @@ class Verticality(prebase.ProtoM21Object):
             if previousTs is None or not isinstance(previousTs, spans.PitchedTimespan):
                 continue  # first not in piece in this part
 
-            if includeRests is False:
+            if not includeRests:
                 if previousTs not in stopTss:
                     continue
-            if includeOblique is False and startingTs.pitches == previousTs.pitches:
+            if not includeOblique and startingTs.pitches == previousTs.pitches:
                 continue
             tsTuple = (previousTs, startingTs)
             allPairedMotions.append(tsTuple)
 
-        if includeOblique is True:
+        if includeOblique:
             for overlapTs in overlapTss:
                 if not isinstance(overlapTs, spans.PitchedTimespan):
                     continue

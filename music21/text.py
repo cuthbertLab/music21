@@ -131,7 +131,7 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n', *, wordSepar
     Concatenate all Lyrics text from a stream separated by lyricSeparation.
     The Stream is automatically recursed.
 
-    uses assembleLyrics to do the heavy work.
+    Uses assembleLyrics to do the heavy work.
 
     maxLyrics just determines how many times we should parse through the score, since it is
     not easy to determine what the maximum number of lyrics exist in the score.
@@ -291,7 +291,6 @@ class TextBox(base.Music21Object):
 
     .. image:: images/textBoxes-01.*
         :width: 600
-
     '''
     _styleClass = style.TextStyle
     classSortOrder = -31  # text expressions are -30
@@ -413,11 +412,11 @@ class LanguageDetector:
         '''
         Read the stored trigrams once and store them for later.
 
-        Called on first LanguageDectector read.
+        Called on first LanguageDetector read.
         '''
         for languageCode in cls.languageCodes:
             thisExcerpt = (common.getSourceFilePath() / 'languageExcerpts'
-                            / 'trainingData' / (languageCode + '.txt'))
+                           / 'trainingData' / (languageCode + '.txt'))
 
             with thisExcerpt.open(encoding='utf-8') as f:
                 excerptWords = f.read().split()
@@ -469,7 +468,7 @@ class LanguageDetector:
 
     def mostLikelyLanguageNumeric(self, excerpt=None):
         '''
-        returns a number representing the most likely language for a passage
+        Returns a number representing the most likely language for a passage
         or 0 if there is no text.
 
         Useful for feature extraction.
@@ -578,7 +577,7 @@ class Trigram:
 
     def measure(self):
         '''
-        calculates the scalar length of the trigram vector and
+        Calculates the scalar length of the trigram vector and
         stores it in self.length.
         '''
         total = 0
@@ -589,7 +588,7 @@ class Trigram:
 
     def similarity(self, other: Trigram) -> float:
         '''
-        returns a number between 0 and 1 indicating similarity between
+        Returns a number between 0 and 1 indicating similarity between
         two trigrams.
 
         1.0 means an identical ratio of trigrams;
@@ -615,14 +614,14 @@ class Trigram:
 
     def __sub__(self, other: Trigram) -> float:
         '''
-        indicates difference between trigram sets; 1.0 is entirely
+        Indicates difference between trigram sets; 1.0 is entirely
         different, 0.0 is entirely the same.
         '''
         return 1.0 - self.similarity(other)
 
     def makeWords(self, count):
         '''
-        returns a string of made-up words based on the known text.
+        Returns a string of made-up words based on the known text.
         '''
         text = []
         k = '  '

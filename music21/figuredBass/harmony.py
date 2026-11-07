@@ -66,7 +66,7 @@ class FiguredBass(Harmony):
                  figureString: str = '',
                  *,
                  figureStrings: Iterable[str] = (),
-                 **keywords):
+                 **keywords) -> None:
         super().__init__(**keywords)
 
         self._figs: str = ''
@@ -100,7 +100,7 @@ class FiguredBass(Harmony):
         return self._figNotation
 
     @notation.setter
-    def notation(self, figureNotation: notation.Notation):
+    def notation(self, figureNotation: notation.Notation) -> None:
         self._figNotation = figureNotation
         self._figs = figureNotation.notationColumn
 
@@ -126,7 +126,7 @@ class FiguredBass(Harmony):
         return self._figs
 
     @figureString.setter
-    def figureString(self, figureString: str):
+    def figureString(self, figureString: str) -> None:
         self._figs = figureString
         self.notation = notation.Notation(self._figs)
 
@@ -153,7 +153,7 @@ class FiguredBass(Harmony):
     def figureStrings(self, figureStrings: Iterable[str]) -> None:
         self.figureString = ','.join(figureStrings)
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         return self.notation.notationColumn
 
 

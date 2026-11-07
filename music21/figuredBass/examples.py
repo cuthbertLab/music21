@@ -21,15 +21,19 @@ calling :meth:`~music21.base.Music21Object.show`.
 from __future__ import annotations
 
 import copy
+import typing as t
 import unittest
 
 from music21.figuredBass import realizer
 from music21.figuredBass import rules
 
+if t.TYPE_CHECKING:
+    from music21 import stream
+
 # ------------------------------------------------------------------------------
 
 
-def exampleA():
+def exampleA() -> realizer.FiguredBassLine:
     '''
     This example was a homework assignment for 21M.302: Harmony & Counterpoint II
     at MIT in the fall of 2010, taught by Charles Shadle of the MIT Music Program.
@@ -76,7 +80,7 @@ def exampleA():
     return realizer.figuredBassFromStream(s)
 
 
-def exampleD():
+def exampleD() -> realizer.FiguredBassLine:
     '''
     This example was a homework assignment for 21M.302: Harmony & Counterpoint II
     at MIT in the fall of 2010, taught by Charles Shadle of the MIT Music Program.
@@ -139,7 +143,7 @@ def exampleD():
     return realizer.figuredBassFromStream(s)
 
 
-def exampleB():
+def exampleB() -> realizer.FiguredBassLine:
     '''
     This example was retrieved from page 114 of *The Music Theory Handbook* by Marjorie Merryman.
 
@@ -182,7 +186,7 @@ def exampleB():
     return realizer.figuredBassFromStream(s)
 
 
-def exampleC():
+def exampleC() -> realizer.FiguredBassLine:
     '''
     This example was retrieved from page 114 of *The Music Theory Handbook* by Marjorie Merryman.
 
@@ -227,7 +231,7 @@ def exampleC():
     return realizer.figuredBassFromStream(s)
 
 
-def V43ResolutionExample():
+def V43ResolutionExample() -> realizer.FiguredBassLine:
     '''
     The dominant 4,3 can resolve to either the tonic 5,3 or tonic 6,3. The proper resolution
     is dependent on the bass note of the tonic, and is determined in context, as shown in the
@@ -248,7 +252,7 @@ def V43ResolutionExample():
     return realizer.figuredBassFromStream(s)
 
 
-def viio65ResolutionExample():
+def viio65ResolutionExample() -> realizer.FiguredBassLine:
     '''
     For a fully diminished seventh chord resolving to the tonic, the resolution chord
     can contain either a doubled third (standard resolution) or a doubled tonic (alternate
@@ -278,7 +282,7 @@ def viio65ResolutionExample():
     return realizer.figuredBassFromStream(s)
 
 
-def augmentedSixthResolutionExample():
+def augmentedSixthResolutionExample() -> realizer.FiguredBassLine:
     '''
     This example was retrieved from page 61 of *The Music Theory Handbook* by Marjorie Merryman.
 
@@ -308,7 +312,7 @@ def augmentedSixthResolutionExample():
     return realizer.figuredBassFromStream(s)
 
 
-def italianA6ResolutionExample():
+def italianA6ResolutionExample() -> realizer.FiguredBassLine:
     '''
     The Italian augmented sixth chord (It+6) is the only
     augmented sixth chord to consist of only three
@@ -353,7 +357,7 @@ def italianA6ResolutionExample():
     return realizer.figuredBassFromStream(s)
 
 
-def twelveBarBlues():
+def twelveBarBlues() -> realizer.FiguredBassLine:
     '''
     This is a progression in Bb major based on the twelve bar blues. The progression used is:
 
@@ -392,7 +396,10 @@ def twelveBarBlues():
 # Functions that generate Boogie/Blues vamps.
 
 
-def generateBoogieVamp(blRealization=None, numRepeats=5):
+def generateBoogieVamp(
+    blRealization: realizer.Realization | None = None,
+    numRepeats: int = 5,
+) -> stream.Score:
     '''
     Turns whole notes in twelve bar blues bass line to blues boogie woogie bass line. Takes
     in numRepeats, which is the number of times to repeat the bass line. Also, takes in a
@@ -440,7 +447,10 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
     return newScore
 
 
-def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
+def generateTripletBlues(
+    blRealization: realizer.Realization | None = None,
+    numRepeats: int = 5,
+) -> stream.Score:  # 12/8
     '''
     Turns whole notes in twelve bar blues bass line to triplet blues bass line. Takes
     in numRepeats, which is the number of times to repeat the bass line. Also, takes in a

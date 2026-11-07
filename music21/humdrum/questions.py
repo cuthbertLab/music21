@@ -78,7 +78,7 @@ class Test(unittest.TestCase):
     #     # for part in partStream.partData:
     #     # a part stream could have an iterator that partitions itself
     #     # into measure-length part streams
-    #     for measure in partStream.getElementsByClass(stream.Measure)():  # () ?
+    #     for measure in partStream.getElementsByClass(stream.Measure):
     #         # measure is a partStream isolated for just the desired measure
     #         # assuming only one meter per measure
     #         meterObj = measure['meter']
@@ -120,7 +120,7 @@ class Test(unittest.TestCase):
     #         # this could be contained w/n a part stream
     #         pageStream = partStream['pages']
     #         # assuming we have classes for things on pages, such as
-    #         # titles and other tex annotations
+    #         # titles and other text annotations
     #         # here, we get these only from the first page
     #         titleCandidates += pageStream[0].getElementsByClass(TextAnnotation)
     #         # an additional slot might be used to store metadata, also
@@ -145,7 +145,7 @@ class Test(unittest.TestCase):
     #     partStream = converter.parse('dichterliebe1.xml')
     #
     #     # we might look at arpeggios as a type of extractable phrase,
-    #     # looking fo open spacings, even rhythms, and chordal forms
+    #     # looking for open spacings, even rhythms, and chordal forms
     #     phraseStream = analysis.phraseExtract(partStream, ['arpeggio'])
     #     newStream = Stream()
     #     newStream.append(partStream.notationStream)
@@ -230,7 +230,7 @@ class Test(unittest.TestCase):
 
     # def xtest010(self):
     #     '''
-    #     Assemble individual parts into a full scores.
+    #     Assemble individual parts into a full scores. [sic]
     #     '''
     #     partStream = PartStream()
     #     for part in PartsList:
@@ -502,7 +502,7 @@ class Test(unittest.TestCase):
 #     8.    Are dynamic swells (crescendo-diminuendos) more
 #                common than dips (diminuendos-crescendos)?
 #     9.    Are lower pitches likely to be shorter and higher pitches likely to be longer?
-#     10.    Assemble individual parts into a full scores.
+#     10.    Assemble individual parts into a full scores. [sic]
 #     11.    Assemble syllables into words for some vocal text.
 #     12.    Calculate all the permuted harmonic intervals in a chord.
 #     13.    Calculate changes of listeners' heart-rate from physiological data.
@@ -548,7 +548,7 @@ class Test(unittest.TestCase):
 #     46.    Count the number of notes in measures 8 to 16.
 #     47.    Count the number of notes in the exposition.
 #     48.    Count the number of phrases in a score.
-#     49.    Count the number of phrases in each work containing `Liebe' in the title.
+#     49.    Count the number of phrases in each work containing 'Liebe' in the title.
 #     50.    Count the number of phrases in the development.
 #     51.    Count the number of phrases that begin on the subdominant pitch.
 #     52.    Count the number of phrases that end on the subdominant pitch.
@@ -617,7 +617,7 @@ class Test(unittest.TestCase):
 #                tends to be shorter than the final phrase.
 #     99.    Determine whether the subdominant pitch is used
 #                less often in pop melodies than in French chanson.
-#     100.    Determine whether the words `high,' `hoch,' or `haut'
+#     100.    Determine whether the words 'high,' 'hoch,' or 'haut'
 #                tend to coincide with higher pitches in a vocal work.
 #     101.    Determine whether there are any notes in the bassoon part.
 #     102.    Determine whether tonic pitches tend to be followed
@@ -637,7 +637,7 @@ class Test(unittest.TestCase):
 #     113.    Estimate the degree of emotionality for some vocal text.
 #     114.    Estimate the sensory dissonance evoked by some frequency spectrum.
 #     115.    Expand all the verses for a strophic song.
-#     116.    Expand repeats to a `through-composed' version of the score.
+#     116.    Expand repeats to a 'through-composed' version of the score.
 #     117.    Extract anacrusis material and the final measure from two scores.
 #     118.    Extract and transpose the trumpet part to concert pitch.
 #     119.    Extract any transposing instruments.
@@ -678,7 +678,7 @@ class Test(unittest.TestCase):
 #     154.    Find all 18th century works that include French horns and oboes.
 #     155.    Find all Corelli works that contain a change of meter.
 #     156.    Find all heterophonic works.
-#     157.    Find all jazz works designated `bebop' in style.
+#     157.    Find all jazz works designated 'bebop' in style.
 #     158.    Find all Rondo movements.
 #     159.    Find all scores composed by Cesar Franck.
 #     160.    Find all scores containing one or more brass instruments.
@@ -717,7 +717,7 @@ class Test(unittest.TestCase):
 #     189.    Identify all scores containing a tuba but not a trumpet.
 #     190.    Identify all works not in the keys of C major, G major, B-flat major or D minor.
 #     191.    Identify all works that are in compound meters, but not quadruple compound.
-#     192.    Identify all works that end with a `tierce de picardie'.
+#     192.    Identify all works that end with a 'tierce de picardie'.
 #     193.    Identify alliterations in a vocal text.
 #     194.    Identify any augmented sixth chords.
 #     195.    Identify any augmented sixth intervals in Bach's two-part inventions.
@@ -740,16 +740,16 @@ class Test(unittest.TestCase):
 #     210.    Identify any subdominant chords between measures 80 and 86.
 #     211.    Identify any tritone intervals that are not spelled
 #                as augmented fourths or diminished fifths.
-#     212.    Identify any works that are classified as `Ballads'.
+#     212.    Identify any works that are classified as 'Ballads'.
 #     213.    Identify any works that are in irregular meters.
 #     214.    Identify any works that are in simple triple meters.
 #     215.    Identify any works that are not composed by [Robert] Schumann.
 #     216.    Identify any works that bear a dedication.
 #     217.    Identify any works that contain passages in 9/8 meter.
 #     218.    Identify any works that contain passages in either 3/8 or 9/8 meter.
-#     219.    Identify any works that contain the word `Amour' in the title.
-#     220.    Identify any works that contain the words `Drei' and `Koenige'.
-#     221.    Identify any works that contain the words `Liebe' and `Tod' in the title.
+#     219.    Identify any works that contain the word 'Amour' in the title.
+#     220.    Identify any works that contain the words 'Drei' and 'Koenige'.
+#     221.    Identify any works that contain the words 'Liebe' and 'Tod' in the title.
 #     222.    Identify any works that don't contain any double barlines.
 #     223.    Identify any works whose instrumentation includes a cornet but not a trumpet.
 #     224.    Identify any works whose instrumentation includes a trumpet and a cornet.
@@ -763,7 +763,7 @@ class Test(unittest.TestCase):
 #     232.    Identify how often a high subdominant note in a long-short-long rhythm is
 #                followed by a low submediant in a long-long-short context.
 #     233.    Identify how often the flute is resting when the trumpet is active.
-#     234.    Identify how the melodic intervals in measures 8 to 32.
+#     234.    Identify how the melodic intervals in measures 8 to 32. [sic]
 #     235.    Identify melodic intervals (avoiding intervals spanning rests).
 #     236.    Identify overlapped parts.
 #     237.    Identify parts that are out of range.
@@ -772,7 +772,7 @@ class Test(unittest.TestCase):
 #     240.    Identify possible recapitulation passages.
 #     241.    Identify possible sonata-allegro movements.
 #     242.    Identify progressions that are similar to II-IV-V-I.
-#     243.    Identify similes using `like' or `as' in some vocal text.
+#     243.    Identify similes using 'like' or 'as' in some vocal text.
 #     244.    Identify the available versions of a score.
 #     245.    Identify the average overall dynamic level for a work.
 #     246.    Identify the crossing of parts.
@@ -786,7 +786,7 @@ class Test(unittest.TestCase):
 #     254.    Identify the most common harmonic interval arrangement in some score.
 #     255.    Identify the most common harmonic progression apart from the V-I progression.
 #     256.    Identify the most common sequence of five melodic intervals.
-#     257.    Identify the most common word following `gloria' in Gregorian chants.
+#     257.    Identify the most common word following 'gloria' in Gregorian chants.
 #     258.    Identify the number of notes per syllable for some score.
 #     259.    Identify the number of notes per word for some score.
 #     260.    Identify the number of syllables per phrase for some work.
@@ -804,9 +804,9 @@ class Test(unittest.TestCase):
 #     270.    Identify unison doublings.
 #     271.    Identify what harmonic intervals precede the interval of an octave.
 #     272.    Identify what scale degree most commonly precedes the dominant pitch.
-#     273.    Identify whether a score contains an `Andante' section.
+#     273.    Identify whether a score contains an 'Andante' section.
 #     274.    Identify whether a score contains any double sharps.
-#     275.    Identify whether any score contains an `Andante' section.
+#     275.    Identify whether any score contains an 'Andante' section.
 #     276.    Identify whether drinking songs are more apt to be in triple meter.
 #     277.    Identify whether dynamics are gradual or terraced.
 #     278.    Identify whether large leaps involving
@@ -815,7 +815,7 @@ class Test(unittest.TestCase):
 #     280.    Identify whether the subdominant occurs more frequently in one repertory than another.
 #     281.    Identify whether there are any tritone melodic intervals in the vocal parts.
 #     282.    Identify whether titles containing the
-#                word `death' or more likely to be in minor keys.
+#                word 'death' or more likely to be in minor keys. [sic]
 #     283.    Identify whether two songs have identical lyrics.
 #     284.    Identify whether two works are identical apart from transposition.
 #     285.    Identify whether two works have identical harmonies.
@@ -839,7 +839,7 @@ class Test(unittest.TestCase):
 #     303.    Locate any doubled seventh scale degrees.
 #     304.    Locate any parallel fifths between the bass and alto voices.
 #     305.    Locate instances of the pitch sequence D-S-C-H in Shostakovich's music.
-#     306.    Locate occurrences of the word `Liebe' in some lyrics.
+#     306.    Locate occurrences of the word 'Liebe' in some lyrics.
 #     307.    Locate submediant pitches that are approached by
 #                an ascending major third followed by a descending major second.
 #     308.    Locate the most emotionally charged words in some vocal text.
@@ -850,7 +850,7 @@ class Test(unittest.TestCase):
 #     313.    Play a melody but eliminate all tonic pitches.
 #     314.    Play a melody but replace all tonic pitches by rests.
 #     315.    Play just the rhythm of a work.
-#     316.    Play some MIDI data from the `second theme'.
+#     316.    Play some MIDI data from the 'second theme'.
 #     317.    Play some MIDI data.
 #     318.    Play the clarinet part for the 4th and 8th phrases.
 #     319.    Play the first and last measures from the Coda section at half tempo.
@@ -859,7 +859,7 @@ class Test(unittest.TestCase):
 #     322.    Play the MIDI data from the next G#.
 #     323.    Play the MIDI data from the next pause.
 #     324.    Play the thema and first variation at the same time.
-#     325.    Play the `Trio' section.
+#     325.    Play the 'Trio' section.
 #     326.    Print a transposed version of the accompaniment parts.
 #     327.    Rearrange a score so the measures are in reverse order.
 #     328.    Renumber all measures in a score.
@@ -887,7 +887,6 @@ class Test(unittest.TestCase):
 #     349.    Transpose from one key to another.
 #     350.    Transpose to Dorian mode.
 #     351.    Transpose up a minor third.
-#
 
 
 # ------------------------------------------------------------------------------

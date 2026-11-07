@@ -104,9 +104,9 @@ class StreamCore(Music21Object):
         if not ignoreSort:
             # # if sorted and our insertion is > the highest time, then
             # # are still inserted
-            # if self.isSorted is True and self.highestTime <= offset:
+            # if self.isSorted and self.highestTime <= offset:
             #     storeSorted = True
-            if self.isSorted is True:
+            if self.isSorted:
                 ht = self.highestTime   # type: ignore
                 if ht < offset:
                     storeSorted = True
@@ -345,7 +345,7 @@ class StreamCore(Music21Object):
         This is not the same as getElementById, which refers to the id
         attribute which may be manually set and not unique.
 
-        However, some implementations of python will reuse object locations, sometimes
+        However, some implementations of Python will reuse object locations, sometimes
         quickly, so don't keep these around.
 
         Used by spanner and variant.
@@ -403,7 +403,6 @@ class StreamCore(Music21Object):
         music21.exceptions21.StreamException: The object you tried to add to
         the Stream, 3.14159, is not a Music21Object.  Use an ElementWrapper
         object if this is what you intend.
-
         '''
         if element is self:  # cannot add this Stream into itself
             raise StreamException('this Stream cannot be contained within itself')
@@ -525,15 +524,13 @@ class StreamCore(Music21Object):
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
         '''
-        if t.TYPE_CHECKING:
-            assert isinstance(self, Stream)
         hashedAttributes = hash((tuple(classList or ()),
                                  flatten,
                                  useTimespans,
                                  groupOffsets))
         cacheKey = 'elementTree' + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            hashedElementTree = tree.fromStream.asTree(self,
+            hashedElementTree = tree.fromStream.asTree(t.cast('Stream', self),
                                                        flatten=flatten,
                                                        classList=classList,
                                                        useTimespans=useTimespans,

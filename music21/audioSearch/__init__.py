@@ -154,7 +154,8 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
         warnings.warn('Running convolve without scipy -- will be slower', stacklevel=2)
         convolve = numpy.convolve
 
-    recordedSignal = numpy.array(recordedSignal)
+    # floats, so that sixteen-bit samples do not overflow when multiplied
+    recordedSignal = numpy.array(recordedSignal, dtype=float)
     correlation = convolve(recordedSignal, recordedSignal[::-1], mode='full')
     lengthCorrelation = len(correlation) // 2
     correlation = correlation[lengthCorrelation:]
@@ -1008,7 +1009,28 @@ class AudioSearchException(exceptions21.Music21Exception):
 
 
 class Test(unittest.TestCase):
-    pass
+
+    def testAutocorrelationWithoutScipy(self):
+        '''
+        Sixteen-bit samples, as read from a wave file, give their frequency
+        when numpy convolves them in place of scipy.
+        '''
+        if 'numpy' in base._missingImport:
+            self.skipTest('needs numpy')
+        import sys
+        from unittest import mock
+        import numpy
+
+        rate = 44100
+        samples = numpy.array(
+            [int(10000 * math.sin(2 * math.pi * 441 * i / rate)) for i in range(1024)],
+            dtype=numpy.int16,
+        )
+        with mock.patch.dict(sys.modules, {'scipy.signal': None}):
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore')
+                frequency = autocorrelationFunction(samples, rate)
+        self.assertAlmostEqual(frequency, 441, delta=2)
 
 
 # ------------------------------------------------------------------------------

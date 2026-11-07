@@ -5,7 +5,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2014 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2010, 2014, 2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -159,7 +159,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
 
     def _getPitchParameters(self):
         '''
-
         >>> mdr = musedata.MuseDataRecord('Ef4    1        s     d  ==')
         >>> mdr.isNote()
         True
@@ -397,7 +396,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('E2     4        q     u')
         >>> mdr.getBeams() is None
         True
-
         '''
         if self.stage == 1:
             return None
@@ -458,7 +456,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p>')
         >>> mdr.getArticulationObjects()
         [<music21.articulations.Staccato>, <music21.articulations.Accent>]
-
         '''
         from music21 import articulations
         post = []
@@ -498,7 +495,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [      .p>F')
         >>> mdr.getExpressionObjects()
         [<music21.expressions.Fermata>]
-
         '''
         from music21 import expressions
         post = []
@@ -540,8 +536,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
             return post
         # find targets from largest to smallest
         targets = ('ppp', 'fff',
-                    'pp', 'ff', 'fp', 'mp', 'mf',
-                    'p', 'f', 'm', 'Z', 'Zp', 'R')
+                   'pp', 'ff', 'fp', 'mp', 'mf',
+                   'p', 'f', 'm', 'Z', 'Zp', 'R')
         for target in targets:
             pos = data.find(target)
             if pos < 0:
@@ -574,7 +570,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr = musedata.MuseDataRecord('C4    12        e     u  [')
         >>> mdr.hasCautionaryAccidental()
         False
-
         '''
         data = self._getAdditionalNotations()
         if data is None:
@@ -833,7 +828,6 @@ class MuseDataPart(prebase.ProtoM21Object):
 
     def _getDigitsFollowingTag(self, line, tag):
         '''
-
         >>> mdp = musedata.MuseDataPart()
         >>> mdp._getDigitsFollowingTag('junk WK#:2345', 'WK#:')
         '2345'
@@ -864,7 +858,6 @@ class MuseDataPart(prebase.ProtoM21Object):
     def _getAlphasFollowingTag(self, line, tag, keepSpace=False,
                                keepCase=False):
         '''
-
         >>> mdp = musedata.MuseDataPart()
         >>> mdp._getAlphasFollowingTag('Group memberships: sound, score', 'Group memberships:')
         'sound,score'
@@ -1386,7 +1379,6 @@ class MuseDataPart(prebase.ProtoM21Object):
 
     def _getMeasureBoundaryIndices(self, src=None):
         '''
-
         >>> mdp = musedata.MuseDataPart()
         >>> mdp.stage is None
         True
@@ -1518,7 +1510,7 @@ class MuseDataFile(prebase.ProtoM21Object):
         commentToggle = False
 
         lines = []
-        srcLines = input_str.split('\n')
+        srcLines = input_str.replace('\r\n', '\n').split('\n')
         # lastLineIndex = len(srcLines) - 1
         for i, line in enumerate(srcLines):
             # environLocal.printDebug(['reading line', i, line])
@@ -1772,6 +1764,18 @@ class Test(unittest.TestCase):
     #     self.assertEqual(mdpObjs[0].getKeyParameters(), -3)
     #     self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '3/4')
     #     self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
+
+    def testReadCrlf(self):
+        fp = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01' / '01.md'
+        text = fp.read_bytes().replace(b'\r\n', b'\n').decode('latin-1')
+        lfWork = MuseDataWork()
+        lfWork.addString(text)
+        crlfWork = MuseDataWork()
+        crlfWork.addString(text.replace('\n', '\r\n'))
+        crlfPart = crlfWork.getParts()[0]
+        self.assertEqual(crlfPart.src, lfWork.getParts()[0].src)
+        self.assertEqual(crlfPart.getWorkTitle(), 'Clarinet Quintet')
+        self.assertEqual(crlfPart.getMovementTitle(), 'Trio II')
 
     def testLoadFromFile(self):
         fp = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive')

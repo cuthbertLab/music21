@@ -52,7 +52,7 @@ class DirectoryInformation(prebase.ProtoM21Object):
         >>> di = corpus.work.DirectoryInformation('schoenberg',
         ...             corpusObject=corpus.corpora.CoreCorpus())
         >>> di.findWorks()
-        OrderedDict([('opus19', CorpusWork(title='Opus 19',
+        OrderedDict({'opus19': CorpusWork(title='Opus 19',
                                     files=[CorpusFile(path='schoenberg...opus19...movement2.mxl',
                                                         title='Movement 2',
                                                         filename='movement2.mxl',
@@ -63,7 +63,7 @@ class DirectoryInformation(prebase.ProtoM21Object):
                                                         filename='movement6.mxl',
                                                         format='musicxml',
                                                         ext='.mxl')],
-                                    virtual=False))])
+                                    virtual=False)})
 
         (The ellipses in the documentation above represent '/' on Mac/Unix systems and
         '\' on Windows.)

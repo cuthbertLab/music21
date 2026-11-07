@@ -11,66 +11,66 @@
 # noinspection SpellCheckingInspection
 '''
 Files in this package deal specifically with making life easier for
-people who have previously used humdrum or need to import
-humdrum data (in spines, etc.) into music21.
+people who have previously used Humdrum (David Huron's Humdrum Toolkit)
+or need to import Humdrum data (in spines, etc.) into music21.
 
 Humdrum programs and their closest music21 equivalents:
 
 ============  =================================================  =========================================================================================================================================================================
 Humdrum       music21                                            notes
 ============  =================================================  =========================================================================================================================================================================
-assemble_     Not needed                                         Use python commands to unite objects and `s.insert(0, p)` to put a part at the beginning of a multipart score.
-census_       Not needed                                         Use python to create census equivalents
+assemble_     Not needed                                         Use Python commands to unite objects and `s.insert(0, p)` to put a part at the beginning of a multipart score.
+census_       Not needed                                         Use Python to create census equivalents.
 cents_        `interval.ChromaticInterval.cents`
 cleave_       Not needed                                         kern specific, not needed
 context_      Not needed                                         Use object.next and object.prev to get some context for many objects and :meth:`~music21.base.Music21Object.getContextByClass` to find the most recent object of a given type
 correl_       Not needed                                         Use numpy.corrcoef() or other, more sophisticated code
-deg_          Several tools, see Notes                           Closest is :meth:`~music21.scale.Scale.getScaleDegreeAndAccidentalFromPitch`. See also `stream.Stream.analyze('key')`
+deg_          Several tools, see Notes                           Closest is :meth:`~music21.scale.Scale.getScaleDegreeAndAccidentalFromPitch`. See also `stream.Stream.analyze('key')`.
 degree_       see above for "`deg`"
-diss_         Spectral analysis.  Out of scope for m21           Would be "analysis.kkdiss" for Kameoka and Kuriyagawa.
-ditto_        see Notes                                          :meth:`~music21.stream.Stream.chordify` and the offsetTree objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object
-encode_       `midi.(severaltools)`                              Multifunction humdrum program.  See the midi directory for some replacements.  Or for simple conversion, `converter.parse` and `show('midi')` do this automatically
-extract_      Not needed                                         Use python commands to extract objects with certain properties
+diss_         Spectral analysis.  Out of scope for m21.          Would be "analysis.kkdiss" for Kameoka and Kuriyagawa.
+ditto_        see Notes                                          :meth:`~music21.stream.Stream.chordify` and the offsetTree objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object.
+encode_       `midi.(severaltools)`                              Multifunction Humdrum program.  See the midi directory for some replacements.  Or for simple conversion, `converter.parse` and `show('midi')` do this automatically.
+extract_      Not needed                                         Use Python commands to extract objects with certain properties.
 fields_       Not needed
-fin2hum_      `music21.converter.parse` (filename)               Enigma Transport Format did not take off and is rarely used. Software to convert Enigma to MusicXML is available from recordare
+fin2hum_      `music21.converter.parse` (filename)               Enigma Transport Format did not take off and is rarely used. Software to convert Enigma to MusicXML is available from Recordare.
 freq_         see :meth:`~music21.pitch.Pitch.frequency`
 hint_         see Notes                                          :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams` See music21-tools trecento.capua demo to show how it can be done.
-hum2fin_      `.write('musicxml')`                               Writes to musicXML.  A music21 to Enigma converter will not be written (obsolete format)
+hum2fin_      `.write('musicxml')`                               Writes to MusicXML.  A music21 to Enigma converter will not be written (obsolete format).
 humdrum_      Not needed                                         The `spineParser` will report errors when parsing.
 humsed_       Not needed
 humver_       Not needed
-infot_        Not needed                                         Use general purpose python information theory models
+infot_        Not needed                                         Use general purpose Python information theory models.
 iv_           :meth:`~music21.chord.Chord.intervalVector`
 kern_         None                                               Output to Humdrum is not currently supported
 key_          :meth:`~music21.stream.Stream.analyze` ('key')
-melac_        see Notes                                          :meth:`~music21.analysis.metrical.thomassenMelodicAccent`.  incorporates humdrum additions for giving accent of the first and last notes.
-metpos_       `1 / obj.beatStrength()`                           the beatStrength of an object is essentially something similar but inverted.  beatStrength handles irregular meters.
+melac_        see Notes                                          :meth:`~music21.analysis.metrical.thomassenMelodicAccent`.  Incorporates Humdrum additions for giving accent of the first and last notes.
+metpos_       `1 / obj.beatStrength()`                           The beatStrength of an object is essentially something similar but inverted.  beatStrength handles irregular meters.
 midi_         `.show('midi')`
 midireset_    None                                               Not needed for now because we do not write directly to MIDI.  A midi.allOff() will be needed for direct midi access.
 mint_         `interval.Interval(note1, note2)`                  Or :meth:`~music21.stream.Stream.melodicIntervals`
 nf_           :meth:`~music21.chord.Chord.normalOrder`           Also :meth:`~music21.chord.Chord.primeForm`, :meth:`~music21.chord.Chord.intervalVector`, :meth:`~music21.chord.Chord.forteClass`, :meth:`~music21.chord.Chord.getZRelation` etc.
 num_          Not needed                                         try: `for i in range(len(s.recurse().getElementsByClass(X)))` etc.
-patt_         `search.*`                                         see also, for instance, trecento.find_trecento_fragments for an example of a pattern searching module
-pattern_      `search.*`                                         see patt above
+patt_         `search.*`                                         See also, for instance, trecento.find_trecento_fragments for an example of a pattern searching module.
+pattern_      `search.*`                                         See patt above.
 pc_           :meth:`~music21.pitch.Pitch.pitchClass`
 pcset_        see `Pitch.*` and `Chord.*`                        Pitch.pitchClass and pitchClassString, Chord.normalOrder, .primeForm, .intervalVector, etc.
 perform_      `.show('midi')`
 pf_           :meth:`~music21.chord.Chord.primeForm`             Also :meth:`~music21.chord.Chord.normalOrder` etc.
 pitch_        :meth:`~music21.pitch.Pitch.nameWithOctave`
-proof_        Not needed                                         See `humdrum` command above; However, something like this could be useful for each encoding format.
+proof_        Not needed                                         See `humdrum` command above; however, something like this could be useful for each encoding format.
 recode_       `"if"`
-record_       via music21j                                       Not yet determined if it is a good idea to record directly to music21 within music21 -- our MIDI to music21 converter should suffice.  But note that audioSearch.recording gives recording transcription abilities
+record_       via music21j                                       Not yet determined if it is a good idea to record directly to music21 within music21 -- our MIDI to music21 converter should suffice.  But note that audioSearch.recording gives recording transcription abilities.
 regexp_       Not needed                                         Use `re` module in Python core, not music21
 reihe_        :class:`~music21.serial.TwelveToneRow`
 rend_         Not needed                                         Object properties perform the same function.
 rid_          Not needed                                         Use :meth:`~music21.stream.Stream.getElementsByClass` or :meth:`~music21.stream.Stream.getElementsNotOfClass` instead
-scramble_     Not needed                                         Use random module in Python core, not music21.  However, see composition tools for some sophisticated scrambling methods
+scramble_     Not needed                                         Use random module in Python core, not music21.  However, see composition tools for some sophisticated scrambling methods.
 semits_       see Notes                                          :meth:`~music21.pitch.Pitch.ps`, :meth:`~music21.pitch.Pitch.p.midiNote` or :meth:`~music21.interval.Interval.chromatic`.  See also :class:`music21.pitch.Accidental`, esp. the `.alter` property.
 simil_        Many implementations
 smf_          `.write('midi')`                                   See midi above
-solfa_        :meth:`~music21.scale.ConcreteScale.solfeg`        Use variant='humdrum' to get exact humdrum solfeg syllables
+solfa_        :meth:`~music21.scale.ConcreteScale.solfeg`        Use variant='humdrum' to get exact Humdrum solfeg syllables.
 solfg_        :meth:`~music21.pitch.Pitch.french`                Also .dutch, .italian, .spanish
-strophe_      :meth:`~music21.text.assembleLyrics`               You probably won't need this though
+strophe_      :meth:`~music21.text.assembleLyrics`               You probably won't need this though.
 synco_        To-Do                                              Will be "analysis.leeLHiggins" but not yet written -- low priority
 tacet_        Not needed                                         see `midireset` above; -i will not be supported
 timebase_     Not needed                                         stream.getElementsByOffset() will cover most uses

@@ -6,7 +6,7 @@
 #               Christopher Ariza
 #               Michael Bodenbach
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -17,7 +17,7 @@ within :class:`~music21.stream.Measure` objects.
 '''
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 import typing as t
 import unittest
 
@@ -45,7 +45,7 @@ class ClefException(exceptions21.Music21Exception):
 class Clef(base.Music21Object):
     '''
     A Clef is a basic `music21` object for representing musical clefs
-    (Treble, Bass, etc.)
+    (Treble, Bass, etc.).
 
     Some clefs only represent the graphical element of the clef,
     such as G clef, which is subclassed by TrebleClef() and FrenchViolinClef().
@@ -107,7 +107,6 @@ class Clef(base.Music21Object):
             True
             >>> clef.NoClef().sign
             'none'
-
             ''',
         'line': '''
             The line, counting from the bottom up, that the clef resides on.
@@ -322,7 +321,7 @@ class PitchClef(Clef):
 
 class PercussionClef(Clef):
     '''
-    represents a Percussion clef.
+    Represents a Percussion clef.
 
     >>> pc = clef.PercussionClef()
     >>> pc.sign
@@ -350,7 +349,7 @@ class PercussionClef(Clef):
 
 class NoClef(Clef):
     '''
-    represents the absence of a Clef.
+    Represents the absence of a Clef.
 
     >>> nc = clef.NoClef()
     >>> nc.sign
@@ -385,13 +384,12 @@ class JianpuClef(NoClef):
 
 class TabClef(PitchClef):
     '''
-    represents a Tablature clef.
+    Represents a Tablature clef.
 
     >>> a = clef.TabClef()
     >>> a.sign
     'TAB'
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.sign = 'TAB'
@@ -399,7 +397,7 @@ class TabClef(PitchClef):
 
     def getStemDirectionForPitches(
         self,
-        pitchList: pitch.Pitch|Iterable[pitch.Pitch],
+        pitches: pitch.Pitch|Sequence[pitch.Pitch],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -414,18 +412,17 @@ class TabClef(PitchClef):
 
 class GClef(PitchClef):
     '''
-    A generic G Clef
+    A generic G Clef.
 
     >>> a = clef.GClef()
     >>> a.sign
     'G'
 
-    If not defined, the lowestLine is set as a Treble Clef (E4 = 31)
+    If not defined, the lowestLine is set as a Treble Clef (E4 = 31).
 
     >>> a.lowestLine
     31
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.sign = 'G'
@@ -443,7 +440,6 @@ class FrenchViolinClef(GClef):
     >>> a.line
     1
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 1
@@ -464,14 +460,13 @@ class TrebleClef(GClef):
     >>> note.Note('E4').pitch.diatonicNoteNum
     31
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 2
         self.lowestLine = (7 * 4) + 3  # 4 octaves + 3 notes = e4
 
 
-class Treble8vbClef(TrebleClef):
+class Treble8vbClef(GClef):
     '''
     A vocal tenor treble clef. Also for guitars.
 
@@ -480,29 +475,33 @@ class Treble8vbClef(TrebleClef):
     'G'
     >>> a.octaveChange
     -1
-    '''
 
+    * Changed in v11: no longer a subclass of :class:`~music21.clef.TrebleClef`.
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
+        self.line = 2
         self.octaveChange = -1
         self.lowestLine = (7 * 3) + 3
 
 
-class Treble8vaClef(TrebleClef):
+class Treble8vaClef(GClef):
     '''
-    A treble clef an octave up (such as for piccolos)
+    A treble clef an octave up (such as for piccolos).
 
     >>> a = clef.Treble8vaClef()
     >>> a.sign
     'G'
     >>> a.octaveChange
     1
-    '''
 
+    * Changed in v11: no longer a subclass of :class:`~music21.clef.TrebleClef`.
+    '''
     def __init__(self, **keywords):
         super().__init__(**keywords)
+        self.line = 2
         self.octaveChange = 1
-        self.lowestLine = (7 * 3) + 3
+        self.lowestLine = (7 * 5) + 3
 
 
 class GSopranoClef(GClef):
@@ -516,7 +515,6 @@ class GSopranoClef(GClef):
     >>> a.line
     3
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 3
@@ -527,13 +525,12 @@ class GSopranoClef(GClef):
 
 class CClef(PitchClef):
     '''
-    A generic C Clef, with no line set
+    A generic C Clef, with no line set.
 
     >>> a = clef.CClef()
     >>> a.sign
     'C'
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.sign = 'C'
@@ -542,7 +539,7 @@ class CClef(PitchClef):
 class SopranoClef(CClef):
     '''
     A soprano clef, with C on the lowest line
-    (found in Bach often)
+    (found in Bach often).
 
     >>> a = clef.SopranoClef()
     >>> a.sign
@@ -550,7 +547,6 @@ class SopranoClef(CClef):
     >>> a.line
     1
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 1
@@ -560,7 +556,7 @@ class SopranoClef(CClef):
 class MezzoSopranoClef(CClef):
     '''
     A C clef with C on the second line.  Perhaps
-    the rarest of the C clefs
+    the rarest of the C clefs.
 
     >>> a = clef.MezzoSopranoClef()
     >>> a.sign
@@ -568,7 +564,6 @@ class MezzoSopranoClef(CClef):
     >>> a.line
     2
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 2
@@ -585,7 +580,6 @@ class AltoClef(CClef):
     >>> a.line
     3
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 3
@@ -602,9 +596,7 @@ class TenorClef(CClef):
     'C'
     >>> a.line
     4
-
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 4
@@ -613,7 +605,7 @@ class TenorClef(CClef):
 
 class CBaritoneClef(CClef):
     '''
-    A Baritone C clef (as opposed to an F Baritone Clef)
+    A Baritone C clef (as opposed to an F Baritone Clef).
 
     >>> a = clef.CBaritoneClef()
     >>> a.sign
@@ -621,7 +613,6 @@ class CBaritoneClef(CClef):
     >>> a.line
     5
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 5
@@ -631,13 +622,12 @@ class CBaritoneClef(CClef):
 # ------------------------------------------------------------------------------
 class FClef(PitchClef):
     '''
-    A generic F-Clef, like a Bass clef
+    A generic F-Clef, like a Bass clef.
 
     >>> a = clef.FClef()
     >>> a.sign
     'F'
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.sign = 'F'
@@ -645,7 +635,7 @@ class FClef(PitchClef):
 
 class FBaritoneClef(FClef):
     '''
-    an F Baritone Clef
+    An F Baritone Clef.
 
     >>> a = clef.FBaritoneClef()
     >>> a.sign
@@ -673,7 +663,6 @@ class BassClef(FClef):
     >>> a.sign
     'F'
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 4
@@ -690,12 +679,11 @@ class Bass8vbClef(FClef):
     >>> a.octaveChange
     -1
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 4
         self.octaveChange = -1
-        self.lowestLine = (7 * 2) + 5
+        self.lowestLine = (7 * 1) + 5
 
 
 class Bass8vaClef(FClef):
@@ -706,12 +694,11 @@ class Bass8vaClef(FClef):
     >>> a.sign
     'F'
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 4
         self.octaveChange = 1
-        self.lowestLine = (7 * 2) + 5
+        self.lowestLine = (7 * 3) + 5
 
 
 class SubBassClef(FClef):
@@ -722,7 +709,6 @@ class SubBassClef(FClef):
     >>> a.sign
     'F'
     '''
-
     def __init__(self, **keywords):
         super().__init__(**keywords)
         self.line = 5
@@ -824,16 +810,12 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
         else:
             lineNum = False
     elif len(xnStr) > 2:
-        from music21 import clef as myself
         xnLower = xnStr.lower()
-        for x in dir(myself):
-            if 'Clef' not in x:
+        for className, classObj in globals().items():
+            if not isinstance(classObj, type) or not issubclass(classObj, Clef):
                 continue
-            if xnLower != x.lower() and xnLower + 'clef' != x.lower():
-                continue
-            objType = getattr(myself, x)
-            if isinstance(objType, type):
-                return objType()
+            if className.lower() in (xnLower, xnLower + 'clef'):
+                return classObj()
 
         raise ClefException('Could not find clef ' + xnStr)
     else:

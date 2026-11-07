@@ -1,0 +1,101 @@
+# Profile the author of a PR from someone with no merged PR here yet, and comment
+# only when gh-profiler raises a yellow or red flag, or when it could not run.
+#
+# gh-profiler is by Eric Matthes: https://github.com/ehmatthes/gh-profiler
+
+name: profile_contributors
+
+on:
+    # Never checks out or runs PR code; it reads the author's login and comments.
+    pull_request_target:
+        types: [opened]
+
+permissions:
+    # gh-profiler reads the author's recent issues; without issues:read the Actions
+    # token cannot resolve Issue objects and every search node comes back empty.
+    issues: read
+    pull-requests: write
+
+jobs:
+    profile:
+        # Dependabot and friends do not need profiling.
+        if: github.event.pull_request.user.type != 'Bot'
+        runs-on: ubuntu-latest
+        steps:
+        - name: Check whether contributor has a previously merged PR
+          id: previous
+          env:
+              GH_TOKEN: ${{ github.token }}
+              AUTHOR: ${{ github.event.pull_request.user.login }}
+              REPO: ${{ github.repository }}
+          run: |
+              count="$(gh pr list --repo "$REPO" --author "$AUTHOR" \
+                  --state merged --limit 1 --json number --jq 'length')"
+              echo "count=$count" >> "$GITHUB_OUTPUT"
+
+        - name: Install uv
+          if: steps.previous.outputs.count == '0'
+          uses: astral-sh/setup-uv@v7
+
+        - name: Profile contributor
+          if: steps.previous.outputs.count == '0'
+          id: profile
+          env:
+              GH_TOKEN: ${{ github.token }}
+              AUTHOR: ${{ github.event.pull_request.user.login }}
+          run: |
+              # gh-profiler raises on an issue or PR the token cannot resolve
+              # (ehmatthes/gh-profiler#143), and an unprofiled author is not a red check.
+              if ! uvx gh-profiler==0.9.0 "$AUTHOR" --concise > profile.txt; then
+                  cat profile.txt
+                  echo "::warning::gh-profiler failed on $AUTHOR; profile by hand."
+                  echo "concern=false" >> "$GITHUB_OUTPUT"
+                  echo "failed=true" >> "$GITHUB_OUTPUT"
+                  exit 0
+              fi
+              cat profile.txt
+              echo '===================== Full profile ====================='
+              uvx gh-profiler==0.9.0 "$AUTHOR" || true
+
+              # A yellow on the profile section alone means only that the account is
+              # newish or has empty bio fields, which is not worth a public comment.
+              concern=false
+              if grep -q '🔴' profile.txt; then
+                  concern=true
+              elif grep -e 'recent PR activity' -e 'recent issue activity' profile.txt \
+                      | grep -q '🟡'; then
+                  concern=true
+              fi
+              echo "concern=$concern" >> "$GITHUB_OUTPUT"
+
+        - name: Comment on PR
+          if: steps.previous.outputs.count == '0' && steps.profile.outputs.concern == 'true'
+          env:
+              GH_TOKEN: ${{ github.token }}
+              PR: ${{ github.event.pull_request.number }}
+          run: |
+              {
+                  echo 'Contributor profile ([gh-profiler](https://github.com/ehmatthes/gh-profiler));'
+                  echo 'the full report is in this workflow'"'"'s log.'
+                  echo
+                  echo '```text'
+                  cat profile.txt
+                  echo '```'
+              } > comment.txt
+
+              gh pr comment "$PR" --body-file comment.txt
+
+        # The traceback stays in the log; a public comment does not need it.
+        - name: Comment on PR when profiling could not run
+          if: steps.previous.outputs.count == '0' && steps.profile.outputs.failed == 'true'
+          env:
+              GH_TOKEN: ${{ github.token }}
+              PR: ${{ github.event.pull_request.number }}
+          run: |
+              {
+                  echo 'Contributor profiling ([gh-profiler](https://github.com/ehmatthes/gh-profiler))'
+                  echo 'could not run here, so a maintainer will read this PR without it.'
+                  echo 'Nothing is wrong with the pull request itself.'
+              } > comment.txt
+
+              gh pr comment "$PR" --body-file comment.txt

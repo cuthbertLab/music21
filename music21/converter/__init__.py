@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -215,7 +215,7 @@ class ArchiveManager:
                     # Noteflight bug for untitled files puts filename as just '.xml'
                     continue
 
-                post = f.read(subFp)
+                post = common.readZipMember(f, subFp, ArchiveManagerException)
                 if isinstance(post, bytes):
                     foundEncoding = re.match(br"encoding=[\'\"](\S*?)[\'\"]", post[:1000])
                     if foundEncoding:
@@ -244,15 +244,14 @@ class ArchiveManager:
                 # this was f.open(subFp, 'rU') for universal newline support
                 # but that was removed in Python 3.6 and while it is supposed
                 # to be fixed with io.TextIOWrapper, there are no docs that
-                # show how to do so.  -- hopefully fixed
+                # show how to do so.  -- hopefully fixed -- no problems for years, maybe okay.
+                memberData = common.readZipMember(f, subFp, ArchiveManagerException)
                 try:
-                    with f.open(subFp, 'r') as zipOpen:
-                        lines = list(io.TextIOWrapper(zipOpen, newline=None))
+                    lines = list(io.TextIOWrapper(io.BytesIO(memberData), newline=None))
                 except UnicodeDecodeError:
                     # python3 UTF-8 failed to read haydn/opus103/movement1.zip
-                    with f.open(subFp, 'r') as zipOpen:
-                        lines = list(io.TextIOWrapper(zipOpen, newline=None,
-                                                      encoding='ISO-8859-1'))
+                    lines = list(io.TextIOWrapper(io.BytesIO(memberData), newline=None,
+                                                  encoding='ISO-8859-1'))
                 # environLocal.printDebug(['subFp', subFp, len(lines)])
                 post.append(''.join(lines))
 
@@ -565,12 +564,11 @@ class Converter:
         if useFormat is None:
             useFormat = self.getFormatFromFileExtension(fpPathlib)
         self.setSubConverterFromFormat(useFormat)
-        if t.TYPE_CHECKING:
-            assert isinstance(self.subConverter, subConverters.SubConverter)
+        subConverter = t.cast(subConverters.SubConverter, self.subConverter)
 
-        self.subConverter.keywords = keywords
+        subConverter.keywords = keywords
         try:
-            self.subConverter.parseFile(
+            subConverter.parseFile(
                 fp,
                 number=number,
                 **keywords
@@ -578,14 +576,13 @@ class Converter:
         except NotImplementedError:
             raise ConverterFileException(f'File is not in a correct format: {fp}')
 
-        if t.TYPE_CHECKING:
-            assert isinstance(self.stream, stream.Stream)
+        parsedStream = t.cast(stream.Stream, self.stream)
 
-        if not self.stream.metadata:
-            self.stream.metadata = metadata.Metadata()
-        self.stream.metadata.filePath = str(fpPathlib)
-        self.stream.metadata.fileNumber = number
-        self.stream.metadata.fileFormat = useFormat
+        if not parsedStream.metadata:
+            parsedStream.metadata = metadata.Metadata()
+        parsedStream.metadata.filePath = str(fpPathlib)
+        parsedStream.metadata.fileNumber = number
+        parsedStream.metadata.fileFormat = useFormat
 
     def getFormatFromFileExtension(self, fp):
         # noinspection PyShadowingNames
@@ -723,10 +720,9 @@ class Converter:
                 )
 
         self.setSubConverterFromFormat(useFormat)
-        if t.TYPE_CHECKING:
-            assert isinstance(self.subConverter, subConverters.SubConverter)
-        self.subConverter.keywords = keywords
-        self.subConverter.parseData(dataStr, number=number)
+        subConverter = t.cast(subConverters.SubConverter, self.subConverter)
+        subConverter.keywords = keywords
+        subConverter.parseData(dataStr, number=number)
 
     def parseURL(
         self,
@@ -773,8 +769,9 @@ class Converter:
                 raise ConverterException(f'cannot determine file format of url: {url}')
         else:
             unused_formatType, ext = common.findFormat(format)
-            if ext is None:
-                ext = '.txt'
+
+        if ext is None:
+            ext = '.txt'
 
         directory = environLocal.getRootTempDir()
         fp = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
@@ -1261,9 +1258,8 @@ def parseFile(fp,
     v = Converter()
     fp = common.cleanpath(fp, returnPathlib=True)
     v.parseFile(fp, number=number, format=format, forceSource=forceSource, **keywords)
-    if t.TYPE_CHECKING:
-        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
-    return v.stream
+    vStream = t.cast(stream.Score | stream.Part | stream.Opus, v.stream)
+    return vStream
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
@@ -1277,9 +1273,8 @@ def parseData(dataStr,
     '''
     v = Converter()
     v.parseData(dataStr, number=number, format=format, **keywords)
-    if t.TYPE_CHECKING:
-        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
-    return v.stream
+    vStream = t.cast(stream.Score | stream.Part | stream.Opus, v.stream)
+    return vStream
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
@@ -1298,9 +1293,8 @@ def parseURL(url,
     '''
     v = Converter()
     v.parseURL(url, format=format, forceSource=forceSource, **keywords)
-    if t.TYPE_CHECKING:
-        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
-    return v.stream
+    vStream = t.cast(stream.Score | stream.Part | stream.Opus, v.stream)
+    return vStream
 
 
 def parse(value: bundles.MetadataEntry|bytes|str|pathlib.Path|list|tuple,
@@ -1401,6 +1395,10 @@ def parse(value: bundles.MetadataEntry|bytes|str|pathlib.Path|list|tuple,
             return sc
     # a midi string, must come before os.path.exists test
     elif not isinstance(value, bytes) and valueStr.startswith('MThd'):
+        return parseData(value, number=number, format=format, **keywords)
+    elif (isinstance(value, str)
+          and Converter().formatFromHeader(value.lstrip())[0] is not None):
+        # 'tinyNotation: ...' is data even if it contains a path
         return parseData(value, number=number, format=format, **keywords)
     elif (not isinstance(value, bytes)
           and _osCanLoad(valueStr)):
@@ -1657,6 +1655,28 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
+
+    def testArchiveMemberSizeLimit(self):
+        '''
+        An archive member that uncompresses to more than
+        common.fileTools.MAX_UNCOMPRESSED_BYTES raises ArchiveManagerException.
+        '''
+        from unittest import mock
+
+        fp = environLocal.getTempFile('.mxl')
+        try:
+            with zipfile.ZipFile(fp, 'w', zipfile.ZIP_DEFLATED) as zf:
+                zf.writestr('score.xml', '<score-partwise/>' + ' ' * 2000)
+                zf.writestr('part01', 'x' * 2000)
+            am = ArchiveManager(fp)
+            with mock.patch.object(common.fileTools, 'MAX_UNCOMPRESSED_BYTES', 1000):
+                for dataFormat in ('musicxml', 'musedata'):
+                    with self.assertRaisesRegex(ArchiveManagerException, 'more than 1000 bytes'):
+                        am.getData(dataFormat)
+            self.assertEqual(len(am.getData('musicxml')), 2017)
+            self.assertEqual(am.getData('musedata'), ['x' * 2000])
+        finally:
+            os.remove(fp)
 
     def testConversionMX(self):
         from music21.musicxml import testPrimitive
@@ -2237,6 +2257,29 @@ class Test(unittest.TestCase):
             parse(str(fp))
         with self.assertRaises(FileNotFoundError):
             parse('nonexistent_path_ending_in_correct_extension.musicxml')
+
+    def testDataNotReadAsPath(self):
+        '''
+        Data whose '/..' segments cancel out to a real path must not read that file.
+        '''
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tempDir:
+            fp = pathlib.Path(tempDir, 'other.tntxt')
+            fp.write_text('3/4 f#2.', encoding='utf-8')
+            toRoot = '/..' * 30
+
+            s = parse('tinyNotation: ' + toRoot + str(fp))
+            self.assertNotIn('F#', [n.name for n in s.recurse().notes])
+            with self.assertRaises(FileNotFoundError):
+                parse('c4 ' + toRoot + str(fp), format='tinyNotation')
+
+            s = parse(str(fp), storePickle=False)
+            self.assertEqual(s.recurse().notes.first().name, 'F#')
+            with mock.patch.dict(os.environ, {'HOME': tempDir, 'USERPROFILE': tempDir}):
+                s = parse('~/other.tntxt', storePickle=False)
+            self.assertEqual(s.recurse().notes.first().name, 'F#')
 
     def testParseURL(self):
         '''

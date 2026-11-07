@@ -18,10 +18,10 @@ from music21.common.enums import OffsetSpecial
 if t.TYPE_CHECKING:
     import music21
 
-DocOrder = list[str|Callable]
-OffsetQL = float|Fraction
-OffsetQLSpecial = float|Fraction|OffsetSpecial
-OffsetQLIn = int|float|Fraction
+type DocOrder = list[str|Callable]
+type OffsetQL = float|Fraction
+type OffsetQLSpecial = float|Fraction|OffsetSpecial
+type OffsetQLIn = int|float|Fraction
 
 StreamType = t.TypeVar('StreamType', bound='music21.stream.Stream')
 StreamType2 = t.TypeVar('StreamType2', bound='music21.stream.Stream')
@@ -30,6 +30,7 @@ M21ObjType2 = t.TypeVar('M21ObjType2', bound='music21.base.Music21Object')  # wh
 # to be explicit that a type is changing
 ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound='music21.base.Music21Object')
 
-# does not seem to like the | way of spelling
-ClassListType = t.Union[str, Iterable[str], type[M21ObjType], Iterable[type[M21ObjType]]]
-StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']
+type ClassListType[M21ObjType: 'music21.base.Music21Object'] = (
+    str | Iterable[str] | type[M21ObjType] | Iterable[type[M21ObjType]]
+)
+type StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']

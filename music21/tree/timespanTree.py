@@ -5,7 +5,7 @@
 # Authors:      Joséphine Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2013-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -50,7 +50,7 @@ class TimespanTree(trees.OffsetTree):
     like all :class:`~music21.tree.trees.OffsetTree` objects, for searching large scores
     quickly by time.
 
-    While you can construct an TimespanTree by hand, inserting timespans one at
+    While you can construct a TimespanTree by hand, inserting timespans one at
     a time, the common use-case is to construct the TimespanTree from an entire
     score at once:
 
@@ -148,8 +148,8 @@ class TimespanTree(trees.OffsetTree):
         TimespanTree is an extended AVL tree because each node in the
         tree keeps track of not just the start offsets of PitchedTimespans
         stored at that node, but also the earliest and latest stop offset of
-        all PitchedTimespans stores at both that node and all nodes which are
-        children of that node. This lets us quickly located PitchedTimespans
+        all PitchedTimespans stored at both that node and all nodes which are
+        children of that node. This lets us quickly locate PitchedTimespans
         which overlap offsets or which are contained within ranges of offsets.
         This also means that the contents of a TimespanTree are always
         sorted.
@@ -176,7 +176,7 @@ class TimespanTree(trees.OffsetTree):
     def elementEndTime(el, unused_node):
         '''
         Use so that both OffsetTrees, which have elements which do not have a .endTime, and
-        TimespanTrees, which have element that have an .endTime but not a duration, can
+        TimespanTrees, which have elements that have an .endTime but not a duration, can
         use most of the same code.
         '''
         return el.endTime
@@ -276,7 +276,7 @@ class TimespanTree(trees.OffsetTree):
         if classList is None:
             classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
-            message = f'PitchedTimespan {pitchedTimespan!r}, must be an PitchedTimespan'
+            message = f'PitchedTimespan {pitchedTimespan!r}, must be a PitchedTimespan'
             raise TimespanTreeException(message)
         verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
@@ -294,7 +294,7 @@ class TimespanTree(trees.OffsetTree):
         classList=None
     ) -> spans.PitchedTimespan | None:
         r'''
-        Finds next element timespan in the same Part/Measure, etc. (specify in classList) as
+        Finds previous element timespan in the same Part/Measure, etc. (specify in classList) as
         the `pitchedTimespan`.
 
         >>> score = corpus.parse('bwv66.6')
@@ -324,7 +324,7 @@ class TimespanTree(trees.OffsetTree):
         if classList is None:
             classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
-            message = f'PitchedTimespan {pitchedTimespan!r}, must be an PitchedTimespan'
+            message = f'PitchedTimespan {pitchedTimespan!r}, must be a PitchedTimespan'
             raise TimespanTreeException(message)
         verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
@@ -494,6 +494,8 @@ class TimespanTree(trees.OffsetTree):
         <music21.tree.verticality.Verticality 30.0 {A#2 C#4 E4 F#4}>
         <music21.tree.verticality.Verticality 29.5 {A#2 F#3 D4 F#4}>
         '''
+        if self.rootNode is None:
+            return
         if reverse:
             offset = self.highestPosition()
             verticality = self.getVerticalityAt(offset)
@@ -687,12 +689,13 @@ class TimespanTree(trees.OffsetTree):
         Used by reduceChords.  May disappear at any time without a deprecation
         notice.
         '''
-        partwiseTimespanTrees = {}
-        for part in self.allParts():
-            partwiseTimespanTrees[part] = TimespanTree()
+        partwiseTimespans = {part: [] for part in self.allParts()}
         for timespan in self:
-            partwiseTimespanTree = partwiseTimespanTrees[timespan.part]
-            partwiseTimespanTree.insert(timespan)
+            partwiseTimespans[timespan.part].append(timespan)
+        partwiseTimespanTrees = {}
+        for part, timespans in partwiseTimespans.items():
+            partwiseTimespanTrees[part] = TimespanTree()
+            partwiseTimespanTrees[part].insert(timespans)
         return partwiseTimespanTrees
 
     @staticmethod
@@ -737,11 +740,33 @@ class TimespanTree(trees.OffsetTree):
     # PUBLIC PROPERTIES #
 
     def allParts(self):
-        parts = set()
-        for timespan in self:
-            parts.add(timespan.part)
-        parts = sorted(parts, key=lambda x: x.getInstrument().partId)
-        return parts
+        '''
+        Returns a list of the parts that the timespans in this tree belong to.
+
+        If the tree's source has parts (such as a Score), the parts are returned
+        in the order they appear in the source.  Other parts come after them,
+        sorted by the partId of their instrument.
+
+        Parts do not need a partId:
+
+        >>> upper = stream.Part([instrument.Instrument(), note.Note('E4')])
+        >>> lower = stream.Part([instrument.Instrument(), note.Note('C3')])
+        >>> score = stream.Score([upper, lower])
+        >>> scoreTree = score.asTimespans()
+        >>> scoreTree.allParts() == [upper, lower]
+        True
+        '''
+        parts = {timespan.part for timespan in self}
+        source = self.source
+        sourceOrder = {}
+        if source is not None and hasattr(source, 'parts'):
+            sourceOrder = {id(part): i for i, part in enumerate(source.parts)}
+
+        def sortKey(part):
+            partId = part.getInstrument().partId
+            return (sourceOrder.get(id(part), len(sourceOrder)), partId is None, str(partId))
+
+        return sorted(parts, key=sortKey)
 
     def maximumOverlap(self):
         '''
@@ -792,7 +817,7 @@ class TimespanTree(trees.OffsetTree):
     @property
     def element(self):
         '''
-        defined so a TimespanTree can be used like an PitchedTimespan
+        defined so a TimespanTree can be used like a PitchedTimespan
 
         TODO: Look at subclassing or at least deriving from a common base.
         '''
@@ -816,6 +841,22 @@ class Test(unittest.TestCase):
         v = scoreTree.getVerticalityAt(0.0)
         ps = v.pitchSet
         self.assertEqual(len(ps), 1)
+
+    def testIterateVerticalitiesEmptyTree(self):
+        emptyTree = TimespanTree()
+        self.assertEqual(list(emptyTree.iterateVerticalities()), [])
+        self.assertEqual(list(emptyTree.iterateVerticalities(reverse=True)), [])
+        self.assertEqual(list(emptyTree.iterateVerticalitiesNwise()), [])
+
+    def testToPartwiseTimespanTrees(self):
+        from music21 import corpus
+        from music21 import note
+        score = corpus.parse('bwv66.6')
+        scoreTree = score.asTimespans(classList=(note.Note,))
+        partwise = scoreTree.toPartwiseTimespanTrees()
+        self.assertEqual(list(partwise), list(score.parts))
+        for part, subtree in partwise.items():
+            self.assertEqual(list(subtree), [ts for ts in scoreTree if ts.part is part])
 
     def testTimespanTree(self):
         for attempt in range(100):

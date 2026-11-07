@@ -34,12 +34,12 @@ from __future__ import annotations
 
 import sys
 
-minPythonVersion = (3, 11)
+minPythonVersion = (3, 12)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     # DO NOT CHANGE THIS TO AN f-String -- it needs to run on old python.
     raise ImportError('''
-    Music21 v9.0+ is a Python {}+ only library.
+    Music21 v11+ is a Python {}+ only library.
     Use music21 v1 to run on Python 2.1-2.6.
     Use music21 v4 to run on Python 2.7.
     Use music21 v5.1 to run on Python 3.4.
@@ -48,11 +48,12 @@ if sys.version_info < minPythonVersion:
     Use music21 v7.3 to run on Python 3.7
     Use music21 v8.1 to run on Python 3.8/3.9
     Use music21 v9.9 to run on Python 3.10.
+    Use music21 v10.5 to run on Python 3.11.
 
     If you have the wrong version there are several options for getting
     the right one.
 
-    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.14).
+    - 1. (Best) Upgrade to a recent version of Python 3 (such as 3.15).
 
          The great features there will more
          than make up for the headache of downloading
@@ -175,7 +176,6 @@ __all__ = [
     'Groups',
     'Music21Object',
     'ElementWrapper',
-    'VERSION',
 ]
 
 # ------------------------------------------------------------------------------
@@ -198,10 +198,10 @@ from music21.base import Groups  # noqa: E402
 from music21.base import Music21Object  # noqa: E402
 from music21.base import ElementWrapper  # noqa: E402
 
-from music21.base import VERSION  # noqa: E402
-from music21.base import VERSION_STR  # noqa: E402
-
-__version__ = VERSION_STR
+# public attributes, but not in __all__: import * must not overwrite a module's __version__
+from music21._version import __version__, __version_info__  # noqa: E402, F401
+from music21.base import VERSION  # noqa: E402, F401
+from music21.base import VERSION_STR  # noqa: E402, F401
 
 from music21.test.testRunner import mainTest  # noqa: E402
 

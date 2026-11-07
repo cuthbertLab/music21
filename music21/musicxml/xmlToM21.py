@@ -6,7 +6,7 @@
 #               Christopher Ariza
 #               Jacob Tyler Walls
 #
-# Copyright:    Copyright © 2009-2024 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from __future__ import annotations
@@ -58,7 +58,7 @@ from music21 import tie
 
 from music21.musicxml import xmlObjects
 from music21.musicxml import helpers
-from music21.musicxml.xmlSoundParser import SoundTagMixin
+from music21.musicxml import xmlSoundParser
 from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
 synchronizeIds = helpers.synchronizeIdsToM21
@@ -301,6 +301,9 @@ class XMLParserBase:
         >>> m21Obj.style.hideObjectOnPrint
         True
         '''
+        if not mxObject.attrib:
+            return
+
         if isinstance(m21Object, style.Style):
             stObj = m21Object
         else:
@@ -842,7 +845,7 @@ class MusicXMLImporter(XMLParserBase):
             partId = p.get('id')
             if partId is None:  # pragma: no cover
                 partId = list(self.mxScorePartDict.keys())[0]
-                # Lilypond Test Suite allows for parsing w/o a part ID for one part
+                # LilyPond Test Suite allows for parsing w/o a part ID for one part
             try:
                 mxScorePart = self.mxScorePartDict[partId]
             except KeyError:  # pragma: no cover
@@ -899,7 +902,6 @@ class MusicXMLImporter(XMLParserBase):
         <score-part> entries into self.mxScorePartDict[partId]
         and adds them to any open <part-group> entries,
         stored as PartGroup objects in self.partGroupList
-
         '''
         mxPartList = mxScore.find('part-list')
         if mxPartList is None:
@@ -1484,12 +1486,15 @@ class PartParser(XMLParserBase):
         self.staffReferenceList: list[StaffReferenceType] = []
 
         self.lastTimeSignature: meter.TimeSignature|None = None
-        self.lastMeasureWasShort = False
-        self.lastMeasureOffset = 0.0
+        self.lastMeasureWasShort: bool = False
+        self.lastMeasureOffset: OffsetQL = 0.0
 
         # a dict of clefs per staff number -- needed for converting rests w/ steps
         self.lastClefs: dict[int, clef.Clef|None] = {}
         self.activeTuplets: list[duration.Tuplet|None] = [None] * 7
+        # keyed by number and offset: number only tells apart simultaneous
+        # arpeggios, which may cross staves but not parts
+        self.arpeggioSpanners: dict[tuple[str, OffsetQL], expressions.ArpeggioMarkSpanner] = {}
 
         self.maxStaves = 1  # will be changed in measure parsing
 
@@ -1716,7 +1721,7 @@ class PartParser(XMLParserBase):
                 try:
                     i = pm.midiPitchToInstrument(_adjustMidiData(midiUnpitchedText))
                 except MIDIPercussionException as mpe:
-                    # objects not yet existing in m21 such as Cabasa
+                    # numbers outside the GM percussion map
                     warnings.warn(MusicXMLWarning(mpe), stacklevel=2)
                     i = instrument.UnpitchedPercussion()
                     i.percMapPitch = _adjustMidiData(midiUnpitchedText)
@@ -2246,8 +2251,8 @@ class PartParser(XMLParserBase):
             # If the measure is overfull by a "round" amount, assume that it was intended
             # otherwise it was likely the result of malformed MusicXML.
             if (diff > 0.5
-                  or nearestMultiple(diff, 0.0625)[1] < tol
-                  or nearestMultiple(diff, 1 / 12)[1] < tol):
+                    or nearestMultiple(diff, 0.0625)[1] < tol
+                    or nearestMultiple(diff, 1 / 12)[1] < tol):
                 mOffsetShift = mHighestTime
             else:
                 mOffsetShift = lastTimeSignatureQuarterLength
@@ -2282,7 +2287,7 @@ class PartParser(XMLParserBase):
                 mOffsetShift = mHighestTime
             else:
                 mOffsetShift = mHighestTime  # lastTimeSignatureQuarterLength
-                if self.lastMeasureWasShort is True:
+                if self.lastMeasureWasShort:
                     if m.barDurationProportion() < 1.0:
                         m.padAsAnacrusis()  # probably a pickup after a repeat or phrase boundary
                         # or something
@@ -2336,7 +2341,6 @@ class PartParser(XMLParserBase):
         >>> pp.applyMultiMeasureRest(r3)
         >>> pp.stream.show('text')
         {0.0} <music21.spanner.MultiMeasureRest 2 measures>
-
         '''
         if self.activeMultiMeasureRestSpanner is None:
             return
@@ -2348,7 +2352,7 @@ class PartParser(XMLParserBase):
 
 
 # -----------------------------------------------------------------------------
-class MeasureParser(SoundTagMixin, XMLParserBase):
+class MeasureParser(XMLParserBase):
     '''
     parser to work with a single <measure> tag.
 
@@ -2469,6 +2473,14 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         # inserted into a Stream).
         # key is PedalMark; value is OffsetQL
         self.pedalToStartOffset: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
+
+    def xmlSound(self, mxSound: ET.Element) -> None:
+        '''
+        Convert a <sound> tag; delegates to
+        :func:`~music21.musicxml.xmlSoundParser.xmlSound`, which is pulled out to
+        keep this file smaller.
+        '''
+        xmlSoundParser.xmlSound(self, mxSound)
 
     @staticmethod
     def getStaffNumber(mxObject: ET.Element|int|None) -> int:
@@ -2850,14 +2862,12 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             n = self.xmlToRest(mxNote)
 
         if isChord is False:  # normal note or rest
-            if t.TYPE_CHECKING:
-                assert isinstance(n, note.GeneralNote)
-
-            self.updateLyricsFromList(n, mxNote.findall('lyric'))
-            self.addToStaffReference(mxNote, n)
-            self.insertInMeasureOrVoice(mxNote, n)
-            offsetIncrement = n.duration.quarterLength
-            self.nLast = n  # update
+            generalNote = t.cast(note.GeneralNote, n)
+            self.updateLyricsFromList(generalNote, mxNote.findall('lyric'))
+            self.addToStaffReference(mxNote, generalNote)
+            self.insertInMeasureOrVoice(mxNote, generalNote)
+            offsetIncrement = generalNote.duration.quarterLength
+            self.nLast = generalNote  # update
 
         # if we have notes in the note list and the next
         # note either does not exist or is not a chord, we
@@ -2918,7 +2928,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         ...        + qnDuration
         ...        + '<notehead>diamond</notehead></note>')
         >>> c = MP.xmlToChord([a, b])
-        >>> c.getNotehead(c.pitches[0])
+        >>> c[0].notehead
         'diamond'
 
         >>> a = EL('<note><unpitched><display-step>A</display-step>'
@@ -3869,15 +3879,15 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                     arpeggio = expressions.ArpeggioMark(arpeggioType)
                     n.expressions.append(arpeggio)
                 else:
-                    sb = self.spannerBundle.getByClassIdLocalComplete(
-                        expressions.ArpeggioMarkSpanner, idFound, False)
-                    if sb:
-                        # if we already have a spanner matching
-                        arpeggioSpanner = t.cast(expressions.ArpeggioMarkSpanner, sb[0])
-                    else:
+                    arpeggioSpanners = self.parent.arpeggioSpanners
+                    offset = opFrac(self.parent.lastMeasureOffset + self.offsetMeasureNote)
+                    numberAndOffset = (idFound, offset)
+                    arpeggioSpanner = arpeggioSpanners.get(numberAndOffset)
+                    if arpeggioSpanner is None:
                         arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType=arpeggioType)
                         arpeggioSpanner.idLocal = idFound
                         self.spannerBundle.append(arpeggioSpanner)
+                        arpeggioSpanners[numberAndOffset] = arpeggioSpanner
                     arpeggioSpanner.addSpannedElements(n)
 
         mostRecentOrnament: expressions.Ornament|None = None
@@ -5041,9 +5051,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         if identifier is not None:
             ly.identifier = identifier
 
-        self.setStyleAttributes(mxLyric, ly,
-                                ('justify', 'placement', 'print-object'),
-                                ('justify', 'placement', 'hideObjectOnPrint'))
+        self.setStyleAttributes(mxLyric, ly, ('justify', 'placement'))
+        self.setPrintObject(mxLyric, ly)
         self.setColor(mxLyric, ly)
         self.setPosition(mxLyric, ly)
 
@@ -5090,8 +5099,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             useVoice = self.lastVoice
             if useVoice is None:  # pragma: no cover
                 warnings.warn('Cannot put in an element with a missing voice tag when '
-                    + 'no previous voice tag was given.  Assuming voice 1... ',
-                    MusicXMLWarning, stacklevel=2)
+                              + 'no previous voice tag was given.  Assuming voice 1... ',
+                              MusicXMLWarning, stacklevel=2)
                 useVoice = 1
 
         thisVoice: stream.Voice|None = None
@@ -5155,10 +5164,16 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 rb.addSpannedElements(m)
 
             if mxEndingObj.get('type') == 'start':
-                mxNumber = mxEndingObj.get('number')
+                mxNumberStr = mxEndingObj.get('number')
+                if mxNumberStr is None:
+                    warnings.warn(f'number is required on <ending> object, {mxEndingObj}',
+                                  MusicXMLWarning,
+                                  stacklevel=2)
+                    mxNumberStr = '1'
+
                 # RepeatBracket handles comma-separated values, such as "1,2"
                 try:
-                    rb.number = mxNumber
+                    rb.number = mxNumberStr
                 except spanner.SpannerException:
                     rb.number = 1
 
@@ -5178,6 +5193,16 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
                 rb.completeStatus = True
 
             # set number; '' or None is interpreted as 1
+
+        # a barline may also carry a segno or coda (MusicXML allows both inside <barline>);
+        # put them in the measure where the barline is, as a direction would
+        for tag, markClass in (('segno', repeat.Segno), ('coda', repeat.Coda)):
+            mxMark = mxBarline.find(tag)
+            if mxMark is not None:
+                rm = markClass()
+                synchronizeIds(mxMark, rm)
+                self.setPosition(mxMark, rm)
+                self.insertCoreAndRef(self.offsetMeasureNote, None, rm)
 
         if barline.location == 'left':
             # environLocal.printDebug(['setting left barline', barline])
@@ -5518,11 +5543,11 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             for mxSound in mxDirection.findall('sound'):
                 if 'tempo' not in mxSound.attrib:
                     continue
-                # setSoundTempo is defined in xmlSoundParser.py
-                self.setSound(mxSound,
-                              mxDirection,
-                              staffKey,
-                              totalOffset)
+                # setSound is defined in xmlSoundParser.py
+                xmlSoundParser.setSound(self,
+                                        mxSound,
+                                        mxDir=mxDirection,
+                                        totalOffset=totalOffset)
                 break
 
         # TODO: musicxml 4:listening
@@ -5891,7 +5916,8 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         mxOctaveChange = mxTranspose.find('octave-change')
         if mxOctaveChange is not None:
             octaveChange = int(mxOctaveChange.text) * 12
-            diatonicStep += 7 * int(mxOctaveChange.text)
+            if diatonicStep is not None:
+                diatonicStep += 7 * int(mxOctaveChange.text)
         # TODO: presently not dealing with <double>
 
         # doubled one octave down from what is currently written
@@ -6244,7 +6270,7 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
 
         ks.alteredPitches = alteredPitches
 
-    def nonTraditionalKeySignature(self, mxKey):
+    def nonTraditionalKeySignature(self, mxKey: ET.Element) -> key.KeySignature:
         # noinspection PyShadowingNames
         '''
         Returns a KeySignature object that represents a nonTraditional Key Signature
@@ -6273,17 +6299,17 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
         children = list(mxKey)
 
         lastTag = None
-        steps = []
-        alters = []
-        accidentals = []
+        steps: list[str] = []
+        alters: list[float] = []
+        accidentals: list[str|None] = []
 
         for c in children:
             tag = c.tag
             if lastTag == 'key-alter' and tag == 'key-step':
                 accidentals.append(None)
-            if tag == 'key-step':
+            if tag == 'key-step' and c.text:
                 steps.append(c.text)
-            elif tag == 'key-alter':
+            elif tag == 'key-alter' and c.text:
                 alters.append(float(c.text))
             elif tag == 'key-accidental':
                 accidentals.append(c.text)
@@ -6295,9 +6321,10 @@ class MeasureParser(SoundTagMixin, XMLParserBase):
             raise MusicXMLImportException(
                 'For non traditional signatures each step must have an alter')
 
-        ks = key.KeySignature(sharps=None)
+        ks = key.KeySignature()
+        ks.isNonTraditional = True
 
-        alteredPitches = []
+        alteredPitches: list[pitch.Pitch] = []
         for step, alter, accidental in zip(steps, alters, accidentals):
             p = pitch.Pitch(step)
             if accidental is not None:

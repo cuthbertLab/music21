@@ -315,7 +315,7 @@ class GuitarFretBoard(FretBoard):
 
 class UkeleleFretBoard(FretBoard):
     '''
-    A four-string fretboard tuned to G C E A
+    A four-string fretboard tuned to G C E A.
     '''
 
     def __init__(self, fretNotes=None, displayFrets=4):
@@ -327,7 +327,7 @@ class UkeleleFretBoard(FretBoard):
 
 class BassGuitarFretBoard(FretBoard):
     '''
-    A four-string fretboard tuned to E A D G
+    A four-string fretboard tuned to E A D G.
     '''
 
     def __init__(self, fretNotes=None, displayFrets=4):
@@ -339,7 +339,7 @@ class BassGuitarFretBoard(FretBoard):
 
 class MandolinFretBoard(FretBoard):
     '''
-    A four-string fretboard tuned to G D A E
+    A four-string fretboard tuned to G D A E.
     '''
 
     def __init__(self, fretNotes=None, displayFrets=4):
@@ -363,8 +363,7 @@ class Test(unittest.TestCase):
         self.assertEqual(FretNote().string, None)
 
     def testFretNoteWeirdRepr(self):
-        from music21 import tablature
-        weirdFretNote = tablature.FretNote(6, 133)
+        weirdFretNote = FretNote(6, 133)
 
         expectedRepr = '<music21.tablature.FretNote 6th string, 133rd fret>'
 

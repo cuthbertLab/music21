@@ -5,7 +5,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -14,6 +14,7 @@ Tools for working with files
 from __future__ import annotations
 
 import codecs
+from collections.abc import Sequence
 import contextlib  # for with statements
 import gzip
 import io
@@ -22,11 +23,14 @@ import pickle
 import os
 import subprocess
 import typing as t
+import zipfile
 
 from music21.exceptions21 import Music21Exception
 
 __all__ = [
+    'MAX_UNCOMPRESSED_BYTES',
     'readFileEncodingSafe',
+    'readZipMember',
     'readPickleGzip',
     'cd',
     'preparePathClassesForUnpickling',
@@ -35,8 +39,52 @@ __all__ = [
 ]
 
 
+MAX_UNCOMPRESSED_BYTES = 256 * 1024 * 1024
+'''
+The largest number of bytes that music21 will uncompress from one member of a
+compressed file (.mxl, .capx, zipped MuseData, compressed .nwc).
+'''
+
+
+def readZipMember(
+    zipFile: zipfile.ZipFile,
+    name: str,
+    exceptionClass: type[Exception] = Music21Exception,
+) -> bytes:
+    '''
+    Return the uncompressed contents of the member `name` of `zipFile`.
+
+    Raises `exceptionClass` if the member holds more than
+    `MAX_UNCOMPRESSED_BYTES` bytes.
+
+    >>> import io, zipfile
+    >>> buffer = io.BytesIO()
+    >>> with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+    ...     zf.writestr('score.xml', '<score/>')
+    >>> with zipfile.ZipFile(buffer) as zf:
+    ...     common.readZipMember(zf, 'score.xml')
+    b'<score/>'
+
+    AI-assisted (Claude).
+    '''
+    limit = MAX_UNCOMPRESSED_BYTES
+    tooLargeMessage = f'{name!r} uncompresses to more than {limit} bytes'
+    zipInfo = zipFile.getinfo(name)
+    if zipInfo.file_size > limit:
+        raise exceptionClass(tooLargeMessage)
+    chunks: list[bytes] = []
+    totalSize = 0
+    with zipFile.open(zipInfo) as member:
+        while chunk := member.read(1024 * 1024):
+            totalSize += len(chunk)
+            if totalSize > limit:
+                raise exceptionClass(tooLargeMessage)
+            chunks.append(chunk)
+    return b''.join(chunks)
+
+
 @contextlib.contextmanager
-def cd(targetDir):
+def cd(targetDir: str|pathlib.Path) -> t.Generator[None, None, None]:
     '''
     Useful for a temporary cd for use in a `with` statement:
 
@@ -74,7 +122,7 @@ def readPickleGzip(filePath: str|pathlib.Path) -> t.Any:
     restorePathClassesAfterUnpickling()
     return newMdb
 
-def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
+def readFileEncodingSafe(filePath: str|pathlib.Path, firstGuess: str = 'utf-8') -> str:
     # noinspection PyShadowingNames
     r'''
     Slow, but will read a file of unknown encoding as safely as possible using
@@ -127,7 +175,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
 
 _storedPathlibClasses = {'posixPath': pathlib.PosixPath, 'windowsPath': pathlib.WindowsPath}
 
-def preparePathClassesForUnpickling():
+def preparePathClassesForUnpickling() -> None:
     '''
     When we need to unpickle a function that might have relative paths
     (like some music21 stream options), Windows chokes if the PosixPath
@@ -135,25 +183,26 @@ def preparePathClassesForUnpickling():
     '''
     from music21.common.misc import getPlatform
     platform = getPlatform()
+    # deliberately swap the pathlib classes so cross-platform pickles can load
     if platform == 'win':
-        pathlib.PosixPath = pathlib.WindowsPath
+        pathlib.PosixPath = pathlib.WindowsPath  # type: ignore[misc, assignment]
     else:
-        pathlib.WindowsPath = pathlib.PosixPath
+        pathlib.WindowsPath = pathlib.PosixPath  # type: ignore[misc, assignment]
 
 
-def restorePathClassesAfterUnpickling():
+def restorePathClassesAfterUnpickling() -> None:
     '''
     After unpickling, leave pathlib alone.
     '''
     from music21.common.misc import getPlatform
     platform = getPlatform()
     if platform == 'win':
-        pathlib.PosixPath = _storedPathlibClasses['posixPath']
+        pathlib.PosixPath = _storedPathlibClasses['posixPath']  # type: ignore[misc, assignment]
     else:
-        pathlib.WindowsPath = _storedPathlibClasses['windowsPath']
+        pathlib.WindowsPath = _storedPathlibClasses['windowsPath']  # type: ignore[misc, assignment]
 
 
-def runSubprocessCapturingStderr(subprocessCommand):
+def runSubprocessCapturingStderr(subprocessCommand: Sequence[str|pathlib.Path]) -> None:
     '''
     Run a subprocess command, capturing stderr and
     only show the error if an exception is raised.

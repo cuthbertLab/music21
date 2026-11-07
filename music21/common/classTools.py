@@ -73,8 +73,8 @@ def isNum(usrData: t.Any) -> t.TypeGuard[t.Union[float, int, Fraction]]:
 
     This function does not use `isinstance(usrData, Rational)` which is 2-6 times slower
     than calling this function (except in the case of Fraction, when
-    it's 6 times faster, but that's rarer).  (6 times slower on Py3.4, now
-    only 2x slower in Python 3.10)
+    it's 6 times faster, but that's rarer).  (6 times slower on Py3.4, only 2x slower
+    in Python 3.10)
 
     Runs by adding 0 to the "number" -- so anything that implements
     adding with a scalar will pass.  Thus, this Decimal number is technically incorrectly typed
@@ -84,7 +84,6 @@ def isNum(usrData: t.Any) -> t.TypeGuard[t.Union[float, int, Fraction]]:
     >>> from decimal import Decimal
     >>> common.isNum(Decimal('2.0'))
     True
-
     '''
     # noinspection PyBroadException
     try:
@@ -136,7 +135,7 @@ def isIterable(usrData: t.Any) -> t.TypeGuard[Iterable]:
     >>> common.isIterable(stream.Stream())
     True
 
-    Ranges are not iterators by python 3, but return True
+    Ranges are not iterators by Python 3, but return True
 
     >>> common.isIterable(range(20))
     True
@@ -230,7 +229,10 @@ def classToClassStr(classObj: type) -> str:
     return str(classObj).rsplit('.', maxsplit=1)[-1][:-2]
 
 
-def getClassSet(instance, classNameTuple=None):
+def getClassSet(
+    instance: object,
+    classNameTuple: tuple[str, ...]|None = None
+) -> frozenset[str|type]:
     '''
     Return the classSet for an instance (whether a Music21Object or something else).
     See base.Music21Object.classSet for more details.
@@ -280,7 +282,11 @@ TEMP_ATTRIBUTE_SENTINEL = object()
 
 
 @contextlib.contextmanager
-def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
+def tempAttribute(
+    obj: object,
+    attribute: str,
+    new_val: t.Any = TEMP_ATTRIBUTE_SENTINEL
+) -> t.Generator[None, None, None]:
     '''
     Temporarily set an attribute in an object to another value
     and then restore it afterwards.
@@ -309,7 +315,7 @@ def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
         setattr(obj, attribute, tempStorage)
 
 @contextlib.contextmanager
-def saveAttributes(obj, *attributeList: str) -> t.Generator[None, None, None]:
+def saveAttributes(obj: object, *attributeList: str) -> t.Generator[None, None, None]:
     '''
     Save a number of attributes in an object and then restore them afterwards.
 

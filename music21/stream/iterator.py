@@ -25,7 +25,7 @@ import warnings
 from music21 import common
 from music21.common.classTools import tempAttribute, saveAttributes
 from music21.common.enums import OffsetSpecial
-from music21.common.types import M21ObjType, OffsetQLIn, StreamType, ChangedM21ObjType
+from music21.common.types import OffsetQLIn, StreamType, ChangedM21ObjType
 from music21 import note
 from music21.stream import filters
 from music21 import prebase
@@ -42,7 +42,7 @@ S = t.TypeVar('S')
 StreamIteratorType = t.TypeVar('StreamIteratorType', bound='StreamIterator')
 
 # pipe | version not passing mypy.
-FilterType = t.Union[Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
+type FilterType = t.Union[Callable[[t.Any, t.Optional[t.Any]], t.Any], filters.StreamFilter]
 
 
 # -----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ class ActiveInformation(t.TypedDict, total=False):
 
 
 # -----------------------------------------------------------------------------
-class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
+class StreamIterator[M21ObjType: base.Music21Object](prebase.ProtoM21Object, Sequence[M21ObjType]):
     '''
     An Iterator object used to handle getting items from Streams.
     The :meth:`~music21.stream.Stream.__iter__` method
@@ -204,10 +204,10 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                 continue
 
             self.elementIndex += 1
-            if self.matchesFilters(e) is False:
+            if not self.matchesFilters(e):
                 continue
 
-            if self.restoreActiveSites is True:
+            if self.restoreActiveSites:
                 self.srcStream.coreSelfActiveSite(e)
 
             self.updateActiveInformation()
@@ -219,7 +219,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
     def __getattr__(self, attr):
         '''
-        DEPRECATED in v8 -- will be removed in v9.
+        DEPRECATED in v8 -- will be removed in soon.
 
         In case an attribute is defined on Stream but not on a StreamIterator,
         create a Stream and then return that attribute.  This is NOT performance
@@ -466,7 +466,6 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
         0
         >>> bool(iterator.getElementsByClass(chord.Chord))
         False
-
         '''
         if self._len is not None:
             return bool(self._len)
@@ -739,9 +738,8 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
                     if f(e, self) is False:
                         return False
                 except TypeError:  # one element filters are acceptable.
-                    if t.TYPE_CHECKING:
-                        assert isinstance(f, filters.StreamFilter)
-                    if f(e) is False:
+                    streamFilter = t.cast(filters.StreamFilter, f)
+                    if streamFilter(e) is False:
                         return False
             except StopIteration:  # pylint: disable=try-except-raise
                 raise  # clearer this way to see that this can happen
@@ -1505,7 +1503,7 @@ class StreamIterator(prebase.ProtoM21Object, Sequence[M21ObjType]):
 
 
 # -----------------------------------------------------------------------------
-class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
+class OffsetIterator[M21ObjType: base.Music21Object](StreamIterator, Sequence[list[M21ObjType]]):
     '''
     An iterator that with each iteration returns a list of elements
     that are at the same offset (or all at end)
@@ -1670,7 +1668,9 @@ class OffsetIterator(StreamIterator, Sequence[list[M21ObjType]]):
 
 
 # -----------------------------------------------------------------------------
-class RecursiveIterator(StreamIterator[M21ObjType], Sequence[M21ObjType]):
+class RecursiveIterator[M21ObjType: base.Music21Object](
+    StreamIterator[M21ObjType], Sequence[M21ObjType]
+):
     '''
     One of the most powerful iterators in music21.  Generally not called
     directly, but created by being invoked on a stream with `Stream.recurse()`
@@ -1811,11 +1811,9 @@ class RecursiveIterator(StreamIterator[M21ObjType], Sequence[M21ObjType]):
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.
             if e.isStream:
-                if t.TYPE_CHECKING:
-                    assert isinstance(e, streamModule.Stream)
-
+                eStream = t.cast('streamModule.Stream', e)
                 childRecursiveIterator: RecursiveIterator[M21ObjType] = RecursiveIterator(
-                    srcStream=e,
+                    srcStream=eStream,
                     restoreActiveSites=self.restoreActiveSites,
                     filterList=self.filters,  # shared list
                     activeInformation=self.activeInformation,  # shared dict
@@ -1828,10 +1826,10 @@ class RecursiveIterator(StreamIterator[M21ObjType], Sequence[M21ObjType]):
 
                 childRecursiveIterator.iteratorStartOffsetInHierarchy = newStartOffset
                 self.childRecursiveIterator = childRecursiveIterator
-            if self.matchesFilters(e) is False:
+            if not self.matchesFilters(e):
                 continue
 
-            if self.restoreActiveSites is True:
+            if self.restoreActiveSites:
                 self.srcStream.coreSelfActiveSite(e)
 
             self.updateActiveInformation()
@@ -2133,8 +2131,6 @@ class Test(unittest.TestCase):
 
     def testAddingFiltersMidRecursiveIteration(self):
         from music21 import stream
-        # noinspection PyUnresolvedReferences
-        from music21.stream.iterator import RecursiveIterator as ImportedRecursiveIterator
         m = stream.Measure()
         r = note.Rest()
         n = note.Note()
@@ -2150,7 +2146,7 @@ class Test(unittest.TestCase):
         self.assertIs(p0, p)
 
         child = sIter.childRecursiveIterator
-        self.assertIsInstance(child, ImportedRecursiveIterator)
+        self.assertIsInstance(child, RecursiveIterator)
 
 
 
