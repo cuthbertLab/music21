@@ -823,11 +823,11 @@ def correctRNAlterationForMinor(
     For a chord whose quality is minor, diminished, or half-diminished, a raised
     root is implied by the lowercase numeral, so the sharp prefix is removed.
 
-    Take for instance, the figure tuple of a B-natural in C minor:
+    Start with a figure tuple of a B-natural in C minor:
 
     >>> ft_b_in_c_minor = roman.FigureTuple.fromPitchAndReference(
     ...     pitch.Pitch('B5'),
-    ...     key.Key('c'),
+    ...     key.Key('c'),  # lowercase = minor
     ...     pitch.Pitch('C3'),
     ... )
 
