@@ -279,6 +279,7 @@ class MeterTerminal(prebase.ProtoM21Object, MeterNode, FrozenObject):
 
     __slots__ = (
         '_denominator',
+        '_frozenHash',
         '_numerator',
         '_weight',
     )
@@ -444,15 +445,13 @@ class MeterTerminal(prebase.ProtoM21Object, MeterNode, FrozenObject):
 
 # -----------------------------------------------------------------------------
 
-_meterTerminalCache: dict[tuple[int, int, float], MeterTerminal] = {}
-
-
+@lru_cache(1024)
 def getMeterTerminal(numerator: int, denominator: int,
                      weight: float = 1.0) -> MeterTerminal:
     '''
     Return a :class:`MeterTerminal` with these values, reusing the one from an
     earlier call if there is one.  MeterTerminals cannot change, so every plain
-    1/4 can safely be the same object.
+    1/4 can safely be the same object.  The 1024 most recently used are kept.
 
     >>> quarter = meter.core.getMeterTerminal(1, 4)
     >>> quarter
@@ -465,12 +464,7 @@ def getMeterTerminal(numerator: int, denominator: int,
     >>> meter.core.getMeterTerminal(1, 4, weight=0.5) is quarter
     False
     '''
-    key = (numerator, denominator, weight)
-    cached = _meterTerminalCache.get(key)
-    if cached is None:
-        cached = MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
-        _meterTerminalCache[key] = cached
-    return cached
+    return MeterTerminal(numerator=numerator, denominator=denominator, weight=weight)
 
 
 # -----------------------------------------------------------------------------
@@ -548,6 +542,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
 
     __slots__ = (
         '_denominator',
+        '_frozenHash',
         '_numerator',
         '_partition',
         'parenthesis',
@@ -2097,11 +2092,7 @@ class MeterSequence(prebase.ProtoM21Object, MeterNode, FrozenObject):
 # -----------------------------------------------------------------------------
 # functions that build MeterSequences
 
-_meterSequenceCache: dict[
-    tuple[int, int, tuple, bool, bool], MeterSequence
-] = {}
-
-
+@lru_cache(4096)
 def makeSequence(
     numerator: int,
     denominator: int,
@@ -2112,25 +2103,21 @@ def makeSequence(
 ) -> MeterSequence:
     '''
     Return a MeterSequence from parts already worked out, reusing the one from an
-    earlier call if there is one.  Nothing checks that `partition` adds up to
-    `numerator` over `denominator`, so this is faster than :func:`getMeterSequence`:
+    earlier call if there is one.  The 4096 most recently used are kept.  Nothing
+    checks that `partition` adds up to `numerator` over `denominator`, so this is
+    faster than :func:`getMeterSequence`:
 
     >>> quarter = meter.core.getMeterTerminal(1, 4)
     >>> fourBeats = meter.core.makeSequence(4, 4, (quarter, quarter, quarter, quarter))
     >>> fourBeats
     <music21.meter.core.MeterSequence {1/4+1/4+1/4+1/4}>
     '''
-    key = (numerator, denominator, partition, parenthesis, summedNumerator)
-    cached = _meterSequenceCache.get(key)
-    if cached is not None:
-        return cached
     ms = MeterSequence.__new__(MeterSequence)
     object.__setattr__(ms, '_numerator', numerator)
     object.__setattr__(ms, '_denominator', denominator)
     object.__setattr__(ms, '_partition', partition)
     object.__setattr__(ms, 'parenthesis', parenthesis)
     object.__setattr__(ms, 'summedNumerator', summedNumerator)
-    _meterSequenceCache[key] = ms
     return ms
 
 

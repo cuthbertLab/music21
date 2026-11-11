@@ -15,6 +15,7 @@ as well as component objects for defining nested metrical structures,
 '''
 from __future__ import annotations
 
+from collections import OrderedDict
 from collections.abc import Sequence
 import copy
 import fractions
@@ -42,10 +43,11 @@ environLocal = environment.Environment('meter')
 # The sequences TimeSignature.load() made for each (value, divisions), in the order
 # (displaySequence, beamSequence, beatSequence, accentSequence).  Sequences cannot
 # change, so every later TimeSignature('4/4') can use the same ones and skip building them.
-_defaultSequenceCache: dict[
+_defaultSequenceCache: OrderedDict[
     tuple[str, t.Any],
     tuple[MeterSequence, MeterSequence, MeterSequence, MeterSequence],
-] = {}
+] = OrderedDict()
+_DEFAULT_SEQUENCE_CACHE_SIZE = 512
 
 if t.TYPE_CHECKING:
     from music21.common.types import OffsetQL, OffsetQLIn
@@ -614,6 +616,7 @@ class TimeSignature(TimeSignatureBase):
         except TypeError:
             cacheable = False  # rare: cannot be a dictionary key, so skip the cache
         if cached is not None:
+            _defaultSequenceCache.move_to_end(cacheKey)
             (self.displaySequence, self.beamSequence,
              self.beatSequence, self.accentSequence) = cached
             return
@@ -654,6 +657,8 @@ class TimeSignature(TimeSignatureBase):
             _defaultSequenceCache[cacheKey] = (
                 self.displaySequence, self.beamSequence,
                 self.beatSequence, self.accentSequence)
+            while len(_defaultSequenceCache) > _DEFAULT_SEQUENCE_CACHE_SIZE:
+                _defaultSequenceCache.popitem(last=False)
 
     @property
     def ratioString(self):
