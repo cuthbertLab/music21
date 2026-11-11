@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import copy
 import random
+import time
 import unittest
 
 from music21 import common
@@ -19,6 +20,7 @@ from music21 import duration
 from music21.exceptions21 import MeterException
 from music21 import note
 from music21 import stream
+from music21.exceptions21 import TimeSignatureException
 from music21.meter.base import TimeSignature
 from music21.meter.core import (
     MeterSequence, MeterTerminal, getMeterSequence, getMeterTerminal,
@@ -824,6 +826,35 @@ class Test(unittest.TestCase):
         self.assertNotEqual(TimeSignature(), note.Note())
         self.assertNotEqual(note.Note(), TimeSignature())
         # NB: not self.assertRaises(AttributeError). Do we want that instead?
+
+    def testLargeNumeratorAccentWeights(self):
+        '''
+        A TimeSignature with hundreds of beats is built quickly and gets
+        the same accent pattern on every beat.
+        '''
+        start = time.perf_counter()
+        ts = TimeSignature('512/8')
+        elapsed = time.perf_counter() - start
+        self.assertLess(elapsed, 2.0)
+        self.assertEqual(len(ts.beatSequence), 512)
+        weights = [mt.weight for mt in ts.accentSequence]
+        self.assertEqual(len(weights), 2048)
+        self.assertEqual(weights[:8], [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125])
+        self.assertEqual(weights[8:], [0.5, 0.125, 0.25, 0.125] * 510)
+
+    def testNumeratorLimit(self):
+        '''
+        A numerator above 10,000 raises a TimeSignatureException, and setting one
+        leaves an existing TimeSignature as it was.
+        '''
+        for value in ('99999999/1', '10001/4', '5000+5001/8'):
+            with self.assertRaises(TimeSignatureException):
+                TimeSignature(value)
+        ts = TimeSignature('3/4')
+        with self.assertRaises(TimeSignatureException):
+            ts.numerator = 99999999
+        self.assertEqual(ts.ratioString, '3/4')
+        self.assertEqual(len(ts.beatSequence), 3)
 
 
 if __name__ == '__main__':
