@@ -45,6 +45,7 @@ from music21.common.types import (
 )
 from music21 import clef
 from music21 import chord
+from music21 import converter
 from music21 import defaults
 from music21 import derivation
 from music21 import duration
@@ -14527,7 +14528,7 @@ class Opus(Stream):
         if not self.scores:
             return None
 
-        if fmt is not None and 'lily' in fmt:
+        if converter.writesUnifiedOpusFiles(fmt):
             return Stream.write(self, fmt, fp, **keywords)
         elif common.runningInNotebook():
             return Stream.write(self, fmt, fp, **keywords)
