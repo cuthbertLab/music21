@@ -9,6 +9,9 @@ on:
         branches:
         - '*'
 
+permissions:
+    contents: read
+
 env:
     # We run coverage on a middle supported Python so that failures on newest and
     # oldest versions return first.
