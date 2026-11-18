@@ -111,9 +111,6 @@ class MeterNode:
         '''
         return self._durationFromNumeratorDenominator(self.numerator, self.denominator)
 
-    def _reprInternal(self):
-        return str(self)
-
     def ratioEqual(self, other) -> bool:
         '''
         Compare the numerator and denominator of another object.
@@ -2310,21 +2307,29 @@ def _getAtPath(root: MeterSequence, path: tuple[int, ...]) -> MeterNode:
     return node
 
 
-def _replaceAtPath(root: MeterSequence, path: tuple[int, ...], newNode) -> MeterSequence:
+def _replaceAtPaths(
+    node: MeterNode,
+    replacements: dict[tuple[int, ...], MeterNode],
+    ancestors: set[tuple[int, ...]],
+    path: tuple[int, ...] = (),
+) -> MeterNode:
     '''
-    Return a new `root` with whatever is at `path` replaced by `newNode`.
+    Return `node` with each node at a path in `replacements` replaced, rebuilding
+    only the sequences in `ancestors`, the paths above a replacement.
 
     >>> ms = meter.MeterSequence('2/4', 2).subdividedPartitionsEqual(2)
     >>> sixteenths = ms[1][0].subdivide(2)
-    >>> meter.core._replaceAtPath(ms, (1, 0), sixteenths)
+    >>> meter.core._replaceAtPaths(ms, {(1, 0): sixteenths}, {(), (1,)})
     <music21.meter.core.MeterSequence {{1/8+1/8}+{{1/16+1/16}+1/8}}>
     '''
-    idx = path[0]
-    if len(path) == 1:
-        return root.setIndex(idx, newNode)
-    child = t.cast('MeterSequence', root[idx])
-    newChild = _replaceAtPath(child, path[1:], newNode)
-    return root.setIndex(idx, newChild)
+    if path in replacements:
+        return replacements[path]
+    if path not in ancestors:
+        return node
+    sequence = t.cast('MeterSequence', node)
+    newPartition = [_replaceAtPaths(child, replacements, ancestors, path + (i,))
+                    for i, child in enumerate(sequence)]
+    return sequence._rebuild(newPartition)
 
 
 def _subdivideNestedByPaths(
@@ -2335,7 +2340,7 @@ def _subdivideNestedByPaths(
     '''
     Call :meth:`MeterSequence.subdividedPartitionsEqual` on each MeterSequence at
     `paths`.  Returns the new root and the paths to what is now inside them, ready
-    to pass back in to go one level deeper.
+    to pass back in to go one level deeper.  No path may lie inside another.
 
     >>> root = meter.MeterSequence('4/4').partitioned(1).subdividedPartitionsEqual(2)
     >>> root
@@ -2343,14 +2348,17 @@ def _subdivideNestedByPaths(
     >>> meter.core._subdivideNestedByPaths(root, [(0,)], 2)
     (<music21.meter.core.MeterSequence {{{1/4+1/4}+{1/4+1/4}}}>, [(0, 0), (0, 1)])
     '''
+    replacements: dict[tuple[int, ...], MeterNode] = {}
     newPaths: list[tuple[int, ...]] = []
     for p in paths:
         node = t.cast('MeterSequence', _getAtPath(root, p))
         newNode = node.subdividedPartitionsEqual(divisions)
-        root = _replaceAtPath(root, p, newNode)
+        replacements[p] = newNode
         for j in range(len(newNode)):
             newPaths.append(p + (j,))
-    return root, newPaths
+    ancestors = {p[:k] for p in paths for k in range(len(p))}
+    newRoot = t.cast('MeterSequence', _replaceAtPaths(root, replacements, ancestors))
+    return newRoot, newPaths
 
 
 if __name__ == '__main__':
