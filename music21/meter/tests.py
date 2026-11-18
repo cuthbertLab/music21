@@ -13,6 +13,7 @@ from __future__ import annotations
 import copy
 import random
 import unittest
+from unittest import mock
 
 from music21 import common
 from music21 import duration
@@ -131,18 +132,12 @@ class Test(unittest.TestCase):
         self.assertNotEqual(e, f)
 
     def testMeterTerminalCache(self):
-        # this is an internal test, so it inspects the private cache directly
-        from music21.meter.core import _meterTerminalCache
-        # the cache key is (numerator, denominator, weight); asking again gives
-        # the same object
         a = getMeterTerminal(1, 4)
-        self.assertIs(_meterTerminalCache[(1, 4, 1.0)], a)
         self.assertIs(a, getMeterTerminal(1, 4))
-        self.assertIs(a, getMeterTerminal(numerator=1, denominator=4, weight=1.0))
-        # a different weight is a different terminal, stored under its own key
+        self.assertEqual(a, getMeterTerminal(numerator=1, denominator=4, weight=1.0))
         b = getMeterTerminal(1, 4, weight=0.5)
         self.assertIsNot(a, b)
-        self.assertIs(_meterTerminalCache[(1, 4, 0.5)], b)
+        self.assertIs(b, getMeterTerminal(1, 4, weight=0.5))
         # equal however they were made
         self.assertEqual(MeterTerminal('1/4'), getMeterTerminal(1, 4))
 
@@ -165,13 +160,9 @@ class Test(unittest.TestCase):
             a.modify(parenthesis=True)
 
     def testMeterSequenceCache(self):
-        # this is an internal test, so it inspects the private caches directly
-        from music21.meter.core import _meterSequenceCache
         from music21.meter.base import _defaultSequenceCache
-        # asking again gives the same object, the one in the cache
         ms = getMeterSequence('4/4', 4)
         self.assertIs(getMeterSequence('4/4', 4), ms)
-        self.assertTrue(any(cached is ms for cached in _meterSequenceCache.values()))
         # TimeSignature.load caches (display, beam, beat, accent) sequences by
         # (value, divisions); a second 4/4 uses the same ones
         a = TimeSignature('4/4')
@@ -184,6 +175,48 @@ class Test(unittest.TestCase):
         for seqName in ('beamSequence', 'beatSequence',
                         'accentSequence', 'displaySequence'):
             self.assertIs(getattr(a, seqName), getattr(b, seqName), seqName)
+
+    def testCachesAreBounded(self):
+        from music21.meter import base as meterBase
+        cache = meterBase._defaultSequenceCache
+        first = TimeSignature('4/4')
+        with mock.patch.object(meterBase, '_DEFAULT_SEQUENCE_CACHE_SIZE', 4):
+            for numerator in range(1, 9):
+                TimeSignature(f'{numerator}/64')
+                TimeSignature('4/4')
+            self.assertLessEqual(len(cache), 4)
+            self.assertIn(('4/4', None), cache)
+            self.assertNotIn(('1/64', None), cache)
+            self.assertIs(TimeSignature('4/4').beatSequence, first.beatSequence)
+            evicted = TimeSignature('1/64')
+            self.assertEqual(evicted.beatSequence, MeterSequence('1/64'))
+
+    def testHashIsCached(self):
+        import pickle
+        a = MeterSequence('6/8', 2)
+        b = MeterSequence('6/8', 2)
+        self.assertIsNone(a._frozenHash)
+        h = hash(a)
+        self.assertEqual(a._frozenHash, h)
+        self.assertEqual(hash(a), h)
+        self.assertIsNone(b._frozenHash)
+        self.assertEqual(a, b)
+        self.assertEqual(hash(b), h)
+        self.assertNotIn('_frozenHash', a._getSlotsRecursive())
+        self.assertNotIn('_frozenHash', a.__getstate__())
+        self.assertIs(copy.deepcopy(a), a)
+        for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
+            loaded = pickle.loads(pickle.dumps(a, protocol))
+            self.assertIsNone(loaded._frozenHash, protocol)
+            self.assertEqual(loaded, a)
+            self.assertEqual(hash(loaded), h)
+        mt = MeterTerminal('3/8')
+        self.assertIsNone(mt._frozenHash)
+        self.assertEqual(hash(mt), mt._frozenHash)
+        fd = duration.FrozenDuration(1.5)
+        self.assertIsNone(fd._frozenHash)
+        self.assertEqual(hash(fd), fd._frozenHash)
+        self.assertEqual(hash(fd), hash(duration.FrozenDuration(1.5)))
 
     def testMeterSequenceModify(self):
         a = MeterSequence('4/4', 4)

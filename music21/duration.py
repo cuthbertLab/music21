@@ -3133,7 +3133,7 @@ class FrozenDuration(common.objects.FrozenObject, Duration):
     >>> copy.deepcopy(fd) is fd
     True
     '''
-    __slots__ = ()
+    __slots__ = ('_frozenHash',)
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
