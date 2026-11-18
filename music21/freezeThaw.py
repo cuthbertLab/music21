@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2011-2026 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 r'''
@@ -708,6 +708,8 @@ class StreamThawer(StreamFreezeThawBase):
 
     In general use :func:`~music21.converter.parse` to read from a
     serialized file.
+
+    .. warning:: Thawing can run any code stored in the data.  Only thaw data you trust.
 
     >>> s = stream.Stream()
     >>> s.repeatAppend(note.Note('C4'), 8)

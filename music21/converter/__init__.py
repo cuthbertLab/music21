@@ -1501,6 +1501,8 @@ def thaw(fp, zipType='zlib'):
     '''
     Given a file path of a serialized Stream, defrost the file into a Stream.
 
+    .. warning:: Thawing can run any code stored in the file.  Only thaw files you trust.
+
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
 
     See the documentation for :meth:`~music21.converter.freeze` for demos.
@@ -1549,6 +1551,8 @@ def freezeStr(streamObj, fmt=None):
 def thawStr(strData):
     '''
     Given a serialization string, defrost into a Stream.
+
+    .. warning:: Thawing can run any code stored in the data.  Only thaw data you trust.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
     '''
