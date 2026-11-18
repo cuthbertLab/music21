@@ -2219,7 +2219,7 @@ class RomanNumeral(harmony.Harmony):
     # TODO: document better! what is inherited and what is new?
     _alterationRegex = re.compile(r'^(b+|-+|#+)')
     _omittedStepsRegex = re.compile(r'(\[(no[1-9]+)+]\s*)+')
-    _addedStepsRegex = re.compile(r'\[add(b*|-*|#*)(\d+)+]\s*')
+    _addedStepsRegex = re.compile(r'\[add(b*|-*|#*)(\d{1,2})]\s*')
     _bracketedAlterationRegex = re.compile(r'\[(b+|-+|#+)(\d+)]')
     _augmentedSixthRegex = re.compile(r'(It|Ger|Fr|Sw)\+?')
     _romanNumeralAloneRegex = re.compile(r'(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N)')
@@ -4958,6 +4958,13 @@ class Test(unittest.TestCase):
             with self.subTest(figure=fig):
                 with self.assertRaises(RomanNumeralException):
                     RomanNumeral(fig, 'C')
+
+    def testAddedStepsLongDigitRunFailsFast(self):
+        # CodeQL py/redos: (\d+)+ backtracked exponentially on a long unclosed digit run.
+        rn = RomanNumeral()
+        figure = '7[add' + '0' * 40 + 'x]'
+        self.assertEqual(rn._parseAddedSteps(figure), figure)
+        self.assertEqual(rn.addedSteps, [])
 
 
 class TestExternal(unittest.TestCase):
