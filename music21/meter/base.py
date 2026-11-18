@@ -27,6 +27,7 @@ from music21 import beam
 from music21 import common
 from music21.common.enums import MeterDivision
 from music21.common.numberTools import opFrac
+from music21 import defaults
 from music21 import duration
 from music21 import environment
 from music21.exceptions21 import MeterException, TimeSignatureException
@@ -34,7 +35,7 @@ from music21 import style
 
 from music21.meter.tools import slashToTuple, proportionToFraction
 from music21.meter.core import (
-    MeterSequence, getMeterSequence, getMeterTerminal, makeSequence,
+    MeterSequence, getMeterSequence, getMeterTerminal,
 )
 
 environLocal = environment.Environment('meter')
@@ -588,6 +589,9 @@ class TimeSignature(TimeSignatureBase):
         6
 
         Loading destroys all preexisting internal representations
+
+        The numerator, summed if the value has several parts, can be at most
+        `defaults.maxMeterNumerator` (10,000).  A larger one raises a TimeSignatureException.
         '''
         # create parallel MeterSequence objects to provide all data
         # these all refer to the same .numerator/.denominator
@@ -618,7 +622,13 @@ class TimeSignature(TimeSignatureBase):
              self.beatSequence, self.accentSequence) = cached
             return
 
-        self.displaySequence = getMeterSequence(value)
+        displaySequence = getMeterSequence(value)
+        if displaySequence.numerator > defaults.maxMeterNumerator:
+            raise TimeSignatureException(
+                'cannot make a TimeSignature with a numerator above '
+                f'{defaults.maxMeterNumerator}: {value}'
+            )
+        self.displaySequence = displaySequence
 
         # get simple representation; presently, only slashToTuple
         # supports the fast/slow indication
@@ -1178,11 +1188,7 @@ class TimeSignature(TimeSignatureBase):
 
     @summedNumerator.setter
     def summedNumerator(self, value: bool):
-        # displaySequence is immutable; swap in a copy with the new flag
-        ds = self.displaySequence
-        self.displaySequence = makeSequence(
-            ds.numerator, ds.denominator, ds._partition,
-            parenthesis=ds.parenthesis, summedNumerator=value)
+        self.displaySequence = self.displaySequence.modify(summedNumerator=value)
 
     # --------------------------------------------------------------------------
     # private methods -- most to be put into the various sequences.
@@ -1326,11 +1332,17 @@ class TimeSignature(TimeSignatureBase):
 
         # provide a partition for each flattened division
         accentCount = len(ms.flatten())
-        divStep = self.barDuration.quarterLength / accentCount
+        msDepth = ms.depth
+        levelStarts = []
+        for level in range(msDepth):
+            levelStarts.append({start for start, unused_end in ms.getLevelSpan(level)})
+        lowestSpans = ms.getLevelSpan(msDepth - 1)
         weightInts = [0] * accentCount  # weights as integer/depth counts
         for i in range(accentCount):
-            ql = opFrac(i * divStep)
-            weightInts[i] = ms.offsetToDepth(ql, align='quantize', index=i)
+            lowestStart = lowestSpans[i][0]
+            for starts in levelStarts:
+                if lowestStart in starts:
+                    weightInts[i] += 1
 
         maxInt = max(weightInts)
         weightValues = {}  # reference dictionary
@@ -1342,14 +1354,13 @@ class TimeSignature(TimeSignatureBase):
             weightValues[x + 1] = weightValueMin * pow(2, x)
 
         # set weights on accent partitions
-        self.accentSequence = self.accentSequence.partitioned([1] * accentCount)
-        for i in range(accentCount):
-            # get values from weightValues dictionary; terminals cannot
-            # change, so replace each with one of the new weight
-            mt = self.accentSequence[i]
-            self.accentSequence = self.accentSequence.setIndex(
-                i, getMeterTerminal(
-                    mt.numerator, mt.denominator, weight=weightValues[weightInts[i]]))
+        accentSequence = self.accentSequence.partitioned([1] * accentCount)
+        weighted = []
+        for i, mt in enumerate(accentSequence):
+            # get values from weightValues dictionary
+            weighted.append(getMeterTerminal(
+                mt.numerator, mt.denominator, weight=weightValues[weightInts[i]]))
+        self.accentSequence = accentSequence.modify(partition=weighted)
 
     # --------------------------------------------------------------------------
     # access data for other processing
