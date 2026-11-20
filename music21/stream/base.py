@@ -3222,6 +3222,7 @@ class Stream[M21ObjType: base.Music21Object](core.StreamCore):
                         sp.replaceSpannedElement(complexObj, objList[-1])
 
                 container.streamStatus.beams = False
+                container.streamStatus.tuplets = None
 
         # Handle "loose" objects in self (usually just Measure or Voice)
         processContainer(self)
