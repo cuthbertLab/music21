@@ -2143,12 +2143,12 @@ class ABCHandler:
         >>> ah.startsMetadata('A', ' ', 's')
         False
 
-        Pipe after colon indicates not metadata (bar info).
+        Pipe or colon after colon indicates not metadata (bar info).
         For example, we need to avoid misinterpreting repeat bars as metadata,
         e.g. `dAG FED:|2 dAG FGA|`
 
         This is incorrect, but we can avoid it by
-        looking for a leading pipe and returning False.
+        looking for a leading pipe or colon and returning False.
 
         >>> ah.startsMetadata('A', ':', '|')
         False
@@ -2160,7 +2160,7 @@ class ABCHandler:
             return False
         elif cNextNext is None:
             return False
-        elif cNextNext == '|':
+        elif cNextNext in ('|', ':'):
             return False
         elif c == 'w':
             return True  # special case, w:...
@@ -4049,6 +4049,18 @@ class Test(unittest.TestCase):
         ah = ABCHandler()
         ah.process(testFiles.graceTest)
         self.assertEqual(len(ah), 85)
+
+    def testDoubleRepeatAfterNote(self):
+        # https://github.com/cuthbertLab/music21/issues/202
+        # 'A::' must not be read as a metadata field like 'A:...'
+        for src in ('E F G A::B c', 'E F G A :: B c'):
+            ah = ABCHandler()
+            ah.tokenize(src)
+            self.assertEqual(
+                [t.src for t in ah.tokens],
+                ['E', 'F', 'G', 'A', ':|', '|:', 'B', 'c'],
+                src,
+            )
 
     def testGuineaPig(self):
         from music21.abcFormat import testFiles
