@@ -207,6 +207,7 @@ def abcToStreamPart(
             p.coreAppend(dst)
 
     p.coreElementsChanged()
+    matchChordTies(p)
 
     try:
         reBar(p, inPlace=True)
@@ -250,6 +251,43 @@ def abcToStreamPart(
     #     p = p.makeMeasures()
 
     return p
+
+
+def matchChordTies(p: stream.Part) -> None:
+    '''
+    A tie in ABC joins notes of the same pitch, so a tie into or out of a chord
+    holds only the pitches its neighbor shares.  Keep the tie on those notes
+    and drop it from the rest.
+
+    AI-assisted (Claude).
+
+    >>> s = converter.parse('L:1/4\\n[CEG]-[CEA]', format='abc')
+    >>> [[n.tie for n in c.notes] for c in s[chord.Chord]]
+    [[<music21.tie.Tie start>, <music21.tie.Tie start>, None],
+     [<music21.tie.Tie stop>, <music21.tie.Tie stop>, None]]
+    '''
+    notes = list(p.recurse().notes)
+    for left, right in zip(notes, notes[1:]):
+        if not (isinstance(left, chord.Chord) or isinstance(right, chord.Chord)):
+            continue
+        leftNotes = left.notes if isinstance(left, chord.Chord) else (left,)
+        rightNotes = right.notes if isinstance(right, chord.Chord) else (right,)
+        leftPitches = {n.pitch.ps for n in leftNotes}
+        rightPitches = {n.pitch.ps for n in rightNotes}
+        for n in leftNotes:
+            if n.tie is None or n.pitch.ps in rightPitches:
+                continue
+            if n.tie.type == 'start':
+                n.tie = None
+            elif n.tie.type == 'continue':
+                n.tie = tie.Tie('stop')
+        for n in rightNotes:
+            if n.tie is None or n.pitch.ps in leftPitches:
+                continue
+            if n.tie.type == 'stop':
+                n.tie = None
+            elif n.tie.type == 'continue':
+                n.tie = tie.Tie('start')
 
 
 def parseTokens(
@@ -379,6 +417,8 @@ def parseABCNote(
             acc = c.pitches[pIndex].accidental
             if acc is not None:
                 acc.displayStatus = accStatusList[pIndex]
+        if t.tie is not None:
+            c.tie = tie.Tie(t.tie)
         dst.coreAppend(c)
         return c
 
@@ -1230,6 +1270,21 @@ w:first second third
         notes = converter.parse('L:1/8\na-a-a', format='abc')
         ties = [n.tie.type for n in notes.flatten().notesAndRests]
         self.assertListEqual(ties, ['start', 'continue', 'stop'])
+
+    def testChordTiesTranslate(self):
+        from music21 import converter
+        s = converter.parse('L:1/4\n[CE]-[CE] [CEG]-[CEA]-[CEA]', format='abc')
+        chords = list(s[chord.Chord])
+
+        def ties(c: chord.Chord) -> list[str|None]:
+            return [n.tie.type if n.tie else None for n in c.notes]
+
+        self.assertEqual(ties(chords[0]), ['start', 'start'])
+        self.assertEqual(ties(chords[1]), ['stop', 'stop'])
+        # only the pitches the next chord shares are tied
+        self.assertEqual(ties(chords[2]), ['start', 'start', None])
+        self.assertEqual(ties(chords[3]), ['continue', 'continue', 'start'])
+        self.assertEqual(ties(chords[4]), ['stop', 'stop', 'stop'])
 
     def testReBarKeepsOverflowWithNoBestTimeSignature(self):
         from music21 import converter
