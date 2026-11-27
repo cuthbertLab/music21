@@ -718,8 +718,11 @@ class XMLParserBase:
             staffNumber = int(staffNumber)
             staffLayout.staffNumber = staffNumber
 
-        if hasattr(self, 'staffLayoutObjects') and hasattr(self, 'offsetMeasureNote'):
-            staffLayoutKey = ((staffNumber or 1), self.offsetMeasureNote)
+        # only numbered layouts are inserted (xmlPrint), so only they take <staff-details>
+        if (staffNumber is not None
+                and hasattr(self, 'staffLayoutObjects')
+                and hasattr(self, 'offsetMeasureNote')):
+            staffLayoutKey = (staffNumber, self.offsetMeasureNote)
             self.staffLayoutObjects[staffLayoutKey] = staffLayout
 
         if inputM21 is None:
