@@ -873,6 +873,27 @@ class Test(unittest.TestCase):
                 sizes.append(s.staffSize)
         self.assertEqual(sizes, [80.0, 120.0, 80.0])
 
+    def testStaffDetailsAfterEmptyStaffLayout(self):
+        # https://github.com/cuthbertLab/music21/issues/2233
+        # music21 writes a measure-1 StaffLayout this way
+        from music21 import converter
+        xml = '''<score-partwise version="4.0">
+            <part-list><score-part id="P1"><part-name>Triangle</part-name></score-part></part-list>
+            <part id="P1"><measure number="1">
+              <print><staff-layout/></print>
+              <attributes>
+                <divisions>1</divisions>
+                <clef><sign>percussion</sign></clef>
+                <staff-details><staff-lines>1</staff-lines></staff-details>
+              </attributes>
+              <note><unpitched><display-step>B</display-step><display-octave>4</display-octave>
+                </unpitched><duration>4</duration><type>whole</type></note>
+            </measure></part>
+        </score-partwise>'''
+        s = converter.parse(xml, format='musicxml')
+        staffLines = [sl.staffLines for sl in s[layout.StaffLayout]]
+        self.assertEqual(staffLines, [1])
+
     def testCountDynamics(self):
         '''
         good test of both dynamics and a PartStaff.

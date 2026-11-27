@@ -26,7 +26,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.__version__
-'11.0.0b18'
+'11.0.0b19'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
